@@ -1,0 +1,79 @@
+{
+  "runAt": "2026-09-26T11:54:17.367Z",
+  "browser": "153.0.4234.32",
+  "environment": "Windows / headless Chromium engine, viewport emulation; not real mobile devices",
+  "results": [
+    {
+      "name": "首页与无结果反馈",
+      "status": "passed"
+    },
+    {
+      "name": "拖动旋转不改变锚点与路线",
+      "status": "passed"
+    },
+    {
+      "name": "中心切换抽屉、缺失试听与单曲模拟",
+      "status": "passed"
+    },
+    {
+      "name": "合作依据作品可以留下",
+      "status": "passed"
+    },
+    {
+      "name": "清单移除、撤销与原位置恢复",
+      "status": "passed"
+    },
+    {
+      "name": "连续移动与回退分支记录",
+      "status": "passed"
+    },
+    {
+      "name": "模式切换不计移动、风格依据和返回恢复",
+      "status": "passed"
+    },
+    {
+      "name": "结束同一记录、刷新恢复与不自动播放",
+      "status": "passed"
+    },
+    {
+      "name": "挑战相同与不可达校验",
+      "status": "passed"
+    },
+    {
+      "name": "挑战计步、撤销、真实回访、重置确认",
+      "status": "passed"
+    },
+    {
+      "name": "挑战成功有效路径、歌曲隔离与刷新结果",
+      "status": "passed"
+    },
+    {
+      "name": "挑战返回恢复原漫游且不混入歌曲",
+      "status": "passed"
+    },
+    {
+      "name": "未完成挑战保存、历史继续与再次挑战",
+      "status": "passed"
+    },
+    {
+      "name": "历史删除仅影响一条记录",
+      "status": "passed"
+    },
+    {
+      "name": "手机和桌面宽度无横向溢出",
+      "status": "passed"
+    },
+    {
+      "name": "空清单结束与起点无关系",
+      "status": "passed"
+    },
+    {
+      "name": "保存失败反馈且当前界面可继续",
+      "status": "passed"
+    },
+    {
+      "name": "运行期间无未捕获页面异常",
+      "status": "passed"
+    }
+  ]
+}
