@@ -20,6 +20,12 @@ function songIsSaved(session, id) {
   return songs[id]?.dataset === 'real' ? getSavedMusic().some(item => item.id === id) : session.saved.some(item => item.id === id);
 }
 
+function currentSavedSongs(session) {
+  if (sessionDataset(session) !== 'real') return session.saved;
+  const savedIds = new Set(getSavedMusic().map(track => track.id));
+  return session.saved.filter(item => savedIds.has(item.id));
+}
+
 export function importLegacyMapMusic(api) {
   const tracks = api.getState().map.sessions.flatMap(session => session.saved
     .filter(item => songs[item.id]?.dataset === 'real')
@@ -181,15 +187,14 @@ function mapHTML(map, api, presentation = 'quiet') {
           ${!neighbors.length ? '<span class="map-stage__no-links">暂无收录连接</span>' : ''}
         </div>
       </div>
-      <aside class="map-artist-panel" aria-label="${escapeHTML(artist.name)}的作品与连接">
+      <aside class="map-artist-panel" aria-label="${escapeHTML(artist.name)}的作品">
         <div class="map-artist-panel__heading"><div><span class="map-card-label">${isReal ? '合作唱片' : '示例作品 · 无音频'}</span><h2>${escapeHTML(artist.name)}</h2></div><span class="map-artist-mark" style="--node-tone:${artist.color}" aria-hidden="true"></span></div>
         ${tracksHTML(session, artist.songIds, api, `在${artist.name}的${isReal ? '入选合作作品' : '示例作品'}中留下`)}
-        <details class="map-connections"><summary>全部连接 <span>${neighbors.length}</span></summary><div class="map-neighbor-list">${neighbors.map(edge => { const next = artistById[otherArtist(edge, node.id)]; return `<button type="button" class="map-neighbor" data-map-action="move" data-id="${next.id}" ${isComplete ? 'disabled' : ''}><span class="map-neighbor__tone" style="--node-tone:${next.color}" aria-hidden="true"></span><span><strong>${escapeHTML(next.name)}</strong><small>${edge.song ? `《${escapeHTML(songs[edge.song].title)}》` : escapeHTML(edge.reason)}</small></span>${api.icon('arrow-up-right')}</button>`; }).join('') || '<p class="map-inline-empty">本专题暂无收录。</p>'}</div></details>
       </aside>
     </div>
     <div class="map-studio-dock">
       ${discoveryHTML(session, api, map.undo)}
-      <div class="map-route-bar"><div class="map-route-controls">${button('back', api.icon('arrow-left'), 'icon-button', `aria-label="返回上一位${isChallenge ? '并撤销一步' : ''}" ${session.path.length < 2 || isComplete ? 'disabled' : ''}`)}${button('reset', api.icon('rotate'), 'icon-button', `aria-label="回到起点" ${session.path.length < 2 || isComplete ? 'disabled' : ''}`)}</div><div class="map-route-trail" aria-label="当前路线">${session.path.map((step, index) => `<span ${index === session.path.length - 1 ? 'aria-current="step"' : ''}>${escapeHTML(artistName(step.id))}</span>`).join('<span class="map-route-trail__arrow" aria-hidden="true">·</span>')}</div>${button('recap', `${session.saved.length} 首收藏`, 'button button--quiet', `data-session="${session.id}"`)}</div>
+      <div class="map-route-bar"><div class="map-route-controls">${button('back', api.icon('arrow-left'), 'icon-button', `aria-label="返回上一位${isChallenge ? '并撤销一步' : ''}" ${session.path.length < 2 || isComplete ? 'disabled' : ''}`)}${button('reset', api.icon('rotate'), 'icon-button', `aria-label="回到起点" ${session.path.length < 2 || isComplete ? 'disabled' : ''}`)}</div><div class="map-route-trail" aria-label="当前路线">${session.path.map((step, index) => `<span ${index === session.path.length - 1 ? 'aria-current="step"' : ''}>${escapeHTML(artistName(step.id))}</span>`).join('<span class="map-route-trail__arrow" aria-hidden="true">·</span>')}</div>${button('recap', `${currentSavedSongs(session).length} 首收藏`, 'button button--quiet', `data-session="${session.id}" data-map-saved-count="${session.id}"`)}</div>
     </div>
     ${undoHTML(map, api)}
     <div class="map-foot"><div>${isChallenge ? button('recap', isComplete ? '挑战结果' : '回顾路线', 'button button--quiet', `data-session="${session.id}"`) : button('finish', '结束探索', 'button button--quiet')}</div>${button('space', `${api.icon('users')} ${isReal ? '去同场' : isEventArtist ? '关联示例现场' : '示例现场'} ${api.icon('arrow-up-right')}`, 'button button--quiet map-space-link', `title="${isReal ? '为自己的活动创建房间，可返回这次探索' : '回声现场 · 虚构情景'}"`)}</div>
@@ -209,11 +214,12 @@ function visitedArtists(session) {
 
 function recapHTML(session, api) {
   const visited = visitedArtists(session);
+  const saved = currentSavedSongs(session);
   const currentRoute = session.path.map(step => artistName(step.id)).join(' → ');
   const isChallenge = session.type === 'challenge';
   return `<div class="map-recap-intro"><span class="eyebrow">${catalogueFor(session).label} · ${dateLabel(session.created)}</span><h2>${isChallenge && session.status === 'complete' ? `${session.path.length - 1} 步抵达${escapeHTML(artistName(session.target))}` : isChallenge ? '挑战回顾' : '探索回顾'}</h2></div>
-    <div class="map-recap-stats"><span><b>${visited.length}</b> 位艺人</span><span><b>${session.saved.length}</b> 首留下</span><span><b>${session.path.length - 1}</b> 步</span></div>
-    <section class="map-recap-section"><h3>留下的作品</h3>${session.saved.length ? tracksHTML(session, session.saved.map(item => item.id), api) : '<p class="map-inline-empty">还没有留下作品。</p>'}</section>
+    <div class="map-recap-stats"><span><b>${visited.length}</b> 位艺人</span><span><b>${saved.length}</b> 首留下</span><span><b>${session.path.length - 1}</b> 步</span></div>
+    <section class="map-recap-section"><h3>留下的作品</h3>${saved.length ? tracksHTML(session, saved.map(item => item.id), api) : '<p class="map-inline-empty">还没有留下作品。</p>'}</section>
     <section class="map-recap-section"><h3>${isChallenge && session.status === 'complete' ? '抵达路线' : '当前路线'}</h3><p class="map-current-route">${escapeHTML(currentRoute)}</p></section>
     <details class="map-route-details"><summary>分支记录 <span>${session.events.filter(event => event.type === 'move').length} 次连接</span></summary><div class="map-timeline">${session.events.map(event => {
       if (event.type !== 'move') return `<div class="map-timeline__return">${event.type === 'reset' ? '回到起点' : '返回'} ${escapeHTML(artistName(event.to))}${isChallenge ? ' · 撤销对应步数' : ''}</div>`;
@@ -254,7 +260,7 @@ function recordsHTML(map, api) {
   const records = [...map.sessions].sort((a, b) => b.updated - a.updated);
   const rows = records.map(session => `<article class="map-record">
     <div class="map-record__disc" style="--node-tone:${artistById[session.start].color}" aria-hidden="true"><span>${String(session.path.length - 1).padStart(2, '0')}</span></div>
-    <div class="map-record__copy"><span class="map-record__meta">${catalogueFor(session).label} · ${session.type === 'challenge' ? '挑战' : '漫游'} · ${session.status === 'complete' ? '已抵达' : session.status === 'ended' ? '已结束' : '进行中'} · ${dateLabel(session.created)}</span><h3>${escapeHTML(artistName(session.start))}${session.target ? ` → ${escapeHTML(artistName(session.target))}` : '出发'}</h3><p>${visitedArtists(session).length} 位艺人 · ${session.saved.length} 首留下 · ${session.path.length - 1} 步</p></div>
+    <div class="map-record__copy"><span class="map-record__meta">${catalogueFor(session).label} · ${session.type === 'challenge' ? '挑战' : '漫游'} · ${session.status === 'complete' ? '已抵达' : session.status === 'ended' ? '已结束' : '进行中'} · ${dateLabel(session.created)}</span><h3>${escapeHTML(artistName(session.start))}${session.target ? ` → ${escapeHTML(artistName(session.target))}` : '出发'}</h3><p>${visitedArtists(session).length} 位艺人 · ${currentSavedSongs(session).length} 首留下 · ${session.path.length - 1} 步</p></div>
     <div class="map-record__actions">${button('recap', `回顾 ${api.icon('arrow-up-right')}`, 'button button--quiet', `data-session="${session.id}"`)}${session.status !== 'complete' ? button('resume', '继续', 'button button--quiet', `data-session="${session.id}"`) : ''}${button('delete', api.icon('trash'), 'icon-button', `data-session="${session.id}" aria-label="删除从${escapeHTML(artistName(session.start))}出发的记录"`)}</div>
   </article>`).join('');
   return `<section class="map-records" aria-label="音乐探索记录"><div class="map-records-heading"><h2>探索记录</h2><span class="muted">${records.length} 次探索</span></div><div class="map-record-list">${rows || `<div class="empty-state"><h3>还没有探索记录</h3>${button('new', '去探索', 'button button--primary', `data-id="${catalogues.real.start}"`)}</div>`}</div><p class="map-storage-note">仅存当前浏览器，清除浏览器数据会丢失。</p>${undoHTML(map, api)}${panelHTML(map, api, true)}</section>`;
@@ -276,22 +282,48 @@ function attachInteractions(container, api, recordsOnly) {
   let drag = null;
   let suppressClickUntil = 0;
   let rotation = null;
-  const mutate = (fn, redraw = true) => {
+  const mutate = (fn, redraw = true, keepPosition = null) => {
     const previousDialog = container.querySelector('.map-dialog');
     const dialogScroll = previousDialog?.scrollTop || 0;
     const routeDetailsOpen = previousDialog?.querySelector('.map-route-details')?.open;
     const previousPanel = api.getState().map.view.panel;
+    const position = keepPosition && {
+      inDialog: Boolean(keepPosition.control.closest('.map-dialog')),
+      control: { ...keepPosition.control.dataset },
+      songId: keepPosition.songId,
+      details: [...container.querySelectorAll('details')].map(detail => detail.open),
+      scroll: ['#main-content', '.map-artist-panel', '.map-route-trail'].map(selector => {
+        const element = selector[0] === '#' ? document.querySelector(selector) : container.querySelector(selector);
+        return { selector, top: element?.scrollTop || 0, left: element?.scrollLeft || 0 };
+      }),
+      windowX: window.scrollX, windowY: window.scrollY,
+    };
     api.update(state => fn(state.map));
     if (redraw) {
       api.render();
+      const currentContainer = container.isConnected ? container : document.getElementById(container.id);
+      if (position) currentContainer.querySelectorAll('details').forEach((detail, index) => { detail.open = Boolean(position.details[index]); });
       if (previousPanel && api.getState().map.view.panel === previousPanel) {
-        const currentContainer = container.isConnected ? container : document.getElementById(container.id);
         const newDialog = currentContainer?.querySelector('.map-dialog');
         if (newDialog) {
           const routeDetails = newDialog.querySelector('.map-route-details');
           if (routeDetails) routeDetails.open = Boolean(routeDetailsOpen);
           newDialog.scrollTop = dialogScroll;
         }
+      }
+      if (position) {
+        const focusScope = position.inDialog ? currentContainer.querySelector('.map-dialog') : currentContainer;
+        const controls = [...focusScope.querySelectorAll('[data-map-action]')].filter(control => !control.disabled && control.getClientRects().length);
+        const target = controls.find(control => Object.entries(position.control).every(([key, value]) => control.dataset[key] === value))
+          || (position.songId && controls.find(control => control.dataset.mapAction === 'save' && control.dataset.id === position.songId))
+          || controls.find(control => control.dataset.mapAction === 'undo')
+          || controls[0];
+        target?.focus({ preventScroll: true });
+        position.scroll.forEach(({ selector, top, left }) => {
+          const element = selector[0] === '#' ? document.querySelector(selector) : currentContainer.querySelector(selector);
+          if (element) { element.scrollTop = top; element.scrollLeft = left; }
+        });
+        window.scrollTo({ left: position.windowX, top: position.windowY, behavior: 'instant' });
       }
     }
   };
@@ -409,14 +441,15 @@ function attachInteractions(container, api, recordsOnly) {
           if (!selected || !songs[id]) return;
           const index = selected.saved.findIndex(item => item.id === id);
           if (removed) {
-            const item = index >= 0 ? selected.saved.splice(index, 1)[0] : { id, source: '在曲目收藏中留下', savedAt: previousLibraryEntry?.savedAt || Date.now() };
+            const item = index >= 0 ? selected.saved[index] : { id, source: '在曲目收藏中留下', savedAt: previousLibraryEntry?.savedAt || Date.now() };
+            if (!real && index >= 0) selected.saved.splice(index, 1);
             state.undo = { sessionId: selected.id, item, index: index >= 0 ? index : selected.saved.length, libraryTrack: previousLibraryEntry };
           } else {
             if (index < 0) selected.saved.push({ id, source: control.dataset.source || '在探索回顾中留下', savedAt: Date.now() });
             state.undo = null;
           }
           selected.updated = Date.now();
-        });
+        }, true, { control });
         api.toast(removed ? '已移除，可撤销' : '已留下这首作品');
         break;
       }
@@ -434,7 +467,7 @@ function attachInteractions(container, api, recordsOnly) {
             selected.updated = Date.now();
           }
           state.undo = null;
-        });
+        }, true, { control, songId: entry?.item.id });
         api.toast('已恢复');
         break;
       }
@@ -622,6 +655,10 @@ function attachInteractions(container, api, recordsOnly) {
 
   const unsubscribeSavedMusic = subscribeSavedMusic(tracks => {
     const savedIds = new Set(tracks.map(track => track.id));
+    container.querySelectorAll('[data-map-saved-count]').forEach(control => {
+      const session = sessionById(api.getState().map, control.dataset.mapSavedCount);
+      control.textContent = `${currentSavedSongs(session).length} 首收藏`;
+    });
     container.querySelectorAll('[data-map-action="save"]').forEach(control => {
       const song = songs[control.dataset.id];
       if (song?.dataset !== 'real') return;

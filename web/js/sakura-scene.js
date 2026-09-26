@@ -287,7 +287,8 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
       slot.texture = texture; textures.add(texture);
     });
     const scope = cards.every(card => card.local) ? '示例卡' : currentView === 'live' ? '可见现场卡' : '我的现场卡';
-    caption.querySelector('[data-world-caption]').textContent = cards.length ? `${cards.length} 张${scope}` : '音乐 · 照片 · 此刻';
+    const firstVisit = currentView === 'space' && currentMode === 'home' && cards.every(card => card.local);
+    caption.querySelector('[data-world-caption]').textContent = firstVisit ? '留一张卡，换一个视角' : cards.length ? `${cards.length} 张${scope}` : '音乐 · 照片 · 此刻';
     renderer.shadowMap.needsUpdate = true; projectPins(); draw();
   }
   function picked(event) {

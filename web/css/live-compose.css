@@ -1,0 +1,136 @@
+/* Two short steps share one form, so changing a photo never clears the words. */
+html[data-theme] .live-dialog.live-dialog--compose {
+  --compose-max-height:min(780px,calc(100dvh - 48px));
+  --compose-paper:var(--studio-panel,var(--surface));
+  max-height:var(--compose-max-height); padding:0; overflow:hidden;
+  color:var(--text); background:var(--compose-paper);
+}
+html[data-theme] .live-dialog--compose #live-dialog-content { display:flex; flex-direction:column; max-height:var(--compose-max-height); padding:24px; }
+html[data-theme] .live-dialog--compose .live-modal-top { flex-shrink:0; margin:0 0 12px; }
+html[data-theme] .live-dialog--compose .live-modal-top .eyebrow { color:var(--muted); font-size:10px; }
+html[data-theme] .live-dialog--compose .live-modal-top .icon-button { width:38px; height:38px; min-width:38px; min-height:38px; }
+html[data-theme] .live-dialog--compose #live-dialog-title { flex-shrink:0; margin:0 0 11px; font-size:25px; line-height:1.3; font-weight:600; outline:none; }
+html[data-theme] .live-dialog--compose [data-modal-error] { flex-shrink:0; margin:13px 0 0; padding:10px 12px; font-size:12px; line-height:1.6; }
+html[data-theme] .live-compose { display:flex; flex:1 1 auto; flex-direction:column; min-height:0; margin:0; overflow:hidden; }
+html[data-theme] .live-compose [hidden] { display:none!important; }
+html[data-theme] .live-compose__context { display:flex; flex-shrink:0; align-items:baseline; gap:11px; margin:0 0 18px; color:var(--muted); font-size:12px; line-height:1.5; }
+html[data-theme] .live-compose__context>span:first-child { flex-shrink:0; color:var(--mint); font-size:11px; font-variant-numeric:tabular-nums; }
+html[data-theme] .live-compose__context>span:last-child { overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+html[data-theme] .live-compose__body { flex:1 1 auto; min-height:0; overflow:auto; overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:transparent transparent; padding:0 2px 2px; }
+html[data-theme] .live-compose__body:hover { scrollbar-color:var(--line) transparent; }
+html[data-theme] .live-compose fieldset { min-width:0; border:0; padding:0; margin:0; }
+html[data-theme] .live-compose legend { margin:0 0 9px; color:var(--text); font-size:13px; font-weight:550; line-height:1.5; }
+html[data-theme] .live-compose__step>legend { position:absolute; width:1px; height:1px; padding:0; margin:0; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+html[data-theme] .live-compose__step:not([hidden]) { animation:live-compose-enter .18s ease-out both; }
+html[data-theme] .live-compose .live-upload-preview { height:clamp(180px,24dvh,230px); border:0; border-radius:15px; background:var(--studio-well,var(--surface-raised)); }
+html[data-theme] .live-compose .live-upload-preview>span { padding:7px 11px; font-size:11px; }
+html[data-theme] .live-compose .live-upload-empty { gap:9px; padding:20px; }
+html[data-theme] .live-compose .live-upload-empty>.icon { width:30px; height:30px; margin:0 0 4px; }
+html[data-theme] .live-compose .live-upload-empty strong { color:var(--text); font-size:16px; font-weight:550; }
+html[data-theme] .live-compose .live-upload-empty>span { color:var(--muted); font-size:12px; }
+html[data-theme] .live-compose .live-upload-button { min-height:46px!important; margin-top:12px; border-radius:12px; font-size:14px; }
+html[data-theme] .live-compose .live-form-note { margin:10px 0 0; font-size:12px; line-height:1.7; color:var(--muted); }
+html[data-theme] .live-compose .live-example-picker { margin:12px 0 0; padding:0; border:0; }
+html[data-theme] .live-compose .live-example-picker>summary { display:list-item; min-height:42px; padding:10px 0; font-size:13px; color:var(--muted); }
+html[data-theme] .live-compose .live-example-picker>p { margin:0 0 11px; color:var(--muted); font-size:12px; }
+html[data-theme] .live-compose .live-photo-choices { margin:0; gap:10px; }
+html[data-theme] .live-compose .live-photo-choices label>span { border-radius:11px; }
+html[data-theme] .live-compose .live-photo-choices img { height:105px; aspect-ratio:auto; }
+html[data-theme] .live-compose .live-photo-choices b { padding:8px 10px; font-size:12px; background:var(--studio-well,var(--surface-raised)); }
+html[data-theme] .live-compose__photo-edit { display:flex; align-items:center; gap:12px; width:100%; min-height:62px; padding:0; border:0; color:var(--text); background:transparent; text-align:left; cursor:pointer; }
+html[data-theme] .live-compose__thumbnail { position:relative; display:block; flex-shrink:0; width:62px; height:62px; overflow:hidden; border:4px solid var(--studio-well,var(--surface-raised)); border-radius:12px; background:var(--studio-well,var(--surface-raised)); }
+html[data-theme] .live-compose__thumbnail>img { display:block; width:100%; height:100%; object-fit:cover; }
+html[data-theme] .live-compose__thumbnail>span { display:none; }
+html[data-theme] .live-compose__thumbnail .live-photo-status { font-size:8px; }
+html[data-theme] .live-compose__photo-edit>span:nth-child(2) { font-size:13px; }
+html[data-theme] .live-compose__photo-edit small { display:block; margin-top:4px; color:var(--muted); font-size:11px; }
+html[data-theme] .live-compose__photo-edit>.icon { width:15px; height:15px; margin-left:auto; color:var(--muted); }
+html[data-theme] .live-compose .live-perspectives { grid-template-columns:repeat(4,minmax(0,1fr)); gap:7px; margin:18px 0; }
+html[data-theme] .live-compose .live-perspectives label>span { display:flex; align-items:center; justify-content:center; min-height:43px; padding:9px 5px; border:1px solid var(--line); border-radius:10px; text-align:center; }
+html[data-theme] .live-compose .live-perspectives b { margin:0; font-size:14px; line-height:1.4; font-weight:550; }
+html[data-theme] .live-compose .live-perspectives input:checked+span { border-color:var(--mint); background:color-mix(in srgb,var(--mint) 11%,transparent); }
+html[data-theme] .live-compose .live-field { margin:0; font-size:13px; line-height:1.6; }
+html[data-theme] .live-compose .live-field>span { font-size:11px; color:var(--muted); }
+html[data-theme] .live-compose textarea { min-height:80px; max-height:160px; margin-top:9px; padding:12px; border:1px solid var(--line); border-radius:12px; background:var(--studio-well,var(--surface-raised)); color:var(--text); font-size:16px; line-height:1.65; resize:vertical; }
+html[data-theme] .live-compose textarea::placeholder { color:var(--muted); }
+html[data-theme] .live-compose__details { margin:12px 0 0; }
+html[data-theme] .live-compose__details>summary { display:flex; align-items:center; justify-content:space-between; gap:10px; min-height:40px; padding:8px 0; color:var(--muted); cursor:pointer; list-style:none; font-size:13px; }
+html[data-theme] .live-compose__details>summary::-webkit-details-marker { display:none; }
+html[data-theme] .live-compose__details>summary>.icon { width:13px; height:13px; transition:transform .18s ease; }
+html[data-theme] .live-compose__details[open]>summary>.icon { transform:rotate(90deg); }
+html[data-theme] .live-compose__details .live-moment-choices { margin:8px 0 12px; }
+html[data-theme] .live-compose__details .live-moment-choices label { margin:0 5px 5px 0; }
+html[data-theme] .live-compose__details .live-moment-choices label>span { min-height:40px; padding:9px 11px; border:1px solid var(--line); border-radius:9px; font-size:12px; }
+html[data-theme] .live-compose__details .live-moment-choices input:checked+span { border-color:var(--mint); background:var(--mint); color:var(--button-ink,var(--bg)); }
+html[data-theme] .live-compose .live-check { gap:10px; margin:12px 0; color:var(--text); font-size:13px; }
+html[data-theme] .live-compose .live-check input { width:19px; height:19px; margin-top:3px; }
+html[data-theme] .live-compose .live-check b { font-size:12px; line-height:1.7; }
+html[data-theme] .live-compose .live-check small { margin-top:2px; color:var(--muted); font-size:12px; line-height:1.6; }
+html[data-theme] .live-compose .live-compose__privacy { margin:10px 0 0; padding:13px 0 2px; border-top:1px solid var(--line); }
+html[data-theme] .live-compose .live-compose__footer { position:relative; bottom:auto; z-index:1; flex-shrink:0; margin:16px 0 0; padding:14px 0 0; border:0; border-top:1px solid var(--line); border-radius:0; background:var(--compose-paper); color:var(--text); box-shadow:none; }
+html[data-theme] .live-compose__footer .button { min-height:46px; margin:0; border-radius:12px; padding:11px 16px; font-size:14px; line-height:1.5; }
+html[data-theme] .live-compose__footer .button--primary { background:var(--button-fill,var(--mint)); border-color:var(--button-fill,var(--mint)); color:var(--button-ink,var(--bg)); }
+html[data-theme] .live-compose__footer .button--secondary { background:var(--studio-well,var(--surface-raised)); border:1px solid var(--line); color:var(--text); }
+html[data-theme] .live-compose__footer>[data-compose-for="photo"] { width:100%; }
+html[data-theme] .live-compose__save>span { display:block; margin:0 0 9px; color:var(--muted); font-size:12px; line-height:1.5; }
+html[data-theme] .live-compose__save>div { display:flex; align-items:stretch; gap:9px; }
+html[data-theme] .live-compose__save .button--secondary { flex:0 0 auto; }
+html[data-theme] .live-compose__save .button--primary { flex:1; }
+html[data-theme] .live-entry-switch.text-button { margin-top:12px; font-size:12px; color:var(--muted); }
+html[data-theme="sakura"] .live-dialog.live-dialog--compose { --compose-max-height:calc(100dvh - 122px); }
+html[data-theme="zine"] .live-compose :is(.live-upload-preview,.live-upload-button,.live-compose__thumbnail,.live-perspectives label>span,textarea,.button) { border-radius:5px; }
+/* A name is enough to create a room; optional details never hide the action. */
+html[data-theme] .live-dialog.live-dialog--event { --event-max-height:calc(100dvh - 48px); max-height:var(--event-max-height); padding:0; overflow:hidden; background:var(--studio-panel,var(--surface)); color:var(--text); }
+html[data-theme] .live-dialog--event #live-dialog-content { display:flex; flex-direction:column; max-height:var(--event-max-height); padding:24px; }
+html[data-theme] .live-dialog--event .live-modal-top { flex-shrink:0; margin:0 0 12px; }
+html[data-theme] .live-dialog--event #live-dialog-title { flex-shrink:0; margin:0 0 20px; font-size:25px; line-height:1.3; }
+html[data-theme] .live-dialog--event [data-modal-error] { flex-shrink:0; margin:12px 0 0; padding:10px 12px; font-size:12px; }
+html[data-theme] .live-event-compose { display:flex; flex:1 1 auto; flex-direction:column; min-height:0; margin:0; overflow:hidden; }
+html[data-theme] .live-event-compose .live-field { min-width:0; margin:0; color:var(--text); font-size:14px; }
+html[data-theme] .live-event-compose .live-field>span { color:var(--muted); font-size:12px; }
+html[data-theme] .live-event-compose .live-field input { min-width:0; height:46px; margin-top:8px; padding:10px 12px; border:1px solid var(--line); border-radius:11px; background:var(--studio-well,var(--surface-raised)); color:var(--text); font-size:16px; line-height:1.5; }
+html[data-theme] .live-event-compose .live-field input::placeholder { color:var(--muted); }
+html[data-theme] .live-event-compose__name { flex-shrink:0; }
+html[data-theme] .live-event-compose__body { flex:1 1 auto; min-height:0; margin-top:15px; padding:0 2px; overflow:auto; overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:transparent transparent; }
+html[data-theme] .live-event-compose__body:hover { scrollbar-color:var(--line) transparent; }
+html[data-theme] .live-event-compose__details>summary { display:flex; align-items:center; justify-content:space-between; gap:10px; min-height:42px; padding:9px 0; color:var(--text); font-size:13px; list-style:none; cursor:pointer; }
+html[data-theme] .live-event-compose__details>summary::-webkit-details-marker { display:none; }
+html[data-theme] .live-event-compose__details>summary>span { display:flex; align-items:center; gap:8px; color:var(--muted); font-size:12px; }
+html[data-theme] .live-event-compose__details>summary .icon { width:13px; height:13px; transition:transform .18s ease; }
+html[data-theme] .live-event-compose__details[open]>summary .icon { transform:rotate(90deg); }
+html[data-theme] .live-event-compose .live-event-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:13px 0 15px; }
+html[data-theme] .live-event-compose .live-event-compose__song { margin:0 0 5px; }
+html[data-theme] .live-event-compose__footer { flex-shrink:0; margin:18px 0 0; padding:13px 0 0; border-top:1px solid var(--line); }
+html[data-theme] .live-event-compose__footer>p { margin:0 0 11px; color:var(--muted); font-size:12px; line-height:1.6; }
+html[data-theme] .live-event-compose__footer>.button { width:100%; min-height:46px; margin:0; border-radius:12px; font-size:14px; }
+html[data-theme="sakura"] .live-dialog.live-dialog--event { --event-max-height:calc(100dvh - 122px); }
+html[data-theme="zine"] .live-event-compose :is(input,.button) { border-radius:5px; }
+@media(max-width:760px) {
+  html[data-theme] .live-dialog.live-dialog--compose { --compose-max-height:calc(100dvh - 28px); }
+  html[data-theme] .live-dialog--compose #live-dialog-content { padding:18px; }
+  html[data-theme] .live-dialog--compose .live-modal-top { margin-bottom:7px; }
+  html[data-theme] .live-dialog--compose #live-dialog-title { font-size:23px; margin-bottom:9px; }
+  html[data-theme] .live-compose__context { margin-bottom:14px; }
+  html[data-theme] .live-compose__thumbnail { width:54px; height:54px; }
+  html[data-theme] .live-compose__photo-edit { min-height:54px; }
+  html[data-theme] .live-compose .live-perspectives { gap:6px; margin:15px 0; }
+  html[data-theme] .live-compose .live-compose__footer { margin-top:13px; padding-top:12px; }
+  html[data-theme] .live-compose__footer .button { min-height:45px; padding:10px 13px; font-size:13px; }
+  html[data-theme="sakura"] .live-dialog.live-dialog--compose { --compose-max-height:76dvh; }
+  html[data-theme] .live-dialog.live-dialog--event { --event-max-height:calc(100dvh - 28px); }
+  html[data-theme] .live-dialog--event #live-dialog-content { padding:19px; }
+  html[data-theme] .live-dialog--event .live-modal-top { margin-bottom:8px; }
+  html[data-theme] .live-dialog--event #live-dialog-title { margin-bottom:17px; font-size:23px; }
+  html[data-theme] .live-event-compose__body { margin-top:11px; }
+  html[data-theme] .live-event-compose__footer { margin-top:13px; }
+  html[data-theme="sakura"] .live-dialog.live-dialog--event { --event-max-height:55dvh; }
+}
+@keyframes live-compose-enter {
+  from { opacity:0; transform:translateY(5px); }
+  to { opacity:1; transform:translateY(0); }
+}
+@media(prefers-reduced-motion:reduce) {
+  html[data-theme] .live-compose__step:not([hidden]) { animation:none; }
+  html[data-theme] .live-compose__details>summary>.icon { transition:none; }
+  html[data-theme] .live-event-compose__details>summary .icon { transition:none; }
+}

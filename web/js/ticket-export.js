@@ -5,6 +5,7 @@ const paper = '#f2efe7';
 const font = '"Microsoft YaHei", "PingFang SC", sans-serif';
 const perspectives = { stage: '舞台', crowd: '人海', friends: '身边', detail: '细节' };
 const themes = ['festival', 'sakura', 'zine'];
+let closeExportPreview = null;
 // Capture this before loading photos/fonts. A later UI switch must not recolor
 // an export that is already in progress. Old callers need no new argument.
 function exportTheme(info) {
@@ -63,13 +64,75 @@ function footer(ctx, info, paired) {
 async function saveCanvas(canvas, id, prefix) {
   const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
   if (!blob) throw new Error('图片暂时未能生成，请重试。');
+  closeExportPreview?.();
   const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url; link.download = `${prefix}-${String(id || Date.now()).slice(0, 12)}.png`;
-  link.click(); setTimeout(() => URL.revokeObjectURL(url), 30000);
+  const filename = `${prefix}-${String(id || Date.now()).slice(0, 12)}.png`;
+  const paired = prefix === 'music-space';
+  const dialog = document.createElement('dialog');
+  dialog.className = 'memory-export';
+  dialog.setAttribute('aria-labelledby', 'memory-export-title');
+  dialog.innerHTML = `<header class="memory-export__header"><h2 id="memory-export-title">${paired ? '双联已生成' : '现场卡已生成'}</h2><span>PNG · 1600 × 1800</span></header>
+    <img class="memory-export__poster" alt="${paired ? '两位作者共同留下的双联成品' : '我的现场卡成品'}" width="1600" height="1800">
+    <p class="memory-export__hint">也可以长按图片保存</p>
+    <div class="memory-export__actions"><button class="button button--primary" type="button" data-export-download>下载图片</button><button class="button" type="button" data-export-close autofocus>关闭预览</button></div>
+    <button class="memory-export__share" type="button" data-export-share hidden>分享图片</button>
+    <p class="memory-export__error" role="status" data-export-error hidden></p>`;
+  const image = dialog.querySelector('img');
+  image.src = url;
+  let disposed = false;
+  function dispose() {
+    if (disposed) return;
+    disposed = true;
+    if (closeExportPreview === dispose) closeExportPreview = null;
+    if (dialog.open) dialog.close();
+    image.removeAttribute('src');
+    dialog.remove();
+    URL.revokeObjectURL(url);
+    window.removeEventListener('popstate', dispose);
+    window.removeEventListener('pagehide', dispose);
+  }
+  function download() {
+    const link = document.createElement('a');
+    link.href = url; link.download = filename;
+    document.body.append(link);
+    link.click(); link.remove();
+  }
+  dialog.querySelector('[data-export-download]').addEventListener('click', download);
+  dialog.querySelector('[data-export-close]').addEventListener('click', dispose);
+  dialog.addEventListener('close', dispose, { once: true });
+  dialog.addEventListener('click', event => {
+    if (event.target !== dialog) return;
+    const bounds = dialog.getBoundingClientRect();
+    if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) dispose();
+  });
+  if (navigator.share && navigator.canShare) {
+    const file = new File([blob], filename, { type: 'image/png' });
+    if (navigator.canShare({ files: [file] })) {
+      const share = dialog.querySelector('[data-export-share]');
+      const error = dialog.querySelector('[data-export-error]');
+      share.hidden = false;
+      share.addEventListener('click', async () => {
+        share.disabled = true; error.hidden = true;
+        try { await navigator.share({ files: [file] }); }
+        catch (reason) {
+          if (reason.name !== 'AbortError' && !disposed) {
+            error.textContent = '暂时无法分享，可以先下载图片。';
+            error.hidden = false;
+          }
+        } finally { if (!disposed) share.disabled = false; }
+      });
+    }
+  }
+  closeExportPreview = dispose;
+  window.addEventListener('popstate', dispose);
+  window.addEventListener('pagehide', dispose);
+  document.body.append(dialog);
+  dialog.showModal();
+  download();
 }
 /** Render accepted snapshots. Real rooms supply authorized photo blob URLs. */
 export async function downloadTicket(cards, info) {
+  closeExportPreview?.();
   const theme = exportTheme(info);
   const images = await Promise.all(cards.map(card => loadImage(card.photoDataUrl || SPACE_PHOTOS[card.photoKey]?.url || SPACE_PHOTOS.stage.url)));
   await document.fonts.ready;
@@ -103,6 +166,7 @@ export async function downloadTicket(cards, info) {
 }
 /** A private card has value before anyone else joins the room. */
 export async function downloadCard(card, info) {
+  closeExportPreview?.();
   const theme = exportTheme(info);
   const image = await loadImage(card.photoDataUrl || SPACE_PHOTOS[card.photoKey]?.url || SPACE_PHOTOS.stage.url);
   await document.fonts.ready;

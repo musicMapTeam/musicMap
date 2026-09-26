@@ -42,7 +42,7 @@ export function mountThemes({ onAction, onShot, view }) {
   }
 
   function applyTheme(id, save = true) {
-    const theme = themes.find(item => item.id === id) || themes[0];
+    const theme = themes.find(item => item.id === id) || themes.find(item => item.id === 'sakura');
     document.documentElement.dataset.theme = theme.id;
     document.querySelector('meta[name="theme-color"]').content = theme.color;
     document.querySelector('meta[name="color-scheme"]').content = theme.id === 'festival' ? 'dark' : 'light';

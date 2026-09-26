@@ -15,6 +15,8 @@ import '../css/spatial-world.css';
 import '../css/open-catalogue.css';
 import '../css/library.css';
 import '../css/product-finish.css';
+import '../css/live-compose.css';
+import '../css/memory-export.css';
 import { OverlayScrollbars } from 'overlayscrollbars';
 import { mountThemes } from './themes.js';
 import { icon } from './icons.js';
@@ -242,7 +244,8 @@ function render() {
 window.addEventListener('popstate', () => {
   if (location.hash === '#main-content') return;
   const view = location.hash.slice(2);
-  state.view = views.includes(view) ? view : 'explore';
+  const invited = /^\d{6}$/.test(new URLSearchParams(location.search).get('room') || '');
+  state.view = views.includes(view) ? view : invited ? 'live' : 'space';
   state.routePayload = null;
   persist();
   render();

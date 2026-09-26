@@ -469,7 +469,7 @@ function makeLifecycle(container, api) {
           createdAt: source.decidedAt || source.createdAt,
           id: source.id,
         });
-        api.toast('票根图片已生成，请在浏览器下载中查看');
+        api.toast('票根已生成');
       } catch (error) {
         api.toast(error.message || '票根图片未能生成，请重试');
       } finally {

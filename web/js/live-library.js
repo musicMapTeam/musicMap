@@ -192,7 +192,7 @@ export function mountLiveLibrary(container, api) {
       if (signal.aborted) return;
       if (item.type === 'record') await downloadTicket(cards, info);
       else await downloadCard(cards[0], info);
-      if (!signal.aborted) api.toast('图片已生成，请查看浏览器下载');
+      if (!signal.aborted) api.toast('图片已生成');
     } catch (error) {
       if (signal.aborted) return;
       notice = error instanceof TypeError ? '照片暂时没有读到，恢复连接后可重试保存。' : error.message;

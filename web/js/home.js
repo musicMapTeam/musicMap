@@ -40,6 +40,12 @@ export function mountHome(container, api) {
     if (item.local) api.navigate('space', { showDemo: true, previewCardId: item.id });
     else api.navigate('records', { section: 'live', libraryItemId: `card:${item.id}` });
   }
+  function selectCard(index) {
+    selected = index;
+    container.querySelector('[data-home-stack]').dataset.perspective = selected ? 'crowd' : 'stage';
+    container.querySelectorAll('[data-home="select"]').forEach((button, i) => button.setAttribute('aria-pressed', String(i === selected)));
+    container.querySelectorAll('[data-home="photo"]').forEach((button, i) => button.setAttribute('aria-pressed', String(i === selected)));
+  }
   function publish() {
     api.spatial?.publish({ mode: 'home', cards: entries().filter(card => card.src), onPhoto: openCard,
       onEdit: () => api.navigate('live', { intent: 'make-card' }) });
@@ -92,10 +98,10 @@ export function mountHome(container, api) {
     if (button.dataset.home === 'demo') api.navigate('space', { showDemo: true });
     if (button.dataset.home === 'resume') api.navigate('live', { roomId: button.dataset.room });
     if (button.dataset.home === 'retry') load();
-    if (button.dataset.home === 'select') { selected = Number(button.dataset.index); render(); }
+    if (button.dataset.home === 'select') selectCard(Number(button.dataset.index));
     if (button.dataset.home === 'photo') {
       const index = entries().findIndex(card => card.id === button.dataset.id);
-      if (selected !== index) { selected = index; render(); } else openCard(button.dataset.id);
+      if (selected !== index) selectCard(index); else openCard(button.dataset.id);
     }
   }, { signal });
   render();

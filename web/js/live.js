@@ -40,10 +40,12 @@ export function mountLive(container, api) {
   let joinCode = entryPayload.intent === 'join-room' ? String(entryPayload.joinCode || '') : new URLSearchParams(location.search).get('room') || session?.rejoinCode || '';
   let entryName = '';
   let draft = null;
+  let editorStep = 'photo';
   let version = 0;
   let photoPreparing = false;
   let photoSelection = 0;
   let createRequested = entryPayload.intent === 'create-room' || Boolean(songDraft) || (makeRequested && !session?.roomId && !requestedRoomId);
+  let entryMode = createRequested || makeRequested ? 'create' : 'join';
   let eventDraft = { title: '', eventDate: '', city: '', song: songDraft?.title.slice(0, 80) || '' };
   const photos = createPhotoStore(() => session?.token, signal);
   if (createRequested || makeRequested || inviteRequested || requestedRoomId || entryPayload.intent === 'join-room') api.update(state => { state.routePayload = null; });
@@ -177,6 +179,7 @@ export function mountLive(container, api) {
     if (photoPermissionChanged || (old?.room.id && old.room.id !== next.room.id)) clearPhotos();
     room = next;
     roomAuthorized = true;
+    entryMode = 'join';
     session.roomId = next.room.id;
     session.rejoinCode = null;
     joinCode = '';
@@ -239,7 +242,8 @@ export function mountLive(container, api) {
         controls.forEach(({ element, disabled }) => { element.disabled = disabled; });
         if (currentModal?.name === 'editor') {
           const hint = modal.querySelector('[data-save-visibility]');
-          if (hint) hint.textContent = modal.querySelector('[name="isPublic"]')?.checked ? '保存后，房间成员可见' : '保存后，仍先为自己私藏';
+          if (hint) hint.textContent = modal.querySelector('[name="isPublic"]')?.checked ? '保存后，同场成员可见' : '保存后，仅自己可见';
+          updateComposeAvailability();
         }
       }
     }
@@ -265,7 +269,8 @@ export function mountLive(container, api) {
   function entryView() {
     const sampleA = { ownerName: '你的舞台', photoKey: 'stage', perspective: 'stage', momentId: 'encore', caption: '灯亮起时，我记得这一面。', event: demoEvent };
     const sampleB = { ownerName: '朋友的人海', photoKey: 'crowd', perspective: 'crowd', momentId: 'encore', caption: '原来那一刻，你看见的是这样。', event: demoEvent };
-    return `<header class="live-entry-head"><button class="text-button" data-live-action="demo">${icon('arrow-left')} 返回同场</button></header>${banner()}<div class="live-entry-grid"><section class="live-entry-copy"><h1>和朋友一起</h1><div class="live-gate"><div class="live-gate-heading"><b>${session ? `你好，${escape(session.user.name)}` : '进入同场'}</b><span>${checking ? '正在连接…' : healthy ? '已连接' : '未连接'}</span></div><form data-live-form="entry">${songDraft ? `<p class="live-form-note">带着《${escape(songDraft.title)}》创建自己的同场。</p>` : ""}${session ? '' : `<label class="live-field">现场昵称<input name="name" value="${escape(entryName)}" placeholder="例如：小满" autocomplete="nickname" maxlength="20" required></label>`}<label class="live-field" ${songDraft ? "hidden" : ""}>邀请码 <span>加入房间时填写</span><input name="code" value="${escape(joinCode)}" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="6 位数字" autocomplete="off"></label><div class="live-gate-actions"><button class="button ${createRequested ? 'button--secondary' : 'button--primary'}" type="submit" name="intent" value="join" ${songDraft ? "hidden" : ""} ${!healthy ? 'disabled' : ''}>加入同场 ${icon('arrow-right')}</button><button class="button ${createRequested ? 'button--primary' : 'button--secondary'}" type="submit" name="intent" value="create" formnovalidate ${!healthy ? 'disabled' : ''}>创建同场 ${icon('plus')}</button></div></form>${!healthy && !checking ? `<div class="live-unavailable"><p>连接失败，可返回体验示例。</p><button class="text-button" data-live-action="reconnect">重试连接</button></div>` : ''}<p class="live-gate-note">身份保存在当前浏览器，清除网站数据后无法找回。</p></div>${session && rooms.length ? `<div class="live-recent"><span class="eyebrow">最近的房间</span>${rooms.map(item => `<button data-live-action="resume" data-room-id="${escape(item.id)}"><span>${escape(item.title)}</span><small>${escape(item.code)}</small>${icon('arrow-right')}</button>`).join('')}</div>` : ''}</section><aside class="live-entry-art" aria-label="两张现场卡构成双联记忆的示意"><div class="live-entry-pair">${miniCard(sampleA)}${miniCard(sampleB)}</div><small>AI 示例照片</small></aside></div>`;
+    const creating = entryMode === 'create';
+    return `<header class="live-entry-head"><button class="text-button" data-live-action="demo">${icon('arrow-left')} 返回同场</button></header>${banner()}<div class="live-entry-grid"><section class="live-entry-copy"><h1>${creating ? '记录这次现场' : '和朋友一起'}</h1><div class="live-gate"><div class="live-gate-heading"><b>${session ? `你好，${escape(session.user.name)}` : creating ? '先留一个现场昵称' : '进入同场'}</b><span>${checking ? '正在连接…' : healthy ? '已连接' : '未连接'}</span></div><form data-live-form="entry">${songDraft ? `<p class="live-form-note">带着《${escape(songDraft.title)}》创建自己的同场。</p>` : ''}${session ? '' : `<label class="live-field">现场昵称<input name="name" value="${escape(entryName)}" placeholder="例如：小满" autocomplete="nickname" maxlength="20" required></label>`}${creating ? '' : `<label class="live-field">邀请码 <span>加入房间时填写</span><input name="code" value="${escape(joinCode)}" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="6 位数字" autocomplete="off"></label>`}<div class="live-gate-actions">${creating ? `<button class="button button--primary" type="submit" name="intent" value="create" ${!healthy ? 'disabled' : ''}>继续 ${icon('arrow-right')}</button>` : `<button class="button button--primary" type="submit" name="intent" value="join" ${!healthy ? 'disabled' : ''}>加入同场 ${icon('arrow-right')}</button><button class="button button--secondary" type="submit" name="intent" value="create" formnovalidate ${!healthy ? 'disabled' : ''}>创建同场 ${icon('plus')}</button>`}</div>${creating ? '<button class="text-button live-entry-switch" type="button" data-live-action="join-entry">使用邀请码加入</button>' : ''}</form>${!healthy && !checking ? `<div class="live-unavailable"><p>连接失败，可返回体验示例。</p><button class="text-button" data-live-action="reconnect">重试连接</button></div>` : ''}<p class="live-gate-note">身份保存在当前浏览器，清除网站数据后无法找回。</p></div>${session && rooms.length ? `<div class="live-recent"><span class="eyebrow">最近的房间</span>${rooms.map(item => `<button data-live-action="resume" data-room-id="${escape(item.id)}"><span>${escape(item.title)}</span><small>${escape(item.code)}</small>${icon('arrow-right')}</button>`).join('')}</div>` : ''}</section><aside class="live-entry-art" aria-label="两张现场卡构成双联记忆的示意"><div class="live-entry-pair">${miniCard(sampleA)}${miniCard(sampleB)}</div><small>AI 示例照片</small></aside></div>`;
   }
 
   function emptyWall(own) {
@@ -282,7 +287,7 @@ export function mountLive(container, api) {
     const hasCards = room.cards.some(card => card.ownerId !== room.me.id && card.isPublic);
     const action = hasCards ? 'wall' : room.room.memberCount < 2 ? 'invite' : own.isPublic ? 'wall' : 'visibility';
     const label = { wall: '看看同场卡片', invite: '邀请朋友一起', visibility: '展示到本场' }[action];
-    openModal('card-saved', '现场卡已保存', `<div class="live-saved-note">${icon('check')}<div><strong>${own.isPublic ? '已展示到本场' : '这张卡先为你私藏'}</strong><p>${own.isPublic ? '房间成员可以看见，交换仍需双方同意。' : '只有你可见，也可以用它向朋友申请交换。'}</p></div></div><div class="live-saved-actions"><button class="button button--primary" data-live-action="${action}">${label} ${icon('arrow-right')}</button><button class="button button--secondary" data-live-action="download-card">下载我的卡片 ${icon('arrow-up-right')}</button>${!own.isPublic && action !== 'visibility' ? '<button class="text-button" data-live-action="visibility">展示到本场</button>' : ''}<button class="text-button" data-live-action="collection">去我的记录</button></div><button class="text-button" data-live-action="close">先收好</button>`, '', own.id);
+    openModal('card-saved', '现场卡已保存', `<div class="live-saved-note">${icon('check')}<div><strong>${own.isPublic ? '已展示到本场' : '这张卡先为你私藏'}</strong><p>${own.isPublic ? '房间成员可以看见，交换仍需双方同意。' : '只有你可见，也可以用它向朋友申请交换。'}</p></div></div><div class="live-saved-actions"><button class="button button--primary" data-live-action="${action}">${label} ${icon('arrow-right')}</button><button class="button button--secondary" data-live-action="download-card">下载我的卡片 ${icon('arrow-up-right')}</button>${!own.isPublic && action !== 'visibility' ? '<button class="text-button" data-live-action="visibility">展示到本场</button>' : ''}<button class="text-button" data-live-action="collection">去我的记录</button></div><button class="text-button" data-live-action="close">先收好</button>`, 'live-dialog--saved', own.id);
   }
 
   function roomView() {
@@ -326,7 +331,14 @@ export function mountLive(container, api) {
 
   function openCreate() {
     createRequested = false;
-    openModal('create', '创建同场', `<form data-live-form="create"><label class="live-field">场次名称 <span>必填</span><input name="title" maxlength="60" required placeholder="例如：周五草坪音乐会" value="${escape(eventDraft.title)}"></label><div class="live-event-fields"><label class="live-field">日期 <span>选填</span><input type="date" name="eventDate" value="${escape(eventDraft.eventDate)}"></label><label class="live-field">地点 <span>选填</span><input name="city" maxlength="40" placeholder="例如：南区草坪" value="${escape(eventDraft.city)}"></label></div><label class="live-field">想一起记住的歌 <span>选填</span><input name="song" maxlength="80" placeholder="填写歌名，也可以先留空" value="${escape(eventDraft.song)}"></label>${songDraft ? `<p class="live-form-note">歌名已带入，可修改。请填写自己的场次。</p>` : ""}<p class="live-form-note">场次创建后不能修改。</p><button class="button button--primary live-wide" type="submit">创建同场 ${icon('arrow-right')}</button></form>`);
+    openModal('create', '创建同场', `<form class="live-event-compose" data-live-form="create">
+      <label class="live-field live-event-compose__name">场次名称 <span>必填</span><input name="title" maxlength="60" required placeholder="例如：周五草坪音乐会" value="${escape(eventDraft.title)}"></label>
+      <div class="live-event-compose__body"><details class="live-event-compose__details" ${songDraft ? 'open' : ''}><summary>补充场次信息 <span>选填 ${icon('chevron-right')}</span></summary>
+        <div class="live-event-fields"><label class="live-field">日期<input type="date" name="eventDate" value="${escape(eventDraft.eventDate)}"></label><label class="live-field">地点<input name="city" maxlength="40" placeholder="例如：南区草坪" value="${escape(eventDraft.city)}"></label></div>
+        <label class="live-field live-event-compose__song">想一起记住的歌<input name="song" maxlength="80" placeholder="填写歌名，也可以先留空" value="${escape(eventDraft.song)}"></label>
+      </details></div>
+      <footer class="live-event-compose__footer"><p>场次信息创建后不能修改。</p><button class="button button--primary" type="submit">创建同场 ${icon('arrow-right')}</button></footer>
+    </form>`, 'live-dialog--event');
   }
 
   function editorPhoto() {
@@ -336,6 +348,38 @@ export function mountLive(container, api) {
     return `<div class="live-upload-empty">${icon('camera')}<strong>选择现场照片</strong><span>保存时上传</span></div>`;
   }
 
+  function updateComposeAvailability() {
+    const ready = Boolean(draft?.photoId || draft?.uploadDataUrl || draft?.useExample);
+    const next = modal.querySelector('[data-live-action="compose-next"]');
+    const save = modal.querySelector('.live-compose button[type="submit"]');
+    if (next) next.disabled = busy || photoPreparing || !ready;
+    if (save) save.disabled = busy || photoPreparing;
+    modal.querySelectorAll('[data-live-action="compose-back"]').forEach(button => { button.disabled = busy || photoPreparing; });
+  }
+
+  function updateEditorPhoto() {
+    modal.querySelectorAll('[data-photo-preview],[data-compose-preview]').forEach(element => { element.innerHTML = editorPhoto(); });
+    const kind = modal.querySelector('[data-compose-photo-kind]');
+    if (kind) kind.textContent = draft.useExample ? 'AI 示例图' : '我的现场照片';
+    hydratePhotos(modal);
+    updateComposeAvailability();
+  }
+
+  function showEditorStep(step, focus = true) {
+    if (currentModal?.name !== 'editor' || photoPreparing) return;
+    if (step === 'details' && !draft.photoId && !draft.uploadDataUrl && !draft.useExample) return;
+    editorStep = step;
+    modal.querySelectorAll('[data-compose-panel]').forEach(panel => { panel.hidden = panel.dataset.composePanel !== step; });
+    modal.querySelectorAll('[data-compose-for]').forEach(element => { element.hidden = element.dataset.composeFor !== step; });
+    const heading = modal.querySelector('#live-dialog-title');
+    heading.textContent = step === 'photo' ? '选照片' : '留一句';
+    modal.querySelector('[data-compose-progress]').textContent = step === 'photo' ? '1 / 2' : '2 / 2';
+    modal.querySelector('.live-compose').dataset.step = step;
+    modal.querySelector('.live-compose__body').scrollTop = 0;
+    if (focus) { heading.tabIndex = -1; heading.focus({ preventScroll: true }); }
+    updateComposeAvailability();
+  }
+
   function openEditor(target = null) {
     requestTarget = target;
     const own = room.ownCard;
@@ -343,7 +387,30 @@ export function mountLive(container, api) {
     draft = { photoKey: 'stage', photoId: null, perspective: 'stage', momentId: 'encore', trackId: event.song ? 'co-0' : '', caption: '', isPublic: false, ...own, uploadDataUrl: null, useExample: Boolean(own && !own.photoId) };
     photoSelection += 1;
     photoPreparing = false;
-    openModal('editor', '我的现场卡', `<form data-live-form="card"><p class="live-editor-event">${escape(event.title)}</p><div class="live-upload-preview" data-photo-preview>${editorPhoto()}</div><label class="button button--secondary live-upload-button">${icon('image')} ${own?.photoId ? '换一张自己的照片' : '选择自己的照片'}<input type="file" name="photoFile" accept="image/jpeg,image/png,image/webp" data-photo-file></label><p class="live-form-note" data-photo-hint>JPG / PNG / WebP · 自动缩小并移除定位信息</p><details class="live-example-picker"><summary>使用示例图</summary><p>AI 生成 · 卡片保留示例标记</p><fieldset class="live-photo-choices"><legend class="sr-only">选择示例照片</legend>${Object.values(SPACE_PHOTOS).map(item => `<label><input type="radio" name="photoKey" value="${item.id}" ${draft.useExample && item.id === draft.photoKey ? 'checked' : ''}><span><img src="${item.url}" alt="${item.description}"><b>${item.name}</b>${icon('check')}</span></label>`).join('')}</fieldset></details><fieldset class="live-perspectives"><legend>拍摄视角</legend>${PERSPECTIVES.map(item => `<label><input type="radio" name="perspective" value="${item.id}" ${item.id === draft.perspective ? 'checked' : ''}><span><b>${item.name}</b><small>${item.detail}</small></span></label>`).join('')}</fieldset><fieldset class="live-moment-choices"><legend>现场瞬间</legend>${SPACE_MOMENTS.map(item => `<label><input type="radio" name="momentId" value="${item.id}" ${item.id === draft.momentId ? 'checked' : ''}><span>${item.name}</span></label>`).join('')}</fieldset><label class="live-field">留一句话 <span data-caption-count>${draft.caption.length} / 80</span><textarea name="caption" maxlength="80" rows="3" placeholder="例如：我面朝舞台，你拍下了背后一起合唱的人。">${escape(draft.caption)}</textarea></label>${event.song ? `<label class="live-check"><input type="checkbox" name="track" ${draft.trackId ? 'checked' : ''}><span>带上这首歌 <b>♪ ${escape(event.song)}</b></span></label>` : ''}<label class="live-check"><input type="checkbox" name="isPublic" ${draft.isPublic ? 'checked' : ''}><span>展示到这个房间<small>房间成员可见，可申请交换。</small></span></label><div class="live-editor-save"><span data-save-visibility>${draft.isPublic ? '保存后，房间成员可见' : '保存后，仍先为自己私藏'}</span><button class="button button--primary live-wide" type="submit">${target ? '保存，继续交换' : '保存我的现场卡'} ${icon('arrow-right')}</button></div></form>`, 'live-dialog--editor');
+    editorStep = own ? 'details' : 'photo';
+    openModal('editor', editorStep === 'photo' ? '选照片' : '留一句', `<form class="live-compose" data-live-form="card" data-step="${editorStep}">
+      <p class="live-compose__context"><span data-compose-progress>${editorStep === 'photo' ? '1 / 2' : '2 / 2'}</span><span>${escape(event.title)}</span></p>
+      <div class="live-compose__body">
+        <fieldset class="live-compose__step" data-compose-panel="photo" ${editorStep !== 'photo' ? 'hidden' : ''}><legend class="sr-only">选照片</legend>
+          <div class="live-upload-preview" data-photo-preview>${editorPhoto()}</div>
+          <label class="button button--secondary live-upload-button">${icon('image')} ${own?.photoId ? '换一张自己的照片' : '选择自己的照片'}<input type="file" name="photoFile" accept="image/jpeg,image/png,image/webp" data-photo-file></label>
+          <p class="live-form-note" data-photo-hint>JPG / PNG / WebP · 自动缩小并移除定位信息</p>
+          <details class="live-example-picker"><summary>使用示例图</summary><p>AI 生成，卡片会保留示例标记。</p><fieldset class="live-photo-choices"><legend class="sr-only">选择示例照片</legend>${Object.values(SPACE_PHOTOS).map(item => `<label><input type="radio" name="photoKey" value="${item.id}" ${draft.useExample && item.id === draft.photoKey ? 'checked' : ''}><span><img src="${item.url}" alt="${item.description}"><b>${item.name}</b>${icon('check')}</span></label>`).join('')}</fieldset></details>
+        </fieldset>
+        <fieldset class="live-compose__step" data-compose-panel="details" ${editorStep !== 'details' ? 'hidden' : ''}><legend class="sr-only">留一句</legend>
+          <button class="live-compose__photo-edit" type="button" data-live-action="compose-back"><span class="live-compose__thumbnail" data-compose-preview>${editorPhoto()}</span><span>换照片<small data-compose-photo-kind>${draft.useExample ? 'AI 示例图' : '我的现场照片'}</small></span>${icon('chevron-right')}</button>
+          <fieldset class="live-perspectives"><legend>我拍的这一面</legend>${PERSPECTIVES.map(item => `<label><input type="radio" name="perspective" value="${item.id}" ${item.id === draft.perspective ? 'checked' : ''}><span><b>${item.name}</b></span></label>`).join('')}</fieldset>
+          <label class="live-field live-compose__caption">留一句话 <span data-caption-count>${draft.caption.length} / 80</span><textarea name="caption" maxlength="80" rows="2" placeholder="这一刻，我记得……">${escape(draft.caption)}</textarea></label>
+          <details class="live-compose__details"><summary>更多细节 ${icon('chevron-right')}</summary><fieldset class="live-moment-choices"><legend>现场瞬间</legend>${SPACE_MOMENTS.map(item => `<label><input type="radio" name="momentId" value="${item.id}" ${item.id === draft.momentId ? 'checked' : ''}><span>${item.name}</span></label>`).join('')}</fieldset>${event.song ? `<label class="live-check"><input type="checkbox" name="track" ${draft.trackId ? 'checked' : ''}><span>带上这首歌 <b>♪ ${escape(event.song)}</b></span></label>` : ''}</details>
+          <label class="live-check live-compose__privacy"><input type="checkbox" name="isPublic" ${draft.isPublic ? 'checked' : ''}><span>展示到本场<small>未开启时，仅自己可见。</small></span></label>
+        </fieldset>
+      </div>
+      <footer class="live-editor-save live-compose__footer">
+        <button class="button button--primary" type="button" data-live-action="compose-next" data-compose-for="photo" ${editorStep !== 'photo' ? 'hidden' : ''}>下一步 ${icon('arrow-right')}</button>
+        <div class="live-compose__save" data-compose-for="details" ${editorStep !== 'details' ? 'hidden' : ''}><span data-save-visibility>${draft.isPublic ? '保存后，同场成员可见' : '保存后，仅自己可见'}</span><div><button class="button button--secondary" type="button" data-live-action="compose-back">上一步</button><button class="button button--primary" type="submit">${target ? '保存，继续交换' : '保存现场卡'} ${icon('arrow-right')}</button></div></div>
+      </footer>
+    </form>`, 'live-dialog--editor live-dialog--compose');
+    updateComposeAvailability();
   }
 
   function openRequest(cardId) {
@@ -416,7 +483,7 @@ export function mountLive(container, api) {
     finally {
       if (!signal.aborted) {
         checking = false;
-        if (makeRequested && !room && !requestedRoomId && !joinCode) createRequested = true;
+        if (entryMode === 'create' && makeRequested && !room && !requestedRoomId && !joinCode) createRequested = true;
         render();
         if (healthy && session) {
           if (createRequested) openCreate();
@@ -437,7 +504,7 @@ export function mountLive(container, api) {
     event.preventDefault();
     const data = new FormData(form);
     if (form.dataset.liveForm === 'entry') {
-      const intent = songDraft ? 'create' : event.submitter?.value || 'join';
+      const intent = entryMode === 'create' ? 'create' : event.submitter?.value || 'join';
       const name = String(data.get('name') || '').trim();
       entryName = name;
       joinCode = String(data.get('code') || '').trim();
@@ -483,6 +550,7 @@ export function mountLive(container, api) {
     if (form.dataset.liveForm === 'card') {
       if (photoPreparing) return;
       if (!draft.photoId && !draft.uploadDataUrl && !draft.useExample) { showError(new Error('先选择一张自己的照片，或明确选用下方示例图。')); return; }
+      if (editorStep === 'photo') { showEditorStep('details'); return; }
       const target = typeof requestTarget === 'string' ? requestTarget : null;
       const currentDraft = draft;
       const firstCard = !room.ownCard;
@@ -511,13 +579,19 @@ export function mountLive(container, api) {
     event.target.setCustomValidity?.('');
     if (event.target.name === 'name') entryName = event.target.value;
     if (event.target.name === 'code') joinCode = event.target.value;
+    if (currentModal?.name === 'editor') {
+      const { name, value, checked } = event.target;
+      if (['caption', 'perspective', 'momentId'].includes(name)) draft[name] = value;
+      if (name === 'track') draft.trackId = checked ? 'co-0' : '';
+      if (name === 'isPublic') draft.isPublic = checked;
+    }
     if (event.target.name === 'caption') {
       const count = modal.querySelector('[data-caption-count]');
       if (count) count.textContent = `${event.target.value.length} / 80`;
     }
     if (event.target.name === 'isPublic') {
       const hint = modal.querySelector('[data-save-visibility]');
-      if (hint) hint.textContent = event.target.checked ? '保存后，房间成员可见' : '保存后，仍先为自己私藏';
+      if (hint) hint.textContent = event.target.checked ? '保存后，同场成员可见' : '保存后，仅自己可见';
     }
   }, { signal });
 
@@ -531,18 +605,16 @@ export function mountLive(container, api) {
       draft.photoId = null;
       draft.uploadDataUrl = null;
       draft.useExample = true;
-      modal.querySelector('[data-photo-preview]').innerHTML = editorPhoto();
-      modal.querySelector('button[type="submit"]').disabled = false;
-      modal.querySelector('[data-photo-hint]').textContent = '已选示例图。卡片会明确标记，不代表你拍摄的真实照片。';
+      updateEditorPhoto();
+      modal.querySelector('[data-photo-hint]').textContent = '已选 AI 示例图，卡片会保留示例标记。';
     }
     if (input.name !== 'photoFile' || !input.files?.[0]) return;
     const selected = ++photoSelection;
     const currentDraft = draft;
     photoPreparing = true;
-    const save = modal.querySelector('button[type="submit"]');
     const hint = modal.querySelector('[data-photo-hint]');
-    save.disabled = true;
-    hint.textContent = '正在处理照片，先为你保留其他输入…';
+    updateComposeAvailability();
+    hint.textContent = '正在处理照片…';
     try {
       const dataUrl = await preparePhoto(input.files[0]);
       if (selected !== photoSelection || currentDraft !== draft || currentModal?.name !== 'editor') return;
@@ -550,15 +622,15 @@ export function mountLive(container, api) {
       draft.photoId = null;
       draft.useExample = false;
       modal.querySelectorAll('[name="photoKey"]').forEach(radio => { radio.checked = false; });
-      modal.querySelector('[data-photo-preview]').innerHTML = editorPhoto();
-      hint.textContent = '照片已准备好。点击保存时上传到当前同场服务，未展示前仅自己可见。';
+      updateEditorPhoto();
+      hint.textContent = '照片已准备好，保存时上传。';
       const error = modal.querySelector('[data-modal-error]');
       if (error) error.hidden = true;
     } catch (error) {
       if (selected === photoSelection) { hint.textContent = '原来的照片和文字都还在，可以重新选择。'; showError(error); }
     } finally {
       input.value = '';
-      if (selected === photoSelection) { photoPreparing = false; if (save.isConnected) save.disabled = false; }
+      if (selected === photoSelection) { photoPreparing = false; updateComposeAvailability(); }
     }
   }, { signal });
 
@@ -568,6 +640,13 @@ export function mountLive(container, api) {
     const action = button.dataset.liveAction;
     const id = button.dataset.id;
     if (busy) return;
+    if (action === 'compose-next') showEditorStep('details');
+    if (action === 'compose-back') showEditorStep('photo');
+    if (action === 'join-entry') {
+      entryMode = 'join'; createRequested = false; songDraft = null;
+      render();
+      surface.querySelector('[name="code"]')?.focus();
+    }
     if (action === 'close') closeModal();
     if (action === 'demo') api.navigate('space');
     if (action === 'reconnect') connect();
@@ -603,7 +682,7 @@ export function mountLive(container, api) {
       errorMessage = '';
       render();
     }
-    if (action === 'resume') act(async () => { version += 1; setState(await request(`/rooms/${button.dataset.roomId}`)); });
+    if (action === 'resume') act(async () => { version += 1; setState(await request(`/rooms/${button.dataset.roomId}`)); openEntryAction(); });
     if (action === 'visibility') {
       if (room.ownCard.isPublic) openModal('withdraw', '把现场卡收回自己这里？', '<p class="live-modal-intro">其他房间成员将不再看到这张卡。涉及你的待回应申请会取消；已经交换的共同记忆仍保留。</p><button class="button button--primary live-wide" data-live-action="confirm-withdraw">确认撤下</button>');
       else act(async () => { version += 1; setState(await request(`/rooms/${room.room.id}/card/visibility`, { method: 'PATCH', body: { isPublic: true } })); if (currentModal?.name === 'card-saved') closeModal(); api.toast('你的视角已展示到本房间'); });
@@ -641,12 +720,12 @@ export function mountLive(container, api) {
       const item = room.exchanges.find(ex => ex.id === id) || room.records.find(record => record.exchangeId === id);
       if (!item) throw new Error('这份共同记忆暂时未找到，请刷新后重试。');
       await downloadTicket(await Promise.all([exportCard(item.fromCard), exportCard(item.toCard)]), exportInfo(item.fromCard, item));
-      api.toast('票根图片已生成，请查看浏览器下载');
+      api.toast('票根已生成');
     });
     if (action === 'download-card') act(async () => {
       if (!room.ownCard) throw new Error('请先保存自己的现场卡。');
       await downloadCard(await exportCard(room.ownCard), exportInfo(room.ownCard));
-      api.toast('你的现场卡已生成，请查看浏览器下载');
+      api.toast('现场卡已生成');
     });
     if (action === 'delete-record') openModal('delete', '从我的记忆中删除这张票？', `<p class="live-modal-intro">只删除你保存的记录，不会改动对方的记录。已经完成的交换动态仍会保留。</p><button class="button button--primary live-wide" data-live-action="confirm-delete" data-id="${escape(id)}">确认删除我的记录</button>`);
     if (action === 'confirm-delete') act(async () => { version += 1; setState(await request(`/rooms/${room.room.id}/records/${id}`, { method: 'DELETE' })); closeModal(); api.toast('已从我的记忆中删除'); });

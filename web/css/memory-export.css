@@ -1,0 +1,49 @@
+.memory-export {
+  width:min(460px,calc(100vw - 32px));
+  max-width:none;
+  max-height:calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  margin:auto;
+  padding:18px;
+  border:1px solid var(--line);
+  border-radius:18px;
+  color:var(--text);
+  background:var(--surface);
+  box-shadow:0 24px 90px #0005;
+  overflow:auto;
+  scrollbar-width:thin;
+  /* The global dialog observer animates inline transforms; this print preview
+     keeps a stable frame so the full image and save controls stay in view. */
+  opacity:1 !important;
+  transform:none !important;
+}
+.memory-export[open] { display:grid; grid-template-columns:minmax(0,1fr); gap:12px; }
+.memory-export::backdrop { background:#08100fbb; backdrop-filter:blur(8px); }
+.memory-export__header { display:flex; align-items:baseline; justify-content:space-between; gap:12px; }
+.memory-export__header h2 { margin:0; font-size:16px; letter-spacing:0; }
+.memory-export__header span { color:var(--muted); font-size:10px; white-space:nowrap; }
+.memory-export__poster {
+  display:block;
+  width:auto;
+  height:auto;
+  max-width:100%;
+  max-height:min(58dvh,calc(100dvh - 220px - env(safe-area-inset-top) - env(safe-area-inset-bottom)));
+  margin:auto;
+  object-fit:contain;
+  box-shadow:0 5px 20px #0002;
+  -webkit-touch-callout:default;
+  user-select:auto;
+}
+.memory-export__hint { margin:-3px 0 0; color:var(--muted); font-size:11px; line-height:1.4; text-align:center; }
+.memory-export__actions { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.memory-export__actions .button { min-width:0; min-height:44px; padding:10px 12px; font-size:13px; border-radius:10px; }
+.memory-export__share { min-height:34px; padding:3px 12px; border:0; color:var(--muted); background:transparent; font-size:12px; justify-self:center; }
+.memory-export__share:hover:not(:disabled) { color:var(--text); }
+.memory-export__error { margin:0; color:var(--coral); font-size:12px; line-height:1.5; text-align:center; }
+html[data-theme='zine'] .memory-export { border-radius:2px; box-shadow:8px 8px 0 #17191466; }
+html[data-theme='zine'] .memory-export__actions .button { border-radius:2px; }
+@media (max-width:520px) {
+  .memory-export { width:calc(100vw - 28px); padding:14px; }
+}
+@media (pointer:fine) {
+  .memory-export__hint { display:none; }
+}
