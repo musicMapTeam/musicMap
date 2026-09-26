@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "npx --yes hyperframes@0.8.78 preview",
     "check": "npx --yes hyperframes@0.8.78 check",
-    "render": "npx --yes hyperframes@0.8.78 render --fps 30 --quality high --workers 2 --strict --output ../music-map-space-demo.mp4",
+    "render": "npx --yes hyperframes@0.8.78 render --composition index.html --fps 30 --quality high --workers 2 --strict --output ../music-map-space-demo.mp4",
     "cover": "npx --yes hyperframes@0.8.78 render --composition cover.html --format png-sequence --fps 1 --workers 1 --output cover-frames"
   }
 }
