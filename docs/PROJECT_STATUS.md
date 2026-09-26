@@ -15,7 +15,7 @@
 
 ## Doing
 
-实现与运行包已完成，正在同步源码。
+无。0.5.1 已完成界面精简、本地运行包与源码同步；部署与试用仍见 Todo。
 
 ## Done · 0.5.1
 
@@ -27,6 +27,7 @@
 | 滚动与表单 | OverlayScrollbars 2.16.0、原生 dialog | body 使用6px自动隐藏浮动条；长制卡弹窗原生滚轮从0滚到540，内容高1354、视口814，未裁掉字段；现有房间可重新进入。编辑器未提交，不改已有卡片 |
 | 开源与许可 | `interface-restraint.md`、NOTICES、完整MIT文件 | 比较OverlayScrollbars/SimpleBar，直接采用前者npm固定版本；Codrops只参考按需展开，未复制其代码或素材。单HTML附完整许可 |
 | 构建与交付 | `dist/index.html`、`delivery/music-map-space-runtime.zip` | 最终构建1,274,445 B / gzip约465.28 KB；运行包482,838 B，原有6文件范围。README、三份产品文档与视觉规范同步 |
+| GitHub 与 CI | 应用提交 [715a80a](https://github.com/musicMapTeam/musicMap/commit/715a80af4f944c6e804fb3492b960cd56d4067f0) | 已推送 `origin/main`；原有 [run 36266662842](https://github.com/musicMapTeam/musicMap/actions/runs/36266662842) 成功。随后仅更新本状态记录 |
 
 检查限于改动相关界面。未新增测试套件，未重跑后端、PNG导出或交换全流程；视频/封面仍为0.4，公网部署与目标用户试用仍见Todo。最后将手机声浪缩略图字号从20减为18并重新构建，未再次截图。
 
