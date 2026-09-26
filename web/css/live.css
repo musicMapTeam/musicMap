@@ -79,10 +79,30 @@
 .live-gate-heading{margin-bottom:16px}
 .live-entry-art{min-height:620px}
 .live-dialog button,.live-dialog input,.live-dialog textarea{font-family:inherit}
+.live-empty-wall .live-empty-own-hint{max-width:38em;color:var(--live-mint);font-size:14px;border-left:2px solid var(--live-mint);padding-left:14px;margin-bottom:24px}
+.live-empty-wall>.button{min-height:48px}
+.live-saved-note{display:flex;gap:16px;padding:24px;background:var(--live-paper);color:var(--live-ink);border-top:3px solid var(--live-mint)}
+.live-saved-note>.icon{flex-shrink:0;width:24px;height:24px;color:#28665c}
+.live-saved-note strong{font-size:18px;line-height:1.5}
+.live-saved-note p{font-size:14px;line-height:1.9;color:#53615a;margin:12px 0 0}
+.live-saved-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:24px}
+.live-saved-actions .button{justify-content:center;min-height:48px}
+.live-return-slip{padding:24px;background:var(--live-paper);color:var(--live-ink);border-top:3px solid var(--live-coral);border-bottom:1px dashed #0c101660}
+.live-return-slip>.eyebrow{font-size:10px;color:#63726b}
+.live-return-slip .live-field{margin:18px 0;font-size:13px}
+.live-return-slip input{font:800 32px/1.4 ui-monospace,monospace;letter-spacing:.16em;border-color:#0c10163b;background:transparent;color:var(--live-ink);padding:12px}
+.live-return-slip input:focus{outline-color:#28665c;border-color:#28665c}
+.live-return-slip .button{background:var(--live-ink);color:var(--live-paper);border-color:var(--live-ink);min-height:48px}
+.live-editor-save{margin-top:24px;padding:16px;background:var(--live-paper);color:var(--live-ink);border-top:1px dashed #0c101660}
+.live-editor-save>span{display:block;font-size:12px;line-height:1.6;color:#52655b}
+.live-editor-save .button{margin:12px 0 0;min-height:48px;background:var(--live-ink);border-color:var(--live-ink);color:var(--live-paper)}
 @media(max-width:760px){
   .live-page{padding-top:0}
   .live-entry-copy h1{font-size:64px}
   .live-ticket-mast{gap:12px}
   .live-ticket-mast>span{font-size:30px;min-width:0}
   .live-ticket-mast>b{width:48px;min-height:62px;font-size:20px;padding:7px;flex-shrink:0;transform:none}
+  .live-saved-actions{grid-template-columns:1fr}
+  .live-saved-note,.live-return-slip{padding:20px}
+  .live-dialog--editor .live-editor-save{position:sticky;bottom:0;z-index:2;box-shadow:0 -10px 24px #0c101618;padding-bottom:calc(16px + env(safe-area-inset-bottom))}
 }

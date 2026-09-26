@@ -15,6 +15,7 @@ const toastElement = document.querySelector('#toast');
 let toastTimer;
 let cleanup;
 let saveFailed = false;
+let recordsFilter = 'all';
 
 function initialState() {
   return { version: 1, view: 'explore', actor: 'a', map: createMapState(), space: createSpaceState(), routePayload: null };
@@ -34,7 +35,7 @@ const state = load();
 const initialView = location.hash.slice(2);
 if (views.includes(initialView)) state.view = initialView;
 const invitedRoom = new URLSearchParams(location.search).get('room');
-if (invitedRoom && /^\d{6}$/.test(invitedRoom)) state.view = 'live';
+if (invitedRoom && /^\d{6}$/.test(invitedRoom) && (!initialView || initialView === 'live')) state.view = 'live';
 
 function toast(message) {
   clearTimeout(toastTimer);
@@ -62,10 +63,14 @@ function navigate(view, payload = null) {
   if (!views.includes(view)) return;
   state.view = view;
   state.routePayload = payload;
-  if (location.hash !== `#/${view}`) history.pushState(null, '', `#/${view}`);
+  const nextUrl = new URL(location.href);
+  nextUrl.hash = `/${view}`;
+  if (view !== 'live') nextUrl.searchParams.delete('room');
+  if (location.href !== nextUrl.href) history.pushState(null, '', nextUrl);
   persist();
   render();
-  window.scrollTo({ top: 0, behavior: 'auto' });
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  document.querySelector('#main-content').focus({ preventScroll: true });
 }
 
 const api = { getState: () => state, update, render, navigate, toast, icon };
@@ -81,9 +86,12 @@ function updateChrome() {
   const storageNote = document.querySelector('#storage-warning');
   if (storageNote) storageNote.hidden = !saveFailed;
   const sectionNames = { explore: '发现新的声音', space: '遇见同场的人', records: '留住这次相遇', live: '邀请同场，交换视角' };
+  document.title = `${sectionNames[state.view]} · Music Map × Space`;
   document.querySelectorAll('[data-view-label]').forEach(el => { el.textContent = sectionNames[state.view]; });
   const identity = document.querySelector('.identity');
-  if (identity) identity.hidden = state.view === 'live';
+  if (identity) identity.hidden = !['space', 'records'].includes(state.view);
+  const modeNames = { explore: '示例音乐图谱', space: '示例场次', records: '当前浏览器', live: '独立身份 · 同场交换' };
+  document.querySelectorAll('[data-mode-label]').forEach(el => { el.textContent = modeNames[state.view]; });
   document.querySelectorAll('[data-footer-status]').forEach(el => { el.textContent = state.view === 'live' ? '房间成员可见，双方同意才交换' : '本地记录保存在当前浏览器'; });
 }
 
@@ -110,10 +118,10 @@ function shell() {
     </header>
     <div class="app-body">
       <header class="topbar">
-        <div class="topbar-breadcrumb"><span data-view-label>发现新的声音</span><span class="topbar-divider"></span><span class="demo-tag">示例内容 · 两种体验</span></div>
+        <div class="topbar-breadcrumb"><span data-view-label>发现新的声音</span><span class="topbar-divider"></span><span class="demo-tag" data-mode-label>示例音乐图谱</span></div>
         <div class="topbar-actions">
           <button class="demo-help" id="demo-help" aria-label="演示说明" aria-haspopup="dialog" aria-controls="about-dialog">${icon('info')}<span>演示说明</span></button>
-          <span class="identity"><span class="identity-dot"></span><span data-current-actor>${actors[state.actor]}</span></span>
+          <span class="identity"><span class="identity-demo">示例</span><span data-current-actor>${actors[state.actor]}</span></span>
         </div>
       </header>
       <div id="storage-warning" class="storage-warning" role="alert" hidden>这次修改尚未保存到浏览器，当前页面内容仍保留。可减少上传图片后重试。<button id="retry-save">重试保存</button></div>
@@ -125,12 +133,26 @@ function shell() {
       <div class="about-top"><span class="eyebrow">MUSIC, WITH PEOPLE.</span><button class="icon-button" id="close-about" aria-label="关闭演示说明">${icon('x')}</button></div>
       <h2 id="about-title">顺着声音，<br><em>找到彼此。</em></h2>
       <p>从艺人关系出发，进入同一场 Space。用自己的现场卡，交换另一个人的视角。</p>
+      <div class="about-path" aria-label="选择体验入口">
+        <button data-nav="explore"><span>01</span><div><b>发现一首合作</b><small>点击地图里的艺人，看看声音怎样相连。</small></div>${icon('arrow-right')}</button>
+        <button data-nav="space"><span>02</span><div><b>先体验一次换卡</b><small>用示例角色走过制卡、同意与留下记忆。</small></div>${icon('arrow-right')}</button>
+        <button data-nav="live"><span>03</span><div><b>邀请朋友同场</b><small>创建房间，双方在自己的浏览器里操作。</small></div>${icon('arrow-right')}</button>
+      </div>
       <div class="about-facts"><p><b>先体验，再邀请</b><span>本地情景演示可切换 Lin 与阿遥，体验申请、接受与拒绝。也可以通过邀请码进入真实双人房间，由各自设备操作；联网体验需要可用的共享服务。</span></p><p><b>两种体验，清楚区分</b><span>本地记录保存在当前浏览器；在线房间的内容向房间成员展示，双方同意后才交换。示例艺人、场次与生成图片用于说明体验，不代表真实到场，尚未接入真实音频。</span></p></div>
       <button class="button button--primary" id="start-experience">继续体验 ${icon('arrow-right')}</button>
     </dialog>`;
   root.addEventListener('click', event => {
     const item = event.target.closest('[data-nav]');
-    if (item) navigate(item.dataset.nav);
+    if (item) {
+      document.querySelector('#about-dialog').close();
+      navigate(item.dataset.nav);
+    }
+    const filter = event.target.closest('[data-records-filter]');
+    if (filter) {
+      recordsFilter = filter.dataset.recordsFilter;
+      render();
+      document.querySelector(`[data-records-filter="${recordsFilter}"]`)?.focus({ preventScroll: true });
+    }
   });
   const dialog = document.querySelector('#about-dialog');
   document.querySelector('#demo-help').addEventListener('click', () => dialog.showModal());
@@ -153,7 +175,11 @@ function render() {
   if (state.view === 'space') cleanup = mountSpace(container, api);
   if (state.view === 'live') cleanup = mountLive(container, api);
   if (state.view === 'records') {
-    container.innerHTML = `<div class="records-page"><header class="records-heading"><span class="eyebrow">YOUR LITTLE ARCHIVE</span><h1>这一刻，<br>留给以后的自己。</h1><p class="muted">走过的音乐，交换的视角。<br>属于你的记忆，在这里慢慢积累。</p><span class="records-local">${icon('bookmark')} 情景与探索记录保存在本机</span></header><section class="records-live-link" aria-label="联网房间记忆"><div><span class="eyebrow">SHARED MEMORIES</span><h2>房间里的共同记忆</h2><p>真实同场的双联票保存在各自房间，回到房间即可查看与下载。</p></div><button class="button button--primary" data-nav="live">查看同场房间 ${icon('arrow-right')}</button></section><div id="space-records"></div><div id="map-records"></div></div>`;
+    if (state.routePayload?.spaceRecordId) recordsFilter = 'space';
+    const cardCount = state.space.records[state.actor].length;
+    const routeCount = state.map.sessions.length;
+    const filters = [['all', '全部', cardCount + routeCount], ['space', '现场记忆', cardCount], ['map', '音乐探索', routeCount]];
+    container.innerHTML = `<div class="records-page"><header class="records-heading"><div><span class="eyebrow">KEPT, NOT FORGOTTEN.</span><h1>把喜欢的，<br><em>好好留下。</em></h1><p class="muted">音乐把你带向远处，记忆把这一晚留下。</p></div><div class="records-tally" aria-label="本机记录数量"><span><b>${String(cardCount).padStart(2, '0')}</b> 张现场记忆</span><i aria-hidden="true">/</i><span><b>${String(routeCount).padStart(2, '0')}</b> 段音乐探索</span></div></header><section class="records-live-link" aria-label="联网房间记忆"><span class="records-live-symbol" aria-hidden="true">${icon('users')}</span><div><h2>和朋友交换的，留在同场房间。</h2><p>用创建房间时的浏览器回去，继续查看和下载共同记忆。</p></div><button class="button button--quiet" data-nav="live">回到房间 ${icon('arrow-up-right')}</button></section><div class="records-filters" role="group" aria-label="筛选本机记录">${filters.map(([value, label, count]) => `<button data-records-filter="${value}" aria-pressed="${recordsFilter === value}">${label}<span>${count}</span></button>`).join('')}</div><p class="records-scope">${icon('bookmark')} 以下为 ${actors[state.actor]} 的本地情景记忆与本机探索记录</p><div id="space-records" ${recordsFilter === 'map' ? 'hidden' : ''}></div><div id="map-records" ${recordsFilter === 'space' ? 'hidden' : ''}></div></div>`;
     const spaceCleanup = mountSpaceRecords(container.querySelector('#space-records'), api);
     const mapCleanup = mountMapRecords(container.querySelector('#map-records'), api);
     cleanup = () => { spaceCleanup?.(); mapCleanup?.(); };

@@ -564,3 +564,37 @@
   .map-experience--entry .map-title-line > span,
   .map-experience--focus .map-node--center .map-node__name { animation: none; }
 }
+
+/* A readable reason for the current stop, before the graph on every screen. */
+.map-discovery {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin: 19px 28px 0;
+  padding: 15px 0 15px 17px;
+  border-left: 2px solid var(--map-sea);
+}
+.map-discovery__copy { min-width: 0; }
+.map-discovery__label { display: block; margin-bottom: 6px; color: #8eafb8; font-size: 11px; letter-spacing: .035em; }
+.map-discovery p { margin: 0; color: var(--map-ink); font-size: 14px; line-height: 1.7; }
+.map-discovery p strong { color: var(--map-sea); font-weight: 550; }
+.map-discovery__arrow { margin: 0 5px; color: #94b8bd; }
+.map-discovery small { display: block; margin-top: 5px; color: #92a9b2; font-size: 11px; line-height: 1.7; }
+.map-discovery__actions { display: flex; flex-shrink: 0; flex-direction: column; align-items: flex-end; gap: 3px; }
+.map-discovery__actions .button { min-height: 44px; padding: 9px 13px; font-size: 13px; white-space: nowrap; }
+.map-discovery__actions .is-saved { color: var(--map-sea); }
+.map-discovery--first { border-color: var(--map-coral); }
+.map-discovery--first .map-discovery__label { color: #ffab8f; }
+
+@media (max-width: 1150px) {
+  .map-discovery { margin-inline: 20px; gap: 13px; padding-left: 14px; }
+  .map-discovery__actions .button { padding-inline: 10px; font-size: 12px; }
+}
+@media (max-width: 760px) {
+  .map-discovery { margin: 17px 14px 0; padding: 12px 0 12px 13px; align-items: flex-start; flex-direction: column; gap: 10px; }
+  .map-discovery p { font-size: 14px; }
+  .map-discovery__label, .map-discovery small { font-size: 11px; }
+  .map-discovery__actions { flex-direction: row; align-items: center; flex-wrap: wrap; }
+  .map-discovery__actions .button { min-height: 44px; font-size: 13px; padding: 9px 13px; }
+}

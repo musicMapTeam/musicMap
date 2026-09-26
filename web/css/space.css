@@ -2345,3 +2345,72 @@
 @media (prefers-reduced-motion: reduce) {
   .space-page *, .sp-records-page *, .sp-dialog, .sp-dialog * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* One main invitation, with the local scene clearly downstream. */
+.sp-hero__actions { display: flex; align-items: center; gap: 26px; }
+.sp-hero .sp-hero__cta { background: var(--sp-coral); border-color: var(--sp-coral); color: var(--sp-ink); }
+.sp-hero__demo { display: flex; flex-direction: column; gap: 5px; align-items: flex-start; min-height: 46px; padding: 2px 0; border: 0; background: transparent; color: var(--sp-paper); font-size: 14px; }
+.sp-hero__demo > span { display: flex; align-items: center; gap: 9px; color: #b7c6c2; font-size: 11px; }
+.sp-hero__demo svg { width: 15px; height: 15px; transition: transform 180ms ease; }
+.sp-hero__demo:hover svg { transform: translateX(4px); }
+.sp-hero__content > .sp-hero__room-note { margin: 15px 0 0; max-width: none; color: #d6e2dc; font-size: 12px; line-height: 1.65; }
+.sp-music-strip__actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px 22px; margin-left: auto; }
+.sp-music-strip__actions .sp-text-link { font-size: 13px; min-height: 44px; }
+.sp-music-strip__actions [data-space-action="resume-map"] { color: var(--sp-mint); }
+.sp-local-scene, .sp-perspective--other { scroll-margin-top: 30px; }
+.sp-local-scene:focus, .sp-perspective--other:focus { outline: none; }
+.sp-demo-intro { display: flex; align-items: flex-end; justify-content: space-between; gap: 30px; padding: 0 0 30px; margin-bottom: 22px; border-bottom: 1px solid var(--sp-line); }
+.sp-demo-intro .eyebrow { color: var(--sp-coral); font-size: 11px; }
+.sp-demo-intro h2 { margin: 13px 0 12px; font-size: clamp(25px, 3vw, 34px); letter-spacing: -.05em; line-height: 1.35; font-weight: 750; }
+.sp-demo-intro p { max-width: 580px; margin: 0; color: var(--sp-muted); font-size: 13px; line-height: 1.85; }
+.sp-demo-intro > .button { flex-shrink: 0; }
+.sp-local-scene > .sp-demo-bar { margin-bottom: 36px; }
+.sp-saved-next__card { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 17px; align-items: center; padding-bottom: 23px; margin-bottom: 23px; border-bottom: 1px dashed var(--sp-line); }
+.sp-saved-next__card > img { width: 92px; height: 115px; object-fit: cover; padding: 5px; background: var(--sp-paper); transform: rotate(-3deg); }
+.sp-saved-next__card span { display: block; font-size: 11px; color: var(--sp-mint); margin-bottom: 9px; }
+.sp-saved-next__card strong { display: block; color: var(--sp-paper); font-size: 17px; line-height: 1.65; font-weight: 650; overflow-wrap: anywhere; }
+.sp-saved-next__card p { margin: 8px 0 0; font-size: 12px; color: var(--sp-muted); }
+.sp-saved-next > p { font-size: 14px; line-height: 1.85; }
+.sp-saved-next > .sp-private-note { font-size: 12px; }
+.sp-editor__fields { grid-column: 2; grid-row: 1; }
+.sp-editor__preview { grid-column: 1; grid-row: 1; min-width: 0; align-self: start; }
+.sp-editor__preview > summary { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 0 0 15px; margin-bottom: 15px; border-bottom: 1px solid var(--sp-line); color: var(--sp-muted); font-size: 12px; cursor: pointer; list-style: none; }
+.sp-editor__preview > summary::-webkit-details-marker { display: none; }
+.sp-editor__preview > summary > span { display: grid; place-items: center; }
+.sp-editor__preview[open] > summary svg { transform: rotate(90deg); }
+.sp-editor__preview > summary:focus-visible { outline: 2px solid var(--sp-mint); outline-offset: 4px; }
+.sp-editor__submit { grid-column: 1 / -1; position: sticky; bottom: 0; z-index: 4; align-items: center; flex-wrap: wrap; margin: 0 -34px -30px; padding: 17px 34px; border-top: 1px solid var(--sp-line); background: var(--sp-ink); box-shadow: 0 -12px 20px #0c10161a; }
+.sp-editor__submit .button--primary { flex: 0 0 auto; min-width: 158px; }
+.sp-editor__save-state { margin-right: auto; color: var(--sp-muted); font-size: 12px; line-height: 1.5; }
+.sp-dialog__footer--wrap [data-view-memory] { margin-left: auto; }
+.sp-dialog--narrow .sp-dialog__footer--wrap .button { flex: 1 0 auto; }
+
+@media (max-width: 700px) {
+  .sp-hero__content { padding-bottom: 145px; }
+  .sp-hero__actions { gap: 20px; }
+  .sp-hero .sp-hero__cta { font-size: 14px; min-height: 48px; padding-inline: 14px; }
+  .sp-hero__demo { font-size: 13px; min-height: 48px; }
+  .sp-hero__demo > span { font-size: 10px; gap: 5px; }
+  .sp-hero__content > .sp-hero__room-note { position: relative; z-index: 2; max-width: 180px; margin-top: 13px; font-size: 11px; }
+  .sp-hero__second { bottom: 114px; width: 95px; right: 17px; }
+  .sp-music-strip__actions { width: 100%; justify-content: flex-start; margin-left: 56px; gap: 0 20px; }
+  .sp-music-strip__actions .sp-text-link { font-size: 12px; }
+  .sp-demo-intro { align-items: flex-start; flex-direction: column; gap: 20px; padding-bottom: 24px; margin-bottom: 20px; }
+  .sp-demo-intro h2 { font-size: 26px; margin-top: 12px; }
+  .sp-demo-intro p { font-size: 13px; }
+  .sp-demo-intro .eyebrow { font-size: 10px; }
+  .sp-local-scene > .sp-demo-bar { margin-bottom: 29px; }
+  .sp-editor { gap: 24px; }
+  .sp-editor__fields { grid-column: 1; grid-row: 1; }
+  .sp-editor__preview { grid-column: 1; grid-row: 2; width: 100%; padding: 0; margin: 0; }
+  .sp-editor__preview > summary { min-height: 48px; box-sizing: border-box; margin-bottom: 0; padding: 13px 0; border-top: 1px solid var(--sp-line); font-size: 14px; color: var(--sp-paper); }
+  .sp-editor__preview[open] > summary { margin-bottom: 22px; }
+  .sp-editor__preview > [data-card-preview] { max-width: 280px; margin-inline: auto; }
+  .sp-editor__submit { grid-column: 1; grid-row: 3; margin: 0 -21px -22px; padding: 13px 21px 18px; gap: 10px; bottom: 0; }
+  .sp-editor__save-state { width: 100%; margin-right: 0; font-size: 12px; }
+  .sp-editor__submit .button--primary { flex: 1; font-size: 14px; }
+  .sp-editor__submit > .button--quiet { min-width: 75px; font-size: 14px; }
+  .sp-editor .sp-field__hint, .sp-display-consent small { font-size: 12px; }
+  .sp-editor .sp-field select { font-size: 16px; }
+  .sp-dialog__footer--wrap [data-view-memory] { margin-left: 0; }
+}
