@@ -1,16 +1,16 @@
 # 实施与演示规格
 
-版本：1.7 · 2026-09-27，对应应用 MVP 0.6.0。产品范围见[产品方案](01-product-plan.md)，比赛交付见[交付方案](02-delivery-plan.md)。本轮重做悬浮导航、照片卡工作台、唱片图谱与轻量房间，接入 MIT 三渲二渲染源码；三主题及 Node + SQLite 业务保持。构建、画面与同步结果统一见[项目状态](../../docs/PROJECT_STATUS.md)；第 8 节旧版本证据保留原版本。
+版本：1.8 · 2026-09-27，对应应用 MVP 0.7.0。产品范围见[产品方案](01-product-plan.md)，比赛交付见[交付方案](02-delivery-plan.md)。本轮加入常驻三维小院与路由镜头、逐人制作署名和开放曲库；三主题及 Node + SQLite 业务保持。构建、画面与同步结果统一见[项目状态](../../docs/PROJECT_STATUS.md)；第 8 节旧版本证据保留原版本。
 
 ## 1. 技术决定
 
 | 部分 | 当前实现 | 边界 |
 |---|---|---|
 | 页面 | HTML / CSS / JavaScript ES 模块；Vite 8.3.1 + vite-plugin-singlefile 2.3.3 | 复用当前原生 JavaScript，不迁移框架 |
-| 视觉 | DOM / SVG、工作台主题 CSS；Three 0.186.1 + 适配后的 Sakura Crossing cel / 深度描线 / 调色 / FXAA 绘制原创街角 | festival 默认，sakura / zine 可选；复用文件与改动登记在 vendor 清单，装饰不称为真实频谱 |
+| 视觉 | DOM / SVG、主题 CSS；Three 0.186.1 透视三维小院 + Sakura Crossing cel / 深度描线 / 调色 / FXAA；GSAP 3.15.0 / Flip 管理镜头、卡片和弹窗 | festival 默认；sakura 场景跨路由常驻，切主题销毁；zine 保留刊物方向，装饰不称为真实频谱 |
 | 外观偏好 | `web/js/themes.js`；localStorage `music-map-visual-theme:v1` | 仅保存主题 ID，与身份、路线、草稿和记录分开；切换不重载页面 |
 | 滚动 | OverlayScrollbars 2.16.0 增强 body，自动隐藏的 6px 浮动条；弹窗使用原生细条 | 保留浏览器滚动与键盘导航；仅前端依赖 |
-| 内容 | 11 位艺人、10 首作品、10 条共同演唱关系及官方外链；保留独立的虚构示例及两张 AI 生成图 | 专题不是完整曲库；不内置音频，真实艺人不绑定虚构活动 |
+| 内容 | 11 位艺人、10 首作品、10 条共同演唱关系与逐人制作署名；独立 HF 开放曲库 120 首；保留虚构示例及两张 AI 生成图 | 共同署名不推断制作工种；试听链接撤下，QQ 同版本直达待核；不内置音频 |
 | 本地情景状态 | localStorage `music-map-space:v1`，两个示例角色 | 仅当前浏览器；可选本机照片，不上传服务 |
 | 联网身份 | 匿名 bearer 凭据，浏览器保存于 `music-map-live:v1` | 不是手机号账号，无找回与跨设备身份迁移 |
 | 共享服务 | Node.js 24+，内置 HTTP 与 `node:sqlite` 的 DatabaseSync；无运行时 npm 依赖 | 同源 `/api/live`，服务端校验成员和操作权限 |
@@ -18,14 +18,14 @@
 | 数据库 | SQLite，默认 `data/music-map.sqlite`，事务与 WAL；用户照片存独立表的 BLOB | 单实例 + 持久磁盘；图片不写入公开目录，`data/` 和数据库 sidecars 不提交 |
 | 输出 | 单个 `dist/index.html`；联网服务同时提供它和 API；浏览器绘制主题单卡 / 双联 PNG | 具体构建与导出检查见项目状态；只托管 HTML 可跑 Map 和本地演示，不能运行后端 |
 
-源码分工：外壳 `web/js/app.js`、Map `map.js` / `map-data.js` / `map-catalogue.js`、本地 Space `space.js`、联网房间 `live.js`、照片 `live-photo.js`、票根 `ticket-export.js`；服务入口 `server/index.js`，数据库 `server/db.js`。使用 hash 路由，依赖由锁文件固定。Three 仅用于浏览器装饰场景，OverlayScrollbars 仅调整滚动条呈现；没有引入 React、Motion、测试框架或推理模型。
+源码分工：外壳 `web/js/app.js`、Map `map.js` / `map-data.js` / `map-catalogue.js`、开放曲库 `open-catalogue.js`、本地 Space `space.js`、联网房间 `live.js`、照片 `live-photo.js`、票根 `ticket-export.js`、界面动画 `motion.js`；服务入口 `server/index.js`，数据库 `server/db.js`。使用 hash 路由，依赖由锁文件固定。Three 场景随功能切换镜头，HTML 层负责输入与业务操作；OverlayScrollbars 调整滚动条呈现。没有引入 React、测试框架或推理模型。
 
-### 0.6 页面与滚动
+### 0.7 页面与滚动
 
 - 外壳使用桌面悬浮左导轨、手机底部导航和右上角外观工具。`app-studio.css` 统一间距、颜色、圆角与操作层；不更换 hash 路由、存储键或业务状态。
-- Space 首页使用可切换视角的照片卡叠；「做一张卡」打开本地制卡，「邀请朋友」进入联网房间，选中的照片卡再次点击进入本地换卡。`space-studio.css` 管理首页与本地两卡工作区；樱花场景挂载点为 `.space-scene-slot`。
+- Space 首页使用可切换视角的照片卡叠；「做一张卡」打开本地制卡，「邀请朋友」进入联网房间，选中的照片卡再次点击进入本地换卡。`space-studio.css` 管理首页与本地两卡工作区；樱花场景已移至外壳常驻的 `#sakura-world`。
 - `space.js` 的模块内 `showDemo` 只管理界面模式，不写入卡片或持久化业务数据。同页重绘保留模式；离开 Space 后重置。记录返回与 `eventId`、`requestTarget`、`exchangeId`、`cardSaved` 等业务 payload 直接进入相应示例状态；返回首页清除旧 payload。
-- Map 使用 `.map-studio` 与 `map-studio.css`：首字彩色唱片节点、单条低对比轨道、真实关系线、作品短浮卡和底部路线。小屏从中心唱片打开作品，来源面板保留逐条前往按钮；邻居、合作／策展标签、挑战、路径与记录规则保持。去听仍是官方外链，不新增站内播放器。
+- Map 使用 `.map-studio` 与 `map-studio.css`：首字彩色唱片节点、单条低对比轨道、真实关系线、作品短浮卡和底部路线。`map-credits.css` 呈现逐人署名，作品名与“谁做了什么”打开详情；各工种有独立来源。顶部“开放曲库”打开独立搜索弹窗，原邻居、挑战、路径与记录含义保持。试听链接撤下，不新增站内播放器。
 - 联网房间采用简洁入场卡与照片工作区；个人记录以收藏卡与筛选组织。私藏／展示、申请状态、双方同意、作品来源和 AI 预置图标记继续显示在相应操作处。
 - 外壳为 body 初始化 OverlayScrollbars 2.16.0，使用自动隐藏的 6px 浮动条；弹窗保持原生滚动与细条。样式随主题变化，不接管卡片、身份或交换数据。许可与来源见[第三方说明](../../THIRD_PARTY_NOTICES.md)。
 
@@ -38,25 +38,41 @@
 | `web/css/themes.css` | 主题选择入口、共享样式和外观切换基础 |
 | `web/css/theme-sakura.css` / `theme-zine.css` | 樱下放映 / 独立刊物的页面、卡片、表单和结果视觉；festival 沿用基础样式 |
 | `web/css/app-studio.css` / `space-studio.css` / `map-studio.css` | 在旧主题样式之后加载；统一 0.6 外壳、照片卡工作台与唱片图谱构图 |
-| `web/js/sakura-scene.js` | Three 0.186.1 原创小音乐街角的几何、正交镜头、灯光、可见性和销毁 |
+| `web/js/sakura-scene.js` | Three 0.186.1 原创小院几何、透视镜头、路由视角、灯光、可见性和销毁 |
+| `web/css/spatial-world.css` | 全路由樱花场景及其 HTML 操作层的空间布局 |
+| `web/js/motion.js` | GSAP 3.15.0 / Flip 驱动卡片和弹窗动画，三主题共用并支持减少动态 |
+| `web/js/open-catalogue.js` | HF 精选数据搜索与展示，和人工核实制作名单分开 |
+| `web/css/map-credits.css` | 作品按人合并工种、署名表与逐工种来源标记 |
 | `web/js/vendor/sakura/` | MIT `toon.js` / `post.js` / `palette.js`；cel 材质、彩色阴影、深度描线、调色与 FXAA；`SOURCE.json` 记录固定提交及适配 |
 | `web/js/ticket-export.js` | 按主题绘制单卡 / 双联 PNG，保留快照、照片和来源说明 |
 
 外观通过右上角主题按钮即时选择，按钮显示当前主题名，存储键为 **`music-map-visual-theme:v1`**。模块只更新呈现与偏好，不调用业务保存、换角色、退出房间、申请或接受操作，不重载页面。首屏与跨标签偏好同步使用同一主题白名单；业务 localStorage 和匿名凭据保持各自原有键。主题规范与设计参数见 [VISUAL_THEMES.md](../../docs/VISUAL_THEMES.md)。
 
-`themes.js` 观察同场首页 `.space-scene-slot`，仅在 `sakura` 主题且挂载点存在时创建街角；离开或切换主题时调用销毁函数并移除容器。小音乐店、街道和道具的几何与构图由本项目编写，渲染方法实际复用 Sakura Crossing MIT 源码，未复制其完整街区、人物、纹理原图或音频。
+`themes.js` 在 `sakura` 主题下将场景挂到外壳 `#sakura-world`。同一个 scene / renderer 跨 hash 路由保留：`space` 小院全景、`explore` 唱片台、`live` 照片墙、`records` 收藏架。路由驱动真实透视相机沿约 1.3 秒曲线路径移动，新的导航可打断当前镜头；减少动态偏好直接切到目标。切走主题时销毁场景。小院与道具由本项目编写，渲染方法复用 Sakura Crossing MIT 源码，未复制其完整街区、人物、纹理原图或音频。
 
-上游 Three 0.180.0 的 cel shader 补丁已按本项目 0.186.1 源码位置适配；深度描线加入正交相机的深度还原与近远裁切同步。`createCelMaterials()` 为每个挂载场景创建独立的材质和色阶纹理池；`Pipeline` 控制深度墨线、色彩分级和 FXAA。后处理设定 DPR 上限 1.5 与 200 万像素预算，主循环保留 30fps 上限、离屏／隐藏暂停和减少动态效果。销毁时释放后处理目标与材质池、几何体、纹理、阴影、renderer 及监听。上述是实现描述，设备性能与画面结果仍按实际检查记录。
+上游 Three 0.180.0 的 cel shader 补丁按本项目 0.186.1 源码位置适配；当前使用透视相机，深度描线与近远裁切同步。`createCelMaterials()` 为挂载场景创建独立的材质和色阶纹理池；`Pipeline` 控制深度墨线、调色与 FXAA。GSAP 管理镜头时间线，空闲渲染目标 30fps、转场目标 60fps；这些是调度目标，不是设备实测保证。减少动态时使用静态画面；销毁释放后处理目标、材质、几何、纹理、renderer 及监听。画面与实际性能范围按项目状态记实。
 
 PNG 在开始异步加载照片和字体前确定本次导出主题；用户稍后切换页面外观，不改变已开始导出的画风。双联继续使用已接受的两卡快照，单卡使用自己的当前卡；主题不写回照片、文案、作者或交换数据。三套绘制共用照片披露逻辑，预置示例保留 AI 标识；上传照片通过既有授权 blob URL 读取，不因外观转换而改放公共目录。
 
 Three 与实际复用的 Sakura Crossing 模块均保留 MIT 许可；固定提交、文件哈希及本地改动见[源码清单](../../web/js/vendor/sakura/SOURCE.json)和 [THIRD_PARTY_NOTICES](../../THIRD_PARTY_NOTICES.md)。0.5 的[研究记录](../../references/research/2026-09-27/sakura-visual-reference.md)保留当时仅作视觉参考的决定，不能代替 0.6 实际代码采用范围。
 
+### 0.7 数据来源与复现
+
+`map-catalogue.js` 的 10 首精选使用 `real-vocal-2026-09-v2`，稳定 ID 与共同演唱边保持。`credits[]` 每项包含 `name`、`role`、`sourceId` 和可选 `artistId`；幕后人员可以没有图节点。`creditSources[]` 提供来源 URL、标题和核对日期。`creditsScope: 'selected-verified'` 表示只列已核实分工，不承诺完整名单。详情按人合并工种，来源仍精确到工种；见[署名取证记录](../../references/research/2026-09-27/collaboration-roles.md)。
+
+Hugging Face 数据：`maharshipandya/spotify-tracks-dataset`，固定 revision `635b034f69257814eff850a5c2b3346fe458134f`。完整 `dataset.csv` 位于 `data/external/spotify-tracks-dataset/`，共 **114,000 行、20,118,244 B**；同目录有清单、文件树和数据卡副本。复现：
+
+```sh
+python scripts/datasets/download_hf_catalogue.py
+```
+
+前端载入 `web/assets/data/hf-collaborations.json` 的 **120 首**整理结果，由 `open-catalogue.js` 提供独立搜索。HF 中的共同 artist 署名不推断主唱、词曲或制作，不合并到原共唱挑战图中。完整 CSV 不进入 HTML 或运行包，启动不依赖在线 HF 请求；没有下载音频、封面或模型权重。下载范围和来源见[下载记录](../../references/research/2026-09-27/huggingface-download.md)。
+
 ### 沿用的 0.4.0 能力
 
 0.4 在动态排版主导的音乐节视觉下加入以下能力；当前版本保留其业务含义。0.4 实际操作范围见第 8 节与项目状态：
 
-1. Map 加入 11 位艺人的真实合作小专题，10 首合作作品逐项附署名、版本、来源日期和官方 MV 外链。虚构示例保持独立，旧探索与记录仍能识别其示例身份；不把真实艺人挂到虚构场次。
+1. 0.4 的 Map 加入 11 位艺人的真实合作专题，10 首作品附署名、版本、日期，当时带官方 MV 外链；0.7 保留数据身份并扩充逐人制作署名，撤下试听链接。虚构示例保持独立，旧探索与记录仍能识别其示例身份；不把真实艺人挂到虚构场次。
 2. 用户用活动名、日期、城市和共同歌曲建立自己的私有房间；共同歌曲是用户填写的信息，不代表取得音频或证明艺人到场。
 3. 真实房间支持用户自己的压缩 JPEG 和舞台 / 人海 / 同伴 / 细节视角，默认私藏，可主动展示或定向发起交换。服务端保存照片与快照引用；前端负责压图、携带身份读取 blob URL 和单卡 PNG。
 4. 保留可直接操作的邻居、即时探索收获、`mapReturnId` 返回原探索、手机输入优先与折叠预览、本地接受后自动保存、记录筛选和重入邀请码。0.5.1 删除的是常驻教程，不改变探索或交换状态。
@@ -101,7 +117,8 @@ Three 与实际复用的 Sakura Crossing 模块均保留 MIT 许可；固定提�
 
 | 对象 | 最少字段 / 用途 |
 |---|---|
-| Artist / Track | 稳定 ID、`dataset`、名称、显式 `songIds`；真实作品含版本、`credits`、来源、日期与 `listenLinks`，无内置音频 |
+| Artist / Track | 稳定 ID、`dataset`、名称、显式 `songIds`；真实精选含录音版本、`credits` / `creditSources`、日期与空的 `listenLinks`；`audioAvailable:false` |
+| OpenCatalogue | 独立 HF 精选 JSON；共同署名和数据来源，不写入原挑战图或人工核实制作工种 |
 | Relation | 两端艺人、`dataset`、合作作品、版本、演唱角色和来源；真实共同演唱或明确示例 |
 | Event | 房间响应与新卡快照中的 `{id,title,date,city,song,isDemo}`；Map 真实合作专题与虚构示例另行标识 |
 | Moment | 场次内的歌曲或环节，如返场、全场合唱 |
@@ -155,13 +172,13 @@ stateDiagram-v2
 
 ## 5. 音频如果加入
 
-当前实现只有官方 MV 外链，跳转 YouTube，可能受地区与账号条件影响；没有播放器、音频下载或实时音频分析。外链元数据核对不等于实际播放验证。以下仅是未来确实接入试听时的规格。
+当前没有播放器、音频下载或实时音频分析；试听链接已撤下。以后优先采用经核实的 QQ 音乐同作品、同版本直达，未核实时继续不显示入口。当前来源链接只用于署名取证。以下仅是未来确实接入试听时的规格。
 
 使用单一原生音频元素，只有用户明确点击才播放。浏览其他艺人、开关面板或进入 Space 不主动打断；播放器显示实际音源，避免把 A 的歌归到当前查看的 B。刷新不自动播放，后台表现以实际浏览器为准。
 
 缺资源、加载失败和播放被拒绝都要反馈；不以计时器伪装真实声音，也不把另一首歌挂到目标作品名下。只有确实接入音频分析时才显示真实频谱，普通装饰不标作实时音频。
 
-本条是“实现试听时”的规格。没有试听版本仍可完整展示现场卡和交换，不因此要求下载整库。
+本条是“实现试听时”的规格。已下载的 HF 文件只有元数据，不提供试听音频；没有试听仍可完整展示现场卡和交换。
 
 ## 6. 本地运行与部署
 
@@ -190,9 +207,9 @@ npm start
 仓库有多阶段 Dockerfile：构建前端，运行时保留 Node 24、服务和 `dist/`，以非 root 用户运行。
 
 ```powershell
-docker build -t music-map-space:0.6.0 .
+docker build -t music-map-space:0.7.0 .
 docker volume create music-map-data
-docker run -d --name music-map-space --restart unless-stopped -p 127.0.0.1:8787:8787 -v music-map-data:/app/data music-map-space:0.6.0
+docker run -d --name music-map-space --restart unless-stopped -p 127.0.0.1:8787:8787 -v music-map-data:/app/data music-map-space:0.7.0
 ```
 
 这些是部署说明，不代表已经执行。Docker 内服务监听 `0.0.0.0`，上述端口映射仍只开放到宿主机环回地址。生产由反向代理将同一 HTTPS 域名的页面和 `/api/live` 全部转发到这个 Node 实例；需要定向访问时也在入口限制站点访问。保留 `music-map-data` volume，不把数据库放进镜像或无持久磁盘的平台。采用单实例，不启用多个独立 SQLite 副本的自动横向扩容。实际托管、TLS、访问控制与备份安排尚未执行。
@@ -201,7 +218,8 @@ docker run -d --name music-map-space --restart unless-stopped -p 127.0.0.1:8787:
 
 | 项目 | 当前安排 | 记录位置 |
 |---|---|---|
-| 0.6 独立 App 构图与渲染 | 悬浮导航、照片卡工作台、唱片图谱与 MIT 三渲二管线；构建、画面、打包和同步分别登记 | [项目状态](../../docs/PROJECT_STATUS.md) |
+| 0.7 空间镜头与作品数据 | 常驻透视小院、GSAP / Flip、逐人制作署名、完整 HF CSV 与前端 120 首开放曲库；检查与交付分别登记 | [项目状态](../../docs/PROJECT_STATUS.md) |
+| 0.6 独立 App 历史证据 | 悬浮导航、照片卡工作台、唱片图谱与 MIT 三渲二管线，保留当次构建和画面范围 | [项目状态](../../docs/PROJECT_STATUS.md) |
 | 0.5.1 界面精简历史证据 | 首页与示例分开、紧凑图谱、按需说明与浮动滚动条，保留原版本检查 | [项目状态](../../docs/PROJECT_STATUS.md) |
 | 0.5.0 三主题历史证据 | 默认声浪现场、樱下放映与独立刊物；当时的构建、切换、页面与 PNG 检查保留原版本 | [项目状态](../../docs/PROJECT_STATUS.md) |
 | 0.4.0 历史构建与关键操作 | 构建通过；旧身份 / 房间读回，自定义活动、文件上传、独立同意、双方记录和单卡 / 双联下载已操作；范围见第 8 节 | [项目状态](../../docs/PROJECT_STATUS.md) |
@@ -215,9 +233,13 @@ docker run -d --name music-map-space --restart unless-stopped -p 127.0.0.1:8787:
 
 ## 8. 证据与待检查边界
 
-### 0.6 当前结果
+### 0.7 当前结果
 
-本轮照片卡工作台、唱片 Map、悬浮导航、轻量房间与新三渲二渲染的构建和相关画面检查，由整合者统一记录在[项目状态](../../docs/PROJECT_STATUS.md)。本次文档同步不新增构建或浏览器结果，不推定 GitHub、CI、运行包或部署已完成。
+本轮常驻透视场景、路由镜头、GSAP 界面动画、逐人署名和开放曲库的构建及相关画面检查，由整合者统一记录在[项目状态](../../docs/PROJECT_STATUS.md)。本次文档同步不新增构建或浏览器结果，不推定 GitHub、CI、运行包或部署已完成。
+
+### 0.6 历史结果
+
+照片卡工作台、唱片 Map、悬浮导航和 MIT 三渲二管线的当次检查保留在[项目状态](../../docs/PROJECT_STATUS.md)，不代替 0.7 空间镜头、动画或新数据的检查。
 
 ### 0.5.1 历史结果
 
@@ -242,7 +264,7 @@ docker run -d --name music-map-space --restart unless-stopped -p 127.0.0.1:8787:
 | Map | 已操作真实周杰伦 → 张惠妹与来源面板，旧 fictional 路线保持 | 没有内置音频或官方 MV 实际播放保证 |
 | 视频素材 | 0.4.0 已完成 **106 秒、1080p、30fps** 的实际操作中文字幕成片与 16:9 封面；全片解码与关键帧目视已完成 | 不包含 0.5 三主题；详细规格与剪辑来源见交付清单，不扩大为全部新主题录制 |
 
-线上受保护评审链接、外部目标用户试用、实体手机与正式提交仍未完成。没有下载大数据或模型权重，没有内置音频或实时 AI 推理。具体原始操作证据见[项目状态](../../docs/PROJECT_STATUS.md)。
+以上为 0.4 的历史结果；当时尚未下载 HF 曲库。当前完整 CSV 已下载，仍无模型权重、内置音频或实时 AI 推理。线上受保护评审链接、外部目标用户试用、实体手机与正式提交尚待完成，原始操作与本轮状态见[项目状态](../../docs/PROJECT_STATUS.md)。
 
 ### 历史版本记录
 
@@ -261,4 +283,4 @@ docker run -d --name music-map-space --restart unless-stopped -p 127.0.0.1:8787:
 | 线上部署 | 评审实际可访问，API 同源，磁盘持续保留 | 尚未部署；Dockerfile 存在不等于容器已运行 |
 | 音频与真实元数据 | 来源及实际能力准确 | 尚未接入 |
 
-以上 0.2.0 运行证据由整合者及接口检查协作者提供，当时没有新增或运行测试框架 / 套件。本次文档同步没有新增检查；0.4.0 / 0.5.0 / 0.5.1 按历史范围保留，0.6 由任务记录记实，不将局部检查扩展成未执行的环境或路径。
+以上 0.2.0 运行证据由整合者及接口检查协作者提供，当时没有新增或运行测试框架 / 套件。本次文档同步没有新增检查；0.4.0 / 0.5.0 / 0.5.1 / 0.6 按历史范围保留，0.7 由任务记录记实，不将局部检查扩展成未执行的环境或路径。

@@ -9,7 +9,7 @@ const themes = [
 ];
 
 /** Visual state deliberately lives outside the room, card and route stores. */
-export function mountThemes() {
+export function mountThemes({ navigate, view }) {
   const launcher = document.querySelector('#theme-launcher');
   const dialog = document.createElement('dialog');
   dialog.className = 'theme-dialog';
@@ -23,24 +23,14 @@ export function mountThemes() {
     <footer class="theme-dialog__footer"><p data-theme-status role="status" aria-live="polite"></p><button class="button button--primary" data-theme-close>完成</button></footer>`;
   document.body.append(dialog);
 
-  let sceneHost = null;
-  let disposeScene = null;
+  const sceneHost = document.querySelector('#sakura-world');
+  let scene = null;
+  let currentView = view;
   function syncScene() {
-    const hero = document.querySelector('.space-scene-slot');
     const wantsScene = document.documentElement.dataset.theme === 'sakura';
-    if (sceneHost && (!sceneHost.isConnected || !wantsScene)) {
-      disposeScene?.();
-      sceneHost.remove();
-      sceneHost = null;
-      disposeScene = null;
-    }
-    if (hero && wantsScene && !sceneHost) {
-      sceneHost = document.createElement('div');
-      sceneHost.className = 'theme-world';
-      sceneHost.dataset.themeWorld = '';
-      hero.prepend(sceneHost);
-      disposeScene = mountSakuraScene(sceneHost);
-    }
+    sceneHost.hidden = !wantsScene;
+    if (!wantsScene) { scene?.dispose(); scene = null; }
+    if (wantsScene && !scene) scene = mountSakuraScene(sceneHost, { navigate, view: currentView });
   }
 
   function applyTheme(id, save = true) {
@@ -68,9 +58,6 @@ export function mountThemes() {
   window.addEventListener('storage', event => {
     if (event.key === STORAGE_KEY) applyTheme(event.newValue, false);
   });
-  // Space can rerender its own content after changing demo roles. Attach the
-  // scene to the current desk; never rerender any business UI for a theme.
-  const observer = new MutationObserver(syncScene);
-  observer.observe(document.querySelector('#main-content'), { childList: true, subtree: true });
   applyTheme(document.documentElement.dataset.theme, false);
+  return { setView(next) { currentView = next; scene?.setView(next); } };
 }

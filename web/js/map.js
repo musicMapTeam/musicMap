@@ -64,20 +64,43 @@ function evidenceHTML(edge, api) {
   return edge.sourceUrl ? `<a class="map-evidence-link" href="${escapeHTML(edge.sourceUrl)}" target="_blank" rel="noopener noreferrer" aria-label="查看${escapeHTML(edge.sourceLabel)}，新标签页">${escapeHTML(edge.sourceLabel)} ${api.icon('arrow-up-right')}</a>` : '';
 }
 
+function creditRows(song) {
+  const people = new Map();
+  for (const credit of song.credits || []) {
+    const name = credit.name || artistName(credit.artistId);
+    if (!people.has(name)) people.set(name, { name, roles: [] });
+    people.get(name).roles.push(credit);
+  }
+  return [...people.values()];
+}
+
+function creditsHTML(song, api, expanded = false) {
+  if (!song?.credits?.length) return '';
+  const people = creditRows(song);
+  const table = `<table class="map-credit-table"><thead><tr><th scope="col">姓名</th><th scope="col">负责内容</th></tr></thead><tbody>${people.map(person => `<tr><th scope="row">${escapeHTML(person.name)}</th><td>${person.roles.map(credit => {
+    const index = song.creditSources.findIndex(source => source.id === credit.sourceId);
+    const source = song.creditSources[index];
+    return `<span class="map-credit-role">${escapeHTML(credit.role)}<a href="${escapeHTML(source.url)}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHTML(person.name)}的${escapeHTML(credit.role)}署名来源：${escapeHTML(source.label)}，新标签页" title="${escapeHTML(source.label)}">${index + 1}</a></span>`;
+  }).join('')}</td></tr>`).join('')}</tbody></table>`;
+  const sources = `<details class="map-credit-sources"><summary>署名来源 <span>${song.creditSources.length}</span></summary><ol>${song.creditSources.map(source => `<li><a href="${escapeHTML(source.url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(source.label)} ${api.icon('arrow-up-right')}</a></li>`).join('')}</ol><p>核对于 ${song.checkedAt}。仅列已核实署名，未列出不表示未参与。</p></details>`;
+  if (expanded) return `<div class="map-credits map-credits--expanded">${table}${sources}</div>`;
+  return `<details class="map-credits"><summary><span>作品署名</span><small>${people.length} 位</small>${api.icon('chevron-right')}</summary>${table}${sources}</details>`;
+}
+
 function catalogueSwitchHTML(dataset) {
   return `<div class="map-catalogue"><div class="map-catalogue__switch" role="group" aria-label="选择音乐图谱">${Object.values(catalogues).map(item => button('dataset', item.id === 'real' ? '真实合作' : '情景示例', item.id === dataset ? 'is-active' : '', `data-dataset="${item.id}" aria-pressed="${item.id === dataset}"`)).join('')}</div></div>`;
 }
 
-function tracksHTML(session, trackIds, api, source = '', showVersion = false) {
+function tracksHTML(session, trackIds, api, source = '', showVersion = false, showCredits = false) {
   return trackIds.map((id, index) => {
     const song = songs[id];
     if (!song) return '';
     const saved = session.saved.some(item => item.id === id);
     return `<div class="map-track">
       <span class="map-track__index" aria-hidden="true">${String(index + 1).padStart(2, '0')}</span>
-      <div class="map-track__copy"><strong>${escapeHTML(song.title)}</strong><span>${song.artists.map(artistName).map(escapeHTML).join(' / ')}</span>${showVersion && song.versionLabel ? `<small>${escapeHTML(song.versionLabel)}</small>` : ''}</div>
+      <div class="map-track__copy">${song.credits?.length ? button('credits', `${escapeHTML(song.title)}<span aria-hidden="true">↗</span>`, 'map-track__title', `data-id="${id}" data-session="${session.id}" aria-label="查看《${escapeHTML(song.title)}》的作品署名"`) : `<strong>${escapeHTML(song.title)}</strong>`}<span>${song.artists.map(artistName).map(escapeHTML).join(' / ')}</span>${showVersion && (song.recordingLabel || song.versionLabel) ? `<small>${escapeHTML(song.recordingLabel || song.versionLabel)}</small>` : !showVersion && song.creditSummary ? `<small class="map-track__credit-preview">${escapeHTML(song.creditSummary)}</small>` : ''}</div>
       <div class="map-track__actions">${listenHTML(song, api)}${button('save', api.icon(saved ? 'check' : 'plus'), `icon-button map-track__save ${saved ? 'is-saved' : ''}`, `data-id="${id}" data-session="${session.id}" data-source="${escapeHTML(source)}" aria-label="${saved ? '移除' : '留下'}《${escapeHTML(song.title)}》" aria-pressed="${saved}" title="${saved ? '已留下，点击移除' : '留下这首作品'}"`)}</div>
-    </div>`;
+    </div>${showCredits ? creditsHTML(song, api) : ''}`;
   }).join('');
 }
 
@@ -97,7 +120,7 @@ function discoveryHTML(session, api, undo) {
     const canUndo = undo?.sessionId === session.id && undo.item.id === edge.song;
     return `<section class="map-discovery" aria-label="当前连接的作品">
       <div class="map-discovery__copy"><p><strong>${edge.song ? `《${escapeHTML(songs[edge.song].title)}》` : `策展标签 · ${escapeHTML(edge.reason)}`}</strong><span class="map-discovery__artists">${origin} × ${destination}</span></p></div>
-      ${edge.song ? `<div class="map-discovery__actions">${listenHTML(songs[edge.song], api)}${button('save', `${api.icon(saved ? 'check' : 'plus')} ${saved ? '已留下' : '留下'}`, `button button--quiet ${saved ? 'is-saved' : ''}`, `data-id="${edge.song}" data-session="${session.id}" data-source="${escapeHTML(source)}" aria-label="${saved ? '移除' : '留下'}《${escapeHTML(songs[edge.song].title)}》" aria-pressed="${saved}"`)}${canUndo ? button('undo', '撤销', 'button button--quiet') : ''}</div>` : ''}
+      ${edge.song ? `<div class="map-discovery__actions">${songs[edge.song].credits?.length ? button('credits', '谁做了什么', 'button button--quiet', `data-id="${edge.song}" data-session="${session.id}"`) : ''}${listenHTML(songs[edge.song], api)}${button('save', `${api.icon(saved ? 'check' : 'plus')} ${saved ? '已留下' : '留下'}`, `button button--quiet ${saved ? 'is-saved' : ''}`, `data-id="${edge.song}" data-session="${session.id}" data-source="${escapeHTML(source)}" aria-label="${saved ? '移除' : '留下'}《${escapeHTML(songs[edge.song].title)}》" aria-pressed="${saved}"`)}${canUndo ? button('undo', '撤销', 'button button--quiet') : ''}</div>` : ''}
     </section>`;
   }
 
@@ -127,7 +150,7 @@ function mapHTML(map, api, presentation = 'quiet') {
   return `<section class="map-experience map-studio map-experience--${presentation}" aria-label="音乐关系探索">
     <header class="map-studio-head">
       <div class="map-studio-title"><h1>${isChallenge ? '合作挑战' : '音乐地图'}</h1>${catalogueSwitchHTML(dataset)}</div>
-      <div class="map-studio-tools">${button('search', api.icon('compass'), 'icon-button', 'aria-label="换个起点" title="换个起点"')}${button('challenge', '合作挑战', 'button button--quiet')}</div>
+      <div class="map-studio-tools"><button type="button" class="button button--quiet" data-open-catalogue>开放曲库</button>${button('search', api.icon('compass'), 'icon-button', 'aria-label="换个起点" title="换个起点"')}${button('challenge', '合作挑战', 'button button--quiet')}</div>
     </header>
     ${isChallenge ? `<div class="map-challenge-banner"><div><span class="map-challenge-banner__label">${isComplete ? '已抵达' : '挑战中'}</span><strong>${escapeHTML(artistName(session.start))} ${api.icon('arrow-right')} ${escapeHTML(artistName(session.target))}</strong></div><span><b>${session.path.length - 1}</b> 步</span>${button('return-roam', '返回漫游', 'button button--quiet', `data-session="${session.id}"`)}</div>` : ''}
     <div class="map-workspace">
@@ -187,7 +210,7 @@ function recapHTML(session, api) {
 
 function panelHTML(map, api, recordsOnly = false) {
   const panel = map.view.panel;
-  if (!panel || (recordsOnly && !['recap', 'delete'].includes(panel))) return '';
+  if (!panel || (recordsOnly && !['recap', 'delete', 'credits'].includes(panel))) return '';
   const session = sessionById(map, map.view.reviewId) || activeSession(map);
   const dataset = sessionDataset(session);
   const catalogue = catalogueFor(session);
@@ -196,10 +219,14 @@ function panelHTML(map, api, recordsOnly = false) {
   let content = '';
   if (panel === 'search') content = `<span class="eyebrow">${catalogue.label}</span><h2>换个起点</h2><p class="map-panel-description">开启新探索，当前记录保留。</p><label class="map-search-label" for="map-artist-search">${availableArtists.length} 位艺人</label><input id="map-artist-search" class="map-input" type="search" placeholder="${isReal ? '搜索名字，如 周杰伦、JJ Lin' : '搜索名字或标签，如 林间、民谣'}" value="${escapeHTML(map.view.query)}" autocomplete="off"><div class="map-search-results" data-map-search-results>${searchResultsHTML(map.view.query, dataset)}</div>`;
   if (panel === 'challenge') content = `<span class="eyebrow">${catalogue.label}</span><h2>合作挑战</h2><p class="map-panel-description">沿合作找到终点，进度自动保留。</p><form data-map-challenge-form><label class="map-field">起点<select name="start">${availableArtists.map(artist => `<option value="${artist.id}" ${map.view.challengeStart === artist.id ? 'selected' : ''}>${escapeHTML(artist.name)}</option>`).join('')}</select></label><label class="map-field">终点<select name="target">${availableArtists.map(artist => `<option value="${artist.id}" ${map.view.challengeEnd === artist.id ? 'selected' : ''}>${escapeHTML(artist.name)}</option>`).join('')}</select></label><p class="map-form-error" data-map-challenge-error role="alert">${escapeHTML(map.view.challengeError)}</p><button class="button button--primary" type="submit">开始挑战 ${api.icon('arrow-right')}</button></form><p class="map-storage-note">每次连接计 1 步，返回撤销 1 步。仅使用本图谱已收录的关系。</p>`;
-  if (panel === 'artist' && session) { const artist = artistById[currentNode(session).id]; content = `<span class="eyebrow">${catalogue.label} · ${isReal ? '入选合作' : '示例作品'}</span><h2>${escapeHTML(artist.name)}</h2><p class="map-panel-description">${isReal ? '官方 MV · 新标签页打开' : '虚构作品，无音源。'}</p>${tracksHTML(session, artist.songIds, api, `在${artist.name}的${isReal ? '入选合作作品' : '示例作品'}中留下`, true)}`; }
+  if (panel === 'artist' && session) { const artist = artistById[currentNode(session).id]; content = `<span class="eyebrow">${catalogue.label} · ${isReal ? '入选合作' : '示例作品'}</span><h2>${escapeHTML(artist.name)}</h2><p class="map-panel-description">${isReal ? '作品与制作署名 · 无内置音频' : '虚构作品，无音源。'}</p>${tracksHTML(session, artist.songIds, api, `在${artist.name}的${isReal ? '入选合作作品' : '示例作品'}中留下`, true, true)}`; }
+  if (panel === 'credits' && session) {
+    const song = songs[map.view.creditSongId];
+    if (song?.credits?.length) content = `<div class="map-credit-heading"><span class="map-credit-disc" style="--credit-tone:${artistById[song.artists[0]].color}" aria-hidden="true"></span><div><span class="eyebrow">作品署名</span><h2>${escapeHTML(song.title)}</h2><p>${escapeHTML(song.recordingLabel)}</p></div></div>${creditsHTML(song, api, true)}<div class="map-credit-bottom"><span>无内置音频</span>${button('save', `${api.icon(session.saved.some(item => item.id === song.id) ? 'check' : 'plus')} ${session.saved.some(item => item.id === song.id) ? '已留下' : '留下作品'}`, 'button button--quiet', `data-id="${song.id}" data-session="${session.id}" data-source="查看作品制作署名后留下" aria-pressed="${session.saved.some(item => item.id === song.id)}"`)}</div>`;
+  }
   if (panel === 'relations' && session) {
     const id = currentNode(session).id;
-    content = `<span class="eyebrow">${catalogue.label} · ${modeName(session.mode)}</span><h2>连接来源</h2><p class="map-panel-description">${isReal ? '按共同演唱署名整理。官方 MV 可能受地区或登录限制。' : '虚构示例，无音源。标签由人工整理。'}</p>${getNeighbors(id, session.mode, dataset).map(edge => `<section class="map-relation-proof"><div class="map-relation-title"><h3>${escapeHTML(artistName(id))} <span>↔</span> ${escapeHTML(artistName(otherArtist(edge, id)))}</h3>${button('move', api.icon('arrow-up-right'), 'icon-button', `data-id="${otherArtist(edge, id)}" aria-label="前往${escapeHTML(artistName(otherArtist(edge, id)))}" ${session.status === 'complete' ? 'disabled' : ''}`)}</div><p>${escapeHTML(edge.evidence)}</p>${edge.dataset === 'real' ? `<p class="map-relation-credits">${songs[edge.song].credits.map(credit => `${escapeHTML(artistName(credit.artistId))} · ${escapeHTML(credit.role)}`).join(' / ')}<br>核对日期：${edge.checkedAt}</p>` : ''}${evidenceHTML(edge, api)}${edge.song ? tracksHTML(session, [edge.song], api, `通过${artistName(edge.a)}与${artistName(edge.b)}的合作作品留下`, true) : ''}</section>`).join('') || '<p class="map-inline-empty">本图谱暂无收录。</p>'}`;
+    content = `<span class="eyebrow">${catalogue.label} · ${modeName(session.mode)}</span><h2>连接来源</h2><p class="map-panel-description">${isReal ? '图中连线表示共同演唱；每首作品可展开制作署名。' : '虚构示例，无音源。标签由人工整理。'}</p>${getNeighbors(id, session.mode, dataset).map(edge => `<section class="map-relation-proof"><div class="map-relation-title"><h3>${escapeHTML(artistName(id))} <span>↔</span> ${escapeHTML(artistName(otherArtist(edge, id)))}</h3>${button('move', api.icon('arrow-up-right'), 'icon-button', `data-id="${otherArtist(edge, id)}" aria-label="前往${escapeHTML(artistName(otherArtist(edge, id)))}" ${session.status === 'complete' ? 'disabled' : ''}`)}</div>${edge.song ? tracksHTML(session, [edge.song], api, `通过${artistName(edge.a)}与${artistName(edge.b)}的合作作品留下`, true, true) : `<p>${escapeHTML(edge.evidence)}</p>`}${edge.dataset !== 'real' ? evidenceHTML(edge, api) : ''}</section>`).join('') || '<p class="map-inline-empty">本图谱暂无收录。</p>'}`;
   }
   if (panel === 'recap' && session) content = recapHTML(session, api);
   if (panel === 'delete' && session) content = `<h2>删除这次探索？</h2><p class="map-panel-description">将删除从${escapeHTML(artistName(session.start))}出发的路线、分支和作品清单，无法恢复。</p><div class="map-panel-actions">${button('delete-confirm', '删除记录', 'button button--primary', `data-session="${session.id}"`)}${button('close', '保留')}</div>`;
@@ -287,6 +314,10 @@ function attachInteractions(container, api, recordsOnly) {
     const { mapAction: action, id, session: sessionId } = control.dataset;
     const map = api.getState().map;
     const session = activeSession(map);
+    if (action === 'credits' && songs[id]?.credits?.length) {
+      mutate(state => { state.view.creditSongId = id; state.view.reviewId = sessionId || null; state.view.panel = 'credits'; });
+      return;
+    }
     if (['search', 'artist', 'relations', 'challenge', 'delete', 'recap'].includes(action)) {
       showPanel(action, sessionId || null);
       if (recordsOnly && ['search', 'challenge'].includes(action)) goExplore();

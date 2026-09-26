@@ -1,7 +1,7 @@
 // A small, manually checked catalogue of credited vocal collaborations.
 // Metadata and outbound official links only: no audio, lyrics or cover images.
 // Evidence and metadata-check details: references/research/2026-09-27/real-catalogue-sources.md
-export const REAL_CATALOGUE_VERSION = 'real-vocal-2026-09-v1';
+export const REAL_CATALOGUE_VERSION = 'real-vocal-2026-09-v2';
 const checkedAt = '2026-09-27';
 const warnerJam = 'https://www.warnermusic.com.tw/blog/posts/與蕭敬騰與合唱的必聽歌曲-蕭敬騰合唱-禁愛條款-張惠妹一眼瞬間-林俊傑hello';
 const warnerGenesis = 'https://www.warnermusic.com.tw/products/《新地球-genesis-發行版-─-天sky》';
@@ -90,11 +90,180 @@ const recordings = [
   },
 ];
 
-export const realSongs = Object.fromEntries(recordings.map(recording => [recording.id, {
-  ...recording, dataset: 'real', audioAvailable: false, checkedAt,
-  credits: recording.artists.map(artistId => ({ artistId, role: '演唱' })),
-  listenLinks: [{ label: '官方 MV', platform: 'YouTube', url: `https://www.youtube.com/watch?v=${recording.videoId}` }],
-}]));
+// A credit belongs to a specific recording, not to an artist in general.
+// Keep one role/source pair per row so co-vocal graph edges stay unambiguous.
+const source = (id, label, url) => ({ id, label, url, checkedAt });
+const credited = (name, roles, sourceId) => roles.map(role => ({
+  name, role, sourceId,
+  ...(artistEntries.find(entry => entry[1] === name) ? { artistId: artistEntries.find(entry => entry[1] === name)[0] } : {}),
+}));
+const contributions = {
+  'real-bu-gai': {
+    recordingLabel: '《周杰伦的床边故事》· 录音室版', creditSummary: '词 方文山 · 曲 周杰伦',
+    sources: [source('release', 'Shazam · 发行制作署名', 'https://www.shazam.com/zh-tw/song/1721456390/不該-feat-張惠妹')],
+    credits: [
+      ...credited('周杰伦', ['作曲', '制作人'], 'release'),
+      ...credited('方文山', ['作词'], 'release'),
+      ...credited('黄雨勋', ['编曲', '吉他'], 'release'),
+      ...credited('陈柏州', ['鼓'], 'release'),
+      ...credited('杨大纬', ['混音'], 'release'),
+      ...credited('杨瑞代', ['录音'], 'release'),
+      ...credited('钟潍宇', ['录音'], 'release'),
+      ...credited('陈羽柔', ['第一小提琴'], 'release'),
+      ...credited('王茂榛', ['第一小提琴'], 'release'),
+      ...credited('骆思云', ['第一小提琴'], 'release'),
+      ...credited('张玮珊', ['第一小提琴'], 'release'),
+      ...credited('陈泱瑾', ['第二小提琴'], 'release'),
+      ...credited('龙俊宇', ['第二小提琴'], 'release'),
+      ...credited('周有玓', ['第二小提琴'], 'release'),
+      ...credited('易欣颖', ['第二小提琴'], 'release'),
+      ...credited('陈怡玲', ['中提琴'], 'release'),
+      ...credited('林筱婷', ['中提琴'], 'release'),
+      ...credited('罗月廷', ['大提琴'], 'release'),
+      ...credited('颜君玲', ['大提琴'], 'release'),
+    ],
+  },
+  'real-far-away': {
+    recordingLabel: '《依然范特西》· 合唱录音室版', creditSummary: '词 方文山 · 曲 周杰伦',
+    sources: [source('release', 'Qobuz ·《依然范特西》曲目 3', 'https://www.qobuz.com/nl-nl/album/-/ilpon2h36u7vc')],
+    credits: [
+      ...credited('周杰伦', ['作曲', '制作人'], 'release'),
+      ...credited('方文山', ['作词'], 'release'),
+      ...credited('林迈可', ['编曲', '混音'], 'release'),
+      ...credited('杨瑞代', ['录音'], 'release'),
+    ],
+  },
+  'real-wont-cry': {
+    recordingLabel: '2019 单曲 · 录音室版', creditSummary: '词 方文山 · 曲 周杰伦',
+    sources: [source('release', 'Qobuz · 单曲制作署名', 'https://www.qobuz.com/nl-nl/album/-/n1w0llg9xtasa')],
+    credits: [
+      ...credited('周杰伦', ['作曲', '制作人'], 'release'),
+      ...credited('方文山', ['作词'], 'release'),
+      ...credited('黄雨勋', ['编曲', '混音'], 'release'),
+      ...credited('杨瑞代', ['录音'], 'release'),
+      ...credited('李汪哲', ['录音'], 'release'),
+    ],
+  },
+  'real-waiting-for-you': {
+    recordingLabel: '《最伟大的作品》· 录音室版', creditSummary: '词曲 周杰伦 · 编曲 黄雨勋',
+    sources: [source('release', 'Shazam · 发行制作署名', 'https://www.shazam.com/zh-tw/song/1721450095/等你下課')],
+    credits: [
+      ...credited('周杰伦', ['作词', '作曲'], 'vocal'),
+      ...credited('周杰伦', ['制作人'], 'release'),
+      ...credited('黄雨勋', ['编曲'], 'release'),
+    ],
+  },
+  'real-sand-painting': {
+    recordingLabel: '《袁咏琳同名专辑》· 录音室版', creditSummary: '词 方文山 · 曲 袁咏琳',
+    sources: [source('release', 'Shazam · 发行制作署名', 'https://www.shazam.com/zh-tw/song/1721885585/畫沙')],
+    credits: [
+      ...credited('袁咏琳', ['作曲'], 'vocal'),
+      ...credited('袁咏琳', ['制作人'], 'release'),
+      ...credited('周杰伦', ['人声编排'], 'release'),
+      ...credited('方文山', ['作词'], 'vocal'),
+      ...credited('黄雨勋', ['编曲'], 'release'),
+      ...credited('杨瑞代', ['录音'], 'release'),
+      ...credited('柯宗佑', ['录音'], 'release'),
+      ...credited('苏正成', ['录音'], 'release'),
+      ...credited('杨大纬', ['混音'], 'release'),
+    ],
+  },
+  'real-a-moment': {
+    recordingLabel: '《STAR》· 录音室版', creditSummary: '词 邬裕康 · 曲 曹格',
+    sources: [source('release', 'Qobuz ·《STAR》曲目 6', 'https://www.qobuz.com/it-it/album/star/fuy5qlvvzxxua')],
+    credits: [
+      ...credited('曹格', ['作曲'], 'release'),
+      ...credited('邬裕康', ['作词'], 'release'),
+      ...credited('吴庆隆', ['编曲'], 'release'),
+      ...credited('马毓芬', ['制作人'], 'release'),
+      ...credited('钟国泰', ['混音', '音响工程'], 'release'),
+      ...credited('叶育轩', ['音响工程'], 'release'),
+    ],
+  },
+  'real-hello': {
+    recordingLabel: '2020 单曲 · 录音室版', creditSummary: '萧敬腾 × 林俊杰 · 作曲 / 制作',
+    sources: [source('official', '萧敬腾官方 · 录音室制作名单', 'https://www.youtube.com/watch?v=dmhhfSkC-Kg')],
+    credits: [
+      ...credited('萧敬腾', ['作曲', '制作人', '配唱制作', '钢琴', '和声编写', '和声', '母带制作人'], 'official'),
+      ...credited('林俊杰', ['作曲', '制作人', '配唱制作', '和声编写', '和声', '录音', '母带制作人'], 'official'),
+      ...credited('奶六', ['作词'], 'official'),
+      ...credited('黄冠龙 ALEX.D', ['编曲', '键盘', '弦乐编写', '吉他', '制作协力'], 'official'),
+      ...credited('阿火 Afire Lee', ['编曲', '键盘', '弦乐编写', '制作协力'], 'official'),
+      ...credited('周信廷', ['制作协力', '录音'], 'official'),
+      ...credited('蔡曜宇', ['弦乐监制', '第一小提琴'], 'official'),
+      ...credited('寗子达', ['贝斯'], 'official'),
+      ...credited('Brendan Buckley', ['鼓', '录音'], 'official'),
+      ...credited('Richard Furch', ['混音'], 'official'),
+      ...credited('Mike Bozzi', ['母带工程'], 'official'),
+      ...credited('沈羿彣', ['第一小提琴'], 'official'),
+      ...credited('黄瑾诤', ['第一小提琴'], 'official'),
+      ...credited('朱奕宁', ['第二小提琴'], 'official'),
+      ...credited('黄雨柔', ['第二小提琴'], 'official'),
+      ...credited('甘威鹏', ['中提琴'], 'official'),
+      ...credited('牟启东', ['中提琴'], 'official'),
+      ...credited('刘涵', ['大提琴'], 'official'),
+      ...credited('叶欲新', ['大提琴'], 'official'),
+      ...credited('刘品贤', ['录音'], 'official'),
+      ...credited('杨敏奇', ['录音'], 'official'),
+      ...credited('徐振程', ['录音助理'], 'official'),
+    ],
+  },
+  'real-dimples': {
+    recordingLabel: '《JJ 陆》· 国语录音室版', creditSummary: '词 王雅君 · 曲 林俊杰',
+    sources: [],
+    credits: [
+      ...credited('林俊杰', ['作曲'], 'vocal'),
+      ...credited('王雅君', ['作词'], 'vocal'),
+    ],
+  },
+  'real-summer-breeze': {
+    recordingLabel: '《空气》· 合唱录音室版', creditSummary: '词 冯欣慧 · 曲 / 编曲 林俊杰',
+    sources: [source('release', 'JOOX ·《空气》作品署名', 'https://www.joox.com/hk/single/TqpRxYVbhHXJMZnSvtT43g%3D%3D')],
+    credits: [
+      ...credited('林俊杰', ['作曲'], 'vocal'),
+      ...credited('林俊杰', ['编曲'], 'release'),
+      ...credited('冯欣慧', ['作词'], 'vocal'),
+      ...credited('毕晓世', ['制作人'], 'release'),
+    ],
+  },
+  'real-beautiful': {
+    recordingLabel: '《新地球》· 录音室版', creditSummary: '词 林怡凤 · 曲 / 制作 林俊杰',
+    sources: [
+      source('release', 'Shazam · 发行制作署名', 'https://www.shazam.com/song/1788007693/beautiful-feat-gem'),
+      source('lyrics', 'LINE MUSIC · 词曲署名', 'https://music-tw.line.me/track/1217180006'),
+    ],
+    credits: [
+      ...credited('林俊杰', ['作曲'], 'lyrics'),
+      ...credited('林俊杰', ['制作人'], 'release'),
+      ...credited('林怡凤', ['作词'], 'lyrics'),
+      ...credited('Terence Teo', ['编曲'], 'release'),
+      ...credited('Brendan Buckley', ['鼓', '录音'], 'release'),
+      ...credited('Adam Klemens', ['指挥'], 'release'),
+      ...credited('Lucie Svehlová', ['第一小提琴'], 'release'),
+      ...credited('Dr. Moon', ['录音'], 'release'),
+      ...credited('Kai', ['录音'], 'release'),
+      ...credited('Ludwig', ['录音'], 'release'),
+      ...credited('Vitek Kral', ['录音'], 'release'),
+      ...credited('Zhou Xin Ting', ['制作助理'], 'release'),
+    ],
+  },
+};
+
+export const realSongs = Object.fromEntries(recordings.map(recording => {
+  const details = contributions[recording.id];
+  return [recording.id, {
+    ...recording, dataset: 'real', audioAvailable: false, checkedAt,
+    recordingLabel: details.recordingLabel, creditSummary: details.creditSummary,
+    creditsScope: 'selected-verified',
+    credits: [
+      ...recording.artists.map(artistId => ({ artistId, name: artistEntries.find(entry => entry[0] === artistId)[1], role: '演唱', sourceId: 'vocal' })),
+      ...details.credits,
+    ],
+    creditSources: [source('vocal', recording.sourceLabel, recording.sourceUrl), ...details.sources],
+    // QQ Music is preferred. No same-version direct link has been verified yet.
+    listenLinks: [], listenStatus: 'qq-unverified',
+  }];
+}));
 
 export const realArtists = artistEntries.map(([id, name, aliases, color, bio]) => {
   const songIds = recordings.filter(recording => recording.artists.includes(id)).map(recording => recording.id);

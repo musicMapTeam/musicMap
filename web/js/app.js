@@ -10,12 +10,17 @@ import '../css/compact.css';
 import '../css/app-studio.css';
 import '../css/space-studio.css';
 import '../css/map-studio.css';
+import '../css/map-credits.css';
+import '../css/spatial-world.css';
+import '../css/open-catalogue.css';
 import { OverlayScrollbars } from 'overlayscrollbars';
 import { mountThemes } from './themes.js';
 import { icon } from './icons.js';
 import { createMapState, mountMap, mountMapRecords } from './map.js';
 import { createSpaceState, mountSpace, mountSpaceRecords } from './space.js';
 import { mountLive } from './live.js';
+import { mountMotion } from './motion.js';
+import { mountOpenCatalogue } from './open-catalogue.js';
 
 const STORAGE_KEY = 'music-map-space:v1';
 const views = ['explore', 'space', 'records', 'live'];
@@ -26,6 +31,8 @@ let toastTimer;
 let cleanup;
 let saveFailed = false;
 let recordsFilter = 'all';
+let themeController;
+let motion;
 
 function initialState() {
   return { version: 1, view: 'space', actor: 'a', map: createMapState(), space: createSpaceState(), routePayload: null };
@@ -128,6 +135,7 @@ function shell() {
       <nav class="primary-nav" aria-label="主要导航">${navItems()}</nav>
       <div class="masthead-tools"><button class="theme-launcher" id="theme-launcher" aria-haspopup="dialog" aria-controls="theme-dialog"><span class="theme-launcher__swatch" aria-hidden="true"></span><span data-theme-name>声浪现场</span></button><button class="demo-help icon-button" id="demo-help" aria-label="关于 Music Map" aria-haspopup="dialog" aria-controls="about-dialog">${icon('info')}</button></div>
     </header>
+    <div id="sakura-world" class="spatial-world" hidden></div>
     <div class="app-body">
       <div id="storage-warning" class="storage-warning" role="alert" hidden>这次修改尚未保存到浏览器，当前页面内容仍保留。可减少上传图片后重试。<button id="retry-save">重试保存</button></div>
       <main id="main-content" class="main-content" tabindex="-1"></main>
@@ -135,7 +143,7 @@ function shell() {
     <nav class="mobile-nav" aria-label="手机导航">${navItems()}</nav>
     <dialog id="about-dialog" class="about-dialog" aria-labelledby="about-title">
       <div class="about-top"><h2 id="about-title">Music Map × Space</h2><button class="icon-button" id="close-about" aria-label="关闭关于">${icon('x')}</button></div>
-      <div class="about-facts"><p><b>探索</b><span>顺着合作作品发现音乐，来源与试听见作品链接。</span></p><p><b>同场</b><span>邀请朋友交换现场照片。卡片默认私藏，双方同意后生成双联。</span></p><p><b>示例</b><span>Lin 与阿遥为本地演示角色，场次和配图为虚构。示例记录与房间身份保存在当前浏览器；清除网站数据后，身份无法找回。</span></p></div>
+      <div class="about-facts"><p><b>探索</b><span>沿合作作品发现音乐，点歌名看每个人的制作署名。</span></p><p><b>同场</b><span>邀请朋友交换现场照片。卡片默认私藏，双方同意后生成双联。</span></p><p><b>示例</b><span>Lin 与阿遥为本地演示角色，场次和配图为虚构。示例记录与房间身份保存在当前浏览器；清除网站数据后，身份无法找回。</span></p></div>
       <button class="button button--primary" id="start-experience">知道了</button>
     </dialog>`;
   root.addEventListener('click', event => {
@@ -182,6 +190,8 @@ function render() {
     cleanup = () => { spaceCleanup?.(); mapCleanup?.(); };
   }
   updateChrome();
+  themeController?.setView(state.view);
+  motion?.enter(container, state.view);
 }
 
 window.addEventListener('popstate', () => {
@@ -194,7 +204,9 @@ window.addEventListener('popstate', () => {
 });
 
 shell();
-mountThemes();
+themeController = mountThemes({ navigate, view: state.view });
+motion = mountMotion();
+mountOpenCatalogue();
 render();
 // Keep window scrolling and focus navigation native; only replace its chrome.
 OverlayScrollbars(document.body, {

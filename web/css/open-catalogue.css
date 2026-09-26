@@ -1,0 +1,24 @@
+.open-catalogue { width:min(620px,calc(100vw - 28px)); max-height:min(780px,calc(100dvh - 40px)); padding:28px; color:var(--text); background:var(--surface); border:1px solid var(--line); border-radius:26px; box-shadow:0 24px 100px #0004; overflow:hidden; }
+.open-catalogue[open] { display:flex; flex-direction:column; }
+.open-catalogue header { display:flex; align-items:center; justify-content:space-between; gap:20px; }
+.open-catalogue__eyebrow { color:var(--muted); font-size:10px; letter-spacing:.16em; }
+.open-catalogue h2 { display:flex; align-items:center; gap:12px; margin:7px 0 22px; font-size:26px; font-weight:600; }
+.open-catalogue h2 span { font-size:11px; font-weight:500; padding:5px 8px; border-radius:30px; background:var(--surface-2); }
+.open-catalogue__search { display:flex; align-items:center; gap:10px; padding:11px 14px; border:1px solid var(--line); border-radius:14px; }
+.open-catalogue__search input { flex:1; min-width:0; border:0; outline:none; background:none; color:var(--text); font:inherit; font-size:14px; }
+.open-catalogue__search:focus-within { border-color:var(--mint); }
+.open-catalogue__note { color:var(--muted); font-size:11px; margin:14px 0; }
+.open-catalogue__list { overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:var(--line) transparent; min-height:0; }
+.open-catalogue__record { border-top:1px solid var(--line); }
+.open-catalogue__record summary { list-style:none; display:flex; align-items:center; gap:16px; min-height:75px; padding:13px 4px; cursor:pointer; }
+.open-catalogue__record summary::-webkit-details-marker { display:none; }
+.open-catalogue__number { flex:0 0 29px; color:var(--muted); font-size:10px; }
+.open-catalogue__copy { display:grid; gap:6px; min-width:0; }
+.open-catalogue__copy strong { font-size:14px; font-weight:550; overflow-wrap:anywhere; }
+.open-catalogue__copy small { font-size:11px; color:var(--muted); }
+.open-catalogue__record p { margin:0 10px 18px 49px; font-size:11px; line-height:1.8; color:var(--muted); }
+.open-catalogue__record:hover { background:color-mix(in srgb,var(--mint) 4%,transparent); }
+.open-catalogue footer { display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; padding-top:19px; font-size:10px; color:var(--muted); }
+.open-catalogue footer a { display:flex; align-items:center; gap:5px; color:var(--mint); }
+.open-catalogue footer .icon { width:12px; height:12px; }
+.open-catalogue__empty { padding:45px 5px; color:var(--muted); font-size:13px; }

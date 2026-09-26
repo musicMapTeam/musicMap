@@ -1,10 +1,11 @@
 import * as THREE from 'three';
+import { gsap } from 'gsap';
 import { createCelMaterials } from './vendor/sakura/toon.js';
 import { Pipeline } from './vendor/sakura/post.js';
 import { PAL } from './vendor/sakura/palette.js';
 
 /** Original music street, rendered with Sakura Crossing's MIT cel/ink pipeline. */
-export function mountSakuraScene(host) {
+export function mountSakuraScene(host, { navigate, view = 'space' } = {}) {
   let renderer;
   try {
     renderer = new THREE.WebGLRenderer({ antialias: false, stencil: false, powerPreference: 'low-power' });
@@ -14,7 +15,7 @@ export function mountSakuraScene(host) {
     fallback.className = 'sakura-scene__fallback';
     fallback.innerHTML = '<span aria-hidden="true"></span><strong>SAME SHOW.<br>ANOTHER VIEW.</strong>';
     host.append(fallback);
-    return () => { fallback.remove(); host.classList.remove('sakura-scene--fallback'); };
+    return { setView() {}, dispose() { fallback.remove(); host.classList.remove('sakura-scene--fallback'); } };
   }
 
   host.classList.add('sakura-scene');
@@ -23,6 +24,12 @@ export function mountSakuraScene(host) {
   canvas.setAttribute('role', 'img');
   canvas.setAttribute('aria-label', '樱花音乐街角：唱片小店、街边舞台、灯串和飘落的花瓣。');
   host.append(canvas);
+  const compass = document.createElement('nav');
+  compass.className = 'world-compass';
+  compass.setAttribute('aria-label', '音乐小院');
+  compass.innerHTML = '<span class="world-compass__label">SIDE B / 春日唱片店</span><div><button data-world-view="space">小院</button><button data-world-view="explore">唱片台</button><button data-world-view="live">照片墙</button><button data-world-view="records">收藏架</button></div>';
+  host.append(compass);
+  compass.addEventListener('click', event => { const button = event.target.closest('[data-world-view]'); if (button) navigate?.(button.dataset.worldView); });
   renderer.setClearColor(PAL.skyHaze, 1);
   renderer.setPixelRatio(1);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -34,12 +41,13 @@ export function mountSakuraScene(host) {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(PAL.skyMid);
   scene.fog = new THREE.Fog(PAL.fog, 24, 46);
-  const camera = new THREE.OrthographicCamera(-6, 6, 5, -5, .1, 80);
+  const camera = new THREE.PerspectiveCamera(39, 1, .1, 80);
   camera.position.set(8.5, 6.6, 13);
   camera.lookAt(0, 1.55, 0);
   const world = new THREE.Group();
   world.rotation.y = -.12;
   scene.add(world);
+  function hotspot(object, destination) { object.userData.destination = destination; }
   const textures = new Set();
   const geometries = new Set();
   const materials = new Set();
@@ -195,6 +203,7 @@ export function mountSakuraScene(host) {
   box([.47, .76, 1.39], [1.43, .61, .67], toon.green);
   box([.47, 1.09, 1.39], [1.56, .08, .79], toon.wood);
   const record = new THREE.Group(); record.position.set(.27, 1.145, 1.39); world.add(record);
+  hotspot(record, 'explore');
   cylinder([0, 0, 0], [.36, .035, .36], toon.black, record);
   for (const radius of [.22, .265, .31]) {
     const material = new THREE.MeshBasicMaterial({ color: '#637166', side: THREE.DoubleSide }); materials.add(material);
@@ -222,6 +231,50 @@ export function mountSakuraScene(host) {
   box([3.08, .36, 1.73], [.1, .65, .1], toon.green);
   const notice = box([3.08, .92, 1.73], [.68, .76, .07], toon.rose); notice.rotation.z = -.06;
   const noteLabel = label('LIVE / 17:00', .61, .18, '#354a40', '#edabb3'); noteLabel.position.set(3.08, .99, 1.775); noteLabel.rotation.z = -.06;
+  hotspot(notice, 'live');
+
+  // Actual places in a shared set: a freestanding photo wall and record cabinet.
+  // The coloured paper below is scene decoration, never a member's private photo.
+  const wall = new THREE.Group(); wall.position.set(-4.55, .06, -.35); wall.rotation.y = .25; world.add(wall);
+  box([0, .05, 0], [2.6, .12, 1.2], toon.cream, wall);
+  for (const x of [-1.06, 1.06]) box([x, 1.36, 0], [.09, 2.72, .1], toon.green, wall);
+  box([0, 2.64, 0], [2.32, .11, .12], toon.green, wall);
+  box([0, 1.77, -.05], [2.03, 1.51, .07], toon.wood, wall);
+  for (let i = 0; i < 4; i++) {
+    const frame = new THREE.Group(); frame.position.set(i % 2 ? .48 : -.48, i < 2 ? 2.1 : 1.41, .04); frame.rotation.z = (i % 2 ? -1 : 1) * .07; wall.add(frame);
+    box([0, 0, 0], [.7, .61, .035], toon.plaster, frame);
+    box([0, .045, .024], [.6, .4, .018], [toon.rose, toon.mint, toon.glass, toon.coral][i], frame);
+    const moon = cylinder([.14, .1, .04], [.085, .018, .085], toon.cream, frame); moon.rotation.x = Math.PI / 2;
+    box([-.11, -.065, .04], [.3, .13, .02], toon.green, frame);
+    box([0, .3, .04], [.06, .12, .06], toon.gold, frame);
+  }
+  const wallTitle = label('OUR SIDE B', 1.4, .26, '#fff4db', '#42696a'); wall.add(wallTitle); wallTitle.position.set(0, 2.42, .05);
+  hotspot(wall, 'live');
+  const shelf = new THREE.Group(); shelf.position.set(4.38, .08, .18); shelf.rotation.y = -.38; world.add(shelf);
+  box([0, 1.04, -.22], [1.65, 1.95, .12], toon.wood, shelf);
+  for (const x of [-.81, .81]) box([x, 1.04, .02], [.09, 2.08, .65], toon.green, shelf);
+  for (const y of [.13, .98, 2.04]) box([0, y, .02], [1.75, .09, .71], toon.green, shelf);
+  const sleeves = [];
+  for (let i = 0; i < 7; i++) {
+    const sleeve = box([-.6 + i * .2, .61, .01], [.13, .79, .53], [toon.rose, toon.plaster, toon.gold, toon.mint][i % 4], shelf);
+    sleeve.rotation.z = -.055; sleeves.push(sleeve);
+  }
+  for (let i = 0; i < 3; i++) {
+    box([-.52 + i * .52, 1.48, .02], [.44, .7, .09], [toon.mint, toon.rose, toon.cream][i], shelf);
+    const disc = cylinder([-.52 + i * .52, 1.51, .075], [.16, .018, .16], toon.black, shelf); disc.rotation.x = Math.PI / 2;
+    const centre = cylinder([-.52 + i * .52, 1.51, .089], [.053, .018, .053], toon.gold, shelf); centre.rotation.x = Math.PI / 2;
+  }
+  const shelfTitle = label('KEEP THE NIGHT', 1.4, .23, '#42696a', '#f2e7d3'); shelf.add(shelfTitle); shelfTitle.position.set(0, 1.98, .385);
+  hotspot(shelf, 'records');
+
+  // A sleeping shop cat gives the courtyard one quiet, authored idle gesture.
+  const cat = new THREE.Group(); cat.position.set(-2.8, .69, 1.48); world.add(cat);
+  ball([0, 0, 0], [.24, .14, .15], toon.plaster, cat);
+  ball([.18, .07, .025], [.12, .105, .105], toon.plaster, cat);
+  const earGeometry = geometry(new THREE.ConeGeometry(.055, .105, 3));
+  mesh(earGeometry, toon.coral, [.13, .18, .04], [1, 1, 1], cat);
+  mesh(earGeometry, toon.coral, [.23, .18, .04], [1, 1, 1], cat);
+  for (const x of [.14, .22]) box([x, .09, .122], [.032, .008, .012], toon.ink, cat);
 
   let seed = 54;
   const random = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
@@ -289,8 +342,80 @@ export function mountSakuraScene(host) {
   let lastTime = 0;
   let sceneTime = 0;
   let width = 0; let height = 0;
+  let currentView = view;
+  let cameraTween;
+  let hoverTween;
+  let hovered = null;
+  const target = new THREE.Vector3(0, 1.55, 0);
+  const raycaster = new THREE.Raycaster();
+  const pointer = new THREE.Vector2();
+  const shots = {
+    space: { position: [10.9, 7.8, 17.5], target: [0, 1.35, .05] },
+    explore: { position: [3.7, 3.55, 6.2], target: [.43, 1.19, 1.05] },
+    live: { position: [-1.9, 3.2, 5.7], target: [-4.35, 1.5, .35] },
+    records: { position: [7.3, 3.1, 4.5], target: [4.14, 1.14, -.25] },
+  };
+  function shotFor(next) {
+    const shot = shots[next] || shots.space;
+    const endTarget = new THREE.Vector3(...shot.target);
+    const endPosition = new THREE.Vector3(...shot.position);
+    // Wide phone viewport is a compact establishing strip; preserve the set.
+    const aspect = width / height || 1;
+    const distance = aspect < .85 ? 1.18 : aspect > 1.4 ? .84 : 1;
+    endPosition.sub(endTarget).multiplyScalar(distance).add(endTarget);
+    return { endTarget, endPosition };
+  }
+  function setView(next, { immediate = false, force = false } = {}) {
+    if (next === currentView && !force) return;
+    currentView = next;
+    host.dataset.shot = next;
+    compass.querySelectorAll('button').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.worldView === next)));
+    cameraTween?.kill();
+    const { endTarget, endPosition } = shotFor(next);
+    if (immediate || reducedMotion.matches) {
+      camera.position.copy(endPosition); target.copy(endTarget); camera.lookAt(target); draw(); return;
+    }
+    const startPosition = camera.position.clone();
+    const startTarget = target.clone();
+    const midpoint = startPosition.clone().lerp(endPosition, .5);
+    midpoint.y += Math.min(1.25, startPosition.distanceTo(endPosition) * .13);
+    const arc = new THREE.QuadraticBezierCurve3(startPosition, midpoint, endPosition);
+    const progress = { value: 0 };
+    host.dataset.travelling = 'true';
+    cameraTween = gsap.to(progress, { value: 1, duration: 1.3, ease: 'power2.inOut',
+      onUpdate() { camera.position.copy(arc.getPoint(progress.value)); target.lerpVectors(startTarget, endTarget, progress.value); camera.lookAt(target); },
+      onComplete() { delete host.dataset.travelling; cameraTween = null; },
+      onInterrupt() { delete host.dataset.travelling; },
+    });
+  }
+  function picked(event) {
+    const rect = canvas.getBoundingClientRect();
+    pointer.set((event.clientX - rect.left) / rect.width * 2 - 1, -(event.clientY - rect.top) / rect.height * 2 + 1);
+    raycaster.setFromCamera(pointer, camera);
+    const hit = raycaster.intersectObjects(world.children, true)[0];
+    let object = hit?.object;
+    while (object && !object.userData.destination) object = object.parent;
+    return object;
+  }
+  function onPointerMove(event) {
+    if (event.pointerType === 'touch') return;
+    const object = picked(event);
+    if (object === hovered) return;
+    hovered = object;
+    canvas.style.cursor = object ? 'pointer' : '';
+    hoverTween?.kill();
+    hoverTween = gsap.to(sleeves[3].position, { z: object === shelf ? .17 : .01, duration: reducedMotion.matches ? 0 : .45, ease: 'power3.out', onUpdate: () => { if (reducedMotion.matches) draw(); } });
+  }
+  function onCanvasClick(event) { const object = picked(event); if (object) navigate?.(object.userData.destination); }
+  function onPointerLeave() { hovered = null; canvas.style.cursor = ''; hoverTween?.kill(); hoverTween = gsap.to(sleeves[3].position, { z: .01, duration: reducedMotion.matches ? 0 : .35, onUpdate: () => { if (reducedMotion.matches) draw(); } }); }
+  canvas.addEventListener('pointermove', onPointerMove);
+  canvas.addEventListener('pointerleave', onPointerLeave);
+  canvas.addEventListener('click', onCanvasClick);
   function pose(time) {
     record.rotation.y = time * .24;
+    cat.scale.y = 1 + Math.sin(time * 1.3) * .025;
+    notice.rotation.z = -.06 + Math.sin(time * .7) * .012;
+    noteLabel.rotation.z = notice.rotation.z;
     drifts.forEach((drift, index) => {
       dummy.position.set(drift.x + Math.sin(time * .38 + drift.phase) * .27, .25 + ((drift.phase + 5.2 - time * drift.speed) % 4.1 + 4.1) % 4.1, drift.z + Math.cos(time * .21 + drift.phase) * .18);
       dummy.rotation.set(.5 + Math.sin(time * .5 + drift.phase) * .6, drift.phase + time * .13, time * .3 + drift.phase);
@@ -303,7 +428,7 @@ export function mountSakuraScene(host) {
     frame = 0;
     if (disposed || !visible || document.hidden || reducedMotion.matches) return;
     if (!lastTime) lastTime = now;
-    if (now - lastTime >= 1000 / 30) {
+    if (now - lastTime >= 1000 / (cameraTween ? 60 : 30)) {
       sceneTime += Math.min((now - lastTime) / 1000, .1); lastTime = now;
       pose(sceneTime); draw();
     }
@@ -312,7 +437,7 @@ export function mountSakuraScene(host) {
   function updateMotion() {
     cancelAnimationFrame(frame); frame = 0; lastTime = 0;
     if (disposed || !visible || document.hidden) return;
-    if (reducedMotion.matches) { pose(0); draw(); }
+    if (reducedMotion.matches) { cameraTween?.progress(1); pose(0); draw(); }
     else { draw(); frame = requestAnimationFrame(tick); }
   }
   function resize() {
@@ -320,11 +445,10 @@ export function mountSakuraScene(host) {
     width = Math.round(bounds.width); height = Math.round(bounds.height);
     if (!width || !height || disposed) return;
     const aspect = width / height;
-    const viewHeight = Math.max(6.6, 9.8 / aspect);
-    camera.left = -viewHeight * aspect / 2; camera.right = viewHeight * aspect / 2;
-    camera.top = viewHeight / 2; camera.bottom = -viewHeight / 2;
+    camera.aspect = aspect;
     camera.updateProjectionMatrix();
     pipeline.setSize(width, height);
+    setView(currentView, { immediate: true, force: true });
     renderer.shadowMap.needsUpdate = true;
     draw();
   }
@@ -339,8 +463,9 @@ export function mountSakuraScene(host) {
   reducedMotion.addEventListener('change', updateMotion);
   resize(); updateMotion();
 
-  return () => {
+  return { setView, dispose() {
     disposed = true; cancelAnimationFrame(frame);
+    cameraTween?.kill(); hoverTween?.kill();
     resizeObserver.disconnect(); intersectionObserver.disconnect();
     document.removeEventListener('visibilitychange', updateMotion);
     reducedMotion.removeEventListener('change', updateMotion);
@@ -348,6 +473,9 @@ export function mountSakuraScene(host) {
     celMaterials.dispose(); pipeline.dispose();
     sun.shadow.dispose();
     scene.clear(); renderer.renderLists.dispose(); renderer.dispose(); renderer.forceContextLoss();
-    canvas.remove(); host.classList.remove('sakura-scene');
-  };
+    canvas.removeEventListener('pointermove', onPointerMove);
+    canvas.removeEventListener('pointerleave', onPointerLeave);
+    canvas.removeEventListener('click', onCanvasClick);
+    canvas.remove(); compass.remove(); host.classList.remove('sakura-scene');
+  } };
 }

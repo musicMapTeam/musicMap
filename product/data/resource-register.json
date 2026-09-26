@@ -1,7 +1,7 @@
 {
-  "updatedAt": "2026-09-26",
-  "planVersion": "1.0",
-  "scope": "初赛交互Demo的当前来源，不是必须下载清单。",
+  "updatedAt": "2026-09-27",
+  "planVersion": "1.8",
+  "scope": "当前来源与实际落地状态；完整原始数据保留本地，不与逐人制作署名混合。",
   "resources": [
     {
       "id": "official-competition",
@@ -35,8 +35,9 @@
     {
       "id": "event-demo-photos",
       "type": "image",
-      "status": "pending",
-      "notes": "准备两张自己拍摄或允许使用的照片；以不同现场视角表达交换理由。"
+      "status": "generated-demo",
+      "notes": "两张 AI 生成的虚构现场示例图，原图与生成来源已留档；真实用户上传照片不提交 Git。",
+      "location": "../../web/assets/image-provenance.json"
     },
     {
       "id": "tme-event-music",
@@ -45,6 +46,19 @@
       "sourceUrl": "https://c6.y.qq.com/base/fcgi-bin/u?__=UFgdsOYo9Glo",
       "permissionSourceUrl": "https://saas.docs.qq.com/sheet/DR2VHa0JGT3ZGVFNKTmpybUdJ?tab=000006",
       "notes": "官方赛事评审用途歌单；未取得音频文件或接入方式。音频是可选增强，不阻塞前端情景演示。"
+    },
+    {
+      "id": "hf-spotify-tracks",
+      "type": "metadata",
+      "status": "downloaded-full-local",
+      "sourceUrl": "https://huggingface.co/datasets/maharshipandya/spotify-tracks-dataset/tree/635b034f69257814eff850a5c2b3346fe458134f",
+      "localRaw": "../../data/external/spotify-tracks-dataset/dataset.csv",
+      "distributedExtract": "../../web/assets/data/hf-collaborations.json",
+      "record": "../../references/research/2026-09-27/huggingface-download.md",
+      "rows": 114000,
+      "bytes": 20118244,
+      "selectedTracks": 120,
+      "notes": "共同署名艺人，不含制作分工、音频或权重。卡仅标bsd，无独立LICENSE；逐字情况见下载记录。"
     }
   ]
 }

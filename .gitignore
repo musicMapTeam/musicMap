@@ -12,6 +12,7 @@ playwright-report/
 test-results/
 work/
 data/
+!web/assets/data/
 *.sqlite
 *.sqlite-shm
 *.sqlite-wal

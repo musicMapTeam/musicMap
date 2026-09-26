@@ -126,7 +126,7 @@ The following repositories informed the 0.4 product and data design. They are re
 
 Actual README / license / source-file reading scope and adoption decisions are recorded in [music-discovery-review.md](references/research/2026-09-27/music-discovery-review.md) and [social-product-review.md](references/research/2026-09-27/social-product-review.md). If a future change copies substantive code or assets, its actual version, license obligations, and modifications must be recorded separately. The QR library above is an actual bundled dependency and retains its own complete MIT notice.
 
-## Sakura Crossing renderer and Three runtime (2026-09-27, MVP 0.6.0)
+## Sakura Crossing renderer and Three runtime (2026-09-27, introduced in MVP 0.6.0)
 
 [Sakura Crossing](https://github.com/Kenton-GMI/sakura-crossing), fixed commit [`de01898e89c7f6ab3fad93fa802f0f5ac66fbd81`](https://github.com/Kenton-GMI/sakura-crossing/tree/de01898e89c7f6ab3fad93fa802f0f5ac66fbd81), supplies the **MIT rendering code adapted in 0.6.0**. Copyright (c) 2026 Kenton Wang. A complete [local MIT notice](web/assets/licenses/sakura-crossing-MIT.txt) accompanies the modules and is embedded in the distributable HTML.
 
@@ -138,3 +138,17 @@ Actual README / license / source-file reading scope and adoption decisions are r
 `web/js/sakura-scene.js` retains Music Map's original music shop geometry and composes its own street, lighting and camera. No upstream world, player movement, artwork textures or audio is distributed. Upstream stock audio is explicitly excluded from MIT and is not used. The earlier [0.5 visual-only research](references/research/2026-09-27/sakura-visual-reference.md) remains a historical record; the [0.6 adoption note](references/research/2026-09-27/indie-app-direction.md) describes the current scope.
 
 [Three](https://github.com/mrdoob/three.js), package **0.186.1**, is an actual browser runtime dependency for the independently authored scene. License: **MIT**, Copyright © 2010-2026 three.js authors. The complete license is copied to [web/assets/licenses/three-MIT.txt](web/assets/licenses/three-MIT.txt); `package-lock.json` records the exact package integrity. Vite retains the full copyright and permission notice in the standalone HTML, including the runtime package. Its presence in the 0.5 production output was read during integration.
+
+## GSAP and Flip (MVP 0.7.0)
+
+[GSAP](https://gsap.com/), pinned npm package **3.15.0**, supplies camera interpolation, UI entrance timelines and Flip card transitions. Copyright 2008–2026, GreenSock. All rights reserved. License: [Standard No Charge GSAP License](https://gsap.com/community/standard-license/), **not MIT**. The source copyright, author and license reference are retained in [gsap-notice.txt](web/assets/licenses/gsap-notice.txt) and embedded in the single HTML. No GSAP source modifications. This application does not expose an animation authoring tool.
+
+The 0.7 scene remains original procedural geometry. Its persistent set, perspective camera shots, photo wall, record cabinet, cat and GSAP path controller are written for Music Map. The vendor renderer modules and their pinned upstream commit remain as documented above.
+
+## Hugging Face factual music metadata (MVP 0.7.0)
+
+Source: [maharshipandya/spotify-tracks-dataset](https://huggingface.co/datasets/maharshipandya/spotify-tracks-dataset/tree/635b034f69257814eff850a5c2b3346fe458134f), revision **635b034f69257814eff850a5c2b3346fe458134f**. The upstream card labels the dataset `bsd`; it supplies no standalone LICENSE or specific BSD variant. This is recorded as stated, without inferring a broader music or recording license.
+
+The full CSV (114,000 rows, 20,118,244 bytes) is downloaded locally under ignored `data/external/spotify-tracks-dataset/`. The distributed [120-record extract](web/assets/data/hf-collaborations.json) contains factual track names, credited artist names, album names and source record identifiers. It contains no audio, lyrics, artwork, listening URL, or detailed production-role claims. See [download record](references/research/2026-09-27/huggingface-download.md) and [reproduction script](scripts/datasets/download_hf_catalogue.py).
+
+The 10 curated vocal collaborations use separate manually checked per-role sources. See [collaboration roles](references/research/2026-09-27/collaboration-roles.md); no HF artist field is used to infer those roles.

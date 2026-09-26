@@ -1,0 +1,1746 @@
+{
+  "schemaVersion": 1,
+  "dataset": "hf-open-catalogue",
+  "title": "开放曲库",
+  "source": {
+    "repository": "maharshipandya/spotify-tracks-dataset",
+    "revision": "635b034f69257814eff850a5c2b3346fe458134f",
+    "url": "https://huggingface.co/datasets/maharshipandya/spotify-tracks-dataset/tree/635b034f69257814eff850a5c2b3346fe458134f",
+    "cardUrl": "https://huggingface.co/datasets/maharshipandya/spotify-tracks-dataset/blob/635b034f69257814eff850a5c2b3346fe458134f/README.md",
+    "file": "dataset.csv",
+    "sha256": "b202fa49909b2d5cef71a04b1d21243cfeb36414535f2ca9272aa646721177bd",
+    "licenseLabel": "bsd",
+    "licenseNote": "上游数据卡仅标 bsd，未提供独立 LICENSE 或具体 BSD 版本；不构成音频授权。"
+  },
+  "counts": {
+    "rows": 114000,
+    "uniqueTrackIds": 89741,
+    "multiArtistRows": 30075,
+    "genres": 114,
+    "selectedTracks": 120
+  },
+  "creditMeaning": "原始 artists 字段列出的共同署名艺人；具体演唱、词曲、编曲、制作与演奏分工未提供。",
+  "selection": "从 2–5 名艺人的记录中按采集时 popularity 降序选取；track_id 去重，再按曲名+艺人名单去重；同一首位艺人最多 3 首，共 120 首。不是当前榜单或统计抽样。",
+  "tracks": [
+    {
+      "id": "hf-3nqQXoyQOWXiESFLlDF1hG",
+      "title": "Unholy (feat. Kim Petras)",
+      "artists": [
+        "Sam Smith",
+        "Kim Petras"
+      ],
+      "album": "Unholy (feat. Kim Petras)",
+      "source": {
+        "rowIndex": 20001,
+        "recordNumber": 20002,
+        "trackId": "3nqQXoyQOWXiESFLlDF1hG"
+      }
+    },
+    {
+      "id": "hf-2tTmW7RDtMQtBk7m2rYeSw",
+      "title": "Quevedo: Bzrp Music Sessions, Vol. 52",
+      "artists": [
+        "Bizarrap",
+        "Quevedo"
+      ],
+      "album": "Quevedo: Bzrp Music Sessions, Vol. 52",
+      "source": {
+        "rowIndex": 51664,
+        "recordNumber": 51665,
+        "trackId": "2tTmW7RDtMQtBk7m2rYeSw"
+      }
+    },
+    {
+      "id": "hf-4uUG5RXrOk84mYEfFvj3cK",
+      "title": "I'm Good (Blue)",
+      "artists": [
+        "David Guetta",
+        "Bebe Rexha"
+      ],
+      "album": "I'm Good (Blue)",
+      "source": {
+        "rowIndex": 20008,
+        "recordNumber": 20009,
+        "trackId": "4uUG5RXrOk84mYEfFvj3cK"
+      }
+    },
+    {
+      "id": "hf-6Sq7ltF9Qa7SNFBsV5Cogx",
+      "title": "Me Porto Bonito",
+      "artists": [
+        "Bad Bunny",
+        "Chencho Corleone"
+      ],
+      "album": "Un Verano Sin Ti",
+      "source": {
+        "rowIndex": 67358,
+        "recordNumber": 67359,
+        "trackId": "6Sq7ltF9Qa7SNFBsV5Cogx"
+      }
+    },
+    {
+      "id": "hf-3k3NWokhRRkEPhCzPmV8TW",
+      "title": "Ojitos Lindos",
+      "artists": [
+        "Bad Bunny",
+        "Bomba Estéreo"
+      ],
+      "album": "Un Verano Sin Ti",
+      "source": {
+        "rowIndex": 67500,
+        "recordNumber": 67501,
+        "trackId": "3k3NWokhRRkEPhCzPmV8TW"
+      }
+    },
+    {
+      "id": "hf-0mBP9X2gPCuapvpZ7TGDk3",
+      "title": "Left and Right (Feat. Jung Kook of BTS)",
+      "artists": [
+        "Charlie Puth",
+        "Jung Kook",
+        "BTS"
+      ],
+      "album": "Left and Right (Feat. Jung Kook of BTS)",
+      "source": {
+        "rowIndex": 20017,
+        "recordNumber": 20018,
+        "trackId": "0mBP9X2gPCuapvpZ7TGDk3"
+      }
+    },
+    {
+      "id": "hf-0WtM2NBVQNNJLh6scP13H8",
+      "title": "Calm Down (with Selena Gomez)",
+      "artists": [
+        "Rema",
+        "Selena Gomez"
+      ],
+      "album": "Calm Down (with Selena Gomez)",
+      "source": {
+        "rowIndex": 81100,
+        "recordNumber": 81101,
+        "trackId": "0WtM2NBVQNNJLh6scP13H8"
+      }
+    },
+    {
+      "id": "hf-3F5CgOj3wFlRv51JsHbxhe",
+      "title": "Jimmy Cooks (feat. 21 Savage)",
+      "artists": [
+        "Drake",
+        "21 Savage"
+      ],
+      "album": "Honestly, Nevermind",
+      "source": {
+        "rowIndex": 51203,
+        "recordNumber": 51204,
+        "trackId": "3F5CgOj3wFlRv51JsHbxhe"
+      }
+    },
+    {
+      "id": "hf-79HZAZNnOE97rb2hnI0XQr",
+      "title": "LOKERA",
+      "artists": [
+        "Rauw Alejandro",
+        "Lyanno",
+        "Brray"
+      ],
+      "album": "LOKERA",
+      "source": {
+        "rowIndex": 67801,
+        "recordNumber": 67802,
+        "trackId": "79HZAZNnOE97rb2hnI0XQr"
+      }
+    },
+    {
+      "id": "hf-41oY4WCTj5kccfesTVFnvN",
+      "title": "Tarot",
+      "artists": [
+        "Bad Bunny",
+        "Jhayco"
+      ],
+      "album": "Un Verano Sin Ti",
+      "source": {
+        "rowIndex": 67865,
+        "recordNumber": 67866,
+        "trackId": "41oY4WCTj5kccfesTVFnvN"
+      }
+    },
+    {
+      "id": "hf-4zN21mbAuaD0WqtmaTZZeP",
+      "title": "Ferrari",
+      "artists": [
+        "James Hype",
+        "Miggy Dela Rosa"
+      ],
+      "album": "Ferrari",
+      "source": {
+        "rowIndex": 20811,
+        "recordNumber": 20812,
+        "trackId": "4zN21mbAuaD0WqtmaTZZeP"
+      }
+    },
+    {
+      "id": "hf-2rurDawMfoKP4uHyb2kJBt",
+      "title": "Te Felicito",
+      "artists": [
+        "Shakira",
+        "Rauw Alejandro"
+      ],
+      "album": "Te Felicito",
+      "source": {
+        "rowIndex": 67602,
+        "recordNumber": 67603,
+        "trackId": "2rurDawMfoKP4uHyb2kJBt"
+      }
+    },
+    {
+      "id": "hf-7MXVkk9YMctZqd1Srtv4MB",
+      "title": "Starboy",
+      "artists": [
+        "The Weeknd",
+        "Daft Punk"
+      ],
+      "album": "Starboy",
+      "source": {
+        "rowIndex": 81004,
+        "recordNumber": 81005,
+        "trackId": "7MXVkk9YMctZqd1Srtv4MB"
+      }
+    },
+    {
+      "id": "hf-1cKHdTo9u0ZymJdPGSh6nq",
+      "title": "I Was Never There",
+      "artists": [
+        "The Weeknd",
+        "Gesaffelstein"
+      ],
+      "album": "My Dear Melancholy,",
+      "source": {
+        "rowIndex": 81101,
+        "recordNumber": 81102,
+        "trackId": "1cKHdTo9u0ZymJdPGSh6nq"
+      }
+    },
+    {
+      "id": "hf-1ga4PztXOIw1yBbdUt2X8v",
+      "title": "GATÚBELA",
+      "artists": [
+        "KAROL G",
+        "Maldy"
+      ],
+      "album": "GATÚBELA",
+      "source": {
+        "rowIndex": 88609,
+        "recordNumber": 88610,
+        "trackId": "1ga4PztXOIw1yBbdUt2X8v"
+      }
+    },
+    {
+      "id": "hf-7ef4DlsgrMEH11cDZd32M6",
+      "title": "One Kiss (with Dua Lipa)",
+      "artists": [
+        "Calvin Harris",
+        "Dua Lipa"
+      ],
+      "album": "One Kiss (with Dua Lipa)",
+      "source": {
+        "rowIndex": 20014,
+        "recordNumber": 20015,
+        "trackId": "7ef4DlsgrMEH11cDZd32M6"
+      }
+    },
+    {
+      "id": "hf-1DIXPcTDzTj8ZMHt3PDt8p",
+      "title": "Gangsta's Paradise",
+      "artists": [
+        "Coolio",
+        "L.V."
+      ],
+      "album": "Gangsta's Paradise",
+      "source": {
+        "rowIndex": 37000,
+        "recordNumber": 37001,
+        "trackId": "1DIXPcTDzTj8ZMHt3PDt8p"
+      }
+    },
+    {
+      "id": "hf-5HCyWlXZPP0y6Gqq8TgA20",
+      "title": "STAY (with Justin Bieber)",
+      "artists": [
+        "The Kid LAROI",
+        "Justin Bieber"
+      ],
+      "album": "STAY (with Justin Bieber)",
+      "source": {
+        "rowIndex": 51004,
+        "recordNumber": 51005,
+        "trackId": "5HCyWlXZPP0y6Gqq8TgA20"
+      }
+    },
+    {
+      "id": "hf-59nOXPmaKlBfGMDeOVGrIK",
+      "title": "WAIT FOR U (feat. Drake & Tems)",
+      "artists": [
+        "Future",
+        "Drake",
+        "Tems"
+      ],
+      "album": "I NEVER LIKED YOU",
+      "source": {
+        "rowIndex": 51751,
+        "recordNumber": 51752,
+        "trackId": "59nOXPmaKlBfGMDeOVGrIK"
+      }
+    },
+    {
+      "id": "hf-5jt25aFjW2kNoBqaEVaz5W",
+      "title": "LA INOCENTE",
+      "artists": [
+        "Mora",
+        "Feid"
+      ],
+      "album": "MICRODOSIS",
+      "source": {
+        "rowIndex": 68611,
+        "recordNumber": 68612,
+        "trackId": "5jt25aFjW2kNoBqaEVaz5W"
+      }
+    },
+    {
+      "id": "hf-72yP0DUlWPyH8P7IoxskwN",
+      "title": "Hold Me Closer",
+      "artists": [
+        "Elton John",
+        "Britney Spears"
+      ],
+      "album": "Hold Me Closer",
+      "source": {
+        "rowIndex": 79051,
+        "recordNumber": 79052,
+        "trackId": "72yP0DUlWPyH8P7IoxskwN"
+      }
+    },
+    {
+      "id": "hf-0u2P5u6lvoDfwTYjAADbn4",
+      "title": "lovely (with Khalid)",
+      "artists": [
+        "Billie Eilish",
+        "Khalid"
+      ],
+      "album": "lovely (with Khalid)",
+      "source": {
+        "rowIndex": 81053,
+        "recordNumber": 81054,
+        "trackId": "0u2P5u6lvoDfwTYjAADbn4"
+      }
+    },
+    {
+      "id": "hf-3uUuGVFu1V7jTQL60S1r8z",
+      "title": "Where Are You Now",
+      "artists": [
+        "Lost Frequencies",
+        "Calum Scott"
+      ],
+      "album": "Where Are You Now",
+      "source": {
+        "rowIndex": 20560,
+        "recordNumber": 20561,
+        "trackId": "3uUuGVFu1V7jTQL60S1r8z"
+      }
+    },
+    {
+      "id": "hf-6VBhH7CyP56BXjp8VsDFPZ",
+      "title": "Kesariya (From \"Brahmastra\")",
+      "artists": [
+        "Pritam",
+        "Arijit Singh",
+        "Amitabh Bhattacharya"
+      ],
+      "album": "Kesariya (From \"Brahmastra\")",
+      "source": {
+        "rowIndex": 55001,
+        "recordNumber": 55002,
+        "trackId": "6VBhH7CyP56BXjp8VsDFPZ"
+      }
+    },
+    {
+      "id": "hf-0fea68AdmYNygeTGI4RC18",
+      "title": "LA CANCIÓN",
+      "artists": [
+        "J Balvin",
+        "Bad Bunny"
+      ],
+      "album": "OASIS",
+      "source": {
+        "rowIndex": 68600,
+        "recordNumber": 68601,
+        "trackId": "0fea68AdmYNygeTGI4RC18"
+      }
+    },
+    {
+      "id": "hf-0kTMK4gNFfLXaTb62w1UaJ",
+      "title": "BABY OTAKU",
+      "artists": [
+        "Pablo Pesadilla",
+        "Polimá Westcoast",
+        "Nickoog Clk",
+        "Fran C"
+      ],
+      "album": "BABY OTAKU",
+      "source": {
+        "rowIndex": 68604,
+        "recordNumber": 68605,
+        "trackId": "0kTMK4gNFfLXaTb62w1UaJ"
+      }
+    },
+    {
+      "id": "hf-6DoL1yYIwEW7VZMRaJhoJI",
+      "title": "La Llevo Al Cielo (Ft. Ñengo Flow)",
+      "artists": [
+        "Chris Jedi",
+        "Anuel AA",
+        "Chencho Corleone",
+        "Ñengo Flow"
+      ],
+      "album": "La Llevo Al Cielo (Ft. Ñengo Flow)",
+      "source": {
+        "rowIndex": 68663,
+        "recordNumber": 68664,
+        "trackId": "6DoL1yYIwEW7VZMRaJhoJI"
+      }
+    },
+    {
+      "id": "hf-73vIOb4Q7YN6HeJTbscRx5",
+      "title": "Miss You",
+      "artists": [
+        "Oliver Tree",
+        "Robin Schulz"
+      ],
+      "album": "Miss You",
+      "source": {
+        "rowIndex": 3300,
+        "recordNumber": 3301,
+        "trackId": "73vIOb4Q7YN6HeJTbscRx5"
+      }
+    },
+    {
+      "id": "hf-0xzI1KAr0Yd9tv8jlIk3sn",
+      "title": "Bad Decisions (with BTS & Snoop Dogg)",
+      "artists": [
+        "benny blanco",
+        "BTS",
+        "Snoop Dogg"
+      ],
+      "album": "Bad Decisions (with BTS & Snoop Dogg)",
+      "source": {
+        "rowIndex": 20030,
+        "recordNumber": 20031,
+        "trackId": "0xzI1KAr0Yd9tv8jlIk3sn"
+      }
+    },
+    {
+      "id": "hf-10xV5l9nhLvFpR8mqzs0bL",
+      "title": "Numb",
+      "artists": [
+        "Marshmello",
+        "Khalid"
+      ],
+      "album": "Numb",
+      "source": {
+        "rowIndex": 20251,
+        "recordNumber": 20252,
+        "trackId": "10xV5l9nhLvFpR8mqzs0bL"
+      }
+    },
+    {
+      "id": "hf-7fZBQnc0zXwVybgCIrQQil",
+      "title": "Belly Dancer",
+      "artists": [
+        "Imanbek",
+        "BYOR"
+      ],
+      "album": "Belly Dancer",
+      "source": {
+        "rowIndex": 20419,
+        "recordNumber": 20420,
+        "trackId": "7fZBQnc0zXwVybgCIrQQil"
+      }
+    },
+    {
+      "id": "hf-0QBzMgT7NIeoCYy3sJCof1",
+      "title": "Bam Bam (feat. Ed Sheeran)",
+      "artists": [
+        "Camila Cabello",
+        "Ed Sheeran"
+      ],
+      "album": "Bam Bam (feat. Ed Sheeran)",
+      "source": {
+        "rowIndex": 20654,
+        "recordNumber": 20655,
+        "trackId": "0QBzMgT7NIeoCYy3sJCof1"
+      }
+    },
+    {
+      "id": "hf-4gzsuuZypVbxs0Af1LSZyB",
+      "title": "Lo Siento BB:/ (with Bad Bunny & Julieta Venegas)",
+      "artists": [
+        "Tainy",
+        "Bad Bunny",
+        "Julieta Venegas"
+      ],
+      "album": "Lo Siento BB:/ (with Bad Bunny & Julieta Venegas)",
+      "source": {
+        "rowIndex": 68701,
+        "recordNumber": 68702,
+        "trackId": "4gzsuuZypVbxs0Af1LSZyB"
+      }
+    },
+    {
+      "id": "hf-18asYwWugKjjsihZ0YvRxO",
+      "title": "The Motto",
+      "artists": [
+        "Tiësto",
+        "Ava Max"
+      ],
+      "album": "The Motto",
+      "source": {
+        "rowIndex": 20418,
+        "recordNumber": 20419,
+        "trackId": "18asYwWugKjjsihZ0YvRxO"
+      }
+    },
+    {
+      "id": "hf-27NovPIUIRrOZoCHxABJwK",
+      "title": "INDUSTRY BABY (feat. Jack Harlow)",
+      "artists": [
+        "Lil Nas X",
+        "Jack Harlow"
+      ],
+      "album": "INDUSTRY BABY (feat. Jack Harlow)",
+      "source": {
+        "rowIndex": 51050,
+        "recordNumber": 51051,
+        "trackId": "27NovPIUIRrOZoCHxABJwK"
+      }
+    },
+    {
+      "id": "hf-4xkOaSrkexMciUUogZKVTS",
+      "title": "Till I Collapse",
+      "artists": [
+        "Eminem",
+        "Nate Dogg"
+      ],
+      "album": "The Eminem Show",
+      "source": {
+        "rowIndex": 51277,
+        "recordNumber": 51278,
+        "trackId": "4xkOaSrkexMciUUogZKVTS"
+      }
+    },
+    {
+      "id": "hf-4woTEX1wYOTGDqNXuavlRC",
+      "title": "Superman",
+      "artists": [
+        "Eminem",
+        "Dina Rae"
+      ],
+      "album": "The Eminem Show",
+      "source": {
+        "rowIndex": 51503,
+        "recordNumber": 51504,
+        "trackId": "4woTEX1wYOTGDqNXuavlRC"
+      }
+    },
+    {
+      "id": "hf-4iJyoBOLtHqaGxP12qzhQI",
+      "title": "Peaches (feat. Daniel Caesar & Giveon)",
+      "artists": [
+        "Justin Bieber",
+        "Daniel Caesar",
+        "Giveon"
+      ],
+      "album": "Justice",
+      "source": {
+        "rowIndex": 81207,
+        "recordNumber": 81208,
+        "trackId": "4iJyoBOLtHqaGxP12qzhQI"
+      }
+    },
+    {
+      "id": "hf-1r9xUipOqoNwggBpENDsvJ",
+      "title": "Enemy (with JID) - from the series Arcane League of Legends",
+      "artists": [
+        "Imagine Dragons",
+        "JID",
+        "Arcane",
+        "League of Legends"
+      ],
+      "album": "Enemy (with JID) [from the series Arcane League of Legends]",
+      "source": {
+        "rowIndex": 91022,
+        "recordNumber": 91023,
+        "trackId": "1r9xUipOqoNwggBpENDsvJ"
+      }
+    },
+    {
+      "id": "hf-2vXKRlJBXyOcvZYTdNeckS",
+      "title": "Lost in the Fire (feat. The Weeknd)",
+      "artists": [
+        "Gesaffelstein",
+        "The Weeknd"
+      ],
+      "album": "Hyperion",
+      "source": {
+        "rowIndex": 17000,
+        "recordNumber": 17001,
+        "trackId": "2vXKRlJBXyOcvZYTdNeckS"
+      }
+    },
+    {
+      "id": "hf-5nujrmhLynf4yMoMtj8AQF",
+      "title": "Levitating (feat. DaBaby)",
+      "artists": [
+        "Dua Lipa",
+        "DaBaby"
+      ],
+      "album": "Future Nostalgia",
+      "source": {
+        "rowIndex": 20007,
+        "recordNumber": 20008,
+        "trackId": "5nujrmhLynf4yMoMtj8AQF"
+      }
+    },
+    {
+      "id": "hf-6RUKPb4LETWmmr3iAEQktW",
+      "title": "Something Just Like This",
+      "artists": [
+        "The Chainsmokers",
+        "Coldplay"
+      ],
+      "album": "Memories...Do Not Open",
+      "source": {
+        "rowIndex": 20059,
+        "recordNumber": 20060,
+        "trackId": "6RUKPb4LETWmmr3iAEQktW"
+      }
+    },
+    {
+      "id": "hf-4qu63nuBpdn0qHUHuObEj1",
+      "title": "Leave Before You Love Me (with Jonas Brothers)",
+      "artists": [
+        "Marshmello",
+        "Jonas Brothers"
+      ],
+      "album": "Leave Before You Love Me",
+      "source": {
+        "rowIndex": 20154,
+        "recordNumber": 20155,
+        "trackId": "4qu63nuBpdn0qHUHuObEj1"
+      }
+    },
+    {
+      "id": "hf-1bgKMxPQU7JIZEhNsM1vFs",
+      "title": "Words (feat. Zara Larsson)",
+      "artists": [
+        "Alesso",
+        "Zara Larsson"
+      ],
+      "album": "Words (feat. Zara Larsson)",
+      "source": {
+        "rowIndex": 30365,
+        "recordNumber": 30366,
+        "trackId": "1bgKMxPQU7JIZEhNsM1vFs"
+      }
+    },
+    {
+      "id": "hf-3rb0tMq42WfggucPm0HHkA",
+      "title": "Bad Memories (feat. Elley Duhé & FAST BOY)",
+      "artists": [
+        "MEDUZA",
+        "James Carter",
+        "Elley Duhé",
+        "FAST BOY"
+      ],
+      "album": "Bad Memories (feat. Elley Duhé & FAST BOY)",
+      "source": {
+        "rowIndex": 30466,
+        "recordNumber": 30467,
+        "trackId": "3rb0tMq42WfggucPm0HHkA"
+      }
+    },
+    {
+      "id": "hf-1WCEAGGRD066z2Q89ObXTq",
+      "title": "Crazy What Love Can Do",
+      "artists": [
+        "David Guetta",
+        "Becky Hill",
+        "Ella Henderson"
+      ],
+      "album": "Crazy What Love Can Do",
+      "source": {
+        "rowIndex": 30532,
+        "recordNumber": 30533,
+        "trackId": "1WCEAGGRD066z2Q89ObXTq"
+      }
+    },
+    {
+      "id": "hf-1zi7xx7UVEFkmKfv06H8x0",
+      "title": "One Dance",
+      "artists": [
+        "Drake",
+        "Wizkid",
+        "Kyla"
+      ],
+      "album": "Views",
+      "source": {
+        "rowIndex": 51300,
+        "recordNumber": 51301,
+        "trackId": "1zi7xx7UVEFkmKfv06H8x0"
+      }
+    },
+    {
+      "id": "hf-3UmaczJpikHgJFyBTAJVoz",
+      "title": "Stan",
+      "artists": [
+        "Eminem",
+        "Dido"
+      ],
+      "album": "The Marshall Mathers LP",
+      "source": {
+        "rowIndex": 51301,
+        "recordNumber": 51302,
+        "trackId": "3UmaczJpikHgJFyBTAJVoz"
+      }
+    },
+    {
+      "id": "hf-2hLXUbsOU9cDb9RFva9FYr",
+      "title": "MEMORIAS",
+      "artists": [
+        "Mora",
+        "Jhayco"
+      ],
+      "album": "MICRODOSIS",
+      "source": {
+        "rowIndex": 68612,
+        "recordNumber": 68613,
+        "trackId": "2hLXUbsOU9cDb9RFva9FYr"
+      }
+    },
+    {
+      "id": "hf-2TDyyEBasw10wu5Uh94bR1",
+      "title": "PUNTO 40",
+      "artists": [
+        "Rauw Alejandro",
+        "Baby Rasta"
+      ],
+      "album": "PUNTO 40",
+      "source": {
+        "rowIndex": 68653,
+        "recordNumber": 68654,
+        "trackId": "2TDyyEBasw10wu5Uh94bR1"
+      }
+    },
+    {
+      "id": "hf-48AJSd42lXpicsGqcgopof",
+      "title": "X ÚLTIMA VEZ",
+      "artists": [
+        "Daddy Yankee",
+        "Bad Bunny"
+      ],
+      "album": "LEGENDADDY",
+      "source": {
+        "rowIndex": 68721,
+        "recordNumber": 68722,
+        "trackId": "48AJSd42lXpicsGqcgopof"
+      }
+    },
+    {
+      "id": "hf-5fhcuVxuBWfgNXGuyAtLmr",
+      "title": "Los Cachos",
+      "artists": [
+        "Piso 21",
+        "Manuel Turizo"
+      ],
+      "album": "Los Cachos",
+      "source": {
+        "rowIndex": 68729,
+        "recordNumber": 68730,
+        "trackId": "5fhcuVxuBWfgNXGuyAtLmr"
+      }
+    },
+    {
+      "id": "hf-1ri9ZUkBJVFUdgwzCnfcYs",
+      "title": "MAMIII",
+      "artists": [
+        "Becky G",
+        "KAROL G"
+      ],
+      "album": "MAMIII",
+      "source": {
+        "rowIndex": 88705,
+        "recordNumber": 88706,
+        "trackId": "1ri9ZUkBJVFUdgwzCnfcYs"
+      }
+    },
+    {
+      "id": "hf-2bRKxuH1o7pTmb1y4GfdEc",
+      "title": "Clean White Noise - Loopable with no fade",
+      "artists": [
+        "White Noise Baby Sleep",
+        "White Noise for Babies"
+      ],
+      "album": "Best White Noise for Baby Sleep - Loopable with No Fade",
+      "source": {
+        "rowIndex": 101376,
+        "recordNumber": 101377,
+        "trackId": "2bRKxuH1o7pTmb1y4GfdEc"
+      }
+    },
+    {
+      "id": "hf-7BKLCZ1jbUBVqRi2FVlTVw",
+      "title": "Closer",
+      "artists": [
+        "The Chainsmokers",
+        "Halsey"
+      ],
+      "album": "Closer",
+      "source": {
+        "rowIndex": 20004,
+        "recordNumber": 20005,
+        "trackId": "7BKLCZ1jbUBVqRi2FVlTVw"
+      }
+    },
+    {
+      "id": "hf-0lYBSQXN6rCTvUZvg9S0lU",
+      "title": "Let Me Love You",
+      "artists": [
+        "DJ Snake",
+        "Justin Bieber"
+      ],
+      "album": "Encore",
+      "source": {
+        "rowIndex": 20005,
+        "recordNumber": 20006,
+        "trackId": "0lYBSQXN6rCTvUZvg9S0lU"
+      }
+    },
+    {
+      "id": "hf-0k4d5YPDr1r7FX77VdqWez",
+      "title": "You Right",
+      "artists": [
+        "Doja Cat",
+        "The Weeknd"
+      ],
+      "album": "Planet Her",
+      "source": {
+        "rowIndex": 20100,
+        "recordNumber": 20101,
+        "trackId": "0k4d5YPDr1r7FX77VdqWez"
+      }
+    },
+    {
+      "id": "hf-3ZFTkvIE7kyPt6Nu3PEa7V",
+      "title": "Hips Don't Lie (feat. Wyclef Jean)",
+      "artists": [
+        "Shakira",
+        "Wyclef Jean"
+      ],
+      "album": "Oral Fixation, Vol. 2 (Expanded Edition)",
+      "source": {
+        "rowIndex": 20365,
+        "recordNumber": 20366,
+        "trackId": "3ZFTkvIE7kyPt6Nu3PEa7V"
+      }
+    },
+    {
+      "id": "hf-02VBYrHfVwfEWXk5DXyf0T",
+      "title": "Leave The Door Open",
+      "artists": [
+        "Bruno Mars",
+        "Anderson .Paak",
+        "Silk Sonic"
+      ],
+      "album": "An Evening With Silk Sonic",
+      "source": {
+        "rowIndex": 20602,
+        "recordNumber": 20603,
+        "trackId": "02VBYrHfVwfEWXk5DXyf0T"
+      }
+    },
+    {
+      "id": "hf-2VxeLyX666F8uXCJ0dZF8B",
+      "title": "Shallow",
+      "artists": [
+        "Lady Gaga",
+        "Bradley Cooper"
+      ],
+      "album": "A Star Is Born Soundtrack",
+      "source": {
+        "rowIndex": 20909,
+        "recordNumber": 20910,
+        "trackId": "2VxeLyX666F8uXCJ0dZF8B"
+      }
+    },
+    {
+      "id": "hf-0bI7K9Becu2dtXK1Q3cZNB",
+      "title": "Don't Be Shy",
+      "artists": [
+        "Tiësto",
+        "KAROL G"
+      ],
+      "album": "Don't Be Shy",
+      "source": {
+        "rowIndex": 30305,
+        "recordNumber": 30306,
+        "trackId": "0bI7K9Becu2dtXK1Q3cZNB"
+      }
+    },
+    {
+      "id": "hf-3Z7CaxQkqbIs1rewKi6v4W",
+      "title": "Hot In It",
+      "artists": [
+        "Tiësto",
+        "Charli XCX"
+      ],
+      "album": "Hot In It",
+      "source": {
+        "rowIndex": 30458,
+        "recordNumber": 30459,
+        "trackId": "3Z7CaxQkqbIs1rewKi6v4W"
+      }
+    },
+    {
+      "id": "hf-7MIhUdNJtaOnDmC5nBC1fb",
+      "title": "Deep Down (feat. Never Dull)",
+      "artists": [
+        "Alok",
+        "Ella Eyre",
+        "Kenny Dope",
+        "Never Dull"
+      ],
+      "album": "Deep Down (feat. Never Dull)",
+      "source": {
+        "rowIndex": 31681,
+        "recordNumber": 31682,
+        "trackId": "7MIhUdNJtaOnDmC5nBC1fb"
+      }
+    },
+    {
+      "id": "hf-503OTo2dSqe7qk76rgsbep",
+      "title": "Still D.R.E.",
+      "artists": [
+        "Dr. Dre",
+        "Snoop Dogg"
+      ],
+      "album": "2001",
+      "source": {
+        "rowIndex": 37050,
+        "recordNumber": 37051,
+        "trackId": "503OTo2dSqe7qk76rgsbep"
+      }
+    },
+    {
+      "id": "hf-7nFJSfGvvV0WjatTZN6QYi",
+      "title": "Bamba (feat. Aitch & BIA)",
+      "artists": [
+        "Luciano",
+        "Aitch",
+        "BIA"
+      ],
+      "album": "Bamba (feat. Aitch & BIA)",
+      "source": {
+        "rowIndex": 39408,
+        "recordNumber": 39409,
+        "trackId": "7nFJSfGvvV0WjatTZN6QYi"
+      }
+    },
+    {
+      "id": "hf-1XGmzt0PVuFgQYYnV2It7A",
+      "title": "Payphone",
+      "artists": [
+        "Maroon 5",
+        "Wiz Khalifa"
+      ],
+      "album": "Overexposed Track By Track",
+      "source": {
+        "rowIndex": 81668,
+        "recordNumber": 81669,
+        "trackId": "1XGmzt0PVuFgQYYnV2It7A"
+      }
+    },
+    {
+      "id": "hf-48QmG1dfvMuYLxMPt7KSRA",
+      "title": "No Lie",
+      "artists": [
+        "Sean Paul",
+        "Dua Lipa"
+      ],
+      "album": "Mad Love The Prequel",
+      "source": {
+        "rowIndex": 20003,
+        "recordNumber": 20004,
+        "trackId": "48QmG1dfvMuYLxMPt7KSRA"
+      }
+    },
+    {
+      "id": "hf-4HBZA5flZLE435QTztThqH",
+      "title": "Stuck with U (with Justin Bieber)",
+      "artists": [
+        "Ariana Grande",
+        "Justin Bieber"
+      ],
+      "album": "Stuck with U",
+      "source": {
+        "rowIndex": 20050,
+        "recordNumber": 20051,
+        "trackId": "4HBZA5flZLE435QTztThqH"
+      }
+    },
+    {
+      "id": "hf-2dpaYNEQHiRxtZbfNsse99",
+      "title": "Happier",
+      "artists": [
+        "Marshmello",
+        "Bastille"
+      ],
+      "album": "Happier",
+      "source": {
+        "rowIndex": 20056,
+        "recordNumber": 20057,
+        "trackId": "2dpaYNEQHiRxtZbfNsse99"
+      }
+    },
+    {
+      "id": "hf-0VO8gYVDSwM1Qdd2GsMoYK",
+      "title": "Moth To A Flame (with The Weeknd)",
+      "artists": [
+        "Swedish House Mafia",
+        "The Weeknd"
+      ],
+      "album": "Paradise Again",
+      "source": {
+        "rowIndex": 20412,
+        "recordNumber": 20413,
+        "trackId": "0VO8gYVDSwM1Qdd2GsMoYK"
+      }
+    },
+    {
+      "id": "hf-32OlwWuMpZ6b0aN2RZOeMS",
+      "title": "Uptown Funk (feat. Bruno Mars)",
+      "artists": [
+        "Mark Ronson",
+        "Bruno Mars"
+      ],
+      "album": "Uptown Special",
+      "source": {
+        "rowIndex": 20716,
+        "recordNumber": 20717,
+        "trackId": "32OlwWuMpZ6b0aN2RZOeMS"
+      }
+    },
+    {
+      "id": "hf-0HaRLPnr887lcQM2YQzkff",
+      "title": "For My Hand (feat. Ed Sheeran)",
+      "artists": [
+        "Burna Boy",
+        "Ed Sheeran"
+      ],
+      "album": "Love, Damini",
+      "source": {
+        "rowIndex": 20917,
+        "recordNumber": 20918,
+        "trackId": "0HaRLPnr887lcQM2YQzkff"
+      }
+    },
+    {
+      "id": "hf-1RF02Cf80mTaeNXG2P2boR",
+      "title": "21 Reasons (feat. Ella Henderson)",
+      "artists": [
+        "Nathan Dawe",
+        "Ella Henderson"
+      ],
+      "album": "21 Reasons (feat. Ella Henderson)",
+      "source": {
+        "rowIndex": 20926,
+        "recordNumber": 20927,
+        "trackId": "1RF02Cf80mTaeNXG2P2boR"
+      }
+    },
+    {
+      "id": "hf-3sa06xVNmLLYIxdNNmVQN8",
+      "title": "Where Did You Go? (feat. MNEK)",
+      "artists": [
+        "Jax Jones",
+        "MNEK"
+      ],
+      "album": "Where Did You Go (feat. MNEK)",
+      "source": {
+        "rowIndex": 30690,
+        "recordNumber": 30691,
+        "trackId": "3sa06xVNmLLYIxdNNmVQN8"
+      }
+    },
+    {
+      "id": "hf-7AQim7LbvFVZJE3O8TYgf2",
+      "title": "Fuck Love (feat. Trippie Redd)",
+      "artists": [
+        "XXXTENTACION",
+        "Trippie Redd"
+      ],
+      "album": "17",
+      "source": {
+        "rowIndex": 33002,
+        "recordNumber": 33003,
+        "trackId": "7AQim7LbvFVZJE3O8TYgf2"
+      }
+    },
+    {
+      "id": "hf-3GCdLUSnKSMJhs4Tj6CV3s",
+      "title": "All The Stars (with SZA)",
+      "artists": [
+        "Kendrick Lamar",
+        "SZA"
+      ],
+      "album": "Black Panther The Album Music From And Inspired By",
+      "source": {
+        "rowIndex": 51350,
+        "recordNumber": 51351,
+        "trackId": "3GCdLUSnKSMJhs4Tj6CV3s"
+      }
+    },
+    {
+      "id": "hf-40iJIUlhi6renaREYGeIDS",
+      "title": "Fair Trade (with Travis Scott)",
+      "artists": [
+        "Drake",
+        "Travis Scott"
+      ],
+      "album": "Certified Lover Boy",
+      "source": {
+        "rowIndex": 51700,
+        "recordNumber": 51701,
+        "trackId": "40iJIUlhi6renaREYGeIDS"
+      }
+    },
+    {
+      "id": "hf-5aucVLKiumD89mxVCB4zvS",
+      "title": "Rush Hour (Feat. j-hope of BTS)",
+      "artists": [
+        "Crush",
+        "j-hope"
+      ],
+      "album": "Rush Hour",
+      "source": {
+        "rowIndex": 65002,
+        "recordNumber": 65003,
+        "trackId": "5aucVLKiumD89mxVCB4zvS"
+      }
+    },
+    {
+      "id": "hf-6TsVhM8qIkWN5cJVDIVbbz",
+      "title": "Besos Moja2",
+      "artists": [
+        "Wisin & Yandel",
+        "ROSALÍA"
+      ],
+      "album": "La Última Misión",
+      "source": {
+        "rowIndex": 68655,
+        "recordNumber": 68656,
+        "trackId": "6TsVhM8qIkWN5cJVDIVbbz"
+      }
+    },
+    {
+      "id": "hf-6mmPpaltUZK7xjNlBPQQ0p",
+      "title": "Desesperados",
+      "artists": [
+        "Rauw Alejandro",
+        "Chencho Corleone"
+      ],
+      "album": "VICE VERSA",
+      "source": {
+        "rowIndex": 68668,
+        "recordNumber": 68669,
+        "trackId": "6mmPpaltUZK7xjNlBPQQ0p"
+      }
+    },
+    {
+      "id": "hf-2vmfvSoZBFAt9hhRoEByLi",
+      "title": "Volví",
+      "artists": [
+        "Aventura",
+        "Bad Bunny"
+      ],
+      "album": "Volví",
+      "source": {
+        "rowIndex": 68800,
+        "recordNumber": 68801,
+        "trackId": "2vmfvSoZBFAt9hhRoEByLi"
+      }
+    },
+    {
+      "id": "hf-0G2zPzWqVjR68iNPmx2TBe",
+      "title": "Volando - Remix",
+      "artists": [
+        "Mora",
+        "Bad Bunny",
+        "Sech"
+      ],
+      "album": "Volando (Remix)",
+      "source": {
+        "rowIndex": 68802,
+        "recordNumber": 68803,
+        "trackId": "0G2zPzWqVjR68iNPmx2TBe"
+      }
+    },
+    {
+      "id": "hf-5GF0X7GdNmnouKcdhhRmtm",
+      "title": "Party en el Barrio (feat. Duki)",
+      "artists": [
+        "Paulo Londra",
+        "Duki"
+      ],
+      "album": "Party en el Barrio (feat. Duki)",
+      "source": {
+        "rowIndex": 68813,
+        "recordNumber": 68814,
+        "trackId": "5GF0X7GdNmnouKcdhhRmtm"
+      }
+    },
+    {
+      "id": "hf-7hynhxDoDpgMIV12JuVtNa",
+      "title": "UN PESO",
+      "artists": [
+        "J Balvin",
+        "Bad Bunny",
+        "Marciano Cantero"
+      ],
+      "album": "OASIS",
+      "source": {
+        "rowIndex": 68904,
+        "recordNumber": 68905,
+        "trackId": "7hynhxDoDpgMIV12JuVtNa"
+      }
+    },
+    {
+      "id": "hf-4jPy3l0RUwlUI9T5XHBW2m",
+      "title": "Mood (feat. iann dior)",
+      "artists": [
+        "24kGoldn",
+        "iann dior"
+      ],
+      "album": "El Dorado",
+      "source": {
+        "rowIndex": 81460,
+        "recordNumber": 81461,
+        "trackId": "4jPy3l0RUwlUI9T5XHBW2m"
+      }
+    },
+    {
+      "id": "hf-6JIC3hbC28JZKZ8AlAqX8h",
+      "title": "Cold Heart - PNAU Remix",
+      "artists": [
+        "Elton John",
+        "Dua Lipa",
+        "PNAU"
+      ],
+      "album": "The Lockdown Sessions",
+      "source": {
+        "rowIndex": 91151,
+        "recordNumber": 91152,
+        "trackId": "6JIC3hbC28JZKZ8AlAqX8h"
+      }
+    },
+    {
+      "id": "hf-7eJMfftS33KTjuF7lTsMCx",
+      "title": "death bed (coffee for your head)",
+      "artists": [
+        "Powfu",
+        "beabadoobee"
+      ],
+      "album": "death bed (coffee for your head)",
+      "source": {
+        "rowIndex": 94000,
+        "recordNumber": 94001,
+        "trackId": "7eJMfftS33KTjuF7lTsMCx"
+      }
+    },
+    {
+      "id": "hf-2kx5sQgmjYug0GiDh1a4sU",
+      "title": "Living Life, In The Night",
+      "artists": [
+        "Cheriimoya",
+        "Sierra Kidd"
+      ],
+      "album": "Living Life, In The Night",
+      "source": {
+        "rowIndex": 94002,
+        "recordNumber": 94003,
+        "trackId": "2kx5sQgmjYug0GiDh1a4sU"
+      }
+    },
+    {
+      "id": "hf-64dLd6rVqDLtkXFYrEUHIU",
+      "title": "New Gold (feat. Tame Impala and Bootie Brown)",
+      "artists": [
+        "Gorillaz",
+        "Tame Impala",
+        "Bootie Brown"
+      ],
+      "album": "New Gold (feat. Tame Impala and Bootie Brown)",
+      "source": {
+        "rowIndex": 3253,
+        "recordNumber": 3254,
+        "trackId": "64dLd6rVqDLtkXFYrEUHIU"
+      }
+    },
+    {
+      "id": "hf-6GomT970rCOkKAyyrwJeZi",
+      "title": "Move Your Body",
+      "artists": [
+        "Öwnboss",
+        "Sevek"
+      ],
+      "album": "Move Your Body",
+      "source": {
+        "rowIndex": 9000,
+        "recordNumber": 9001,
+        "trackId": "6GomT970rCOkKAyyrwJeZi"
+      }
+    },
+    {
+      "id": "hf-06KyNuuMOX1ROXRhj787tj",
+      "title": "We Don't Talk Anymore (feat. Selena Gomez)",
+      "artists": [
+        "Charlie Puth",
+        "Selena Gomez"
+      ],
+      "album": "Nine Track Mind",
+      "source": {
+        "rowIndex": 20018,
+        "recordNumber": 20019,
+        "trackId": "06KyNuuMOX1ROXRhj787tj"
+      }
+    },
+    {
+      "id": "hf-0qOnSQQF0yzuPWsXrQ9paz",
+      "title": "Stereo Hearts (feat. Adam Levine)",
+      "artists": [
+        "Gym Class Heroes",
+        "Adam Levine"
+      ],
+      "album": "The Papercut Chronicles II",
+      "source": {
+        "rowIndex": 20022,
+        "recordNumber": 20023,
+        "trackId": "0qOnSQQF0yzuPWsXrQ9paz"
+      }
+    },
+    {
+      "id": "hf-2JzZzZUQj3Qff7wapcbKjc",
+      "title": "See You Again (feat. Charlie Puth)",
+      "artists": [
+        "Wiz Khalifa",
+        "Charlie Puth"
+      ],
+      "album": "See You Again (feat. Charlie Puth)",
+      "source": {
+        "rowIndex": 20055,
+        "recordNumber": 20056,
+        "trackId": "2JzZzZUQj3Qff7wapcbKjc"
+      }
+    },
+    {
+      "id": "hf-0z8hI3OPS8ADPWtoCjjLl6",
+      "title": "Summer of Love (Shawn Mendes & Tainy)",
+      "artists": [
+        "Shawn Mendes",
+        "Tainy"
+      ],
+      "album": "Summer Of Love",
+      "source": {
+        "rowIndex": 20157,
+        "recordNumber": 20158,
+        "trackId": "0z8hI3OPS8ADPWtoCjjLl6"
+      }
+    },
+    {
+      "id": "hf-5WtfUKzXircvW8l5aaVZWT",
+      "title": "What A Time (feat. Niall Horan)",
+      "artists": [
+        "Julia Michaels",
+        "Niall Horan"
+      ],
+      "album": "Inner Monologue Part 1",
+      "source": {
+        "rowIndex": 20359,
+        "recordNumber": 20360,
+        "trackId": "5WtfUKzXircvW8l5aaVZWT"
+      }
+    },
+    {
+      "id": "hf-748mdHapucXQri7IAO8yFK",
+      "title": "Kiss Me More (feat. SZA)",
+      "artists": [
+        "Doja Cat",
+        "SZA"
+      ],
+      "album": "Kiss Me More (feat. SZA)",
+      "source": {
+        "rowIndex": 20404,
+        "recordNumber": 20405,
+        "trackId": "748mdHapucXQri7IAO8yFK"
+      }
+    },
+    {
+      "id": "hf-6f5ExP43esnvdKPddwKXJH",
+      "title": "Better Days (NEIKED x Mae Muller x Polo G)",
+      "artists": [
+        "NEIKED",
+        "Mae Muller",
+        "Polo G"
+      ],
+      "album": "Better Days (NEIKED x Mae Muller x Polo G)",
+      "source": {
+        "rowIndex": 20752,
+        "recordNumber": 20753,
+        "trackId": "6f5ExP43esnvdKPddwKXJH"
+      }
+    },
+    {
+      "id": "hf-4cG7HUWYHBV6R6tHn1gxrl",
+      "title": "Friday (feat. Mufasa & Hypeman) - Dopamine Re-Edit",
+      "artists": [
+        "Riton",
+        "Nightcrawlers",
+        "Mufasa & Hypeman",
+        "Dopamine"
+      ],
+      "album": "Friday (feat. Mufasa & Hypeman) [Dopamine Re-Edit]",
+      "source": {
+        "rowIndex": 30572,
+        "recordNumber": 30573,
+        "trackId": "4cG7HUWYHBV6R6tHn1gxrl"
+      }
+    },
+    {
+      "id": "hf-2Foc5Q5nqNiosCNqttzHof",
+      "title": "Get Lucky (feat. Pharrell Williams & Nile Rodgers) - Radio Edit",
+      "artists": [
+        "Daft Punk",
+        "Pharrell Williams",
+        "Nile Rodgers"
+      ],
+      "album": "Get Lucky (feat. Pharrell Williams & Nile Rodgers) [Radio Edit]",
+      "source": {
+        "rowIndex": 31261,
+        "recordNumber": 31262,
+        "trackId": "2Foc5Q5nqNiosCNqttzHof"
+      }
+    },
+    {
+      "id": "hf-7tqhbajSfrz2F7E1Z75ASX",
+      "title": "Ain't No Mountain High Enough",
+      "artists": [
+        "Marvin Gaye",
+        "Tammi Terrell"
+      ],
+      "album": "United",
+      "source": {
+        "rowIndex": 37401,
+        "recordNumber": 37402,
+        "trackId": "7tqhbajSfrz2F7E1Z75ASX"
+      }
+    },
+    {
+      "id": "hf-42TMa2hgBNjte4uV7jNCnQ",
+      "title": "Baller",
+      "artists": [
+        "Shubh",
+        "Ikky"
+      ],
+      "album": "Baller",
+      "source": {
+        "rowIndex": 51002,
+        "recordNumber": 51003,
+        "trackId": "42TMa2hgBNjte4uV7jNCnQ"
+      }
+    },
+    {
+      "id": "hf-29m79w9xPMH4YCD6r8JSmV",
+      "title": "Excuses",
+      "artists": [
+        "AP Dhillon",
+        "Gurinder Gill",
+        "Intense"
+      ],
+      "album": "Excuses",
+      "source": {
+        "rowIndex": 51010,
+        "recordNumber": 51011,
+        "trackId": "29m79w9xPMH4YCD6r8JSmV"
+      }
+    },
+    {
+      "id": "hf-3B54sVLJ402zGa6Xm4YGNe",
+      "title": "Unforgettable",
+      "artists": [
+        "French Montana",
+        "Swae Lee"
+      ],
+      "album": "Jungle Rules",
+      "source": {
+        "rowIndex": 51150,
+        "recordNumber": 51151,
+        "trackId": "3B54sVLJ402zGa6Xm4YGNe"
+      }
+    },
+    {
+      "id": "hf-2g6tReTlM2Akp41g0HaeXN",
+      "title": "Die Hard",
+      "artists": [
+        "Kendrick Lamar",
+        "Blxst",
+        "Amanda Reifer"
+      ],
+      "album": "Mr. Morale & The Big Steppers",
+      "source": {
+        "rowIndex": 51750,
+        "recordNumber": 51751,
+        "trackId": "2g6tReTlM2Akp41g0HaeXN"
+      }
+    },
+    {
+      "id": "hf-7ycWLEP1GsNjVvcjawXz3z",
+      "title": "Praise The Lord (Da Shine) (feat. Skepta)",
+      "artists": [
+        "A$AP Rocky",
+        "Skepta"
+      ],
+      "album": "TESTING",
+      "source": {
+        "rowIndex": 51753,
+        "recordNumber": 51754,
+        "trackId": "7ycWLEP1GsNjVvcjawXz3z"
+      }
+    },
+    {
+      "id": "hf-0Fs9cdPDhptWEDJmiCbkEW",
+      "title": "She Knows (feat. Amber Coffman & Cults)",
+      "artists": [
+        "J. Cole",
+        "Cults",
+        "Amber Coffman"
+      ],
+      "album": "Born Sinner (Deluxe Version)",
+      "source": {
+        "rowIndex": 51761,
+        "recordNumber": 51762,
+        "trackId": "0Fs9cdPDhptWEDJmiCbkEW"
+      }
+    },
+    {
+      "id": "hf-0zlGnseLGzRIBA0TJcb3Bo",
+      "title": "Manike (From \"Thank God\")",
+      "artists": [
+        "Yohani",
+        "Jubin Nautiyal",
+        "Tanishk Bagchi",
+        "Rashmi Virag",
+        "Surya Ragunaathan"
+      ],
+      "album": "Manike (From \"Thank God\")",
+      "source": {
+        "rowIndex": 57001,
+        "recordNumber": 57002,
+        "trackId": "0zlGnseLGzRIBA0TJcb3Bo"
+      }
+    },
+    {
+      "id": "hf-2gam98EZKrF9XuOkU13ApN",
+      "title": "Promiscuous",
+      "artists": [
+        "Nelly Furtado",
+        "Timbaland"
+      ],
+      "album": "Loose",
+      "source": {
+        "rowIndex": 67701,
+        "recordNumber": 67702,
+        "trackId": "2gam98EZKrF9XuOkU13ApN"
+      }
+    },
+    {
+      "id": "hf-4R8BJggjosTswLxtkw8V7P",
+      "title": "No Me Conoce - Remix",
+      "artists": [
+        "Jhayco",
+        "J Balvin",
+        "Bad Bunny"
+      ],
+      "album": "Famouz",
+      "source": {
+        "rowIndex": 68700,
+        "recordNumber": 68701,
+        "trackId": "4R8BJggjosTswLxtkw8V7P"
+      }
+    },
+    {
+      "id": "hf-4srcMdbm2qzVG98tJajHxp",
+      "title": "Pantysito",
+      "artists": [
+        "Alejo",
+        "Feid",
+        "ROBI"
+      ],
+      "album": "Pantysito",
+      "source": {
+        "rowIndex": 68714,
+        "recordNumber": 68715,
+        "trackId": "4srcMdbm2qzVG98tJajHxp"
+      }
+    },
+    {
+      "id": "hf-6ojZtz3sZr6ynvejLOqgCj",
+      "title": "Nos Comemos (feat. Ozuna)",
+      "artists": [
+        "Tiago PZK",
+        "Ozuna"
+      ],
+      "album": "Nos Comemos (feat. Ozuna)",
+      "source": {
+        "rowIndex": 68724,
+        "recordNumber": 68725,
+        "trackId": "6ojZtz3sZr6ynvejLOqgCj"
+      }
+    },
+    {
+      "id": "hf-4SSbtLDkepeOHAckM1FCBP",
+      "title": "LOS APARATOS",
+      "artists": [
+        "El Alfa",
+        "Noriel",
+        "Trueno"
+      ],
+      "album": "LOS APARATOS",
+      "source": {
+        "rowIndex": 68757,
+        "recordNumber": 68758,
+        "trackId": "4SSbtLDkepeOHAckM1FCBP"
+      }
+    },
+    {
+      "id": "hf-03a359wbiUsjN9h6yzXvmS",
+      "title": "She Don't Give a Fo",
+      "artists": [
+        "Duki",
+        "KHEA"
+      ],
+      "album": "She Don't Give a Fo",
+      "source": {
+        "rowIndex": 68855,
+        "recordNumber": 68856,
+        "trackId": "03a359wbiUsjN9h6yzXvmS"
+      }
+    },
+    {
+      "id": "hf-2tFwfmceQa1Y6nRPhYbEtC",
+      "title": "CÓMO SE SIENTE - Remix",
+      "artists": [
+        "Jhayco",
+        "Bad Bunny"
+      ],
+      "album": "CÓMO SE SIENTE (Remix)",
+      "source": {
+        "rowIndex": 68901,
+        "recordNumber": 68902,
+        "trackId": "2tFwfmceQa1Y6nRPhYbEtC"
+      }
+    },
+    {
+      "id": "hf-0vHfVsEe6Ps0d8cZ9PGzSw",
+      "title": "Loco Por Perrearte - Remix",
+      "artists": [
+        "De La Ghetto",
+        "Rauw Alejandro"
+      ],
+      "album": "Loco Por Perrearte (Remix)",
+      "source": {
+        "rowIndex": 68910,
+        "recordNumber": 68911,
+        "trackId": "0vHfVsEe6Ps0d8cZ9PGzSw"
+      }
+    },
+    {
+      "id": "hf-6epn3r7S14KUqlReYr77hA",
+      "title": "Baby",
+      "artists": [
+        "Justin Bieber",
+        "Ludacris"
+      ],
+      "album": "My World 2.0",
+      "source": {
+        "rowIndex": 81211,
+        "recordNumber": 81212,
+        "trackId": "6epn3r7S14KUqlReYr77hA"
+      }
+    },
+    {
+      "id": "hf-1TfqLAPs4K3s2rJMoCokcS",
+      "title": "Sweet Dreams (Are Made of This) - Remastered",
+      "artists": [
+        "Eurythmics",
+        "Annie Lennox",
+        "Dave Stewart"
+      ],
+      "album": "Sweet Dreams (Are Made Of This)",
+      "source": {
+        "rowIndex": 91719,
+        "recordNumber": 91720,
+        "trackId": "1TfqLAPs4K3s2rJMoCokcS"
+      }
+    },
+    {
+      "id": "hf-07MDkzWARZaLEdKxo6yArG",
+      "title": "Meet Me At Our Spot",
+      "artists": [
+        "THE ANXIETY",
+        "WILLOW",
+        "Tyler Cole"
+      ],
+      "album": "THE ANXIETY",
+      "source": {
+        "rowIndex": 3005,
+        "recordNumber": 3006,
+        "trackId": "07MDkzWARZaLEdKxo6yArG"
+      }
+    },
+    {
+      "id": "hf-0TK2YIli7K1leLovkQiNik",
+      "title": "Señorita",
+      "artists": [
+        "Shawn Mendes",
+        "Camila Cabello"
+      ],
+      "album": "Señorita",
+      "source": {
+        "rowIndex": 20016,
+        "recordNumber": 20017,
+        "trackId": "0TK2YIli7K1leLovkQiNik"
+      }
+    },
+    {
+      "id": "hf-2kQuhkFX7uSVepCD3h29g5",
+      "title": "Smack That",
+      "artists": [
+        "Akon",
+        "Eminem"
+      ],
+      "album": "Konvicted",
+      "source": {
+        "rowIndex": 20413,
+        "recordNumber": 20414,
+        "trackId": "2kQuhkFX7uSVepCD3h29g5"
+      }
+    }
+  ]
+}

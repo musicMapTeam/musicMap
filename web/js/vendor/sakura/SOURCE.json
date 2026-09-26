@@ -39,5 +39,5 @@
       "modified": false
     }
   ],
-  "hostIntegration": "../../sakura-scene.js owns original shop / street geometry, lighting, gradient sky, composition, local scale parameters and lifecycle. The host preserves reduced motion, 30 fps updates, visibility suspension and cleanup."
+  "hostIntegration": "../../sakura-scene.js owns original shop / street / photo wall / cabinet geometry, lighting, gradient sky and lifecycle. MVP 0.7 uses one persistent scene across routes, perspective camera shots and interruptible GSAP paths. Idle rendering targets 30 fps, camera travel targets 60 fps; these are scheduling limits, not measured device performance. Reduced motion, visibility suspension and theme-exit cleanup remain."
 }

@@ -1,0 +1,82 @@
+/* A persistent camera set. Functional surfaces remain real HTML. */
+.spatial-world[hidden] { display:none; }
+html[data-theme='sakura'] .spatial-world { position:fixed; z-index:0; left:94px; top:82px; bottom:26px; width:calc(53% - 94px); border-radius:30px; overflow:hidden; background:#dce7ed; isolation:isolate; }
+html[data-theme='sakura'] .spatial-world::after { content:''; position:absolute; pointer-events:none; inset:0; z-index:2; border:1px solid #647b6817; border-radius:inherit; box-shadow:inset 0 0 50px #f3e5d51a; }
+html[data-theme='sakura'] .spatial-world .sakura-scene__canvas { width:100%; height:100%; display:block; }
+.world-compass { position:absolute; z-index:3; left:24px; right:24px; bottom:22px; display:flex; flex-direction:column; align-items:center; gap:11px; }
+.world-compass__label { font-size:9px; letter-spacing:.14em; color:#384950; text-shadow:0 1px 10px #fff; }
+.world-compass>div { display:flex; gap:3px; padding:5px; border-radius:30px; border:1px solid #ffffffb3; background:#fdfaf0df; box-shadow:0 7px 22px #3b465719; backdrop-filter:blur(14px); }
+.world-compass button { border:0; border-radius:30px; min-height:34px; padding:7px 13px; background:none; color:#5a6962; font-size:11px; transition:color .25s,background .25s; }
+.world-compass button[aria-pressed='true'] { color:#faf4e9; background:#41665d; }
+.world-compass button:hover { color:#2b493e; background:#dce4d7; }
+html[data-theme='sakura'] .main-content { position:relative; z-index:1; width:47%; min-width:0; margin:0 0 0 auto; padding:94px 28px 28px 26px; }
+html[data-theme='sakura'] .app-body { margin-left:0; pointer-events:none; }
+html[data-theme='sakura'] .main-content>* { pointer-events:auto; }
+html[data-theme='sakura'] .storage-warning { pointer-events:auto; }
+html[data-theme='sakura'] .space-studio .space-scene-slot { display:none; }
+html[data-theme='sakura'] .space-studio--home { min-height:580px; height:calc(100dvh - 124px); }
+html[data-theme='sakura'] .space-studio__desk { width:100%; }
+html[data-theme='sakura'] .space-card-stack { width:min(100%,430px); height:clamp(325px,49dvh,455px); }
+html[data-theme='sakura'] .space-studio__header { gap:10px; }
+html[data-theme='sakura'] .space-studio__header h1 { gap:10px; font-size:25px; }
+html[data-theme='sakura'] .map-studio { min-height:650px; height:calc(100dvh - 124px); }
+html[data-theme='sakura'] .map-studio .map-workspace { display:flex; flex-direction:column; align-items:stretch; gap:10px; }
+html[data-theme='sakura'] .map-studio .map-stage-column { min-height:340px; flex:1; }
+html[data-theme='sakura'] .map-studio .map-stage { min-height:300px; }
+html[data-theme='sakura'] .map-studio .map-artist-panel { align-self:stretch; padding:17px 20px; max-height:190px; flex-shrink:0; }
+html[data-theme='sakura'] .map-studio .map-artist-panel__heading { margin-bottom:8px; }
+html[data-theme='sakura'] .map-studio .map-artist-panel h2 { margin-top:4px; font-size:18px; }
+html[data-theme='sakura'] .map-studio .map-node--center { width:140px; height:156px; }
+html[data-theme='sakura'] .map-studio .map-node--center .map-node__disc { width:106px; height:106px; }
+html[data-theme='sakura'] .map-studio .map-node--center .map-node__name { font-size:19px; margin-top:9px; }
+html[data-theme='sakura'] .map-studio .map-node--orbit { width:98px; min-height:105px; }
+html[data-theme='sakura'] .map-studio .map-node--orbit .map-node__disc { width:54px; height:54px; }
+html[data-theme='sakura'] .map-studio .map-node--orbit .map-node__name { margin-top:6px; font-size:12px; }
+html[data-theme='sakura'] .map-studio .map-node--orbit .map-node__tag { font-size:9px; }
+html[data-theme='sakura'] .map-studio .map-stage-top { top:0; }
+html[data-theme='sakura'] .map-studio .map-studio-head { flex-wrap:wrap; gap:10px; padding-bottom:12px; }
+html[data-theme='sakura'] .map-studio .map-studio-tools { margin-left:auto; }
+html[data-theme='sakura'] .map-studio .map-stage-tools .button { padding:5px 6px; }
+html[data-theme='sakura'] .map-studio .map-mode-switch button { padding:6px 8px; }
+html[data-theme='sakura'] .sp-memory-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+html[data-theme='sakura'] .live-entry-grid { grid-template-columns:1fr; gap:24px; }
+html[data-theme='sakura'] .live-entry-art { display:none; }
+html[data-theme='sakura'] .live-room-columns { grid-template-columns:minmax(0,.9fr) minmax(0,1fr); gap:26px; }
+html[data-theme='sakura'] .live-wall { grid-template-columns:1fr; }
+html[data-theme='sakura'] .map-studio .map-studio-dock { display:block; padding:10px 16px; }
+html[data-theme='sakura'] .map-studio .map-route-bar { margin-top:8px; padding:8px 0 0; border-left:0; border-top:1px solid var(--line); }
+html[data-theme='sakura'] .map-studio .map-discovery__copy { flex:1; }
+html[data-theme='sakura'] .sp-layout { grid-template-columns:1fr; }
+
+@media(min-width:761px) and (max-width:1100px) {
+  html[data-theme='sakura'] .spatial-world { width:calc(43% - 94px); }
+  html[data-theme='sakura'] .main-content { width:57%; padding-right:20px; padding-left:18px; }
+  html[data-theme='sakura'] .live-room-columns { grid-template-columns:1fr; }
+  html[data-theme='sakura'] .sp-memory-grid { grid-template-columns:1fr; }
+  .world-compass { left:8px; right:8px; }
+  .world-compass button { padding:7px 9px; }
+}
+@media(max-width:760px) {
+  html[data-theme='sakura'] .spatial-world { position:absolute; left:16px; right:16px; top:78px; bottom:auto; width:auto; height:200px; border-radius:22px; }
+  html[data-theme='sakura'] .main-content { width:100%; margin:0; padding:298px 18px 20px; min-height:calc(100dvh - 91px); }
+  html[data-theme='sakura'] .app-body { margin-left:0; padding-bottom:91px; }
+  .world-compass { left:12px; right:12px; bottom:10px; gap:0; }
+  .world-compass__label { display:none; }
+  .world-compass>div { padding:3px; }
+  .world-compass button { min-height:30px; padding:6px 12px; font-size:10px; }
+  html[data-theme='sakura'] .space-studio--home { min-height:430px; height:auto; }
+  html[data-theme='sakura'] .space-studio__desk { padding:20px 0 0; }
+  html[data-theme='sakura'] .space-card-stack { width:310px; height:265px; min-height:265px; }
+  html[data-theme='sakura'] .space-photo { width:min(70%,207px); }
+  html[data-theme='sakura'] .space-studio__header { padding-top:0; }
+  html[data-theme='sakura'] .space-studio__header h1 { font-size:22px; }
+  html[data-theme='sakura'] .map-studio { height:auto; min-height:720px; }
+  html[data-theme='sakura'] .map-studio .map-stage-column { min-height:360px; }
+  html[data-theme='sakura'] .map-studio .map-artist-panel { max-height:none; }
+  html[data-theme='sakura'] .live-room-columns { grid-template-columns:1fr; }
+  html[data-theme='sakura'] .sp-memory-grid { grid-template-columns:1fr; }
+  .open-catalogue { padding:22px 18px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .world-compass button { transition:none; }
+}
