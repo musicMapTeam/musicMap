@@ -15,7 +15,7 @@
 
 ## Doing
 
-0.6.0 已完成下述本地实现与画面调整，正在同步 GitHub。
+无。0.6.0 已完成下述本地实现、画面调整、运行包与 GitHub 同步；部署与试用仍见 Todo。
 
 ## Done · 0.6.0
 
@@ -29,6 +29,7 @@
 | 三套当前预览 | `docs/assets/themes/` | 最终1440×900声浪/樱花/刊物首页截图均已目视并覆盖预览；三主题即时切换。手机最终目视樱花首页与地图，地图最后缩短21px后只读回尺寸，不宣称三主题所有手机分支均验收 |
 | 源码与许可 | NOTICES、`SOURCE.json`、完整MIT、研究记录 | 固定上游提交与逐文件改动留档，完整许可进入单HTML；没有搬入原作世界、人物或音频 |
 | 构建与运行包 | `dist/index.html`、`delivery/music-map-space-runtime.zip` | 最终Vite构建成功；HTML1,349,206 B / gzip约480.01KB，ZIP497,925 B，原6文件范围；没有数据库、上传照片或凭据 |
+| GitHub 与 CI | 应用提交 [06796f7](https://github.com/musicMapTeam/musicMap/commit/06796f74f5d1fdb30677e16c7f2491ebd010c18e) | 已推送 `origin/main`；原有 [run 36268172621](https://github.com/musicMapTeam/musicMap/actions/runs/36268172621) 成功。随后仅更新本状态记录 |
 
 本轮以重构相关画面和入口为范围，未新增测试套件，后端与PNG导出未改也未重复验收。0.4视频与封面未重制；评审部署、外部用户反馈与正式提交仍见Todo。用户是否认可新的审美仍待反馈，不能由实现者的截图查看替代。
 
