@@ -1,0 +1,53 @@
+{
+  "body": "腾讯音乐首届高校AI Hackathon·官方赛题包\n企业\n只能查看\n\n4\n\n4\n分享\n开始\n插入\n数据\n公式\n协作\n视图\n效率工具\n默认字体\n10\n表格样式\n条件格式\n字体样式\n换行\n合并\n对齐方式\n常规\n数字格式\n筛选\n冻结\n求和\n排序\n数据\n数据\n保护\n插入\n图片\n图表\n透视表\n插入\n快捷工具\n生成图片\n生成查询\n生成智能表\n快捷工具\n打印\n更多\n默认字体\n10\n表格样式\n条件格式\n对齐方式\n数字格式\n筛选\n数据\n保护\n插入\n快捷工具\n打印\n\n初赛方案提交 · 填写指引\n\n初赛方案提交截止时间 10 月 9 日 23:59\n\n\n\n\n🏠目录&导航\n📄初赛提交指引\n🌍赛题说明\n🏆赛程&奖项说明\n📈评审标准\n🙋常见参赛问题Q&A\n100%\n下载\n打印\n导出为\n生成副本\n保存版本\n修订记录\n退出文档\n开启无障碍读屏\nCtrl+~",
+  "combos": [
+    {
+      "class": "formula-input can-not-copy",
+      "rect": {
+        "x": 93,
+        "y": 155
+      },
+      "text": "初赛方案提交 · 填写指引\n\n初赛方案提交截止时间 10 月 9 日 23:59"
+    },
+    {
+      "class": "",
+      "rect": {
+        "x": 49,
+        "y": 205
+      },
+      "text": "\n"
+    },
+    {
+      "class": "dui-select statusbar-custom-hoverable statusbar-scale-select",
+      "rect": {
+        "x": 1010,
+        "y": 905.5
+      },
+      "text": "100%"
+    }
+  ],
+  "shot": {
+    "bytes": 207261,
+    "captureId": "shot-bf3e9a7d-bc9c-444f-b5d6-0aa8d08ce2f8",
+    "capturedFullPage": false,
+    "height": 934,
+    "issuesDelta": [],
+    "mimeType": "image/png",
+    "nextAction": {
+      "mimeType": "image/png",
+      "path": "C:\\Users\\Alakazam\\AppData\\Local\\Tabbit\\User Data\\LocalAgent\\Runtime\\artifacts\\task-fae4ab99-cf5c-4f2a-bcb8-e81d2d666673\\screenshot-shot-bf3e9a7d-bc9c-444f-b5d6-0aa8d08ce2f8.png",
+      "type": "load_image"
+    },
+    "path": "C:\\Users\\Alakazam\\AppData\\Local\\Tabbit\\User Data\\LocalAgent\\Runtime\\artifacts\\task-fae4ab99-cf5c-4f2a-bcb8-e81d2d666673\\screenshot-shot-bf3e9a7d-bc9c-444f-b5d6-0aa8d08ce2f8.png",
+    "recommendedLimitExceeded": true,
+    "requestedFullPage": false,
+    "requiresImageLoad": true,
+    "screenshotCount": 4,
+    "sha256": "e8bd3cd5dbc688b5491848bf33fc990674a316a45da43de02bd3b46fff9e1362",
+    "type": "browser_screenshot",
+    "warnings": [
+      "Recommended screenshot limit of 3 exceeded"
+    ],
+    "width": 1090
+  }
+}

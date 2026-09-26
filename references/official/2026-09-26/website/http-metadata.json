@@ -1,0 +1,9 @@
+{
+  "sourceUrl": "https://join.tencentmusic.com/h5/ai-hackathon/index.html",
+  "retrievedAt": "2026-09-26T22:42:30.3366123+08:00",
+  "httpStatus": 200,
+  "contentType": [
+    "text/html; charset=utf-8"
+  ],
+  "method": "Public HTTP GET; response body saved without rewriting; external assets not bundled."
+}

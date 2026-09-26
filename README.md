@@ -1,31 +1,25 @@
-# Music Map
+# Music Map × Music Space
 
-从喜欢，走向未知。一个以艺人关系网连接自由漫游、沿途发现与轻松步数挑战的音乐探索产品。
+**沿音乐认识新的声音，在同一场现场遇见有共同记忆的人。**
 
-参赛赛道：**创新音乐产品**。第一版面向手机浏览器，核心规则以 PRD v0.2 为准。
+Music Map 负责音乐关系探索；Music Space 面向音乐现场社交，以现场卡、共同音乐时刻和双方同意的交换连接同场观众。私人档案保存探索与交换结果。
 
-## 产品与原型交付
+## 当前定稿
 
-完整内容位于 **[product/](product/README.md)**：
+文档版本 **1.0 / 2026-09-26**。初赛按在线可交互 Demo 交付，无须先做完整商业级前后端，也不安排购买服务器或下载模型权重。
 
-- [产品需求文档 PRD](product/docs/01-PRD.md)
-- [用户流程图](product/docs/02-user-flows.md)
-- [原型设计与交互说明](product/docs/03-prototype-spec.md)
-- [可点击原型文件](product/prototype/index.html)
-- [数据与素材清单](product/docs/04-data-assets.md)
-- [验收清单](product/docs/05-acceptance.md)
-- [开发交接说明](product/docs/06-handoff.md)
-- [参赛介绍与视频脚本工作稿](product/docs/07-submission.md)
-- [原型核验记录](product/verification/report.md)
+1. [产品方案](product/docs/01-product-plan.md)：定位、Map × Space 主流程、范围、规则与视觉。
+2. [交付与部署](product/docs/02-delivery-plan.md)：比赛要求、服务器、WorkBuddy、音频、材料与演示脚本。
+3. [实施规格](product/docs/03-build-guide.md)：前端情景演示、真实双端增强、最少数据和开发顺序。
 
-## 体验原型
+## 来源与历史
 
-下载或克隆本仓库后，用浏览器打开 `product/prototype/index.html`，保持该目录内的 CSS、JS 文件完整。原型无安装依赖，可在本地打开；GitHub 文件预览页展示源码，不直接运行网页。
+- [官方资料留档](references/official/2026-09-26/README.md)：官网与赛题包原文提取 / 截图、来源和保存范围。
+- [原始产品材料](references/original-ideas/README.md)：双 App 方案、《同场》方案和原型素材。
+- [旧方案归档说明](archive/README.md)：v0.3 等旧文档退出当前执行依据。
 
-原型含空间旋转、切换中心、代表作抽屉、留下歌曲、历史回顾和合作挑战。**当前艺人、歌曲及关系均为虚构示例，试听仅模拟，没有真实音频。** 正式音乐数据、音频、素材接入和在线 Demo 部署仍需开发完成与验收。
+## 现有程序
 
-![Music Map 原型效果截图](product/assets/cover-prototype.png)
+[product/prototype/index.html](product/prototype/index.html) 是已有 **Map v0.2 原型**：虚构艺人和歌曲，无声模拟试听；尚未实现 Space 社交或真实双端。浏览器可本地打开，保持 CSS / JS 同目录。
 
-## 协作起点
-
-产品交付已准备；开发从数据与音频最小验证开始，按交接说明接入真实内容并实现正式版本。原型不限定正式项目的技术框架。初赛最晚 **2026 年 10 月 9 日**提交，完整材料要求见 PRD 与验收清单。
+旧程序和[历史核验](product/verification/report.md)保留作开发参考；本轮修改文档与目录，没有发布新网页。当前执行入口只有上方三份定稿文档。

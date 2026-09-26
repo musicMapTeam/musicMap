@@ -1,0 +1,71 @@
+{
+  "cells": [
+    {
+      "requestedCell": "A1",
+      "selectedCell": "A1",
+      "text": "\n"
+    },
+    {
+      "requestedCell": "A2",
+      "selectedCell": "A2",
+      "text": "\n"
+    },
+    {
+      "requestedCell": "A3",
+      "selectedCell": "A3",
+      "text": "\n"
+    },
+    {
+      "requestedCell": "B3",
+      "selectedCell": "B3",
+      "text": "一、大赛基本介绍\n\n\n\n\nQ1：这是什么比赛？\n\nA：Build with AI是腾讯音乐举办的高校 AI Hackathon，你可以选择两条赛道参赛：给TME 现有产品做创意（赛道 1），或全新的音乐/AI 产品（赛道 2） 。重点不是代码量，而是\"想法好不好、AI 用得对不对\"。\n\n\n\n\nQ2：谁可以参加？ \n\nA：欢迎所有对音乐 + AI 感兴趣的在校学生（全日制高校或海外同等学历）参赛，不限岗位、不限职级——产品、设计、研发、运营、市场……都可以参赛。可以单人参赛，也可以组队（组队不超过2人）。\n\n\n\n\nQ3：我不会写代码，能参加吗？\n\n A：可以。不会写代码 ≠ 做不出产品——用 AI Coding 把方案变成可演示的页面、功能、原型等。初赛是「想法优先」——发现了什么真问题、想到了什么好解法，把它实现出来。代码不是门槛。入围后组委会也将提供辅导支持，帮助你把想法完善落地。\n\n\n\n\nQ4：我已经有在做的小项目，能拿来参赛吗？\n\n A：可以。只要是围绕AI X音乐领域的创意，只要目前还没有上线，都可以参加。请在方案中说明\"已实现的部分\"和\"大赛期间计划深化/新增的部分\"。\n\n参赛作品须为原创，如发现抄袭或套用他人方案将取消评审资格。\n\n\n\n\nQ5：我的想法很小/很垂直，可以吗？ \n\nA：完全可以。解决一个真问题、小问题，比大而空的方案更可能打动评委。比如，多模态音乐推荐 App 就是在解决\"用户不知道怎么搜歌\"这一件事。\n\n\n\n\nQ6：请问有token/算力支持吗？\n\nA：本次大赛不提供额外token支持，需要各队伍自行准备AI 模型调用资源。大家也可以选用各类模型免费额度、个人账号等方式完成作品开发。\n\n\n\n\nQ7：会提供相关的内部api吗？\n\nA：目前初赛阶段暂不提供官方 API 接口。初赛重点考察创意与方案，进入决赛后，我们会为入围团队提供平台测试所需的 API 接口，支持作品进一步开发和验证。\n\n\n\n\nQ8：在入选之前代码上传到自己的github的开源仓库允许吗？\n\nA：建议大家入选前尽量不要开源代码，主要是保护大家的创意和成果，避免代码 / 方案被其他人复用。如果队伍自行选择开源，对应的相关风险由参赛队伍自行承担。\n\n\n\n\nQ9：如果中途不想参加了，可以退出吗，会不会有什么影响？\n\nA：参赛队伍可主动申请中途退赛，退赛申请提交并经主办方确认后，即视为自动放弃本次赛事后续参赛、评审、晋级及评奖资格，不再享有赛事相关权益。仅调整团队成员不属于退赛，队员变更需提前向主办方报备。\n\n\n\n\nQ10：之前的作品可以提交吗？要求说作品要求未上线，未上线标准是什么？\n\nA：对外发布至公开平台，任何人均可访问、体验使用，即视为上线；仅团队内部 / 定向小范围内测不算上线。\n\n\n\n\nQ11：Demo使用音乐的版权怎么处理，可以提供授权的音乐作品吗？\n\nA：如果在 Demo 中需要使用音乐素材的，在本次比赛期间，Demo 里用的音乐素材不做商业用途、不对外发布上线，只用于赛事评审演示。赛事结束后，不可以再对外发布、上线使用该素材；\n\n大家也可以先考虑使用公版免费歌曲。如果涉及到使用专辑封面等素材，仅极少量引用用于评论、介绍原作，才有可能适用合理使用，但依然存在不确定性，不建议依赖使用。\n\n我们整理了一个可供大家在参赛期间使用的音乐素材歌单，仅用于作品Demo使用：https://c6.y.qq.com/base/fcgi-bin/u?__=UFgdsOYo9Glo\n\n\n"
+    },
+    {
+      "requestedCell": "A4",
+      "selectedCell": "A4",
+      "text": "\n"
+    },
+    {
+      "requestedCell": "B4",
+      "selectedCell": "B4",
+      "text": "二、提交与评审\n\n\n\n\nQ12：可以同时参加两条赛道吗？\n\n A：每人只能以团队或个人身份提交一个方案，选择一个赛道。\n\n\n\n\nQ13：初筛要交什么？截止时间是？ \n\nA：初筛截止时间为 10 月 09 日 23:59，提交内容包括：\n\n●方案名称、赛道选择、团队成员信息等\n\n●方案描述（问题 + 方案 ，100-300 字）\n\n●附件（必填）：原型截图、演示视频/Demo链接(二选一)\n\n详见\"参赛方案提交模板\"文件。\n\n\n\n\nQ14：入围后我该做什么？\n\n A：10月27日至11月2日为方案打磨期，你需要在截止日11月2日前完成以下任务：\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nQ15：我只能线下参加路演吗？\n\n A：如因异地或其他原因无法到场，可提交预录制路演视频，并远程接入 Q&A 环节。\n\n\n\n\nQ16：我有其他问题，找谁？ \n\nA：扫码加入赛事企微交流群，群内会持续更新赛事动态和答疑。\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+    },
+    {
+      "requestedCell": "A5",
+      "selectedCell": "A5",
+      "text": "\n"
+    },
+    {
+      "requestedCell": "B5",
+      "selectedCell": "B5",
+      "text": "\n"
+    }
+  ],
+  "retrievedAt": "2026-09-26T14:38:57.407Z",
+  "sheet": "🙋常见参赛问题Q&A",
+  "shot": {
+    "bytes": 221274,
+    "captureId": "shot-e2aa9da1-f76c-43df-bdbe-6fe6df5c12f6",
+    "capturedFullPage": false,
+    "height": 934,
+    "issuesDelta": [],
+    "mimeType": "image/png",
+    "nextAction": {
+      "mimeType": "image/png",
+      "path": "C:\\Users\\Alakazam\\AppData\\Local\\Tabbit\\User Data\\LocalAgent\\Runtime\\artifacts\\task-fae4ab99-cf5c-4f2a-bcb8-e81d2d666673\\screenshot-shot-e2aa9da1-f76c-43df-bdbe-6fe6df5c12f6.png",
+      "type": "load_image"
+    },
+    "path": "C:\\Users\\Alakazam\\AppData\\Local\\Tabbit\\User Data\\LocalAgent\\Runtime\\artifacts\\task-fae4ab99-cf5c-4f2a-bcb8-e81d2d666673\\screenshot-shot-e2aa9da1-f76c-43df-bdbe-6fe6df5c12f6.png",
+    "recommendedLimitExceeded": true,
+    "requestedFullPage": false,
+    "requiresImageLoad": true,
+    "screenshotCount": 6,
+    "sha256": "c754f2e8ed995f7c59247b572845a6023980ad49bd2a1025f798cd207f2414b5",
+    "type": "browser_screenshot",
+    "warnings": [
+      "Recommended screenshot limit of 3 exceeded"
+    ],
+    "width": 1090
+  },
+  "sourceUrl": "https://saas.docs.qq.com/sheet/DR2VHa0JGT3ZGVFNKTmpybUdJ?_t=1790430860428&nojump=1&tab=000006"
+}

@@ -1,0 +1,91 @@
+{
+  "cells": [
+    {
+      "requestedCell": "A1",
+      "selectedCell": "A1",
+      "text": "评审细则"
+    },
+    {
+      "requestedCell": "B1",
+      "selectedCell": "A1",
+      "text": "评审细则"
+    },
+    {
+      "requestedCell": "A2",
+      "selectedCell": "A2",
+      "text": "评审维度"
+    },
+    {
+      "requestedCell": "B2",
+      "selectedCell": "B2",
+      "text": "描述"
+    },
+    {
+      "requestedCell": "A3",
+      "selectedCell": "A3",
+      "text": "用户价值"
+    },
+    {
+      "requestedCell": "B3",
+      "selectedCell": "B3",
+      "text": "考察作品是否真正打动用户、解决某个真实的音乐或音频场景需求，能否带来清晰、有趣、自然的产品体验，并为用户创造实际价值"
+    },
+    {
+      "requestedCell": "A4",
+      "selectedCell": "A4",
+      "text": "可行性"
+    },
+    {
+      "requestedCell": "B4",
+      "selectedCell": "B4",
+      "text": "考察作品是否具备合理的产品逻辑和技术实现路径，Demo 完成度是否达到预期，是否具备进一步落地和持续发展的潜力"
+    },
+    {
+      "requestedCell": "A5",
+      "selectedCell": "A5",
+      "text": "创新性"
+    },
+    {
+      "requestedCell": "B5",
+      "selectedCell": "B5",
+      "text": "解决方案切入角度是否新颖，作品是否提出了突破性的思路"
+    },
+    {
+      "requestedCell": "A6",
+      "selectedCell": "A6",
+      "text": "\n"
+    },
+    {
+      "requestedCell": "B6",
+      "selectedCell": "B6",
+      "text": "\n"
+    }
+  ],
+  "retrievedAt": "2026-09-26T14:41:48.359Z",
+  "sheet": "📈评审标准",
+  "shot": {
+    "bytes": 130579,
+    "captureId": "shot-6e6631c0-1a2f-44f3-89ed-7861dcb2b9a9",
+    "capturedFullPage": false,
+    "height": 934,
+    "issuesDelta": [],
+    "mimeType": "image/png",
+    "nextAction": {
+      "mimeType": "image/png",
+      "path": "C:\\Users\\Alakazam\\AppData\\Local\\Tabbit\\User Data\\LocalAgent\\Runtime\\artifacts\\task-fae4ab99-cf5c-4f2a-bcb8-e81d2d666673\\screenshot-shot-6e6631c0-1a2f-44f3-89ed-7861dcb2b9a9.png",
+      "type": "load_image"
+    },
+    "path": "C:\\Users\\Alakazam\\AppData\\Local\\Tabbit\\User Data\\LocalAgent\\Runtime\\artifacts\\task-fae4ab99-cf5c-4f2a-bcb8-e81d2d666673\\screenshot-shot-6e6631c0-1a2f-44f3-89ed-7861dcb2b9a9.png",
+    "recommendedLimitExceeded": true,
+    "requestedFullPage": false,
+    "requiresImageLoad": true,
+    "screenshotCount": 12,
+    "sha256": "497c825cc835880ccce84aa215d3b8fc937bf4bd883fa1e72de033fe4b074315",
+    "type": "browser_screenshot",
+    "warnings": [
+      "Recommended screenshot limit of 3 exceeded"
+    ],
+    "width": 1090
+  },
+  "sourceUrl": "https://saas.docs.qq.com/sheet/DR2VHa0JGT3ZGVFNKTmpybUdJ?_t=1790430860428&nojump=1&tab=000005"
+}

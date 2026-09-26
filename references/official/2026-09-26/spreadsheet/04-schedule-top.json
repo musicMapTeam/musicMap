@@ -1,0 +1,28 @@
+{
+  "retrievedAt": "2026-09-26T14:40:56.517Z",
+  "shot": {
+    "bytes": 174671,
+    "captureId": "shot-5010f94d-5ef8-4edc-927f-f753eb8830b9",
+    "capturedFullPage": false,
+    "height": 934,
+    "issuesDelta": [],
+    "mimeType": "image/png",
+    "nextAction": {
+      "mimeType": "image/png",
+      "path": "C:\\Users\\Alakazam\\AppData\\Local\\Tabbit\\User Data\\LocalAgent\\Runtime\\artifacts\\task-fae4ab99-cf5c-4f2a-bcb8-e81d2d666673\\screenshot-shot-5010f94d-5ef8-4edc-927f-f753eb8830b9.png",
+      "type": "load_image"
+    },
+    "path": "C:\\Users\\Alakazam\\AppData\\Local\\Tabbit\\User Data\\LocalAgent\\Runtime\\artifacts\\task-fae4ab99-cf5c-4f2a-bcb8-e81d2d666673\\screenshot-shot-5010f94d-5ef8-4edc-927f-f753eb8830b9.png",
+    "recommendedLimitExceeded": true,
+    "requestedFullPage": false,
+    "requiresImageLoad": true,
+    "screenshotCount": 11,
+    "sha256": "733c51474840c72d88793026866cec0bf39c50991030312645973177196cfbfb",
+    "type": "browser_screenshot",
+    "warnings": [
+      "Recommended screenshot limit of 3 exceeded"
+    ],
+    "width": 1090
+  },
+  "sourceUrl": "https://saas.docs.qq.com/sheet/DR2VHa0JGT3ZGVFNKTmpybUdJ?_t=1790430860428&nojump=1&tab=000004"
+}

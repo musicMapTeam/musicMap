@@ -1,0 +1,201 @@
+{
+  "cells": [
+    {
+      "requestedCell": "A1",
+      "selectedCell": "A1",
+      "text": "初赛方案提交 · 填写指引\n\n初赛方案提交截止时间 10 月 9 日 23:59"
+    },
+    {
+      "requestedCell": "B1",
+      "selectedCell": "A1",
+      "text": "初赛方案提交 · 填写指引\n\n初赛方案提交截止时间 10 月 9 日 23:59"
+    },
+    {
+      "requestedCell": "C1",
+      "selectedCell": "A1",
+      "text": "初赛方案提交 · 填写指引\n\n初赛方案提交截止时间 10 月 9 日 23:59"
+    },
+    {
+      "requestedCell": "A2",
+      "selectedCell": "A2",
+      "text": "提交物总览：内容与提交作品字段一一对应，请参考填写"
+    },
+    {
+      "requestedCell": "B2",
+      "selectedCell": "A2",
+      "text": "提交物总览：内容与提交作品字段一一对应，请参考填写"
+    },
+    {
+      "requestedCell": "C2",
+      "selectedCell": "A2",
+      "text": "提交物总览：内容与提交作品字段一一对应，请参考填写"
+    },
+    {
+      "requestedCell": "A3",
+      "selectedCell": "A3",
+      "text": "点击填写"
+    },
+    {
+      "requestedCell": "B3",
+      "selectedCell": "A3",
+      "text": "点击填写"
+    },
+    {
+      "requestedCell": "C3",
+      "selectedCell": "A3",
+      "text": "点击填写"
+    },
+    {
+      "requestedCell": "A4",
+      "selectedCell": "A4",
+      "text": "提交物"
+    },
+    {
+      "requestedCell": "B4",
+      "selectedCell": "B4",
+      "text": "填写提示"
+    },
+    {
+      "requestedCell": "C4",
+      "selectedCell": "C4",
+      "text": "示例"
+    },
+    {
+      "requestedCell": "A5",
+      "selectedCell": "A5",
+      "text": "队伍信息"
+    },
+    {
+      "requestedCell": "B5",
+      "selectedCell": "B5",
+      "text": "填写团队成员及其分工，队长放在第一位。"
+    },
+    {
+      "requestedCell": "C5",
+      "selectedCell": "C5",
+      "text": "填写示例（单人）：\n\n张三（队长）——方案策划 + 原型设计\n\n\n\n\n填写示例（多人）：\n\n张三（队长）——整体方案策划 + 产品设计\n\n李四——前端开发 + AI 集成\n\n\n"
+    },
+    {
+      "requestedCell": "A6",
+      "selectedCell": "A6",
+      "text": "作品信息"
+    },
+    {
+      "requestedCell": "B6",
+      "selectedCell": "B6",
+      "text": "产品或者创意名称"
+    },
+    {
+      "requestedCell": "C6",
+      "selectedCell": "C6",
+      "text": "MoFlow"
+    },
+    {
+      "requestedCell": "A7",
+      "selectedCell": "A7",
+      "text": "作品赛道"
+    },
+    {
+      "requestedCell": "B7",
+      "selectedCell": "B7",
+      "text": "选择对应作品赛道"
+    },
+    {
+      "requestedCell": "C7",
+      "selectedCell": "C7",
+      "text": "\n"
+    },
+    {
+      "requestedCell": "A8",
+      "selectedCell": "A8",
+      "text": "创作思路\n\n（100-300 字）"
+    },
+    {
+      "requestedCell": "B8",
+      "selectedCell": "B8",
+      "text": "●解决什么问题：你发现了什么用户痛点或业务机会？\n\n●解决方案是什么：你打算怎么做？核心思路是什么？ "
+    },
+    {
+      "requestedCell": "C8",
+      "selectedCell": "C8",
+      "text": "填写示例一：\n\nMoFlow （创新音乐产品赛道 · 多模态音乐推荐 App）\n\n解决问题：用户常常想听一首\"配当下场景\"的歌，但说不清自己需要什么，因为「视觉感受」和「音乐语言」之间隔着一层翻译——\"晚高峰下班、又累又期待回家\"这种复杂状态，没法用一个标签描述。\n\n解决方案：降低表达门槛，用户只需要一张照片，就能得到一首\"对味\"的歌。\n\nMoFlow 让用户拍照代替打字：对当下场景拍一张照片，AI 多模态视觉模型分析画面中的光线、色调、构图和物体，识别出场景氛围和情绪倾向，再将这些视觉特征映射到音乐的情绪标签（如舒缓、温暖、空灵），从曲库中召回匹配的歌单推荐给用户。\n\n\n\n\n填写示例二：\n\n智能歌单（TME产品创新功能赛道 · 音乐智能歌单助手）\n\n解决问题：每日推荐和歌单广场内容很丰富，但很多用户订阅后就忘了，或者不知道某个歌单里到底有什么歌。歌单的「发现」和「使用」之间是断层的。\n\n解决方案：给歌单加一个自然语言搜索层，让用户不用翻歌单列表、不用记歌单名字，直接用人话找到想听的歌。用户可以用自然语言问\"帮我从最近收藏的3个歌单里挑 10 首适合跑步的歌\"，AI 自动理解语义、检索用户歌单库、匹配输出结果。\n\n\n"
+    },
+    {
+      "requestedCell": "A9",
+      "selectedCell": "A9",
+      "text": "作品Demo链接"
+    },
+    {
+      "requestedCell": "B9",
+      "selectedCell": "B9",
+      "text": "作品须部署至浏览器环境，并提供可直接访问的在线链接。\n\n请确保链接在提交截止日前及评审期间始终可正常访问，因链接失效导致无法体验的，将影响评分"
+    },
+    {
+      "requestedCell": "C9",
+      "selectedCell": "C9",
+      "text": "MoFlow — 让每个瞬间充满音乐"
+    },
+    {
+      "requestedCell": "A10",
+      "selectedCell": "A10",
+      "text": "上传作品演示视频"
+    },
+    {
+      "requestedCell": "B10",
+      "selectedCell": "B10",
+      "text": "录屏包含语音讲解或字幕，清晰演示讲解产品思路、核心功能等。\n\n时长不超过3分钟，文件大小在500M内，视频无水印杂音，原创合规"
+    },
+    {
+      "requestedCell": "C10",
+      "selectedCell": "C10",
+      "text": "\n"
+    },
+    {
+      "requestedCell": "A11",
+      "selectedCell": "A11",
+      "text": "上传作品封面"
+    },
+    {
+      "requestedCell": "B11",
+      "selectedCell": "B11",
+      "text": "请上传 1 张作品封面/效果截图，用于赛后官网展示与宣传。格式为16:9"
+    },
+    {
+      "requestedCell": "C11",
+      "selectedCell": "C11",
+      "text": "\n"
+    }
+  ],
+  "exportControls": {
+    "html": "<li class=\"dui-menu-item dui-menu-submenu mainmenu-submenu-exportAs menu_workbench-menu-item__lH3ED dui-menu-submenu-disabled dui-menu-item-disabled\" role=\"menuitem\" aria-disabled=\"true\" aria-checked=\"false\" tabindex=\"-1\" data-dui-1-28-2=\"dui-menu-item dui-menu-submenu mainmenu-submenu-exportAs menu_workbench-menu-item__lH3ED dui-menu-submenu-disabled dui-menu-item-disabled\" style=\"min-width: 104px;\">导出为</li>",
+    "parent": "<div class=\"dui-dropdown-keep dui-menu-item-container\" data-dui-1-28-2=\"dui-dropdown-keep dui-menu-item-container\"><li class=\"dui-menu-item dui-menu-submenu mainmenu-submenu-exportAs menu_workbench-menu-item__lH3ED dui-menu-submenu-disabled dui-menu-item-disabled\" role=\"menuitem\" aria-disabled=\"true\" aria-checked=\"false\" tabindex=\"-1\" data-dui-1-28-2=\"dui-menu-item dui-menu-submenu mainmenu-submenu-exportAs menu_workbench-menu-item__lH3ED dui-menu-submenu-disabled dui-menu-item-disabled\" style=\"min-width: 104px;\">导出为</li></div>",
+    "text": "导出为"
+  },
+  "retrievedAt": "2026-09-26T14:38:34.442Z",
+  "sheet": "📄初赛提交指引",
+  "shot": {
+    "bytes": 206964,
+    "captureId": "shot-74540552-143e-4bce-8208-6d6b0d7199d5",
+    "capturedFullPage": false,
+    "height": 934,
+    "issuesDelta": [],
+    "mimeType": "image/png",
+    "nextAction": {
+      "mimeType": "image/png",
+      "path": "C:\\Users\\Alakazam\\AppData\\Local\\Tabbit\\User Data\\LocalAgent\\Runtime\\artifacts\\task-fae4ab99-cf5c-4f2a-bcb8-e81d2d666673\\screenshot-shot-74540552-143e-4bce-8208-6d6b0d7199d5.png",
+      "type": "load_image"
+    },
+    "path": "C:\\Users\\Alakazam\\AppData\\Local\\Tabbit\\User Data\\LocalAgent\\Runtime\\artifacts\\task-fae4ab99-cf5c-4f2a-bcb8-e81d2d666673\\screenshot-shot-74540552-143e-4bce-8208-6d6b0d7199d5.png",
+    "recommendedLimitExceeded": true,
+    "requestedFullPage": false,
+    "requiresImageLoad": true,
+    "screenshotCount": 5,
+    "sha256": "f9b290b852dca628f5c4a99c4c1456117a340b93f1b577ac9829ba1518b0cec4",
+    "type": "browser_screenshot",
+    "warnings": [
+      "Recommended screenshot limit of 3 exceeded"
+    ],
+    "width": 1090
+  },
+  "sourceUrl": "https://saas.docs.qq.com/sheet/DR2VHa0JGT3ZGVFNKTmpybUdJ?_t=1790430860428&nojump=1&tab=000002"
+}

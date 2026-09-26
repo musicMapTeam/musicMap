@@ -1,0 +1,113 @@
+{
+  "observation": {
+    "focus": {
+      "active": {
+        "depth": 0,
+        "element": {
+          "contentEditable": false,
+          "disabled": false,
+          "editable": false,
+          "name": "",
+          "readOnly": false,
+          "rect": {
+            "height": 16,
+            "width": 8,
+            "x": -9996,
+            "y": 185
+          },
+          "role": "combobox",
+          "tag": "div",
+          "type": null,
+          "visible": true
+        },
+        "focused": true,
+        "id": "main",
+        "name": "",
+        "selection": {
+          "anchorOffset": 46,
+          "collapsed": true,
+          "focusOffset": 46
+        },
+        "shadowDepth": 0,
+        "url": "https://saas.docs.qq.com/sheet/DR2VHa0JGT3ZGVFNKTmpybUdJ?_t=1790430860428&nojump=1&tab=000002"
+      },
+      "chain": [
+        {
+          "depth": 0,
+          "element": {
+            "contentEditable": false,
+            "disabled": false,
+            "editable": false,
+            "name": "",
+            "readOnly": false,
+            "rect": {
+              "height": 16,
+              "width": 8,
+              "x": -9996,
+              "y": 185
+            },
+            "role": "combobox",
+            "tag": "div",
+            "type": null,
+            "visible": true
+          },
+          "focused": true,
+          "id": "main",
+          "name": "",
+          "selection": {
+            "anchorOffset": 46,
+            "collapsed": true,
+            "focusOffset": 46
+          },
+          "shadowDepth": 0,
+          "url": "https://saas.docs.qq.com/sheet/DR2VHa0JGT3ZGVFNKTmpybUdJ?_t=1790430860428&nojump=1&tab=000002"
+        }
+      ],
+      "page": {
+        "id": "p1",
+        "url": "https://saas.docs.qq.com/sheet/DR2VHa0JGT3ZGVFNKTmpybUdJ?_t=1790430860428&nojump=1&tab=000002"
+      }
+    },
+    "frames": [],
+    "framesTruncated": false,
+    "page": {
+      "id": "p1",
+      "title": "腾讯音乐首届高校AI Hackathon·官方赛题包",
+      "url": "https://saas.docs.qq.com/sheet/DR2VHa0JGT3ZGVFNKTmpybUdJ?_t=1790430860428&nojump=1&tab=000002"
+    },
+    "pages": [
+      {
+        "id": "p1",
+        "url": "https://saas.docs.qq.com/sheet/DR2VHa0JGT3ZGVFNKTmpybUdJ?_t=1790430860428&nojump=1&tab=000002"
+      }
+    ],
+    "revision": {
+      "documentGeneration": 2,
+      "targetEpoch": 2
+    },
+    "snapshot": "- generic [ref=e1] [box=0,0,1090,934]:\n  - generic [ref=e176] [box=0,0,1090,934]:\n    - toolbar \"titlebar\" [ref=e177] [box=1,1,1088,40]:\n      - generic [ref=e182] [box=45,13,326,28]: 腾讯音乐首届高校AI Hackathon·官方赛题包\n      - generic [ref=e190] [box=375,13,38,28]: 企业\n      - button \"只能查看\" [ref=e201] [box=417,15,72,24]\n      - generic [ref=e221] [box=783,17,54,22]:\n        - img \"头像\" [ref=e224] [box=784,18,20,20]\n        - img \"头像\" [ref=e229] [box=800,18,20,20]\n        - generic [ref=e232] [box=815,17,22,22]:\n          - img \"头像\" [ref=e234] [box=816,18,20,20]\n          - paragraph [ref=e238] [box=816,18,20,20]: \"4\"\n      - generic \"file\" [ref=e247] [box=869,15,24,24]\n      - button [ref=e254] [box=901,15,24,24]:\n        - button [ref=e258] [box=901,15,24,24]\n      - generic [ref=e260] [box=933,13,28,28]: \"4\"\n      - button \"分享\" [ref=e270] [box=977,13,56,28]\n      - img \"头像\" [ref=e280] [box=1049,13,28,28]\n    - toolbar \"Toolbar\" [ref=e288] [box=9,41,1072,110]:\n      - tablist [ref=e290] [box=9,45,326,32]:\n        - tab \"开始\" [selected] [ref=e291] [box=9,45,32,32]\n        - tab \"插入\" [ref=e292] [box=53,45,32,32]\n        - tab \"数据\" [ref=e293] [box=97,45,32,32]\n        - tab \"公式\" [ref=e294] [box=141,45,32,32]\n        - tab \"协作\" [ref=e295] [box=185,45,32,32]\n        - tab \"视图\" [ref=e296] [box=229,45,32,32]\n        - tab \"效率工具\" [ref=e297] [box=273,45,56,32]\n      - tabpanel [ref=e299] [box=9,81,1072,70]:\n        - toolbar \"开始\" [ref=e300] [box=21,90,988,52]:\n          - generic [ref=e301] [box=-9979,90,1815,52]:\n            - generic [ref=e302] [box=-9979,90,56,52]:\n              - generic [ref=e303] [box=-9979,90,56,24]:\n                - button [disabled] [ref=e308] [box=-9979,90,24,24]:\n                  - button [disabled] [ref=e310] [box=-9979,90,24,24]\n                - button [disabled] [ref=e316] [box=-9947,90,24,24]:\n                  - button [disabled] [ref=e318] [box=-9947,90,24,24]\n              - generic [ref=e320] [box=-9979,118,56,24]:\n                - button [disabled] [ref=e325] [box=-9979,118,24,24]:\n                  - button [disabled] [ref=e327] [box=-9979,118,24,24]\n                - button [disabled] [ref=e333] [box=-9947,118,24,24]:\n                  - button [disabled] [ref=e335] [box=-9947,118,24,24]\n            - generic [ref=e338] [box=-9898,90,306,52]:\n              - generic [ref=e339] [box=-9898,90,306,24]:\n                - button [disabled] [ref=e347] [box=-9893,90,66,24]:\n                  - generic [ref=e348] [box=-9893,90,66,24]: 默认字体\n                - button [disabled] [ref=e359] [box=-9818,90,35,24]:\n                  - generic [ref=e360] [box=-9818,90,35,24]: \"10\"\n                - group [disabled] [ref=e371] [box=-9770,90,36,24]:\n                  - generic [ref=e372] [box=-9770,90,36,24]:\n                    - button [disabled] [ref=e373] [box=-9770,90,24,24]\n                    - button [disabled] [ref=e376] [box=-9746,90,12,24]\n                - button [disabled] [ref=e384] [box=-9726,90,36,24]:\n                  - button [disabled] [ref=e386] [box=-9726,90,24,24]\n                - button [disabled] [ref=e397] [box=-9682,90,90,24]:\n                  - generic [ref=e398] [box=-9682,90,90,24]:\n                    - button [disabled] [ref=e399] [box=-9682,90,24,24]\n                    - generic [ref=e401] [box=-9658,90,52,24]: 表格样式\n              - generic [ref=e404] [box=-9898,118,306,24]:\n                - button [disabled] [ref=e409] [box=-9898,118,24,24]:\n                  - button [disabled] [ref=e411] [box=-9898,118,24,24]\n                - button [disabled] [ref=e417] [box=-9866,118,24,24]:\n                  - button [disabled] [ref=e419] [box=-9866,118,24,24]\n                - button [disabled] [ref=e425] [box=-9834,118,24,24]:\n                  - button [disabled] [ref=e427] [box=-9834,118,24,24]\n                - button [disabled] [ref=e433] [box=-9802,118,24,24]:\n                  - button [disabled] [ref=e435] [box=-9802,118,24,24]\n                - group [disabled] [ref=e444] [box=-9770,118,36,24]:\n                  - generic [ref=e445] [box=-9770,118,36,24]:\n                    - button [disabled] [ref=e446] [box=-9770,118,24,24]\n                    - button [disabled] [ref=e450] [box=-9746,118,12,24]\n                - group [disabled] [ref=e458] [box=-9726,118,36,24]:\n                  - generic [ref=e459] [box=-9726,118,36,24]:\n                    - button [disabled] [ref=e460] [box=-9726,118,24,24]\n                    - button [disabled] [ref=e464] [box=-9702,118,12,24]\n                - button [disabled] [ref=e472] [box=-9682,118,90,24]:\n                  - generic [ref=e473] [box=-9682,118,90,24]:\n                    - button [disabled] [ref=e474] [box=-9682,118,24,24]\n                    - generic [ref=e476] [box=-9658,118,52,24]: 条件格式\n            - button [ref=e488] [box=-9584,92,52,48]:\n              - button [ref=e490] [box=-9576,92,24,24]\n              - generic [ref=e494] [box=-9584,122,52,16]: 字体样式\n            - generic [ref=e496] [box=-9507,90,88,52]:\n              - generic [ref=e497] [box=-9507,90,88,24]:\n                - button [disabled] [ref=e505] [box=-9507,90,36,24]:\n                  - button [disabled] [ref=e507] [box=-9507,90,24,24]\n                - button [disabled] [ref=e518] [box=-9463,90,36,24]:\n                  - button [disabled] [ref=e520] [box=-9463,90,24,24]\n              - generic [ref=e524] [box=-9507,118,88,24]:\n                - button [disabled] [pressed] [ref=e529] [box=-9507,118,24,24]:\n                  - button [disabled] [ref=e531] [box=-9507,118,24,24]\n                - button [disabled] [ref=e537] [box=-9475,118,24,24]:\n                  - button [disabled] [ref=e539] [box=-9475,118,24,24]\n                - button [disabled] [ref=e545] [box=-9443,118,24,24]:\n                  - button [disabled] [ref=e547] [box=-9443,118,24,24]\n            - generic [ref=e549] [box=-9411,90,66,52]:\n              - button [disabled] [pressed] [ref=e555] [box=-9411,90,54,24]:\n                - generic [ref=e556] [box=-9411,90,54,24]:\n                  - button [disabled] [ref=e557] [box=-9411,90,24,24]\n                  - generic [ref=e559] [box=-9387,90,28,24]: 换行\n              - group [disabled] [ref=e568] [box=-9411,118,66,24]:\n                - generic [ref=e569] [box=-9411,118,66,24]:\n                  - button [disabled] [ref=e570] [box=-9411,118,24,24]\n                  - generic [ref=e572] [box=-9387,118,28,24]: 合并\n                  - button [disabled] [ref=e574] [box=-9357,118,12,24]\n            - button [ref=e584] [box=-9337,92,52,48]:\n              - button [ref=e586] [box=-9329,92,24,24]\n              - generic [ref=e590] [box=-9337,122,52,16]: 对齐方式\n            - generic [ref=e592] [box=-9260,90,90,52]:\n              - button [disabled] [ref=e601] [box=-9252,90,80,24]:\n                - generic [ref=e602] [box=-9252,90,80,24]: 常规\n              - generic [ref=e606] [box=-9260,118,90,24]:\n                - button [disabled] [ref=e611] [box=-9260,118,24,24]:\n                  - button [disabled] [ref=e613] [box=-9260,118,24,24]\n                - button [disabled] [ref=e619] [box=-9232,118,24,24]:\n                  - button [disabled] [ref=e621] [box=-9232,118,24,24]\n            - button [ref=e632] [box=-9162,92,52,48]:\n              - button [ref=e634] [box=-9154,92,24,24]\n              - generic [ref=e638] [box=-9162,122,52,16]: 数字格式\n            - group [ref=e649] [box=-9085,92,36,48]:\n              - generic [ref=e650] [box=-9085,92,36,24]:\n                - button [ref=e651] [box=-9085,92,24,24]\n                - button [ref=e654] [box=-9061,92,12,24]\n              - generic [ref=e655] [box=-9085,122,36,16]: 筛选\n            - generic [ref=e656] [box=-9041,90,140,52]:\n              - generic [ref=e657] [box=-9041,90,140,24]:\n                - button [disabled] [ref=e665] [box=-9041,90,66,24]:\n                  - generic [ref=e666] [box=-9041,90,66,24]:\n                    - button [disabled] [ref=e667] [box=-9041,90,24,24]\n                    - generic [ref=e669] [box=-9017,90,28,24]: 冻结\n                - group [disabled] [ref=e679] [box=-8967,90,66,24]:\n                  - generic [ref=e680] [box=-8967,90,66,24]:\n                    - button [disabled] [ref=e681] [box=-8967,90,24,24]\n                    - generic [ref=e683] [box=-8943,90,28,24]: 求和\n                    - button [disabled] [ref=e685] [box=-8913,90,12,24]\n              - generic [ref=e686] [box=-9041,118,140,24]:\n                - button [disabled] [ref=e694] [box=-9041,118,66,24]:\n                  - generic [ref=e695] [box=-9041,118,66,24]:\n                    - button [disabled] [ref=e696] [box=-9041,118,24,24]\n                    - generic [ref=e698] [box=-9017,118,28,24]: 排序\n                - button [disabled] [ref=e708] [box=-8967,118,66,24]:\n                  - generic [ref=e709] [box=-8967,118,66,24]:\n                    - button [disabled] [ref=e710] [box=-8967,118,24,24]\n                    - generic [ref=e712] [box=-8943,118,28,24]: 数据\n            - button [ref=e724] [box=-8893,",
+    "snapshotTruncated": true
+  },
+  "shot": {
+    "bytes": 220150,
+    "captureId": "shot-eed2899a-574c-4e9c-804b-5a51da25d53e",
+    "capturedFullPage": false,
+    "height": 934,
+    "issuesDelta": [],
+    "mimeType": "image/png",
+    "nextAction": {
+      "mimeType": "image/png",
+      "path": "C:\\Users\\Alakazam\\AppData\\Local\\Tabbit\\User Data\\LocalAgent\\Runtime\\artifacts\\task-fae4ab99-cf5c-4f2a-bcb8-e81d2d666673\\screenshot-shot-eed2899a-574c-4e9c-804b-5a51da25d53e.png",
+      "type": "load_image"
+    },
+    "path": "C:\\Users\\Alakazam\\AppData\\Local\\Tabbit\\User Data\\LocalAgent\\Runtime\\artifacts\\task-fae4ab99-cf5c-4f2a-bcb8-e81d2d666673\\screenshot-shot-eed2899a-574c-4e9c-804b-5a51da25d53e.png",
+    "recommendedLimitExceeded": false,
+    "requestedFullPage": false,
+    "requiresImageLoad": true,
+    "screenshotCount": 3,
+    "sha256": "321a4b6dc707a1e640407802152d15056285e4443cd7ddc3417211b78564d29a",
+    "type": "browser_screenshot",
+    "warnings": [],
+    "width": 1090
+  }
+}

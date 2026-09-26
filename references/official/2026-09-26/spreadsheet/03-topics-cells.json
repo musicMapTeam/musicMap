@@ -1,0 +1,235 @@
+{
+  "cells": [
+    {
+      "requestedCell": "A1",
+      "selectedCell": "A1",
+      "text": "赛道说明\n\n赛题二选一，每人以团队或个人身份选择一个赛道、提交一个方案即可"
+    },
+    {
+      "requestedCell": "B1",
+      "selectedCell": "A1",
+      "text": "赛道说明\n\n赛题二选一，每人以团队或个人身份选择一个赛道、提交一个方案即可"
+    },
+    {
+      "requestedCell": "C1",
+      "selectedCell": "A1",
+      "text": "赛道说明\n\n赛题二选一，每人以团队或个人身份选择一个赛道、提交一个方案即可"
+    },
+    {
+      "requestedCell": "D1",
+      "selectedCell": "A1",
+      "text": "赛道说明\n\n赛题二选一，每人以团队或个人身份选择一个赛道、提交一个方案即可"
+    },
+    {
+      "requestedCell": "E1",
+      "selectedCell": "A1",
+      "text": "赛道说明\n\n赛题二选一，每人以团队或个人身份选择一个赛道、提交一个方案即可"
+    },
+    {
+      "requestedCell": "F1",
+      "selectedCell": "A1",
+      "text": "赛道说明\n\n赛题二选一，每人以团队或个人身份选择一个赛道、提交一个方案即可"
+    },
+    {
+      "requestedCell": "A2",
+      "selectedCell": "A2",
+      "text": "方向"
+    },
+    {
+      "requestedCell": "B2",
+      "selectedCell": "B2",
+      "text": "说明"
+    },
+    {
+      "requestedCell": "C2",
+      "selectedCell": "B2",
+      "text": "说明"
+    },
+    {
+      "requestedCell": "D2",
+      "selectedCell": "B2",
+      "text": "说明"
+    },
+    {
+      "requestedCell": "E2",
+      "selectedCell": "B2",
+      "text": "说明"
+    },
+    {
+      "requestedCell": "F2",
+      "selectedCell": "B2",
+      "text": "说明"
+    },
+    {
+      "requestedCell": "A3",
+      "selectedCell": "A3",
+      "text": "1.  TME 产品创新功能"
+    },
+    {
+      "requestedCell": "B3",
+      "selectedCell": "B3",
+      "text": "在 TME 现有平台上做创意。选择一个你熟悉的平台（QQ音乐、酷狗音乐、酷我音乐、全民K歌、JOOX、Wesing、酷狗直播、懒人听书、喜马拉雅等）找到一个真实的用户需求或体验空白，把你的创意融入其中"
+    },
+    {
+      "requestedCell": "C3",
+      "selectedCell": "B3",
+      "text": "在 TME 现有平台上做创意。选择一个你熟悉的平台（QQ音乐、酷狗音乐、酷我音乐、全民K歌、JOOX、Wesing、酷狗直播、懒人听书、喜马拉雅等）找到一个真实的用户需求或体验空白，把你的创意融入其中"
+    },
+    {
+      "requestedCell": "D3",
+      "selectedCell": "B3",
+      "text": "在 TME 现有平台上做创意。选择一个你熟悉的平台（QQ音乐、酷狗音乐、酷我音乐、全民K歌、JOOX、Wesing、酷狗直播、懒人听书、喜马拉雅等）找到一个真实的用户需求或体验空白，把你的创意融入其中"
+    },
+    {
+      "requestedCell": "E3",
+      "selectedCell": "B3",
+      "text": "在 TME 现有平台上做创意。选择一个你熟悉的平台（QQ音乐、酷狗音乐、酷我音乐、全民K歌、JOOX、Wesing、酷狗直播、懒人听书、喜马拉雅等）找到一个真实的用户需求或体验空白，把你的创意融入其中"
+    },
+    {
+      "requestedCell": "F3",
+      "selectedCell": "B3",
+      "text": "在 TME 现有平台上做创意。选择一个你熟悉的平台（QQ音乐、酷狗音乐、酷我音乐、全民K歌、JOOX、Wesing、酷狗直播、懒人听书、喜马拉雅等）找到一个真实的用户需求或体验空白，把你的创意融入其中"
+    },
+    {
+      "requestedCell": "A4",
+      "selectedCell": "A4",
+      "text": "2. 创新音乐产品"
+    },
+    {
+      "requestedCell": "B4",
+      "selectedCell": "B4",
+      "text": "不限产品、不限形态、只要是全新的创意，服务于音乐或音频场景，尽情发挥想象"
+    },
+    {
+      "requestedCell": "C4",
+      "selectedCell": "B4",
+      "text": "不限产品、不限形态、只要是全新的创意，服务于音乐或音频场景，尽情发挥想象"
+    },
+    {
+      "requestedCell": "D4",
+      "selectedCell": "B4",
+      "text": "不限产品、不限形态、只要是全新的创意，服务于音乐或音频场景，尽情发挥想象"
+    },
+    {
+      "requestedCell": "E4",
+      "selectedCell": "B4",
+      "text": "不限产品、不限形态、只要是全新的创意，服务于音乐或音频场景，尽情发挥想象"
+    },
+    {
+      "requestedCell": "F4",
+      "selectedCell": "B4",
+      "text": "不限产品、不限形态、只要是全新的创意，服务于音乐或音频场景，尽情发挥想象"
+    },
+    {
+      "requestedCell": "A5",
+      "selectedCell": "A5",
+      "text": "灵感参考：音乐小游戏、互动播放器、社交玩法、轻应用......"
+    },
+    {
+      "requestedCell": "B5",
+      "selectedCell": "A5",
+      "text": "灵感参考：音乐小游戏、互动播放器、社交玩法、轻应用......"
+    },
+    {
+      "requestedCell": "C5",
+      "selectedCell": "A5",
+      "text": "灵感参考：音乐小游戏、互动播放器、社交玩法、轻应用......"
+    },
+    {
+      "requestedCell": "D5",
+      "selectedCell": "A5",
+      "text": "灵感参考：音乐小游戏、互动播放器、社交玩法、轻应用......"
+    },
+    {
+      "requestedCell": "E5",
+      "selectedCell": "A5",
+      "text": "灵感参考：音乐小游戏、互动播放器、社交玩法、轻应用......"
+    },
+    {
+      "requestedCell": "F5",
+      "selectedCell": "A5",
+      "text": "灵感参考：音乐小游戏、互动播放器、社交玩法、轻应用......"
+    },
+    {
+      "requestedCell": "A6",
+      "selectedCell": "A6",
+      "text": "载体不限：App、小程序、网页、AI 工具、插件……"
+    },
+    {
+      "requestedCell": "B6",
+      "selectedCell": "A6",
+      "text": "载体不限：App、小程序、网页、AI 工具、插件……"
+    },
+    {
+      "requestedCell": "C6",
+      "selectedCell": "A6",
+      "text": "载体不限：App、小程序、网页、AI 工具、插件……"
+    },
+    {
+      "requestedCell": "D6",
+      "selectedCell": "A6",
+      "text": "载体不限：App、小程序、网页、AI 工具、插件……"
+    },
+    {
+      "requestedCell": "E6",
+      "selectedCell": "A6",
+      "text": "载体不限：App、小程序、网页、AI 工具、插件……"
+    },
+    {
+      "requestedCell": "F6",
+      "selectedCell": "A6",
+      "text": "载体不限：App、小程序、网页、AI 工具、插件……"
+    }
+  ],
+  "navigationTop": {
+    "bytes": 306477,
+    "captureId": "shot-3c9c1bed-9021-4acf-99e5-7972d4f71c11",
+    "capturedFullPage": false,
+    "height": 934,
+    "issuesDelta": [],
+    "mimeType": "image/png",
+    "nextAction": {
+      "mimeType": "image/png",
+      "path": "C:\\Users\\Alakazam\\AppData\\Local\\Tabbit\\User Data\\LocalAgent\\Runtime\\artifacts\\task-fae4ab99-cf5c-4f2a-bcb8-e81d2d666673\\screenshot-shot-3c9c1bed-9021-4acf-99e5-7972d4f71c11.png",
+      "type": "load_image"
+    },
+    "path": "C:\\Users\\Alakazam\\AppData\\Local\\Tabbit\\User Data\\LocalAgent\\Runtime\\artifacts\\task-fae4ab99-cf5c-4f2a-bcb8-e81d2d666673\\screenshot-shot-3c9c1bed-9021-4acf-99e5-7972d4f71c11.png",
+    "recommendedLimitExceeded": true,
+    "requestedFullPage": false,
+    "requiresImageLoad": true,
+    "screenshotCount": 9,
+    "sha256": "8ecbe921cba1e30c00cd76b911e164b11466d965fcd0c823c135e0fa6c000cae",
+    "type": "browser_screenshot",
+    "warnings": [
+      "Recommended screenshot limit of 3 exceeded"
+    ],
+    "width": 1090
+  },
+  "retrievedAt": "2026-09-26T14:40:34.534Z",
+  "sheet": "🌍赛题说明",
+  "shot": {
+    "bytes": 144612,
+    "captureId": "shot-3bd8b276-8ef0-4e63-adc3-ed34a4d4b7ca",
+    "capturedFullPage": false,
+    "height": 934,
+    "issuesDelta": [],
+    "mimeType": "image/png",
+    "nextAction": {
+      "mimeType": "image/png",
+      "path": "C:\\Users\\Alakazam\\AppData\\Local\\Tabbit\\User Data\\LocalAgent\\Runtime\\artifacts\\task-fae4ab99-cf5c-4f2a-bcb8-e81d2d666673\\screenshot-shot-3bd8b276-8ef0-4e63-adc3-ed34a4d4b7ca.png",
+      "type": "load_image"
+    },
+    "path": "C:\\Users\\Alakazam\\AppData\\Local\\Tabbit\\User Data\\LocalAgent\\Runtime\\artifacts\\task-fae4ab99-cf5c-4f2a-bcb8-e81d2d666673\\screenshot-shot-3bd8b276-8ef0-4e63-adc3-ed34a4d4b7ca.png",
+    "recommendedLimitExceeded": true,
+    "requestedFullPage": false,
+    "requiresImageLoad": true,
+    "screenshotCount": 10,
+    "sha256": "cd43067b886239c9113999bf92e2136f5b4c97aa67200da64995a8a6e6f9e299",
+    "type": "browser_screenshot",
+    "warnings": [
+      "Recommended screenshot limit of 3 exceeded"
+    ],
+    "width": 1090
+  },
+  "sourceUrl": "https://saas.docs.qq.com/sheet/DR2VHa0JGT3ZGVFNKTmpybUdJ?_t=1790430860428&nojump=1&tab=000003"
+}

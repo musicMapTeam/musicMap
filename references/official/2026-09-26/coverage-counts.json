@@ -1,0 +1,44 @@
+[
+  {
+    "sheet": "🏠目录&导航",
+    "requestedCells": 45,
+    "uniqueSelectedCells": 41,
+    "rawFile": "01-navigation-cells.json",
+    "readableFile": "01-navigation-cells.md"
+  },
+  {
+    "sheet": "📄初赛提交指引",
+    "requestedCells": 33,
+    "uniqueSelectedCells": 27,
+    "rawFile": "02-submission-cells.json",
+    "readableFile": "02-submission-cells.md"
+  },
+  {
+    "sheet": "🌍赛题说明",
+    "requestedCells": 36,
+    "uniqueSelectedCells": 9,
+    "rawFile": "03-topics-cells.json",
+    "readableFile": "03-topics-cells.md"
+  },
+  {
+    "sheet": "🏆赛程&奖项说明",
+    "requestedCells": 54,
+    "uniqueSelectedCells": 39,
+    "rawFile": "04-schedule-cells.json",
+    "readableFile": "04-schedule-cells.md"
+  },
+  {
+    "sheet": "📈评审标准",
+    "requestedCells": 12,
+    "uniqueSelectedCells": 11,
+    "rawFile": "05-scoring-cells.json",
+    "readableFile": "05-scoring-cells.md"
+  },
+  {
+    "sheet": "🙋常见参赛问题Q&A",
+    "requestedCells": 10,
+    "uniqueSelectedCells": 10,
+    "rawFile": "06-faq-cells.json",
+    "readableFile": "06-faq-cells.md"
+  }
+]

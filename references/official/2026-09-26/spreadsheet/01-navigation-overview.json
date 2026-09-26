@@ -1,0 +1,40 @@
+{
+  "faqHeader": [
+    {
+      "requestedCell": "B1",
+      "selectedCell": "B1",
+      "text": "参赛常见问题 Q&A"
+    },
+    {
+      "requestedCell": "B2",
+      "selectedCell": "B2",
+      "text": "温馨提示：如有本文未覆盖的问题，欢迎在赛事交流群提问。"
+    }
+  ],
+  "retrievedAt": "2026-09-26T14:39:44.659Z",
+  "shot": {
+    "bytes": 213577,
+    "captureId": "shot-58d387ef-bfcb-482e-803c-f42fb278a5df",
+    "capturedFullPage": false,
+    "height": 934,
+    "issuesDelta": [],
+    "mimeType": "image/png",
+    "nextAction": {
+      "mimeType": "image/png",
+      "path": "C:\\Users\\Alakazam\\AppData\\Local\\Tabbit\\User Data\\LocalAgent\\Runtime\\artifacts\\task-fae4ab99-cf5c-4f2a-bcb8-e81d2d666673\\screenshot-shot-58d387ef-bfcb-482e-803c-f42fb278a5df.png",
+      "type": "load_image"
+    },
+    "path": "C:\\Users\\Alakazam\\AppData\\Local\\Tabbit\\User Data\\LocalAgent\\Runtime\\artifacts\\task-fae4ab99-cf5c-4f2a-bcb8-e81d2d666673\\screenshot-shot-58d387ef-bfcb-482e-803c-f42fb278a5df.png",
+    "recommendedLimitExceeded": true,
+    "requestedFullPage": false,
+    "requiresImageLoad": true,
+    "screenshotCount": 8,
+    "sha256": "0635f31a570f5b4cdf55af649172ebcb5f6526f468890b9fa4592d5a7002a1d4",
+    "type": "browser_screenshot",
+    "warnings": [
+      "Recommended screenshot limit of 3 exceeded"
+    ],
+    "width": 1090
+  },
+  "sourceUrl": "https://saas.docs.qq.com/sheet/DR2VHa0JGT3ZGVFNKTmpybUdJ?_t=1790430860428&nojump=1&tab=000001"
+}

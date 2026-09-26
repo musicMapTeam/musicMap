@@ -1,13 +1,50 @@
 {
   "updatedAt": "2026-09-26",
-  "statusMeaning": "candidate 表示入口已识别、具体数据尚未获取核验；provided 表示本交付包已提供；pending 表示尚无可用资源。",
+  "planVersion": "1.0",
+  "scope": "初赛交互Demo的当前来源，不是必须下载清单。",
   "resources": [
-    {"id":"prototype-fictional","type":"fictional-data","name":"原型虚构艺人、歌曲及关系","location":"../prototype/demo-data.js","status":"provided","owner":"本次产品交付","notes":"9 位虚构艺人、27 首个人作品、12 条合作及作品、8 条风格关系；不得混入正式图谱。"},
-    {"id":"prototype-visuals","type":"design","name":"代码绘制首字头像与空间网、流程图","location":"../prototype/style.css","status":"provided","owner":"本次产品交付","notes":"无真人照片、无第三方音频、无在线图片依赖。"},
-    {"id":"musicbrainz-candidate","type":"metadata","name":"MusicBrainz 官方数据库快照入口","sourceUrl":"https://musicbrainz.org/doc/MusicBrainz_Database/Download","status":"candidate","licenseOrPermission":"需按实际下载文件核对；核心与衍生数据包许可不同","owner":"开发验证，产品抽查","notes":"尚未完成华语覆盖和合作角色抽样，不包含本项目可直接用的音频。"},
-    {"id":"wikidata-candidate","type":"metadata","name":"Wikidata 结构化资料候选","sourceUrl":"https://www.wikidata.org/wiki/Wikidata:Licensing","status":"candidate","licenseOrPermission":"结构化数据 CC0；第三方图片和音频另行核验","owner":"开发验证","notes":"需落实具体条目与字段，不视为完整音乐合作图谱。"},
-    {"id":"hf-candidate","type":"dataset-discovery","name":"Hugging Face 数据集卡检查入口","sourceUrl":"https://huggingface.co/docs/hub/datasets-cards","status":"candidate","licenseOrPermission":"尚未选择具体数据集，不能填写已授权","owner":"开发验证","notes":"需要具体数据集仓库、文件、版本、来源、许可和样本核验。"},
-    {"id":"real-audio","type":"audio","name":"正式代表作与合作作品试听","sourceUrl":null,"servingUrl":null,"status":"pending","licenseOrPermission":"待确定","owner":"开发寻找与验证，产品选曲","notes":"必须实际验证手机播放和允许使用方式。"},
-    {"id":"real-images","type":"image","name":"正式艺人头像和作品封面","sourceUrl":null,"servingUrl":null,"status":"pending","licenseOrPermission":"待确定","owner":"开发寻找，产品核对","notes":"缺图可使用首字占位，不使用错配照片。"}
+    {
+      "id": "official-competition",
+      "type": "reference",
+      "status": "provided",
+      "sourceUrl": "https://join.tencentmusic.com/ai-hackathon/",
+      "localArchive": "../../references/official/2026-09-26/README.md",
+      "notes": "赛事原文留档范围以档案README为准。"
+    },
+    {
+      "id": "original-ideas",
+      "type": "reference",
+      "status": "provided",
+      "location": "../../references/original-ideas/README.md",
+      "notes": "用户原始Music Space与同场创意，已恢复现场社交定位。"
+    },
+    {
+      "id": "prototype-fictional",
+      "type": "demo-data",
+      "status": "provided",
+      "location": "../prototype/demo-data.js",
+      "notes": "旧Map虚构数据，仅供明确标识的原型情景。"
+    },
+    {
+      "id": "musicbrainz-metadata",
+      "type": "metadata",
+      "status": "sample-verified",
+      "sourceUrl": "https://musicbrainz.org/ws/2/recording/3d9d0380-c701-4154-a284-1a034348078a?inc=artist-credits%2Bartist-rels%2Bwork-rels%2Breleases&fmt=json",
+      "notes": "前轮读到《珊瑚海》共同艺人署名样例；未导入产品，不包含音频权限。"
+    },
+    {
+      "id": "event-demo-photos",
+      "type": "image",
+      "status": "pending",
+      "notes": "准备两张自己拍摄或允许使用的照片；以不同现场视角表达交换理由。"
+    },
+    {
+      "id": "tme-event-music",
+      "type": "optional-audio",
+      "status": "candidate",
+      "sourceUrl": "https://c6.y.qq.com/base/fcgi-bin/u?__=UFgdsOYo9Glo",
+      "permissionSourceUrl": "https://saas.docs.qq.com/sheet/DR2VHa0JGT3ZGVFNKTmpybUdJ?tab=000006",
+      "notes": "官方赛事评审用途歌单；未取得音频文件或接入方式。音频是可选增强，不阻塞前端情景演示。"
+    }
   ]
 }

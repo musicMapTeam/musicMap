@@ -1,0 +1,277 @@
+{
+  "cells": [
+    {
+      "requestedCell": "A1",
+      "selectedCell": "A1",
+      "text": "赛程&奖项说明"
+    },
+    {
+      "requestedCell": "B1",
+      "selectedCell": "A1",
+      "text": "赛程&奖项说明"
+    },
+    {
+      "requestedCell": "C1",
+      "selectedCell": "A1",
+      "text": "赛程&奖项说明"
+    },
+    {
+      "requestedCell": "A2",
+      "selectedCell": "A2",
+      "text": "赛程安排"
+    },
+    {
+      "requestedCell": "B2",
+      "selectedCell": "A2",
+      "text": "赛程安排"
+    },
+    {
+      "requestedCell": "C2",
+      "selectedCell": "A2",
+      "text": "赛程安排"
+    },
+    {
+      "requestedCell": "A3",
+      "selectedCell": "A3",
+      "text": "时间"
+    },
+    {
+      "requestedCell": "B3",
+      "selectedCell": "B3",
+      "text": "阶段"
+    },
+    {
+      "requestedCell": "C3",
+      "selectedCell": "C3",
+      "text": "内容"
+    },
+    {
+      "requestedCell": "A4",
+      "selectedCell": "A4",
+      "text": "9月14日-10月9日"
+    },
+    {
+      "requestedCell": "B4",
+      "selectedCell": "B4",
+      "text": "投稿阶段"
+    },
+    {
+      "requestedCell": "C4",
+      "selectedCell": "C4",
+      "text": "大赛启动&初赛作品提交"
+    },
+    {
+      "requestedCell": "A5",
+      "selectedCell": "A5",
+      "text": "2026/9/22"
+    },
+    {
+      "requestedCell": "B5",
+      "selectedCell": "B5",
+      "text": "直播答疑"
+    },
+    {
+      "requestedCell": "C5",
+      "selectedCell": "C5",
+      "text": "专家评委线上开题及答疑；非强制参加，不影响参赛结果"
+    },
+    {
+      "requestedCell": "A6",
+      "selectedCell": "A6",
+      "text": "10月12日-10月23日"
+    },
+    {
+      "requestedCell": "B6",
+      "selectedCell": "B6",
+      "text": "初筛初评"
+    },
+    {
+      "requestedCell": "C6",
+      "selectedCell": "C6",
+      "text": "初赛作品评审"
+    },
+    {
+      "requestedCell": "A7",
+      "selectedCell": "A7",
+      "text": "2026/10/26"
+    },
+    {
+      "requestedCell": "B7",
+      "selectedCell": "B7",
+      "text": "入围公布"
+    },
+    {
+      "requestedCell": "C7",
+      "selectedCell": "C7",
+      "text": "入围作品公布"
+    },
+    {
+      "requestedCell": "A8",
+      "selectedCell": "A8",
+      "text": "11月初"
+    },
+    {
+      "requestedCell": "B8",
+      "selectedCell": "B8",
+      "text": "决赛路演及颁奖"
+    },
+    {
+      "requestedCell": "C8",
+      "selectedCell": "C8",
+      "text": "作品路演&赛事颁奖"
+    },
+    {
+      "requestedCell": "A9",
+      "selectedCell": "A9",
+      "text": "\n"
+    },
+    {
+      "requestedCell": "B9",
+      "selectedCell": "A9",
+      "text": "\n"
+    },
+    {
+      "requestedCell": "C9",
+      "selectedCell": "A9",
+      "text": "\n"
+    },
+    {
+      "requestedCell": "A10",
+      "selectedCell": "A10",
+      "text": "奖项说明"
+    },
+    {
+      "requestedCell": "B10",
+      "selectedCell": "A10",
+      "text": "奖项说明"
+    },
+    {
+      "requestedCell": "C10",
+      "selectedCell": "A10",
+      "text": "奖项说明"
+    },
+    {
+      "requestedCell": "A11",
+      "selectedCell": "A11",
+      "text": "奖项"
+    },
+    {
+      "requestedCell": "B11",
+      "selectedCell": "B11",
+      "text": "奖金"
+    },
+    {
+      "requestedCell": "C11",
+      "selectedCell": "B11",
+      "text": "奖金"
+    },
+    {
+      "requestedCell": "A12",
+      "selectedCell": "A12",
+      "text": "🥇一等奖（1名）"
+    },
+    {
+      "requestedCell": "B12",
+      "selectedCell": "B12",
+      "text": "20000元"
+    },
+    {
+      "requestedCell": "C12",
+      "selectedCell": "B12",
+      "text": "20000元"
+    },
+    {
+      "requestedCell": "A13",
+      "selectedCell": "A13",
+      "text": "🥈二等奖（2名）"
+    },
+    {
+      "requestedCell": "B13",
+      "selectedCell": "B13",
+      "text": "10000元"
+    },
+    {
+      "requestedCell": "C13",
+      "selectedCell": "B13",
+      "text": "10000元"
+    },
+    {
+      "requestedCell": "A14",
+      "selectedCell": "A14",
+      "text": "🥉三等奖（3名）"
+    },
+    {
+      "requestedCell": "B14",
+      "selectedCell": "B14",
+      "text": "5000元"
+    },
+    {
+      "requestedCell": "C14",
+      "selectedCell": "B14",
+      "text": "5000元"
+    },
+    {
+      "requestedCell": "A15",
+      "selectedCell": "A15",
+      "text": "🏅优秀奖（9名）"
+    },
+    {
+      "requestedCell": "B15",
+      "selectedCell": "B15",
+      "text": "2000元"
+    },
+    {
+      "requestedCell": "C15",
+      "selectedCell": "B15",
+      "text": "2000元"
+    },
+    {
+      "requestedCell": "A16",
+      "selectedCell": "A16",
+      "text": "特别激励：\n\n💻获奖即可直通 TME 实习终面，优先获得实习名额​​\n\n🎤入围解锁TME 旗下产品SVIP年卡及现场演唱会门票​​​​​​盲盒"
+    },
+    {
+      "requestedCell": "B16",
+      "selectedCell": "A16",
+      "text": "特别激励：\n\n💻获奖即可直通 TME 实习终面，优先获得实习名额​​\n\n🎤入围解锁TME 旗下产品SVIP年卡及现场演唱会门票​​​​​​盲盒"
+    },
+    {
+      "requestedCell": "C16",
+      "selectedCell": "A16",
+      "text": "特别激励：\n\n💻获奖即可直通 TME 实习终面，优先获得实习名额​​\n\n🎤入围解锁TME 旗下产品SVIP年卡及现场演唱会门票​​​​​​盲盒"
+    },
+    {
+      "requestedCell": "A17",
+      "selectedCell": "A17",
+      "text": "\n"
+    },
+    {
+      "requestedCell": "B17",
+      "selectedCell": "B17",
+      "text": "\n"
+    },
+    {
+      "requestedCell": "C17",
+      "selectedCell": "C17",
+      "text": "\n"
+    },
+    {
+      "requestedCell": "A18",
+      "selectedCell": "A18",
+      "text": "\n"
+    },
+    {
+      "requestedCell": "B18",
+      "selectedCell": "B18",
+      "text": "\n"
+    },
+    {
+      "requestedCell": "C18",
+      "selectedCell": "C18",
+      "text": "\n"
+    }
+  ],
+  "retrievedAt": "2026-09-26T14:41:26.421Z",
+  "sheet": "🏆赛程&奖项说明",
+  "sourceUrl": "https://saas.docs.qq.com/sheet/DR2VHa0JGT3ZGVFNKTmpybUdJ?_t=1790430860428&nojump=1&tab=000004"
+}
