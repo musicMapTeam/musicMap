@@ -7,6 +7,14 @@
 - Exact direct and transitive package versions and integrity values are retained in `package-lock.json`. These build dependencies are not a deployed application backend.
 - The standalone HTML retains the full Phosphor MIT notice in an HTML comment, so the icon license accompanies the distributed SVG code.
 
+## OverlayScrollbars
+
+- Official upstream: [KingSora/OverlayScrollbars](https://github.com/KingSora/OverlayScrollbars), npm **2.16.0**.
+- Exact release source: `dfa819688a529db0085c6416a94e816bfbaeaf29`.
+- MIT, Copyright (c) 2022 Rene Haas. Full notice: [`web/assets/licenses/overlayscrollbars-MIT.txt`](web/assets/licenses/overlayscrollbars-MIT.txt), also embedded in the standalone HTML.
+- The unmodified ESM and CSS package is bundled by Vite for body overlay scrollbars; the project configures auto-hide and supplies its own 6px theme. No scroll interpolation, framework wrapper, or optional click-scroll plugin is included.
+- Evaluated alternatives and the Codrops visual reference: [`interface-restraint.md`](references/research/2026-09-27/interface-restraint.md). No SimpleBar or Codrops code/assets are bundled.
+
 ## Phosphor Icons
 
 `web/js/icons.js` embeds 17 SVGs from the **regular** weight of Phosphor Icons.

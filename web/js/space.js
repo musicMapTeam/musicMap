@@ -1,6 +1,9 @@
 import { SPACE_EVENT, SPACE_ACTORS, SPACE_MOMENTS, SPACE_PHOTOS, seedSpaceCard } from './space-data.js';
 import { downloadTicket } from './ticket-export.js';
 
+// Keep presentation mode across app renders without adding it to saved cards.
+let showDemo = false;
+
 export function createSpaceState() {
   return {
     version: 1,
@@ -38,8 +41,7 @@ function ticketMarkup(card, options = {}) {
   return `<article class="sp-ticket sp-ticket--${author.color}${small ? ' sp-ticket--small' : ''}${preview ? ' sp-ticket--preview' : ''}">
     <div class="sp-ticket__photo">
       <img src="${escape(cardPhoto(card))}" alt="${card.photoKey === 'custom' ? `${escape(author.name)}选择的现场照片` : `${escape(SPACE_PHOTOS[card.photoKey]?.description || '现场示例图片')}`}" ${preview ? '' : 'loading="lazy"'}>
-      <div class="sp-ticket__image-top"><span>LIVE / ${escape(momentName(card))}</span><span>${card.photoKey === 'custom' ? '我的照片' : '场景示意'}</span></div>
-      <div class="sp-ticket__image-bottom"><span>${card.photoKey === 'crowd' ? 'THE CROWD' : card.photoKey === 'custom' ? 'MY MOMENT' : 'THE STAGE'}</span><span>01 / 01</span></div>
+      <div class="sp-ticket__image-top"><span>${escape(momentName(card))}</span><span>${card.photoKey === 'custom' ? '我的照片' : 'AI 示例图'}</span></div>
     </div>
     <div class="sp-ticket__paper">
       <div class="sp-ticket__event"><span>${escape(SPACE_EVENT.title)}</span><span>${escape(SPACE_EVENT.date)}</span></div>
@@ -57,7 +59,7 @@ function duetMarkup(first, second, api) {
     <header class="sp-duet__top"><span>回声现场 / 双联记忆</span><span>${escape(SPACE_EVENT.date)}<b>示例场次</b></span></header>
     <div class="sp-duet__sides">${[first, second].map((card, index) => `<section class="sp-duet__side sp-duet__side--${SPACE_ACTORS[card.owner].color}">
       <div class="sp-duet__byline"><span><b>${escape(actorName(card.owner))}</b>的视角</span><span>${index === 0 ? 'A' : 'B'}</span></div>
-      <div class="sp-duet__photo"><img src="${escape(cardPhoto(card))}" alt="${escape(actorName(card.owner))}${card.photoKey === 'custom' ? '选择的现场照片' : '的示例现场视角'}"><span>${escape(momentName(card))} / ${card.photoKey === 'custom' ? '我的照片' : '场景示意'}</span></div>
+      <div class="sp-duet__photo"><img src="${escape(cardPhoto(card))}" alt="${escape(actorName(card.owner))}${card.photoKey === 'custom' ? '选择的现场照片' : '的示例现场视角'}"><span>${escape(momentName(card))} / ${card.photoKey === 'custom' ? '我的照片' : 'AI 示例图'}</span></div>
       <p class="sp-duet__quote">${escape(card.caption || '把这一刻，留给以后。')}</p>
       <div class="sp-duet__credit"><span>${card.trackId ? `《${escape(SPACE_EVENT.song)}》` : escape(momentName(card))}</span><span aria-hidden="true">${index === 0 ? '01' : '02'}</span></div>
     </section>`).join('')}</div>
@@ -67,7 +69,7 @@ function duetMarkup(first, second, api) {
 
 function actorSwitchMarkup(actor, api, compact = false) {
   return `<div class="sp-demo-bar${compact ? ' sp-demo-bar--compact' : ''}">
-    <div class="sp-demo-bar__description"><span class="sp-demo-dot"></span><div><strong>本地双角色情景</strong><span>切换视角，体验一次双方同意</span></div></div>
+    <div class="sp-demo-bar__description"><span class="sp-demo-dot"></span><div><strong>切换角色</strong></div></div>
     <div class="sp-actor-switch" role="group" aria-label="切换示例角色">
       ${Object.values(SPACE_ACTORS).map((person) => `<button type="button" data-space-action="actor" data-actor="${person.id}" class="sp-actor-button${person.id === actor ? ' is-active' : ''}" aria-pressed="${person.id === actor}" aria-label="切换到${escape(person.name)}示例角色"><span class="sp-avatar sp-avatar--${person.color}">${escape(person.initial)}</span><span>${escape(person.name)}</span>${person.id === actor ? api.icon('check') : ''}</button>`).join('')}
     </div>
@@ -96,16 +98,12 @@ function exchangeNoticeMarkup(space, actor, api) {
   const recipient = latest.to === actor;
   const other = recipient ? latest.from : latest.to;
   if (latest.status === 'pending') {
-    return `<section class="sp-exchange-notice${recipient ? ' sp-exchange-notice--incoming' : ''}" aria-label="交换申请">
-      <span class="sp-exchange-notice__icon">${api.icon('swap')}</span>
-      <div class="sp-exchange-notice__text"><span class="eyebrow">${recipient ? '有一张卡，正等你接住' : '申请已递出'}</span><h2>${recipient ? `${escape(actorName(other))}想与你交换这一晚` : `等待${escape(actorName(other))}回应`}</h2><p>${recipient ? '先看看两张卡，再决定是否交换。' : '当前是本地情景。切到对方角色，体验接受或拒绝。'}</p></div>
-      <div class="sp-exchange-notice__actions"><button type="button" class="button ${recipient ? 'button--primary' : 'button--quiet'}" data-space-action="view-exchange" data-id="${escape(latest.id)}">${recipient ? '查看申请' : '查看申请'}</button>${recipient ? '' : `<button type="button" class="button button--primary" data-space-action="actor" data-actor="${other}">切到${escape(actorName(other))}${api.icon('arrow-right')}</button>`}</div>
-    </section>`;
+    return `<section class="sp-exchange-notice${recipient ? ' sp-exchange-notice--incoming' : ''}" aria-label="交换申请"><span class="sp-exchange-notice__icon">${api.icon('swap')}</span><div class="sp-exchange-notice__text"><h2>${recipient ? `${escape(actorName(other))}想和你换卡` : `等待${escape(actorName(other))}回应`}</h2></div><div class="sp-exchange-notice__actions"><button type="button" class="button ${recipient ? 'button--primary' : 'button--quiet'}" data-space-action="view-exchange" data-id="${escape(latest.id)}">查看申请</button>${recipient ? '' : `<button type="button" class="button button--primary" data-space-action="actor" data-actor="${other}">切到${escape(actorName(other))}${api.icon('arrow-right')}</button>`}</div></section>`;
   }
   if (latest.status === 'accepted') {
-    return `<section class="sp-exchange-notice sp-exchange-notice--accepted" aria-label="交换已完成"><span class="sp-exchange-notice__icon">${api.icon('check')}</span><div class="sp-exchange-notice__text"><span class="eyebrow">BOTH SIDES OF THE NIGHT</span><h2>这一晚，多了一个视角。</h2><p>你与${escape(actorName(other))}已在各自角色下确认这次交换。</p></div><button type="button" class="button button--primary" data-space-action="view-exchange" data-id="${escape(latest.id)}">打开双联记忆${api.icon('arrow-up-right')}</button></section>`;
+    return `<section class="sp-exchange-notice sp-exchange-notice--accepted" aria-label="交换已完成"><span class="sp-exchange-notice__icon">${api.icon('check')}</span><div class="sp-exchange-notice__text"><h2>双联记忆已生成</h2></div><button type="button" class="button button--primary" data-space-action="view-exchange" data-id="${escape(latest.id)}">打开记忆${api.icon('arrow-up-right')}</button></section>`;
   }
-  return `<div class="sp-quiet-notice">${api.icon('info')}<span>${latest.status === 'declined' ? '这次交换未被接受。你仍可以保存自己的这一晚。' : latest.cancelReason === 'hidden' ? '卡片已撤下，这条待回应申请已取消。' : '交换申请已取消，还没有交换任何卡片。'}</span><button type="button" data-space-action="view-exchange" data-id="${escape(latest.id)}">查看</button></div>`;
+  return `<div class="sp-quiet-notice">${api.icon('info')}<span>${latest.status === 'declined' ? '对方婉拒了这次交换' : latest.cancelReason === 'hidden' ? '卡片已撤下，申请已取消' : '申请已取消'}</span><button type="button" data-space-action="view-exchange" data-id="${escape(latest.id)}">查看</button></div>`;
 }
 
 function makeLifecycle(container, api) {
@@ -138,7 +136,7 @@ function makeLifecycle(container, api) {
   }
   const closeButton = () => `<button type="button" class="icon-button sp-dialog__close" data-dialog-close aria-label="关闭">${api.icon('x')}</button>`;
   function about() {
-    dialog(`<div class="sp-dialog__head"><span class="eyebrow">ABOUT THIS DEMO</span>${closeButton()}<h2 data-dialog-title>两种视角，一次完整体验。</h2></div><div class="sp-dialog__body sp-about"><p>Lin 与阿遥是同一浏览器里的两个示例角色。你可以分别制作卡片、发出申请，再切到对方决定是否接受。</p><div class="sp-about__point">${api.icon('users')}<div><strong>交互是真的，角色是示例</strong><p>这个本地情景保存在当前浏览器，不与联网房间同步。想与朋友各自操作，请从「和朋友同场」创建或加入房间。</p></div></div><div class="sp-about__point">${api.icon('camera')}<div><strong>由你选择哪张照片出现</strong><p>上传的图片只在当前浏览器处理与保存。默认仅自己可见，勾选展示后才进入本场示例区域。</p></div></div><div class="sp-about__point">${api.icon('compass')}<div><strong>音乐是相遇的理由</strong><p>场次、艺人、歌曲与现场图片均用于情景演示，音频尚未接入。我们不将图片或“我也在”当作到场认证。</p></div></div></div><div class="sp-dialog__footer"><button type="button" class="button button--primary" data-dialog-close>开始体验${api.icon('arrow-right')}</button></div>`, 'sp-dialog--narrow');
+    dialog(`<div class="sp-dialog__head">${closeButton()}<h2 data-dialog-title>本地换卡示例</h2></div><div class="sp-dialog__body sp-about"><p>切换 Lin 和阿遥，体验制卡、申请与接受。卡片仅存本机，不会带入朋友的房间。</p><p>场次、角色和歌曲为示例，预置图片由 AI 生成。</p></div><div class="sp-dialog__footer"><button type="button" class="button button--primary" data-dialog-close>知道了</button></div>`, 'sp-dialog--narrow');
   }
 
   function switchActor(actor) {
@@ -178,7 +176,7 @@ function makeLifecycle(container, api) {
     const card = state.space.cards[state.actor];
     if (!card) return;
     const peer = otherActor(state.actor);
-    const { element, close } = dialog(`<div class="sp-dialog__head"><span class="eyebrow">这一刻，已收好 / SAVED</span>${closeButton()}<h2 data-dialog-title>这一张，替你收好了。</h2></div><div class="sp-dialog__body sp-saved-next"><div class="sp-saved-next__card"><img src="${escape(cardPhoto(card))}" alt="刚保存的现场卡照片"><div><span>${card.isPublic ? '本场展示中' : '仅自己可见'} · 本地情景</span><strong>${escape(card.caption || momentName(card))}</strong><p>已收进${escape(actorName(state.actor))}的现场记忆。</p></div></div><p>${card.isPublic ? '另一位示例角色现在可以看到这张卡。你也可以看看对方记住了什么。' : '自己的记忆已经留下。接下来可以先看另一张卡，再决定展示或交换。'}</p><p class="sp-private-note">示例卡只留在当前浏览器，不会带入朋友的房间。</p></div><div class="sp-dialog__footer sp-dialog__footer--wrap"><button type="button" class="button button--quiet" data-view-saved>查看我的记忆</button>${card.isPublic ? '' : '<button type="button" class="button button--quiet" data-display-saved>展示在本场</button>'}<button type="button" class="button button--primary" data-see-peer>看看${escape(actorName(peer))}的卡${api.icon('arrow-right')}</button></div>`, 'sp-dialog--narrow');
+    const { element, close } = dialog(`<div class="sp-dialog__head"><span class="eyebrow">现场卡</span>${closeButton()}<h2 data-dialog-title>卡片已保存</h2></div><div class="sp-dialog__body sp-saved-next"><div class="sp-saved-next__card"><img src="${escape(cardPhoto(card))}" alt="刚保存的现场卡照片"><div><span>${card.isPublic ? '本场展示中' : '仅自己可见'} · 本地情景</span><strong>${escape(card.caption || momentName(card))}</strong><p>${escape(actorName(state.actor))}的记忆</p></div></div><p>${card.isPublic ? '对方已能看到这张卡，可以申请交换。' : '卡片仍是私藏。你可以展示，或直接向对方申请交换。'}</p></div><div class="sp-dialog__footer sp-dialog__footer--wrap"><button type="button" class="button button--quiet" data-view-saved>查看我的记忆</button>${card.isPublic ? '' : '<button type="button" class="button button--quiet" data-display-saved>展示在本场</button>'}<button type="button" class="button button--primary" data-see-peer>看看${escape(actorName(peer))}的卡${api.icon('arrow-right')}</button></div>`, 'sp-dialog--narrow');
     element.querySelector('[data-view-saved]').addEventListener('click', () => { close(); api.navigate('records', { section: 'space', spaceRecordId: `card:${card.id}` }); });
     element.querySelector('[data-display-saved]')?.addEventListener('click', () => { close(); toggleVisibility(); });
     element.querySelector('[data-see-peer]').addEventListener('click', () => { close(); scrollToScene('.sp-perspective--other'); });
@@ -196,16 +194,16 @@ function makeLifecycle(container, api) {
     const currentCard = api.getState().space.cards[actor];
     const draft = currentCard ? snapshot(currentCard) : { ...seedSpaceCard(actor), isPublic: false, createdAt: now(), caption: actor === 'a' ? '灯光暗下去，还舍不得说再见。' : '你在看舞台，我想留下这一片人海。' };
     let processing = false;
-    const { element, close } = dialog(`<div class="sp-dialog__head"><span class="eyebrow">留下你的视角 / MAKE A LIVE CARD</span>${closeButton()}<h2 data-dialog-title>${currentCard ? '这一刻，可以再改一改。' : '把这一刻，留好。'}</h2><p>当前作者：${escape(actorName(actor))} · ${escape(SPACE_EVENT.title)} / 示例场次</p></div>
+    const { element, close } = dialog(`<div class="sp-dialog__head"><span class="eyebrow">本地示例</span>${closeButton()}<h2 data-dialog-title>${currentCard ? '编辑现场卡' : '制作现场卡'}</h2><p>${escape(actorName(actor))} · ${escape(SPACE_EVENT.title)}</p></div>
       <form class="sp-editor" novalidate>
         <div class="sp-editor__fields">
-          <fieldset class="sp-field"><legend><span>01</span>选择你的视角</legend><div class="sp-photo-options">${Object.values(SPACE_PHOTOS).map((photo) => `<button type="button" data-photo="${photo.id}" class="sp-photo-choice${draft.photoKey === photo.id ? ' is-selected' : ''}" aria-pressed="${draft.photoKey === photo.id}"><img src="${escape(photo.url)}" alt="${escape(photo.description)}"><span>${escape(photo.name)}</span><i>${api.icon('check')}</i></button>`).join('')}<button type="button" data-photo="custom" class="sp-photo-choice sp-photo-choice--upload${draft.photoKey === 'custom' ? ' is-selected' : ''}" aria-pressed="${draft.photoKey === 'custom'}">${draft.photoDataUrl ? `<img src="${escape(draft.photoDataUrl)}" alt="我的照片"><span>我的照片</span>` : `${api.icon('camera')}<span>用自己的照片</span>`}<i>${api.icon('check')}</i></button></div><input type="file" name="photo" accept="image/*" class="sp-visually-hidden" aria-label="选择自己的照片"><p class="sp-field__hint" data-photo-hint>前两张为示例图片。自己的照片只保存在本机。</p></fieldset>
-          <fieldset class="sp-field"><legend><span>02</span>记住哪一个时刻</legend><div class="sp-moment-options">${SPACE_MOMENTS.map((moment) => `<button type="button" data-moment="${moment.id}" class="sp-moment-choice${draft.momentId === moment.id ? ' is-selected' : ''}" aria-pressed="${draft.momentId === moment.id}">${escape(moment.name)}</button>`).join('')}</div><label class="sp-input-label" for="sp-song-select">这一刻的音乐</label><select id="sp-song-select" name="track"><option value="${SPACE_EVENT.trackId}"${draft.trackId ? ' selected' : ''}>《${escape(SPACE_EVENT.song)}》 · 示例曲目</option><option value=""${!draft.trackId ? ' selected' : ''}>只记录这个环节</option></select></fieldset>
-          <div class="sp-field"><label class="sp-field__title" for="sp-caption-input"><span>03</span>留一句自己的话</label><textarea id="sp-caption-input" name="caption" rows="3" maxlength="80" placeholder="那一刻，你在想什么？">${escape(draft.caption)}</textarea><div class="sp-field__counter"><span>可以留空，让照片自己说话。</span><span data-caption-count>${draft.caption.length} / 80</span></div></div>
-          <label class="sp-display-consent"><input type="checkbox" name="isPublic"${draft.isPublic ? ' checked' : ''}><span class="sp-display-consent__check">${api.icon('check')}</span><span><strong>把这张卡展示在本场</strong><small>让另一位示例角色看见。未勾选时仅自己保存。</small></span></label>
+          <fieldset class="sp-field"><legend><span>01</span>选择你的视角</legend><div class="sp-photo-options">${Object.values(SPACE_PHOTOS).map((photo) => `<button type="button" data-photo="${photo.id}" class="sp-photo-choice${draft.photoKey === photo.id ? ' is-selected' : ''}" aria-pressed="${draft.photoKey === photo.id}"><img src="${escape(photo.url)}" alt="${escape(photo.description)}"><span>${escape(photo.name)}</span><i>${api.icon('check')}</i></button>`).join('')}<button type="button" data-photo="custom" class="sp-photo-choice sp-photo-choice--upload${draft.photoKey === 'custom' ? ' is-selected' : ''}" aria-pressed="${draft.photoKey === 'custom'}">${draft.photoDataUrl ? `<img src="${escape(draft.photoDataUrl)}" alt="我的照片"><span>我的照片</span>` : `${api.icon('camera')}<span>用自己的照片</span>`}<i>${api.icon('check')}</i></button></div><input type="file" name="photo" accept="image/*" class="sp-visually-hidden" aria-label="选择自己的照片"><p class="sp-field__hint" data-photo-hint>AI 示例图 · 上传照片仅存本机</p></fieldset>
+          <fieldset class="sp-field"><legend><span>02</span>选一个时刻</legend><div class="sp-moment-options">${SPACE_MOMENTS.map((moment) => `<button type="button" data-moment="${moment.id}" class="sp-moment-choice${draft.momentId === moment.id ? ' is-selected' : ''}" aria-pressed="${draft.momentId === moment.id}">${escape(moment.name)}</button>`).join('')}</div><label class="sp-input-label" for="sp-song-select">这一刻的音乐</label><select id="sp-song-select" name="track"><option value="${SPACE_EVENT.trackId}"${draft.trackId ? ' selected' : ''}>《${escape(SPACE_EVENT.song)}》 · 示例曲目</option><option value=""${!draft.trackId ? ' selected' : ''}>只记录这个环节</option></select></fieldset>
+          <div class="sp-field"><label class="sp-field__title" for="sp-caption-input"><span>03</span>留一句话</label><textarea id="sp-caption-input" name="caption" rows="3" maxlength="80" placeholder="那一刻，你在想什么？">${escape(draft.caption)}</textarea><div class="sp-field__counter"><span>选填</span><span data-caption-count>${draft.caption.length} / 80</span></div></div>
+          <label class="sp-display-consent"><input type="checkbox" name="isPublic"${draft.isPublic ? ' checked' : ''}><span class="sp-display-consent__check">${api.icon('check')}</span><span><strong>展示这张卡</strong><small>让另一位角色看见；不勾选则私藏。</small></span></label>
           <p class="sp-form-error" role="alert" data-editor-error hidden></p>
         </div>
-        <details class="sp-editor__preview"${matchMedia('(min-width: 701px)').matches ? ' open' : ''}><summary>看看成卡效果<span>${api.icon('chevron-right')}</span></summary><div data-card-preview>${ticketMarkup(draft, { preview: true })}</div><p class="sp-editor__preview-note">画面里的音乐与时刻，由你选择。</p></details>
+        <details class="sp-editor__preview"${matchMedia('(min-width: 701px)').matches ? ' open' : ''}><summary>预览卡片<span>${api.icon('chevron-right')}</span></summary><div data-card-preview>${ticketMarkup(draft, { preview: true })}</div></details>
         <div class="sp-editor__submit"><span class="sp-editor__save-state" data-save-state>${draft.isPublic ? '保存并展示在本场' : '仅自己保存 · 不展示'}</span><button type="button" class="button button--quiet" data-dialog-close>取消</button><button type="submit" class="button button--primary"><span data-save-label>${draft.isPublic ? '保存并展示' : '保存现场卡'}</span>${api.icon('arrow-right')}</button></div>
       </form>`, 'sp-dialog--editor');
     const form = element.querySelector('form');
@@ -248,7 +246,7 @@ function makeLifecycle(container, api) {
       processing = true;
       form.querySelector('[type="submit"]').disabled = true;
       error.hidden = true;
-      element.querySelector('[data-photo-hint]').textContent = '正在将照片调整为适合卡片的大小…';
+      element.querySelector('[data-photo-hint]').textContent = '正在处理照片…';
       try {
         const dataUrl = await compressPhoto(file);
         if (!element.isConnected || disposed) return;
@@ -256,13 +254,13 @@ function makeLifecycle(container, api) {
         draft.photoDataUrl = dataUrl;
         const custom = element.querySelector('[data-photo="custom"]');
         custom.innerHTML = `<img src="${escape(dataUrl)}" alt="我的照片"><span>更换我的照片</span><i>${api.icon('check')}</i>`;
-        element.querySelector('[data-photo-hint]').textContent = '照片已在本机缩小处理，没有上传。点缩略图可以更换。';
+        element.querySelector('[data-photo-hint]').textContent = '照片仅存本机 · 点图片更换';
         preview();
       } catch (cause) {
         if (!element.isConnected) return;
         error.textContent = cause.message || '这张照片暂时无法打开，请换一张 JPG 或 PNG。';
         error.hidden = false;
-        element.querySelector('[data-photo-hint]').textContent = '也可以先选用一张示例照片。';
+        element.querySelector('[data-photo-hint]').textContent = '可重选，或使用示例图。';
       } finally {
         processing = false;
         if (element.isConnected) form.querySelector('[type="submit"]').disabled = false;
@@ -313,7 +311,7 @@ function makeLifecycle(container, api) {
       return samePair && exchange.status === 'pending';
     });
     if (previous) { openExchange(previous.id); return; }
-    const { element, close } = dialog(`<div class="sp-dialog__head"><span class="eyebrow">交换前，确认这两张卡</span>${closeButton()}<h2 data-dialog-title>用你的舞台，换我的人海。</h2><p>你将用自己这张卡，向${escape(actorName(target))}发起交换。</p></div><div class="sp-dialog__body"><div class="sp-common-reason">${api.icon('heart')}<span>${escape(sharedMoment(own, theirs))}</span></div><div class="sp-pair sp-pair--request"><div><div class="sp-pair__label">${escape(actorName(actor))}送出的这一张</div>${ticketMarkup(own, { small: true })}</div><span class="sp-pair__join" aria-hidden="true">${api.icon('swap')}</span><div><div class="sp-pair__label">${escape(actorName(target))}的这一张</div>${ticketMarkup(theirs, { small: true })}</div></div><p class="sp-exchange-boundary">对方接受后，两张卡会分别收进你们的记录。不会自动加好友，也不会公开你的其他记录。</p>${own.isPublic ? '' : '<p class="sp-private-note">你的卡仍不在本场展示。本次申请只把这张卡交给对方查看。</p>'}</div><div class="sp-dialog__footer"><button type="button" class="button button--quiet" data-dialog-close>再看看</button><button type="button" class="button button--primary" data-send-request>发送交换申请${api.icon('arrow-right')}</button></div>`, 'sp-dialog--exchange');
+    const { element, close } = dialog(`<div class="sp-dialog__head"><span class="eyebrow">交换申请</span>${closeButton()}<h2 data-dialog-title>和${escape(actorName(target))}交换这两张卡？</h2></div><div class="sp-dialog__body"><div class="sp-common-reason">${api.icon('heart')}<span>${escape(sharedMoment(own, theirs))}</span></div><div class="sp-pair sp-pair--request"><div><div class="sp-pair__label">${escape(actorName(actor))}的卡</div>${ticketMarkup(own, { small: true })}</div><span class="sp-pair__join" aria-hidden="true">${api.icon('swap')}</span><div><div class="sp-pair__label">${escape(actorName(target))}的卡</div>${ticketMarkup(theirs, { small: true })}</div></div><p class="sp-exchange-boundary">对方同意后，双方各自收好一份双联记忆。</p>${own.isPublic ? '' : '<p class="sp-private-note">这张私藏卡将向对方可见。</p>'}</div><div class="sp-dialog__footer"><button type="button" class="button button--quiet" data-dialog-close>再看看</button><button type="button" class="button button--primary" data-send-request>发送申请${api.icon('arrow-right')}</button></div>`, 'sp-dialog--exchange');
     element.querySelector('[data-send-request]').addEventListener('click', (event) => {
       event.currentTarget.disabled = true;
       let created = false;
@@ -346,10 +344,10 @@ function makeLifecycle(container, api) {
     const receiving = exchange.to === actor;
     const counterpart = receiving ? exchange.from : exchange.to;
     const existing = state.space.records[actor].some((record) => record.id === `exchange:${exchange.id}`);
-    const titles = { accepted: '同一晚。<em>两种目光。</em>', pending: receiving ? '这张卡，想与你交换。' : '一张卡，等待另一个人接住。', declined: '这次交换，停在这里。', cancelled: '申请已取消，卡片没有交换。' };
+    const titles = { accepted: '同一晚。<em>两种目光。</em>', pending: receiving ? '要交换这两张卡吗？' : '等待对方回应', declined: '对方婉拒了交换', cancelled: '申请已取消' };
     const statusText = { accepted: '双方已确认 · 本地情景', pending: receiving ? '待你回应' : `等待${actorName(counterpart)}回应`, declined: '对方未接受', cancelled: '已取消' };
-    const exchangeVisual = accepted ? duetMarkup(exchange.fromCard, exchange.toCard, api) : `<div class="sp-common-reason">${api.icon('heart')}<span>${escape(sharedMoment(exchange.fromCard, exchange.toCard))}</span></div><div class="sp-pair sp-pair--request"><div><div class="sp-pair__label">${escape(actorName(exchange.from))}送出的这一张</div>${ticketMarkup(exchange.fromCard, { small: true })}</div><span class="sp-pair__join" aria-hidden="true">${api.icon('swap')}</span><div><div class="sp-pair__label">${escape(actorName(exchange.to))}送出的这一张</div>${ticketMarkup(exchange.toCard, { small: true })}</div></div>`;
-    const { element, close } = dialog(`<div class="sp-dialog__head"><span class="eyebrow">${accepted ? '交换完成 / MUSIC SPACE' : '现场卡交换'}</span>${closeButton()}<h2 data-dialog-title>${titles[exchange.status]}</h2><p class="sp-exchange-status${accepted ? ' is-accepted' : ''}">${api.icon(accepted ? 'check' : pending ? 'swap' : 'info')}<span>${escape(statusText[exchange.status])}</span></p></div><div class="sp-dialog__body">${exchangeVisual}<p class="sp-exchange-boundary">${accepted ? `${existing ? '这份双联记忆已在你的记录里。' : '这次交换已经完成，可以收进自己的记录。'}再次公开对方照片，仍需征得同意。` : pending ? '这里只交换眼前这两张卡。接受后，双方各自的记录会收下一份快照；是否再次公开仍由你们决定。' : '没有生成双联记忆。双方都保留自己的卡片。'}</p>${pending && !receiving ? '<p class="sp-private-note">这是本地情景演示：切换到接收方角色，再体验对方的决定。</p>' : ''}</div><div class="sp-dialog__footer sp-dialog__footer--wrap">${accepted ? `<button type="button" class="button button--quiet sp-ticket-export" data-download-ticket>${api.icon('image')}保存票根图片</button>${mapActionsMarkup()}<button type="button" class="button button--primary" ${existing ? 'data-view-memory' : 'data-save-exchange'}>${api.icon(existing ? 'bookmark' : 'plus')}${existing ? '查看我的记忆' : '保存这场记忆'}</button>` : pending && receiving ? `<button type="button" class="button button--quiet" data-decide="declined">这次先不了</button><button type="button" class="button button--primary" data-decide="accepted">同意交换${api.icon('swap')}</button>` : pending ? `<button type="button" class="button button--quiet" data-decide="cancelled">取消申请</button><button type="button" class="button button--primary" data-switch-recipient>切到${escape(actorName(counterpart))}${api.icon('arrow-right')}</button>` : '<button type="button" class="button button--primary" data-dialog-close>回到本场</button>'}</div>`, `sp-dialog--exchange${accepted ? ' sp-dialog--result' : ''}`);
+    const exchangeVisual = accepted ? duetMarkup(exchange.fromCard, exchange.toCard, api) : `<div class="sp-common-reason">${api.icon('heart')}<span>${escape(sharedMoment(exchange.fromCard, exchange.toCard))}</span></div><div class="sp-pair sp-pair--request"><div><div class="sp-pair__label">${escape(actorName(exchange.from))}的卡</div>${ticketMarkup(exchange.fromCard, { small: true })}</div><span class="sp-pair__join" aria-hidden="true">${api.icon('swap')}</span><div><div class="sp-pair__label">${escape(actorName(exchange.to))}的卡</div>${ticketMarkup(exchange.toCard, { small: true })}</div></div>`;
+    const { element, close } = dialog(`<div class="sp-dialog__head"><span class="eyebrow">${accepted ? '交换完成' : '现场卡交换'}</span>${closeButton()}<h2 data-dialog-title>${titles[exchange.status]}</h2><p class="sp-exchange-status${accepted ? ' is-accepted' : ''}">${api.icon(accepted ? 'check' : pending ? 'swap' : 'info')}<span>${escape(statusText[exchange.status])}</span></p></div><div class="sp-dialog__body">${exchangeVisual}<p class="sp-exchange-boundary">${accepted ? `${existing ? '已收进你的记忆。' : '可以收进你的记忆。'}再次公开对方照片前，请征得同意。` : pending ? '同意后，双方各自保存这两张卡的双联快照。' : '双方保留自己的卡片。'}</p>${pending && !receiving ? '<p class="sp-private-note">切到对方角色，接受或拒绝这次申请。</p>' : ''}</div><div class="sp-dialog__footer sp-dialog__footer--wrap">${accepted ? `<button type="button" class="button button--quiet sp-ticket-export" data-download-ticket>${api.icon('image')}保存票根图片</button>${mapActionsMarkup()}<button type="button" class="button button--primary" ${existing ? 'data-view-memory' : 'data-save-exchange'}>${api.icon(existing ? 'bookmark' : 'plus')}${existing ? '查看我的记忆' : '保存这场记忆'}</button>` : pending && receiving ? `<button type="button" class="button button--quiet" data-decide="declined">这次先不了</button><button type="button" class="button button--primary" data-decide="accepted">同意交换${api.icon('swap')}</button>` : pending ? `<button type="button" class="button button--quiet" data-decide="cancelled">取消申请</button><button type="button" class="button button--primary" data-switch-recipient>切到${escape(actorName(counterpart))}${api.icon('arrow-right')}</button>` : '<button type="button" class="button button--primary" data-dialog-close>回到本场</button>'}</div>`, `sp-dialog--exchange${accepted ? ' sp-dialog--result' : ''}`);
     if (accepted) bindTicketDownload(element, [exchange.fromCard, exchange.toCard], exchange);
     element.querySelectorAll('[data-decide]').forEach((button) => button.addEventListener('click', () => {
       const decision = button.dataset.decide;
@@ -396,7 +394,7 @@ function makeLifecycle(container, api) {
     const record = api.getState().space.records[actor].find((item) => item.id === id);
     if (!record) return;
     const paired = record.kind === 'exchange';
-    const { element, close } = dialog(`<div class="sp-dialog__head"><span class="eyebrow">我的现场记忆</span>${closeButton()}<h2 data-dialog-title>${paired ? '这一晚，<em>我们都记得。</em>' : '属于你的这一晚。'}</h2><p>${escape(actorName(actor))}的本地记录 · ${escape(SPACE_EVENT.title)}</p></div><div class="sp-dialog__body">${paired ? `${duetMarkup(record.fromCard, record.toCard, api)}<p class="sp-exchange-boundary">来自一次已接受的交换；保存不代表可以再次公开对方照片。</p>` : `<div class="sp-record-single">${ticketMarkup(record.card)}</div>`}</div><div class="sp-dialog__footer sp-dialog__footer--wrap">${paired ? `<button type="button" class="button button--quiet sp-ticket-export" data-download-ticket>${api.icon('image')}保存票根图片</button>` : ''}<button type="button" class="button button--quiet" data-delete-record>${api.icon('trash')}删除这条记录</button>${mapActionsMarkup()}</div>`, paired ? 'sp-dialog--exchange sp-dialog--result sp-dialog--saved' : 'sp-dialog--narrow');
+    const { element, close } = dialog(`<div class="sp-dialog__head"><span class="eyebrow">我的现场记忆</span>${closeButton()}<h2 data-dialog-title>${paired ? '这一晚，<em>我们都记得。</em>' : '属于你的这一晚。'}</h2><p>${escape(actorName(actor))}的本地记录 · ${escape(SPACE_EVENT.title)}</p></div><div class="sp-dialog__body">${paired ? `${duetMarkup(record.fromCard, record.toCard, api)}<p class="sp-exchange-boundary">再次公开对方照片前，请征得同意。</p>` : `<div class="sp-record-single">${ticketMarkup(record.card)}</div>`}</div><div class="sp-dialog__footer sp-dialog__footer--wrap">${paired ? `<button type="button" class="button button--quiet sp-ticket-export" data-download-ticket>${api.icon('image')}保存票根图片</button>` : ''}<button type="button" class="button button--quiet" data-delete-record>${api.icon('trash')}删除这条记录</button>${mapActionsMarkup()}</div>`, paired ? 'sp-dialog--exchange sp-dialog--result sp-dialog--saved' : 'sp-dialog--narrow');
     bindMapActions(element, close);
     if (paired) bindTicketDownload(element, [record.fromCard, record.toCard], record);
     element.querySelector('[data-delete-record]').addEventListener('click', () => { close(); deleteRecord(id); });
@@ -429,7 +427,7 @@ function makeLifecycle(container, api) {
     const actor = api.getState().actor;
     const record = api.getState().space.records[actor].find((item) => item.id === id);
     if (!record) return;
-    const { element, close } = dialog(`<div class="sp-dialog__head"><span class="eyebrow">YOUR RECORD</span>${closeButton()}<h2 data-dialog-title>从我的记录中删除？</h2></div><div class="sp-dialog__body"><p class="sp-delete-title">${escape(record.title)}</p><p class="sp-exchange-boundary">只移除${escape(actorName(actor))}的这条本地记录。${record.kind === 'exchange' ? '对方的记录与已完成的交换不会被删除。' : '本场卡片仍按原来的展示设置保留；你可以回本场单独撤下。'}</p></div><div class="sp-dialog__footer"><button type="button" class="button button--quiet" data-dialog-close>保留</button><button type="button" class="button button--primary" data-confirm-delete>删除记录</button></div>`, 'sp-dialog--narrow');
+    const { element, close } = dialog(`<div class="sp-dialog__head"><span class="eyebrow">删除记录</span>${closeButton()}<h2 data-dialog-title>从我的记录中删除？</h2></div><div class="sp-dialog__body"><p class="sp-delete-title">${escape(record.title)}</p><p class="sp-exchange-boundary">只移除${escape(actorName(actor))}的这条本地记录。${record.kind === 'exchange' ? '对方的记录与已完成的交换不会被删除。' : '本场卡片仍按原来的展示设置保留；你可以回本场单独撤下。'}</p></div><div class="sp-dialog__footer"><button type="button" class="button button--quiet" data-dialog-close>保留</button><button type="button" class="button button--primary" data-confirm-delete>删除记录</button></div>`, 'sp-dialog--narrow');
     element.querySelector('[data-confirm-delete]').addEventListener('click', () => {
       api.update((state) => {
         if (state.actor !== actor) return;
@@ -444,7 +442,7 @@ function makeLifecycle(container, api) {
     const card = api.getState().space.cards[actor];
     if (!card) return;
     const willDisplay = !card.isPublic;
-    const { element, close } = dialog(`<div class="sp-dialog__head"><span class="eyebrow">YOUR CHOICE</span>${closeButton()}<h2 data-dialog-title>${willDisplay ? '让本场看见这一张？' : '把这一张从本场撤下？'}</h2></div><div class="sp-dialog__body"><p class="sp-exchange-boundary">${willDisplay ? '另一位示例角色将能看到这张卡，并向你申请交换。其他照片与私人记录不会一起展示。' : '另一位示例角色将不再在本场看到这张卡。涉及它的待回应申请也会取消，已完成的交换不受影响。'}</p></div><div class="sp-dialog__footer"><button type="button" class="button button--quiet" data-dialog-close>取消</button><button type="button" class="button button--primary" data-confirm-visibility>${willDisplay ? '展示这张卡' : '从本场撤下'}</button></div>`, 'sp-dialog--narrow');
+    const { element, close } = dialog(`<div class="sp-dialog__head"><span class="eyebrow">展示设置</span>${closeButton()}<h2 data-dialog-title>${willDisplay ? '展示这张卡？' : '撤下这张卡？'}</h2></div><div class="sp-dialog__body"><p class="sp-exchange-boundary">${willDisplay ? '另一位角色将看到这张卡，并可以申请交换。' : '对方将看不到这张卡，待回应申请会取消。已完成的交换保留。'}</p></div><div class="sp-dialog__footer"><button type="button" class="button button--quiet" data-dialog-close>取消</button><button type="button" class="button button--primary" data-confirm-visibility>${willDisplay ? '展示这张卡' : '从本场撤下'}</button></div>`, 'sp-dialog--narrow');
     element.querySelector('[data-confirm-visibility]').addEventListener('click', () => {
       api.update((state) => {
         if (state.actor !== actor || !state.space.cards[actor]) return;
@@ -456,7 +454,7 @@ function makeLifecycle(container, api) {
   }
 
   function reset() {
-    const { element, close } = dialog(`<div class="sp-dialog__head"><span class="eyebrow">START THIS SCENE AGAIN</span>${closeButton()}<h2 data-dialog-title>重新体验这一场？</h2></div><div class="sp-dialog__body"><p class="sp-exchange-boundary">会清除两个示例角色在 Space 中的卡片、回应、交换与现场记录，恢复初始人海示例卡。Map 的探索记录保留。</p></div><div class="sp-dialog__footer"><button type="button" class="button button--quiet" data-dialog-close>保留当前进度</button><button type="button" class="button button--primary" data-confirm-reset>重置本场</button></div>`, 'sp-dialog--narrow');
+    const { element, close } = dialog(`<div class="sp-dialog__head"><span class="eyebrow">重置示例</span>${closeButton()}<h2 data-dialog-title>重新体验这一场？</h2></div><div class="sp-dialog__body"><p class="sp-exchange-boundary">清空两个角色的卡片、回应、交换与记录，恢复初始示例。Map 记录保留。</p></div><div class="sp-dialog__footer"><button type="button" class="button button--quiet" data-dialog-close>保留当前进度</button><button type="button" class="button button--primary" data-confirm-reset>重置本场</button></div>`, 'sp-dialog--narrow');
     element.querySelector('[data-confirm-reset]').addEventListener('click', () => {
       api.update((state) => { state.space = createSpaceState(); state.actor = 'a'; });
       close(); api.render(); api.toast('本场已重置，可以重新体验双方的视角');
@@ -478,8 +476,9 @@ function makeLifecycle(container, api) {
       case 'records': api.navigate('records', { section: 'space' }); break;
       case 'map': api.navigate('explore', { artistId: SPACE_EVENT.artistId, from: 'space', newSession: true }); break;
       case 'resume-map': api.navigate('explore', { resumeSessionId: api.getState().space.mapReturnId }); break;
-      case 'demo': scrollToScene(); break;
-      case 'space': api.navigate('space', { eventId: SPACE_EVENT.id }); break;
+      case 'demo': showDemo = true; api.render(); window.scrollTo({ top: 0, behavior: 'instant' }); break;
+      case 'home': showDemo = false; api.navigate('space'); break;
+      case 'space': showDemo = true; api.navigate('space', { eventId: SPACE_EVENT.id }); break;
       case 'live': api.navigate('live'); break;
       case 'reset': reset(); break;
       case 'react': {
@@ -546,6 +545,8 @@ function compressPhoto(file) {
 
 export function mountSpace(container, api) {
   const state = api.getState();
+  const payload = state.routePayload;
+  if (payload?.eventId === SPACE_EVENT.id || payload?.requestTarget || payload?.exchangeId || payload?.cardSaved || payload?.showDemo) showDemo = true;
   const actor = state.actor;
   const person = SPACE_ACTORS[actor];
   const peer = otherActor(actor);
@@ -558,27 +559,25 @@ export function mountSpace(container, api) {
   const hasPending = lastExchange?.status === 'pending';
   const completed = getCompletedExchange(state.space, own, other);
   const relevantExchange = hasPending ? lastExchange : completed;
-  container.innerHTML = `<div class="space-page">
-    <section class="sp-hero" aria-labelledby="space-heading">
-      <img class="sp-hero__image" src="${escape(SPACE_PHOTOS.stage.url)}" alt="回声现场的舞台场景示意">
-      <div class="sp-hero__scrim"></div><div class="sp-hero__optic" aria-hidden="true"></div><div class="sp-hero__second"><img src="${escape(SPACE_PHOTOS.crowd.url)}" alt="同一场现场的人海视角示意"><span>人海这一面 / 场景示意</span></div>
-      <div class="sp-hero__content"><div class="sp-hero__eyebrow"><span>MUSIC SPACE</span><span class="sp-scene-tag">留住现场的另一面</span></div><h1 id="space-heading"><span>同一刻。</span><span>另一<em>面。</em></span></h1><p>你拍下舞台，有人记住人海。<br>散场后，把两个视角留成一张共同记忆。</p><div class="sp-hero__actions"><button type="button" class="button button--primary sp-hero__cta" data-space-action="live">${api.icon('users')}创建 / 加入同场${api.icon('arrow-up-right')}</button><button type="button" class="sp-hero__demo" data-space-action="demo">先体验换卡<span>本地情景 ${api.icon('arrow-right')}</span></button></div><p class="sp-hero__room-note">先留好自己的，再决定和谁交换。</p></div>
-      <div class="sp-hero__event"><span class="sp-hero__event-number">YOUR<br>SHOW.</span><div><span>自己的照片 · 同场的另一面</span><strong>一起，记住这一晚。<em>/ 共同署名的票根</em></strong></div><span class="sp-hero__image-note">AI 场景示意</span></div>
-    </section>
-    <section class="sp-local-scene" id="sp-local-scene" tabindex="-1" aria-labelledby="sp-demo-heading"><header class="sp-demo-intro"><div><span class="eyebrow">先体验换卡 / LOCAL SCENE</span><h2 id="sp-demo-heading">先在这里，交换一个视角。</h2><p>一个人也能试一遍。下面的角色和卡片只用于本地情景，不会迁移到朋友的房间。</p></div><button type="button" class="button button--quiet" data-space-action="edit">${api.icon(own ? 'image' : 'plus')}${own ? '编辑示例中的现场卡' : '制作我的现场卡'}</button></header>
-    <div class="sp-music-strip"><span class="sp-music-strip__art" aria-hidden="true"><i></i></span><div><span class="eyebrow">这一晚的共同旋律</span><strong>《${escape(SPACE_EVENT.song)}》</strong><small>${SPACE_EVENT.artists.join(' × ')} · 示例曲目，音频暂未接入</small></div><div class="sp-music-strip__actions">${state.space.mapReturnId ? `<button type="button" class="sp-text-link" data-space-action="resume-map">${api.icon('arrow-left')}继续刚才的探索</button>` : ''}<button type="button" class="sp-text-link" data-space-action="map">从${escape(SPACE_EVENT.artists[0])}新开探索${api.icon('arrow-up-right')}</button></div></div>
-    ${actorSwitchMarkup(actor, api)}
-    ${exchangeNoticeMarkup(state.space, actor, api)}
-    <section class="sp-perspectives" aria-labelledby="sp-perspectives-heading"><div class="sp-section-heading"><div><span class="eyebrow">同场，看看彼此</span><h2 id="sp-perspectives-heading">你的舞台。<br>我的人海。</h2></div><span class="sp-section-heading__hint">由一首歌开始<br>让两个视角相遇 ${api.icon('arrow-right')}</span></div>
+  container.innerHTML = showDemo ? `<div class="space-page space-page--demo">
+    <section class="sp-local-scene" id="sp-local-scene" tabindex="-1" aria-labelledby="sp-demo-heading">
+      <header class="sp-demo-header"><div class="sp-demo-header__title"><button type="button" class="icon-button" data-space-action="home" aria-label="返回 Space 首页">${api.icon('arrow-left')}</button><div><h1 id="sp-demo-heading">体验换卡 <span>本地示例</span></h1><p>${escape(SPACE_EVENT.title)}</p></div></div><button type="button" class="button button--quiet" data-space-action="records">${api.icon('bookmark')}我的记忆</button></header>
+      ${actorSwitchMarkup(actor, api)}
+      ${exchangeNoticeMarkup(state.space, actor, api)}
       <div class="sp-perspectives__grid">
-        <section class="sp-perspective sp-perspective--mine" aria-label="我的现场卡"><div class="sp-person-heading"><span class="sp-avatar sp-avatar--${person.color}">${escape(person.initial)}</span><div><strong>${escape(person.name)} <span>· 当前视角</span></strong><small>属于你的这一张</small></div>${own ? `<span class="sp-visibility-label${own.isPublic ? ' is-public' : ''}">${own.isPublic ? '本场展示中' : '仅自己可见'}</span>` : ''}</div>
-        ${own ? `${ticketMarkup(own)}<div class="sp-card-tools"><button type="button" class="sp-text-link" data-space-action="edit">编辑现场卡${api.icon('arrow-up-right')}</button><button type="button" class="sp-text-link" data-space-action="visibility">${own.isPublic ? '从本场撤下' : '展示在本场'}</button></div>${peerReaction.here || peerReaction.like ? `<div class="sp-reaction-receipt">${api.icon('heart')}<span>${escape(actorName(peer))}${peerReaction.here ? '回应了“我也在”' : '喜欢你的这一张'}${peerReaction.here && peerReaction.like ? '，也留下了喜欢' : ''}</span></div>` : '<p class="sp-mine-caption">保存是给自己，展示和交换由你决定。</p>'}` : `<div class="sp-create-card"><span class="sp-create-card__index">待你入画<span>YOUR SIDE</span></span><div class="sp-create-card__frame">${api.icon('camera')}<span>这里，留给你的那一刻。</span></div><div class="sp-create-card__copy"><h3>这一张，<br>还少了你。</h3><p>选一张图，一首歌，留一句话。<br>先收下自己的这一晚。</p><button type="button" class="button button--primary" data-space-action="edit">制作我的现场卡${api.icon('plus')}</button></div><span class="sp-create-card__note">默认私藏 · 展示由你选择</span></div>`}</section>
-        <section class="sp-perspective sp-perspective--other" tabindex="-1" aria-label="另一位示例角色的现场卡"><div class="sp-person-heading"><span class="sp-avatar sp-avatar--${SPACE_ACTORS[peer].color}">${escape(SPACE_ACTORS[peer].initial)}</span><div><strong>${escape(actorName(peer))}<span> · 示例角色</span></strong><small>同一场，另一双眼睛</small></div><span class="sp-perspective-number">02</span></div>
-        ${other?.isPublic ? `${ticketMarkup(other)}${common ? `<div class="sp-shared-moment">${api.icon('heart')}<span>${escape(common)}</span></div>` : `<p class="sp-other-caption">${escape(actorName(peer))}把「${escape(momentName(other))}」留在了卡上。</p>`}<div class="sp-reaction-row"><button type="button" class="sp-reaction-button${reaction.here ? ' is-active' : ''}" data-space-action="react" data-actor="${peer}" data-reaction="here" aria-pressed="${Boolean(reaction.here)}">${api.icon('users')}${reaction.here ? '已回应 · 我也在' : '我也在'}</button><button type="button" class="sp-reaction-button${reaction.like ? ' is-active' : ''}" data-space-action="react" data-actor="${peer}" data-reaction="like" aria-pressed="${Boolean(reaction.like)}">${api.icon('heart')}${reaction.like ? '已喜欢' : '我也喜欢'}</button></div><button type="button" class="button button--primary sp-request-button" data-space-action="${relevantExchange ? 'view-exchange' : 'request'}" data-actor="${peer}"${relevantExchange ? ` data-id="${escape(relevantExchange.id)}"` : ''}>${api.icon(completed && !hasPending ? 'bookmark' : 'swap')}${hasPending ? '查看这次交换申请' : completed ? '打开我们的双联记忆' : own ? '用我的卡，交换这一晚' : '制作卡片，交换这一晚'}</button><p class="sp-interaction-note">回应不代表交换。对方同意后，两张卡才会相遇。</p>` : `<div class="sp-hidden-card"><span class="sp-hidden-card__icon">${api.icon('image')}</span><h3>${other ? '这一张，暂时只属于对方。' : `${escape(actorName(peer))}还没有做卡。`}</h3><p>你可以先保存自己的现场。<br>也可以切换角色，体验另一面的选择。</p><button type="button" class="button button--quiet" data-space-action="actor" data-actor="${peer}">切到${escape(actorName(peer))}${api.icon('arrow-right')}</button></div>`}</section>
+        <section class="sp-perspective sp-perspective--mine" aria-label="我的现场卡"><div class="sp-person-heading"><span class="sp-avatar sp-avatar--${person.color}">${escape(person.initial)}</span><div><strong>${escape(person.name)} <span>· 当前角色</span></strong></div>${own ? `<span class="sp-visibility-label${own.isPublic ? ' is-public' : ''}">${own.isPublic ? '已展示' : '私藏'}</span>` : ''}</div>
+        ${own ? `${ticketMarkup(own)}<div class="sp-card-tools"><button type="button" class="sp-text-link" data-space-action="edit">编辑${api.icon('arrow-up-right')}</button><button type="button" class="sp-text-link" data-space-action="visibility">${own.isPublic ? '撤下展示' : '展示这张卡'}</button></div>${peerReaction.here || peerReaction.like ? `<div class="sp-reaction-receipt">${api.icon('heart')}<span>${escape(actorName(peer))}${peerReaction.here ? '回应了“我也在”' : '喜欢这张卡'}${peerReaction.here && peerReaction.like ? '，也点了喜欢' : ''}</span></div>` : ''}` : `<div class="sp-create-card"><div class="sp-create-card__frame">${api.icon('camera')}</div><div class="sp-create-card__copy"><h2>你的现场卡</h2><button type="button" class="button button--primary" data-space-action="edit">${api.icon('plus')}制作现场卡</button></div><span class="sp-create-card__note">默认私藏</span></div>`}</section>
+        <section class="sp-perspective sp-perspective--other" tabindex="-1" aria-label="另一位示例角色的现场卡"><div class="sp-person-heading"><span class="sp-avatar sp-avatar--${SPACE_ACTORS[peer].color}">${escape(SPACE_ACTORS[peer].initial)}</span><div><strong>${escape(actorName(peer))}<span> · 另一位角色</span></strong></div></div>
+        ${other?.isPublic ? `${ticketMarkup(other)}${common ? `<div class="sp-shared-moment">${api.icon('heart')}<span>${escape(common)}</span></div>` : ''}<div class="sp-demo-card-actions"><div class="sp-reaction-row"><button type="button" class="sp-reaction-button${reaction.here ? ' is-active' : ''}" data-space-action="react" data-actor="${peer}" data-reaction="here" aria-pressed="${Boolean(reaction.here)}">${api.icon('users')}我也在</button><button type="button" class="sp-reaction-button${reaction.like ? ' is-active' : ''}" data-space-action="react" data-actor="${peer}" data-reaction="like" aria-pressed="${Boolean(reaction.like)}">${api.icon('heart')}${reaction.like ? '已喜欢' : '喜欢'}</button></div><button type="button" class="button button--primary sp-request-button" data-space-action="${relevantExchange ? 'view-exchange' : 'request'}" data-actor="${peer}"${relevantExchange ? ` data-id="${escape(relevantExchange.id)}"` : ''}>${api.icon(completed && !hasPending ? 'bookmark' : 'swap')}${hasPending ? '查看申请' : completed ? '打开双联记忆' : own ? '申请换卡' : '制卡并交换'}</button></div>` : `<div class="sp-hidden-card"><span class="sp-hidden-card__icon">${api.icon('image')}</span><h2>${other ? '这张卡还未展示' : `${escape(actorName(peer))}还没有卡片`}</h2><button type="button" class="button button--quiet" data-space-action="actor" data-actor="${peer}">切到${escape(actorName(peer))}${api.icon('arrow-right')}</button></div>`}</section>
       </div>
+      <footer class="sp-demo-footer"><span>示例卡仅存本机</span><div>${state.space.mapReturnId ? `<button type="button" class="sp-text-link" data-space-action="resume-map">继续刚才的探索${api.icon('arrow-up-right')}</button>` : ''}<button type="button" class="sp-text-link" data-space-action="reset">${api.icon('rotate')}重置示例</button></div></footer>
     </section>
-    <section class="sp-records-link"><div><span class="eyebrow">散场以后 / AFTER THE ENCORE</span><h2>声音会停，这一晚可以留下。</h2><p>自己的卡与交换后的记忆，收在各自的记录里。</p></div><button type="button" class="button button--quiet" data-space-action="records">我的现场记忆${api.icon('arrow-right')}</button></section>
-    <footer class="sp-footer"><p>本地情景演示 · 场次与角色为示例 · 不代表真实到场</p><button type="button" class="sp-text-link" data-space-action="reset">${api.icon('rotate')}重置本场</button></footer>
+  </div>` : `<div class="space-page space-page--home">
+    <section class="sp-hero" aria-labelledby="space-heading">
+      <img class="sp-hero__image" src="${escape(SPACE_PHOTOS.stage.url)}" alt="舞台场景示意">
+      <div class="sp-hero__scrim"></div><div class="sp-hero__optic" aria-hidden="true"></div><div class="sp-hero__second"><img src="${escape(SPACE_PHOTOS.crowd.url)}" alt="人海视角示意"></div>
+      <div class="sp-hero__content"><div class="sp-hero__eyebrow"><span>MUSIC SPACE</span></div><h1 id="space-heading"><span>同一刻。</span><span>另一<em>面。</em></span></h1><p>和同场的人交换照片，留下一张共同署名的票根。</p><div class="sp-hero__actions"><button type="button" class="button button--primary sp-hero__cta" data-space-action="live">${api.icon('users')}创建 / 加入同场${api.icon('arrow-up-right')}</button><button type="button" class="sp-hero__demo" data-space-action="demo">体验换卡${api.icon('arrow-right')}</button></div></div>
+      <div class="sp-hero__event"><span class="sp-hero__image-note">AI 场景示意</span></div>
     </section>
   </div>`;
   const lifecycle = makeLifecycle(container, api);
@@ -594,18 +593,21 @@ export function mountSpace(container, api) {
     api.update((updated) => { delete updated.routePayload.cardSaved; });
     queueMicrotask(() => { if (container.isConnected) lifecycle.openCardSaved(); });
   }
-  return lifecycle.cleanup;
+  return () => {
+    if (api.getState().view !== 'space') showDemo = false;
+    lifecycle.cleanup();
+  };
 }
 
 export function mountSpaceRecords(container, api) {
   const state = api.getState();
   const actor = state.actor;
   const records = state.space.records[actor];
-  container.innerHTML = `<section class="sp-records-page"><div class="sp-section-heading"><div><span class="eyebrow">现场记忆 / THE COLLECTION</span><h2>我的现场记忆</h2><p>${escape(actorName(actor))}的卡片与共同视角，保存在当前浏览器。</p></div><button type="button" class="button button--quiet" data-space-action="space">回到本场${api.icon('arrow-up-right')}</button></div>${actorSwitchMarkup(actor, api, true)}${records.length ? `<div class="sp-memory-grid">${records.map((record) => {
+  container.innerHTML = `<section class="sp-records-page"><div class="sp-section-heading"><div><h2>我的现场记忆</h2><p>${escape(actorName(actor))} · 本地示例</p></div><button type="button" class="button button--quiet" data-space-action="space">继续体验${api.icon('arrow-up-right')}</button></div>${actorSwitchMarkup(actor, api, true)}${records.length ? `<div class="sp-memory-grid">${records.map((record) => {
     const paired = record.kind === 'exchange';
     const cards = paired ? [record.fromCard, record.toCard] : [record.card];
     return `<article class="sp-memory${paired ? ' sp-memory--paired' : ''}"><button type="button" class="sp-memory__open" data-space-action="open-record" data-id="${escape(record.id)}" aria-label="打开${escape(record.title)}"><div class="sp-memory__visual${paired ? ' sp-memory__visual--pair' : ''}">${cards.map((card) => `<div><img src="${escape(cardPhoto(card))}" alt="${escape(actorName(card.owner))}的${card.photoKey === 'custom' ? '照片' : '示例视角'}" loading="lazy"><span>${escape(actorName(card.owner))}</span></div>`).join('')}${paired ? `<span class="sp-memory__join">${api.icon('swap')}</span>` : ''}</div><div class="sp-memory__body"><span class="sp-memory__type">${paired ? '交换后的双联记忆' : '我自己的现场卡'}</span><h3>${escape(record.title)}</h3><div><span>${escape(SPACE_EVENT.date)} · 示例现场</span>${api.icon('arrow-up-right')}</div></div></button><button type="button" class="icon-button sp-memory__delete" data-space-action="delete-record" data-id="${escape(record.id)}" aria-label="删除${escape(record.title)}">${api.icon('trash')}</button></article>`;
-  }).join('')}</div>` : `<div class="sp-records-empty"><div class="sp-records-empty__art">${api.icon('image')}<span>YOUR NEXT MEMORY</span></div><h3>下一张，留给你自己的这一晚。</h3><p>做一张现场卡，或在双方同意后收下双联记忆。<br>探索过的艺人不会自动成为到场记录。</p><button type="button" class="button button--primary" data-space-action="space">去本场看看${api.icon('arrow-right')}</button></div>`}<p class="sp-local-note">仅保存在当前浏览器；清除浏览器数据会移除这些记录。两个示例角色的记录分别保存。</p></section>`;
+  }).join('')}</div>` : `<div class="sp-records-empty"><div class="sp-records-empty__art">${api.icon('image')}</div><h3>还没有记忆</h3><p>制作一张卡，或完成一次交换。</p><button type="button" class="button button--primary" data-space-action="space">体验换卡${api.icon('arrow-right')}</button></div>`}<p class="sp-local-note">记录仅存本机，清除浏览器数据后会丢失。</p></section>`;
   const lifecycle = makeLifecycle(container, api);
   const requested = state.routePayload?.spaceRecordId;
   if (requested) {

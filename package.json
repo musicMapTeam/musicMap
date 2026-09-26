@@ -1,6 +1,6 @@
 {
   "name": "music-map-space",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "private": true,
   "type": "module",
   "description": "Music discovery and consent-based live-event card exchange",
@@ -15,6 +15,7 @@
     "start": "node server/index.js"
   },
   "devDependencies": {
+    "overlayscrollbars": "2.16.0",
     "qrcode-generator": "2.0.4",
     "three": "0.186.1",
     "vite": "8.3.1",

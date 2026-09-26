@@ -5,6 +5,9 @@ import '../css/live.css';
 import '../css/themes.css';
 import '../css/theme-sakura.css';
 import '../css/theme-zine.css';
+import 'overlayscrollbars/overlayscrollbars.css';
+import '../css/compact.css';
+import { OverlayScrollbars } from 'overlayscrollbars';
 import { mountThemes } from './themes.js';
 import { icon } from './icons.js';
 import { createMapState, mountMap, mountMapRecords } from './map.js';
@@ -103,49 +106,34 @@ function updateChrome() {
 
 function navItems() {
   return [
-    ['explore', 'compass', '探索', 'MAP'],
-    ['space', 'users', '同场', 'SPACE'],
-    ['records', 'bookmark', '我的记录', 'COLLECTION'],
-  ].map(([view, name, title, subtitle]) => `
+    ['explore', 'compass', '探索'],
+    ['space', 'users', '同场'],
+    ['records', 'bookmark', '我的记录'],
+  ].map(([view, name, title]) => `
     <button class="nav-item" data-nav="${view}">
-      ${icon(name)}<span>${title}<small>${subtitle}</small></span>
+      ${icon(name)}<span>${title}</span>
     </button>`).join('');
 }
 
 function shell() {
   root.innerHTML = `
     <header class="app-masthead">
-      <button class="brand" data-nav="explore" aria-label="Music Map 首页">
+      <button class="brand" data-nav="space" aria-label="Music Map 首页">
         <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
-        <span class="brand-wordmark">music<span class="brand-light">map</span><small>声音相连，同场相遇。</small></span>
+        <span class="brand-wordmark">music<span class="brand-light">map</span></span>
       </button>
       <nav class="primary-nav" aria-label="主要导航">${navItems()}</nav>
-      <button class="theme-launcher" id="theme-launcher" aria-haspopup="dialog" aria-controls="theme-dialog"><span class="theme-launcher__swatch" aria-hidden="true"></span><span><b>外观</b><small data-theme-name>声浪现场</small></span>${icon('swap')}</button>
+      <div class="masthead-tools"><button class="demo-help icon-button" id="demo-help" aria-label="关于 Music Map" aria-haspopup="dialog" aria-controls="about-dialog">${icon('info')}</button><button class="theme-launcher" id="theme-launcher" aria-haspopup="dialog" aria-controls="theme-dialog"><span class="theme-launcher__swatch" aria-hidden="true"></span><span data-theme-name>声浪现场</span></button></div>
     </header>
     <div class="app-body">
-      <header class="topbar">
-        <div class="topbar-breadcrumb"><span data-view-label>发现新的声音</span><span class="topbar-divider"></span><span class="demo-tag" data-mode-label>示例音乐图谱</span></div>
-        <div class="topbar-actions">
-          <button class="demo-help" id="demo-help" aria-label="演示说明" aria-haspopup="dialog" aria-controls="about-dialog">${icon('info')}<span>演示说明</span></button>
-          <span class="identity"><span class="identity-demo">示例</span><span data-current-actor>${actors[state.actor]}</span></span>
-        </div>
-      </header>
       <div id="storage-warning" class="storage-warning" role="alert" hidden>这次修改尚未保存到浏览器，当前页面内容仍保留。可减少上传图片后重试。<button id="retry-save">重试保存</button></div>
       <main id="main-content" class="main-content" tabindex="-1"></main>
-      <footer class="app-footer"><span>从一个声音，到另一种相遇。</span><span>MUSIC MAP × SPACE <i aria-hidden="true">/</i> <span data-footer-status>本地记录保存在当前浏览器</span></span></footer>
     </div>
     <nav class="mobile-nav" aria-label="手机导航">${navItems()}</nav>
     <dialog id="about-dialog" class="about-dialog" aria-labelledby="about-title">
-      <div class="about-top"><span class="eyebrow">MUSIC, WITH PEOPLE.</span><button class="icon-button" id="close-about" aria-label="关闭演示说明">${icon('x')}</button></div>
-      <h2 id="about-title">顺着声音，<br><em>找到彼此。</em></h2>
-      <p>顺着真实合作发现音乐。散场以后，用另一个人的视角，补完整你记住的那一刻。</p>
-      <div class="about-path" aria-label="选择体验入口">
-        <button data-nav="explore"><span>01</span><div><b>发现一首合作</b><small>顺着有来源的合作作品探索，到官方页面听歌。</small></div>${icon('arrow-right')}</button>
-        <button data-nav="space"><span>02</span><div><b>先体验一次换卡</b><small>用示例角色走过制卡、同意与留下记忆。</small></div>${icon('arrow-right')}</button>
-        <button data-nav="live"><span>03</span><div><b>邀请朋友同场</b><small>命名你们的场次，用自己的照片留下不同视角。</small></div>${icon('arrow-right')}</button>
-      </div>
-      <div class="about-facts"><p><b>先体验，再邀请</b><span>本地情景演示可切换 Lin 与阿遥，体验申请、接受与拒绝。也可以通过邀请码进入真实双人房间，由各自设备操作；联网体验需要可用的共享服务。</span></p><p><b>两种体验，清楚区分</b><span>本地记录保存在当前浏览器；联网卡默认私藏，主动展示后才供房间成员查看。真实合作精选提供官方外链；本地情景的虚构艺人、场次与生成配图用于说明体验，不代表真实到场。</span></p></div>
-      <button class="button button--primary" id="start-experience">继续体验 ${icon('arrow-right')}</button>
+      <div class="about-top"><h2 id="about-title">Music Map × Space</h2><button class="icon-button" id="close-about" aria-label="关闭关于">${icon('x')}</button></div>
+      <div class="about-facts"><p><b>探索</b><span>顺着合作作品发现音乐，来源与试听见作品链接。</span></p><p><b>同场</b><span>邀请朋友交换现场照片。卡片默认私藏，双方同意后生成双联。</span></p><p><b>示例</b><span>Lin 与阿遥为本地演示角色，场次和配图为虚构。示例记录与房间身份保存在当前浏览器；清除网站数据后，身份无法找回。</span></p></div>
+      <button class="button button--primary" id="start-experience">知道了</button>
     </dialog>`;
   root.addEventListener('click', event => {
     const item = event.target.closest('[data-nav]');
@@ -185,7 +173,7 @@ function render() {
     const cardCount = state.space.records[state.actor].length;
     const routeCount = state.map.sessions.length;
     const filters = [['all', '全部', cardCount + routeCount], ['space', '现场记忆', cardCount], ['map', '音乐探索', routeCount]];
-    container.innerHTML = `<div class="records-page"><header class="records-heading"><div><span class="eyebrow">KEPT, NOT FORGOTTEN.</span><h1>把喜欢的，<br><em>好好留下。</em></h1><p class="muted">音乐把你带向远处，记忆把这一晚留下。</p></div><div class="records-tally" aria-label="本机记录数量"><span><b>${String(cardCount).padStart(2, '0')}</b> 张现场记忆</span><i aria-hidden="true">/</i><span><b>${String(routeCount).padStart(2, '0')}</b> 段音乐探索</span></div></header><section class="records-live-link" aria-label="联网房间记忆"><span class="records-live-symbol" aria-hidden="true">${icon('users')}</span><div><h2>和朋友交换的，留在同场房间。</h2><p>用创建房间时的浏览器回去，继续查看和下载共同记忆。</p></div><button class="button button--quiet" data-nav="live">回到房间 ${icon('arrow-up-right')}</button></section><div class="records-filters" role="group" aria-label="筛选本机记录">${filters.map(([value, label, count]) => `<button data-records-filter="${value}" aria-pressed="${recordsFilter === value}">${label}<span>${count}</span></button>`).join('')}</div><p class="records-scope">${icon('bookmark')} 以下为 ${actors[state.actor]} 的本地情景记忆与本机探索记录</p><div id="space-records" ${recordsFilter === 'map' ? 'hidden' : ''}></div><div id="map-records" ${recordsFilter === 'space' ? 'hidden' : ''}></div></div>`;
+    container.innerHTML = `<div class="records-page"><header class="records-heading"><h1>我的记录</h1><button class="button button--secondary" data-nav="live">房间记忆 ${icon('arrow-up-right')}</button></header><div class="records-filters" role="group" aria-label="筛选本机记录">${filters.map(([value, label, count]) => `<button data-records-filter="${value}" aria-pressed="${recordsFilter === value}">${label}<span>${count}</span></button>`).join('')}</div><p class="records-scope">${icon('bookmark')} ${actors[state.actor]} 的示例记忆 · 本机探索</p><div id="space-records" ${recordsFilter === 'map' ? 'hidden' : ''}></div><div id="map-records" ${recordsFilter === 'space' ? 'hidden' : ''}></div></div>`;
     const spaceCleanup = mountSpaceRecords(container.querySelector('#space-records'), api);
     const mapCleanup = mountMapRecords(container.querySelector('#map-records'), api);
     cleanup = () => { spaceCleanup?.(); mapCleanup?.(); };
@@ -205,3 +193,8 @@ window.addEventListener('popstate', () => {
 shell();
 mountThemes();
 render();
+// Keep window scrolling and focus navigation native; only replace its chrome.
+OverlayScrollbars(document.body, {
+  overflow: { x: 'hidden', y: 'scroll' },
+  scrollbars: { theme: 'os-theme-music', autoHide: 'scroll', autoHideDelay: 650, dragScroll: true, clickScroll: false },
+});

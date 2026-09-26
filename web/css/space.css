@@ -2414,3 +2414,93 @@
   .sp-editor .sp-field select { font-size: 16px; }
   .sp-dialog__footer--wrap [data-view-memory] { margin-left: 0; }
 }
+
+/* Home is an invitation; the local card exchange is a separate workspace. */
+.space-page--home { padding-bottom: 0; }
+.space-page--home .sp-hero { margin-bottom: 0; }
+.space-page--home .sp-hero__demo { flex-direction: row; align-items: center; gap: 10px; padding: 10px 0; }
+.space-page--home .sp-hero__event { border-top: 0; padding-top: 0; pointer-events: none; }
+.space-page--home .sp-hero__second { padding-bottom: 6px; }
+
+.space-page--demo { width: min(100%, 1020px); padding-bottom: 16px; }
+.sp-demo-header { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding-bottom: 20px; border-bottom: 1px solid var(--sp-line); }
+.sp-demo-header__title { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.sp-demo-header__title > .icon-button { border: 1px solid var(--sp-line); color: var(--sp-text); }
+.sp-demo-header h1 { display: flex; align-items: center; gap: 11px; margin: 0; color: var(--sp-text); font-size: clamp(23px, 2.6vw, 30px); font-weight: 750; line-height: 1.3; letter-spacing: -.045em; }
+.sp-demo-header h1 > span { padding: 3px 7px; border: 1px solid var(--sp-line); color: var(--sp-muted); font-size: 11px; font-weight: 500; letter-spacing: 0; }
+.sp-demo-header p { margin: 6px 0 0; color: var(--sp-muted); font-size: 12px; line-height: 1.5; }
+.sp-demo-header > .button { flex-shrink: 0; }
+.space-page--demo .sp-demo-bar { padding: 16px 0; margin-bottom: 0; gap: 12px; }
+.space-page--demo .sp-demo-bar__description div { display: flex; align-items: center; gap: 10px; }
+.space-page--demo .sp-demo-bar__description div > span { margin: 0; }
+.space-page--demo .sp-perspectives__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 32px; }
+.space-page--demo .sp-perspective--mine { padding-top: 0; }
+.space-page--demo .sp-person-heading { min-height: 50px; margin-bottom: 14px; }
+.space-page--demo .sp-person-heading strong { font-size: 14px; }
+.space-page--demo .sp-ticket__photo { aspect-ratio: 1.9; }
+.space-page--demo .sp-ticket__paper { padding: 17px 24px 0; }
+.space-page--demo .sp-ticket__caption { min-height: 0; margin: 14px 0 10px; font-size: clamp(18px, 1.8vw, 21px); line-height: 1.6; }
+.space-page--demo .sp-ticket__stub { min-height: 52px; margin-top: 15px; }
+.space-page--demo .sp-ticket__image-top { font-size: 10px; }
+.space-page--demo .sp-create-card { align-items: center; justify-content: center; min-height: 350px; padding: 28px; text-align: center; border-color: var(--sp-line); background: var(--sp-panel); }
+.space-page--demo .sp-create-card__frame { position: static; justify-content: center; margin: 0 0 22px; color: var(--sp-mint); }
+.space-page--demo .sp-create-card__frame svg { width: 38px; height: 38px; }
+.space-page--demo .sp-create-card__copy { margin: 0; }
+.space-page--demo .sp-create-card h2 { margin: 0 0 24px; color: var(--sp-text); font-size: 25px; font-weight: 650; letter-spacing: -.04em; }
+.space-page--demo .sp-create-card__note { margin: 17px 0 0; padding: 0; border: 0; color: var(--sp-muted); font-size: 12px; }
+.space-page--demo .sp-hidden-card { min-height: 350px; border-color: var(--sp-line); }
+.space-page--demo .sp-hidden-card h2 { margin: 17px 0 24px; color: var(--sp-text); font-size: 21px; font-weight: 600; }
+.space-page--demo .sp-exchange-notice { flex-wrap: wrap; gap: 13px; margin: 3px 0 12px; padding: 15px 18px; }
+.space-page--demo .sp-exchange-notice h2 { margin: 0; font-size: 17px; line-height: 1.5; }
+.space-page--demo .sp-exchange-notice__icon { width: 32px; height: 32px; }
+.space-page--demo .sp-exchange-notice__actions { padding-left: 0; }
+.space-page--demo .sp-exchange-notice--accepted > .button { margin-left: auto; }
+.space-page--demo .sp-quiet-notice { margin: 0 0 12px; }
+.sp-demo-card-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 13px; }
+.sp-demo-card-actions .sp-reaction-row { flex: 1 0 auto; width: auto; margin: 0; gap: 8px; }
+.sp-demo-card-actions .sp-reaction-button { min-height: 44px; padding: 10px 12px; font-size: 12px; }
+.sp-demo-card-actions .sp-request-button { flex: 0 1 auto; width: auto; min-height: 44px; margin: 0; padding: 10px 14px; font-size: 13px; }
+.space-page--demo .sp-shared-moment { margin-top: 15px; font-size: 12px; }
+.sp-demo-footer { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 24px; padding-top: 12px; border-top: 1px solid var(--sp-line); color: var(--sp-muted); font-size: 12px; }
+.sp-demo-footer > div { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px 20px; }
+.sp-demo-footer .sp-text-link { color: var(--sp-muted); }
+.sp-dialog { scrollbar-width: thin; scrollbar-color: var(--sp-muted) transparent; }
+.sp-dialog::-webkit-scrollbar { width: 6px; height: 6px; }
+.sp-dialog::-webkit-scrollbar-track { background: transparent; }
+.sp-dialog::-webkit-scrollbar-thumb { border: 1px solid transparent; border-radius: 9px; background: var(--sp-muted); background-clip: padding-box; }
+
+@media (max-width: 700px) {
+  .space-page--demo { padding-bottom: 4px; }
+  .sp-demo-header { align-items: center; gap: 8px; padding-bottom: 16px; }
+  .sp-demo-header__title { gap: 9px; }
+  .sp-demo-header h1 { gap: 7px; font-size: 22px; }
+  .sp-demo-header h1 > span { font-size: 10px; padding: 2px 5px; }
+  .sp-demo-header p { font-size: 10px; }
+  .sp-demo-header > .button { gap: 6px; padding-inline: 0; font-size: 12px; }
+  .sp-demo-header > .button svg { display: none; }
+  .space-page--demo .sp-demo-bar { flex-wrap: wrap; gap: 9px; }
+  .space-page--demo .sp-demo-bar__description { flex: 1 0 100%; }
+  .space-page--demo .sp-actor-switch { flex: 1; }
+  .space-page--demo .sp-actor-button { flex: 1; justify-content: center; }
+  .space-page--demo .sp-perspectives__grid { grid-template-columns: 1fr; gap: 20px; }
+  .space-page--demo .sp-person-heading { margin-bottom: 12px; min-height: 46px; }
+  .space-page--demo .sp-ticket__photo { aspect-ratio: 1.75; }
+  .space-page--demo .sp-ticket__paper { padding: 17px 22px 0; }
+  .space-page--demo .sp-ticket__caption { font-size: 20px; }
+  .space-page--demo .sp-create-card { min-height: 215px; padding: 25px; }
+  .space-page--demo .sp-create-card__frame { margin-bottom: 12px; }
+  .space-page--demo .sp-create-card__frame svg { width: 28px; height: 28px; }
+  .space-page--demo .sp-create-card h2 { font-size: 22px; margin-bottom: 17px; }
+  .space-page--demo .sp-hidden-card { min-height: 230px; }
+  .space-page--demo .sp-exchange-notice { padding: 14px; gap: 10px; }
+  .space-page--demo .sp-exchange-notice h2 { font-size: 16px; }
+  .space-page--demo .sp-exchange-notice__actions { width: 100%; gap: 8px; }
+  .space-page--demo .sp-exchange-notice--accepted > .button { width: 100%; margin: 0; }
+  .sp-demo-footer { align-items: start; margin-top: 20px; }
+  .sp-demo-footer > span { white-space: nowrap; padding-block: 14px; font-size: 11px; }
+  .sp-demo-footer > div { gap: 0; flex-direction: column; align-items: flex-end; }
+  .sp-demo-card-actions { gap: 8px; }
+  .sp-demo-card-actions .sp-reaction-row { gap: 6px; }
+  .sp-demo-card-actions .sp-reaction-button { padding-inline: 9px; }
+  .sp-demo-card-actions .sp-request-button { padding-inline: 12px; }
+}

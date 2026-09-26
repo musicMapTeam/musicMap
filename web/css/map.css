@@ -636,3 +636,114 @@
   .map-track__actions { gap: 4px; }
   .map-discovery .map-evidence-link { font-size: 11px; }
 }
+
+/* The graph is the workspace. Theme materials remain; introductory copy recedes. */
+.map-experience.map-experience--compact .map-heading--compact {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 0 5px;
+  padding: 0;
+  border: 0;
+}
+.map-experience.map-experience--compact .map-heading h1 {
+  display: block;
+  margin: 0;
+  font-size: clamp(27px, 2.5vw, 34px);
+  line-height: 1.25;
+  letter-spacing: -.04em;
+}
+.map-experience.map-experience--compact .map-heading__aside { max-width: none; padding: 0; border: 0; }
+.map-experience.map-experience--compact .map-heading__actions { flex-direction: row; flex-wrap: wrap; justify-content: flex-end; gap: 4px; }
+.map-experience.map-experience--compact .map-heading__actions .button { min-height: 44px; padding: 8px 12px; font-size: 13px; }
+.map-experience.map-experience--compact .map-catalogue { flex-direction: row; align-items: center; gap: 16px; margin-bottom: 9px; }
+.map-experience.map-experience--compact .map-catalogue__switch { gap: 20px; }
+.map-experience.map-experience--compact .map-catalogue__switch button { padding: 8px 2px; font-size: 13px; }
+.map-experience.map-experience--compact .map-catalogue p { font-size: 11px; }
+.map-experience.map-experience--compact .map-workspace { grid-template-columns: minmax(0, 1fr) 286px; }
+.map-experience.map-experience--compact .map-stage-top { min-height: 48px; padding: 2px 18px 0; flex-wrap: nowrap; gap: 8px; }
+.map-experience.map-experience--compact .map-stage-tools { display: flex; align-items: center; gap: 2px; }
+.map-experience.map-experience--compact .map-stage-tools .button { min-height: 44px; padding: 8px 10px; font-size: 12px; }
+.map-experience.map-experience--compact .map-stage-tools .icon-button { width: 44px; height: 44px; }
+.map-experience.map-experience--compact .map-mode-switch { gap: 18px; }
+.map-experience.map-experience--compact .map-mode-switch button { min-height: 44px; font-size: 12px; }
+.map-experience.map-experience--compact .map-discovery { flex-direction: row; align-items: center; gap: 12px; min-height: 44px; margin: 0 18px; padding: 0 8px 0 12px; }
+.map-experience.map-experience--compact .map-discovery p { display: flex; flex-wrap: wrap; column-gap: 10px; font-size: 13px; line-height: 1.6; }
+.map-experience.map-experience--compact .map-discovery__artists { color: var(--map-muted); font-size: 11px; }
+.map-experience.map-experience--compact .map-discovery__actions { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 2px; }
+.map-experience.map-experience--compact .map-discovery__actions .button { padding: 7px 8px; font-size: 12px; }
+.map-experience.map-experience--compact .map-stage { height: clamp(360px, calc(100dvh - 390px), 480px); }
+.map-experience.map-experience--compact .map-route-bar { min-height: 56px; margin-inline: 18px; padding: 4px 0; gap: 10px; }
+.map-experience.map-experience--compact .map-route-trail { padding-block: 7px; font-size: 12px; }
+.map-experience.map-experience--compact .map-route-bar > .button { min-height: 44px; font-size: 12px; }
+.map-experience.map-experience--compact .map-artist-panel { min-width: 0; display: block; padding: 20px 18px 12px; }
+.map-experience.map-experience--compact .map-artist-panel h2 { margin: 0; font-size: 28px; line-height: 1.3; }
+.map-experience.map-experience--compact .map-artist-mark { width: 26px; height: 26px; flex-shrink: 0; }
+.map-experience.map-experience--compact .map-section-label { margin: 18px 0 5px; }
+.map-experience.map-experience--compact .map-section-label h3 { font-size: 12px; }
+.map-experience.map-experience--compact .map-track { gap: 8px; min-height: 58px; padding: 8px 0; }
+.map-experience.map-experience--compact .map-track__copy strong { font-size: 14px; }
+.map-experience.map-experience--compact .map-track__copy span { margin-top: 3px; font-size: 11px; line-height: 1.5; }
+.map-experience.map-experience--compact .map-track__index { font-size: 10px; }
+.map-experience.map-experience--compact .map-connections { margin-top: 15px; border-top: 1px solid var(--map-line); }
+.map-experience.map-experience--compact .map-connections > summary { display: flex; align-items: center; gap: 8px; min-height: 48px; padding: 8px 0; color: var(--map-ink); font-size: 12px; cursor: pointer; list-style: none; }
+.map-experience.map-experience--compact .map-connections > summary::-webkit-details-marker { display: none; }
+.map-experience.map-experience--compact .map-connections > summary::after { content: '+'; margin-left: auto; color: var(--map-muted); font-size: 19px; line-height: 1; }
+.map-experience.map-experience--compact .map-connections[open] > summary::after { content: '−'; }
+.map-experience.map-experience--compact .map-connections > summary > span { color: var(--map-muted); font-variant-numeric: tabular-nums; }
+.map-experience.map-experience--compact .map-connections > summary:focus-visible { outline: 2px solid var(--map-sea); outline-offset: 3px; }
+.map-experience.map-experience--compact .map-neighbor-list { grid-template-columns: 1fr; gap: 2px; }
+.map-experience.map-experience--compact .map-neighbor { min-height: 52px; }
+.map-experience.map-experience--compact .map-neighbor strong { font-size: 13px; }
+.map-experience.map-experience--compact .map-neighbor small { font-size: 11px; }
+.map-experience.map-experience--compact .map-foot { flex-direction: row; align-items: center; gap: 8px; padding: 5px 0 0; }
+.map-experience.map-experience--compact .map-foot > div { align-self: auto; }
+.map-experience.map-experience--compact .map-foot .button { min-height: 44px; padding: 8px 0; font-size: 12px; }
+.map-experience.map-experience--compact .map-space-link { display: inline-flex; align-items: center; gap: 7px; }
+.map-experience.map-experience--compact .map-challenge-banner { margin-bottom: 9px; padding: 5px 15px; gap: 12px; }
+.map-experience.map-experience--compact .map-challenge-banner > div { gap: 10px; }
+.map-experience.map-experience--compact .map-challenge-banner strong { font-size: 14px; }
+.map-experience.map-experience--compact .map-challenge-banner b { font-size: 20px; }
+.map-experience.map-experience--compact .map-challenge-banner .button { min-height: 44px; }
+.map-experience.map-experience--compact .map-dialog h2,
+.map-records .map-dialog h2 { font-size: 28px; line-height: 1.4; margin: 8px 0 14px; }
+.map-experience.map-experience--compact .map-dialog__top { height: 54px; }
+.map-experience.map-experience--compact .map-panel-description { margin-bottom: 18px; line-height: 1.7; }
+.map-experience.map-experience--compact .map-recap-stats { margin: 18px 0 24px; }
+.map-records .map-records-heading h2 { margin: 0; font-size: 26px; }
+.map-records .map-record { padding-block: 18px; }
+
+@media (max-width: 1100px) and (min-width: 961px) {
+  .map-experience.map-experience--compact .map-workspace { grid-template-columns: minmax(0, 1fr) 264px; }
+  .map-experience.map-experience--compact .map-artist-panel { padding-inline: 14px; }
+}
+@media (max-width: 960px) {
+  .map-experience.map-experience--compact .map-workspace { grid-template-columns: minmax(0, 1fr); }
+  .map-experience.map-experience--compact .map-stage { height: clamp(360px, 48vw, 460px); }
+  .map-experience.map-experience--compact .map-artist-panel { border-left: 0; border-top: 1px solid var(--map-line); padding: 18px; }
+  .map-experience.map-experience--compact .map-neighbor-list { grid-template-columns: 1fr 1fr; column-gap: 24px; }
+}
+@media (max-width: 600px) {
+  .map-experience.map-experience--compact .map-heading--compact { flex-wrap: wrap; gap: 4px 12px; }
+  .map-experience.map-experience--compact .map-heading h1 { font-size: 27px; }
+  .map-experience.map-experience--compact .map-heading__actions { gap: 0; }
+  .map-experience.map-experience--compact .map-heading__actions .button { padding-inline: 8px; font-size: 12px; }
+  .map-experience.map-experience--compact .map-catalogue { flex-wrap: wrap; gap: 0 12px; }
+  .map-experience.map-experience--compact .map-catalogue__switch { gap: 17px; }
+  .map-experience.map-experience--compact .map-catalogue p { font-size: 10px; }
+  .map-experience.map-experience--compact .map-stage-top { padding-inline: 12px; }
+  .map-experience.map-experience--compact .map-discovery { flex-wrap: wrap; gap: 0 9px; margin-inline: 12px; padding-block: 2px; }
+  .map-experience.map-experience--compact .map-discovery p { font-size: 12px; }
+  .map-experience.map-experience--compact .map-discovery__actions { margin-left: auto; }
+  .map-experience.map-experience--compact .map-stage { height: 360px; }
+  .map-experience.map-experience--compact .map-route-bar { flex-wrap: wrap; margin-inline: 12px; gap: 4px 8px; }
+  .map-experience.map-experience--compact .map-route-trail { flex-basis: calc(100% - 110px); }
+  .map-experience.map-experience--compact .map-route-bar > .button { margin-left: auto; }
+  .map-experience.map-experience--compact .map-foot { flex-wrap: wrap; column-gap: 16px; }
+  .map-experience.map-experience--compact .map-space-link { margin-left: auto; }
+  .map-experience.map-experience--compact .map-neighbor-list { grid-template-columns: 1fr; }
+  .map-experience.map-experience--compact .map-dialog h2,
+  .map-records .map-dialog h2 { font-size: 25px; }
+}
