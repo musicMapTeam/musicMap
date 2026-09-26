@@ -13,14 +13,18 @@ import '../css/map-studio.css';
 import '../css/map-credits.css';
 import '../css/spatial-world.css';
 import '../css/open-catalogue.css';
+import '../css/library.css';
+import '../css/product-finish.css';
 import { OverlayScrollbars } from 'overlayscrollbars';
 import { mountThemes } from './themes.js';
 import { icon } from './icons.js';
 import { createMapState, mountMap, mountMapRecords } from './map.js';
 import { createSpaceState, mountSpace, mountSpaceRecords } from './space.js';
+import { mountHome } from './home.js';
+import { mountLiveLibrary } from './live-library.js';
 import { mountLive } from './live.js';
 import { mountMotion } from './motion.js';
-import { mountOpenCatalogue } from './open-catalogue.js';
+import { mountOpenCatalogue, mountSavedMusic } from './open-catalogue.js';
 
 const STORAGE_KEY = 'music-map-space:v1';
 const views = ['explore', 'space', 'records', 'live'];
@@ -30,7 +34,7 @@ const toastElement = document.querySelector('#toast');
 let toastTimer;
 let cleanup;
 let saveFailed = false;
-let recordsFilter = 'all';
+let recordsFilter = 'live';
 let themeController;
 let motion;
 let spatialContext = {};
@@ -80,6 +84,7 @@ function update(mutator) {
 
 function navigate(view, payload = null) {
   if (!views.includes(view)) return;
+  if (view === 'records' && !payload) recordsFilter = 'live';
   spatialActionVersion++;
   if (view === 'space' && payload?.intent === 'create-room') view = 'live';
   state.view = view;
@@ -110,7 +115,7 @@ async function onSpatialAction(action) {
   const version = ++spatialActionVersion;
   if (action.type === 'navigate') { navigate(action.view, action.view === 'space' ? { home: true } : null); return; }
   if (action.type === 'editor') {
-    if (!spatialContext.onEdit) { navigate('space', { editCard: true }); return; }
+    if (!spatialContext.onEdit) { navigate('live', { intent: 'make-card' }); return; }
     const arrived = await themeController.focus('editor');
     if (arrived && version === spatialActionVersion) spatialContext.onEdit?.();
   }
@@ -182,6 +187,7 @@ function shell() {
     const filter = event.target.closest('[data-records-filter]');
     if (filter) {
       recordsFilter = filter.dataset.recordsFilter;
+      state.routePayload = null;
       render();
       document.querySelector(`[data-records-filter="${recordsFilter}"]`)?.focus({ preventScroll: true });
     }
@@ -209,19 +215,27 @@ function render() {
   document.body.dataset.spatialSection = state.view === 'space' ? 'home' : state.view;
   themeController?.setView(state.view);
   if (state.view === 'explore') cleanup = mountMap(container, api);
-  if (state.view === 'space') cleanup = mountSpace(container, api);
+  if (state.view === 'space') {
+    const payload = state.routePayload;
+    const isDemo = payload && !payload.home && (payload.showDemo || payload.editCard || payload.requestTarget || payload.exchangeId || payload.cardSaved || payload.previewCardId || payload.eventId);
+    cleanup = isDemo ? mountSpace(container, api) : mountHome(container, api);
+  }
   if (state.view === 'live') cleanup = mountLive(container, api);
   if (state.view === 'records') {
-    if (state.routePayload?.spaceRecordId) recordsFilter = 'space';
-    const cardCount = state.space.records[state.actor].length;
-    const routeCount = state.map.sessions.length;
-    const filters = [['all', '全部', cardCount + routeCount], ['space', '现场记忆', cardCount], ['map', '音乐探索', routeCount]];
-    container.innerHTML = `<div class="records-page"><header class="records-heading"><h1>我的记录</h1><button class="button button--secondary" data-nav="live">房间记忆 ${icon('arrow-up-right')}</button></header><div class="records-filters" role="group" aria-label="筛选本机记录">${filters.map(([value, label, count]) => `<button data-records-filter="${value}" aria-pressed="${recordsFilter === value}">${label}<span>${count}</span></button>`).join('')}</div><p class="records-scope">${icon('bookmark')} ${actors[state.actor]} 的示例记忆 · 本机探索</p><div id="space-records" ${recordsFilter === 'map' ? 'hidden' : ''}></div><div id="map-records" ${recordsFilter === 'space' ? 'hidden' : ''}></div></div>`;
-    const spaceCleanup = mountSpaceRecords(container.querySelector('#space-records'), api);
-    const mapCleanup = mountMapRecords(container.querySelector('#map-records'), api);
-    cleanup = () => { spaceCleanup?.(); mapCleanup?.(); };
+    if (state.routePayload?.spaceRecordId) recordsFilter = 'demo';
+    else if (state.routePayload?.libraryItemId || state.routePayload?.section === 'live') recordsFilter = 'live';
+    else if (state.routePayload?.section === 'music') recordsFilter = 'music';
+    const filters = [['live', '我的现场'], ['music', '音乐收藏'], ['map', '探索路线'], ['demo', '示例']];
+    container.innerHTML = `<div class="records-page collection-page"><header class="records-heading"><h1>我的记录</h1><button class="button button--secondary" data-collection-make>${icon('plus')}记录现场</button></header><div class="records-filters" role="group" aria-label="记录分类">${filters.map(([value, label]) => `<button data-records-filter="${value}" aria-pressed="${recordsFilter === value}">${label}</button>`).join('')}</div><div id="collection-content"></div></div>`;
+    const content = container.querySelector('#collection-content');
+    if (recordsFilter === 'live') cleanup = mountLiveLibrary(content, api);
+    if (recordsFilter === 'music') cleanup = mountSavedMusic(content, api);
+    if (recordsFilter === 'map') cleanup = mountMapRecords(content, api);
+    if (recordsFilter === 'demo') cleanup = mountSpaceRecords(content, api);
+    container.querySelector('[data-collection-make]').onclick = () => navigate('live', { intent: 'make-card' });
   }
   updateChrome();
+  container.scrollTop = 0;
   motion?.enter(container, state.view);
 }
 
@@ -239,7 +253,7 @@ themeController = mountThemes({ onAction: onSpatialAction, view: state.view,
   onShot(key, id, travelling) { document.body.dataset.spatialShot = key; document.body.toggleAttribute('data-spatial-travelling', travelling); },
 });
 motion = mountMotion();
-mountOpenCatalogue();
+mountOpenCatalogue(api);
 render();
 // Keep window scrolling and focus navigation native; only replace its chrome.
 OverlayScrollbars(document.body, {

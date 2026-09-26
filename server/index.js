@@ -234,6 +234,35 @@ async function api(request, response, path) {
     return json(response, 200, { user, rooms });
   }
 
+  if (method === 'GET' && path === '/library') {
+    const joinedRooms = all(`SELECT r.* FROM rooms r JOIN room_members m ON m.room_id = r.id
+      WHERE m.user_id = ? ORDER BY m.joined_at DESC`, user.id);
+    const joinedIds = new Set(joinedRooms.map(room => room.id));
+    const ownCards = all(`SELECT c.*, u.name AS owner_name FROM cards c JOIN users u ON u.id = c.owner_id
+      WHERE c.owner_id = ? ORDER BY c.updated_at DESC, c.id`, user.id);
+    const ownRecords = all('SELECT * FROM records WHERE owner_id = ? ORDER BY created_at DESC, id', user.id);
+    const sourceRooms = new Map(all(`SELECT * FROM rooms WHERE id IN (
+      SELECT room_id FROM cards WHERE owner_id = ? UNION SELECT room_id FROM records WHERE owner_id = ?
+    )`, user.id, user.id).map(room => [room.id, room]));
+    const context = roomId => {
+      const room = sourceRooms.get(roomId);
+      return { roomId, roomCode: room.code, roomTitle: room.title, joined: joinedIds.has(roomId) };
+    };
+    const cards = ownCards.map(card => ({ ...cardJSON(card, sourceRooms.get(card.room_id)), ...context(card.room_id) }));
+    const records = ownRecords.map(record => ({
+      id: record.id, kind: 'exchange', exchangeId: record.exchange_id, title: record.title,
+      fromCard: JSON.parse(record.from_card), toCard: JSON.parse(record.to_card), createdAt: record.created_at,
+      ...context(record.room_id),
+    }));
+    return json(response, 200, { me: user, rooms: joinedRooms.map(roomSummary), cards, records });
+  }
+
+  const libraryRecordRoute = /^\/library\/records\/([a-f0-9-]{36})$/.exec(path);
+  if (method === 'DELETE' && libraryRecordRoute) {
+    run('DELETE FROM records WHERE id = ? AND owner_id = ?', libraryRecordRoute[1], user.id);
+    return json(response, 200, { ok: true });
+  }
+
   const photoRoute = /^\/photos\/([a-f0-9-]{36})$/.exec(path);
   if (method === 'GET' && photoRoute) {
     const photo = get('SELECT id, room_id, owner_id, mime FROM photos WHERE id = ?', photoRoute[1]);

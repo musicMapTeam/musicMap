@@ -1,6 +1,6 @@
 # 实施与演示规格
 
-版本：1.9 · 2026-09-27，对应应用 MVP 0.8.0。产品范围见[产品方案](01-product-plan.md)，比赛交付见[交付方案](02-delivery-plan.md)。本轮将樱下放映扩为常驻全屏小院，连接授权卡片、工作桌和店内收藏，增加照片近景与独立手机机位；既有 Node + SQLite 业务保持，没有新增后端变更。整合、构建、画面与同步待[项目状态](../../docs/PROJECT_STATUS.md)记录；第 8 节旧证据保留原版本。
+版本：2.0 · 2026-09-27，对应应用 MVP 0.9.0。产品范围见[产品方案](01-product-plan.md)，比赛交付见[交付方案](02-delivery-plan.md)。本轮连接本人主页、跨场次现场收藏和独立音乐收藏，新增本人收藏读删接口，沿用照片权限与数据库结构。本机构建与关键路径实操已完成，范围及打包、CI、同步状态见[项目状态](../../docs/PROJECT_STATUS.md)；第 8 节旧证据保留原版本。
 
 ## 1. 技术决定
 
@@ -12,21 +12,23 @@
 | 滚动 | OverlayScrollbars 2.16.0 增强 body，自动隐藏的 6px 浮动条；弹窗使用原生细条 | 保留浏览器滚动与键盘导航；仅前端依赖 |
 | 内容 | 11 位艺人、10 首作品、10 条共同演唱关系与逐人制作署名；独立 HF 开放曲库 120 首；保留虚构示例及两张 AI 生成图 | 共同署名不推断制作工种；试听链接撤下，QQ 同版本直达待核；不内置音频 |
 | 本地情景状态 | localStorage `music-map-space:v1`，两个示例角色 | 仅当前浏览器；可选本机照片，不上传服务 |
+| 音乐收藏 | localStorage `music-map-saved-music:v1`，真实精选与 HF 作品 | 独立于探索路线，仅当前浏览器；保留来源和数据集 |
 | 联网身份 | 匿名 bearer 凭据，浏览器保存于 `music-map-live:v1` | 不是手机号账号，无找回与跨设备身份迁移 |
+| 个人现场收藏 | 受身份保护的 `/api/live/library`，本人跨场次当前卡与已保存双联 | 离场后仍可读；删除接口仅删本人双联，不公开他人私卡 |
 | 共享服务 | Node.js 24+，内置 HTTP 与 `node:sqlite` 的 DatabaseSync；无运行时 npm 依赖 | 同源 `/api/live`，服务端校验成员和操作权限 |
 | 二维码 | 浏览器打包 `qrcode-generator` 2.0.4，现场生成邀请链接二维码 | 不调用外部二维码服务；前端依赖与无 npm 依赖的后端分别说明 |
 | 数据库 | SQLite，默认 `data/music-map.sqlite`，事务与 WAL；用户照片存独立表的 BLOB | 单实例 + 持久磁盘；图片不写入公开目录，`data/` 和数据库 sidecars 不提交 |
 | 输出 | 单个 `dist/index.html`；联网服务同时提供它和 API；浏览器绘制主题单卡 / 双联 PNG | 具体构建与导出检查见项目状态；只托管 HTML 可跑 Map 和本地演示，不能运行后端 |
 
-源码分工：外壳 `web/js/app.js`、Map `map.js` / `map-data.js` / `map-catalogue.js`、开放曲库 `open-catalogue.js`、本地 Space `space.js`、联网房间 `live.js`、照片 `live-photo.js`、票根 `ticket-export.js`、界面动画 `motion.js`；服务入口 `server/index.js`，数据库 `server/db.js`。使用 hash 路由，依赖由锁文件固定。Three 场景随功能切换镜头，HTML 层负责输入与业务操作；OverlayScrollbars 调整滚动条呈现。没有引入 React、测试框架或推理模型。
+源码分工：外壳 `web/js/app.js`、本人主页 `home.js`、Map `map.js` / `map-data.js` / `map-catalogue.js`、开放曲库 `open-catalogue.js`、音乐收藏 `music-library.js`、本地示例 `space.js`、联网房间 `live.js`、现场收藏 `live-library.js`、照片 `live-photo.js`、票根 `ticket-export.js`、界面动画 `motion.js`；服务入口 `server/index.js`，数据库 `server/db.js`。使用 hash 路由，依赖由锁文件固定。Three 场景随功能切换镜头，HTML 层负责输入与业务操作；OverlayScrollbars 调整滚动条呈现。没有引入 React、测试框架或推理模型。
 
-### 0.8 页面与滚动
+### 0.9 主页、记录与滚动
 
-- 外壳使用桌面悬浮左导轨、手机底部导航和右上角外观工具。`app-studio.css` 统一间距、颜色、圆角与操作层；不更换 hash 路由、存储键或业务状态。
-- 樱花首页由 `#sakura-world` 全屏小院承担主画面，其他主题保留照片卡叠。「做一张卡」或场景工作桌打开编辑器，「邀请朋友」进入联网房间；点照片打开预览，继续动作调用原编辑、请求或已有双联。未保存的本地 seed 保留明确示例标记。
-- `space.js` 的模块内 `showDemo` 只管理界面模式，不写入卡片或持久化业务数据。同页重绘保留模式；离开 Space 后重置。记录返回与 `eventId`、`requestTarget`、`exchangeId`、`cardSaved` 等业务 payload 直接进入相应示例状态；返回首页清除旧 payload。
+- 外壳使用桌面悬浮左导轨、手机底部导航和右上角外观工具。`app-studio.css` 统一间距、颜色、圆角与操作层；保留原 hash 路由和既有身份、示例、探索存储。
+- 普通首页由 `home.js` 读取本人现场收藏，展示最近的本人卡；没有卡时的预置内容注明示例。「记录我的现场」或工作桌进入真实制卡，「邀请朋友」进入当前房间邀请或入场流程。点本人卡进入真实收藏，点示例卡或「体验示例」进入本地情景。
+- `space.js` 保留显式本地双角色工作区及旧业务 payload；普通首页与示例不混用身份、计数或记录。樱花首页由 `#sakura-world` 全屏小院承担主画面，其他主题保留照片卡叠。
 - Map 使用 `.map-studio` 与 `map-studio.css`：首字彩色唱片节点、单条低对比轨道、真实关系线、作品短浮卡和底部路线。`map-credits.css` 呈现逐人署名，作品名与“谁做了什么”打开详情；各工种有独立来源。顶部“开放曲库”打开独立搜索弹窗，原邻居、挑战、路径与记录含义保持。试听链接撤下，不新增站内播放器。
-- 联网房间采用简洁入场卡与照片工作区；个人记录以收藏卡与筛选组织。私藏／展示、申请状态、双方同意、作品来源和 AI 预置图标记继续显示在相应操作处。
+- 「我的记录」默认「我的现场」，另有「音乐收藏」「探索路线」「示例」。现场收藏按本人卡片与双联浏览，详情可下载、继续场次或主动重入；个人收藏不批量发布到房间照片墙。联网房间保留照片工作区、私藏／展示和申请状态。
 - 外壳为 body 初始化 OverlayScrollbars 2.16.0，使用自动隐藏的 6px 浮动条；弹窗保持原生滚动与细条。样式随主题变化，不接管卡片、身份或交换数据。许可与来源见[第三方说明](../../THIRD_PARTY_NOTICES.md)。
 
 ### 外观模块与生命周期
@@ -43,6 +45,8 @@
 | `web/css/spatial-world.css` | 全屏樱花场景、当前功能的 HTML 操作层与手机构图 |
 | `web/js/motion.js` | GSAP 3.15.0 / Flip 驱动卡片和弹窗动画，三主题共用并支持减少动态 |
 | `web/js/open-catalogue.js` | HF 精选数据搜索与展示，和人工核实制作名单分开 |
+| `web/js/home.js` / `live-library.js` | 本人主页、跨场次现场收藏和授权照片展示 |
+| `web/js/music-library.js` | 独立本机音乐收藏；真实精选与 HF 作品的来源、保存和移除 |
 | `web/css/map-credits.css` | 作品按人合并工种、署名表与逐工种来源标记 |
 | `web/js/vendor/sakura/` | MIT `toon.js` / `post.js` / `palette.js`；cel 材质、彩色阴影、深度描线、调色与 FXAA；`SOURCE.json` 记录固定提交及适配 |
 | `web/js/ticket-export.js` | 按主题绘制单卡 / 双联 PNG，保留快照、照片和来源说明 |
@@ -51,7 +55,7 @@
 
 `themes.js` 在 `sakura` 主题下将场景挂到全屏壳层 `#sakura-world`，同一 scene / renderer 跨 hash 路由保留。基础机位是 `home` 小院、`explore` 唱片店、`live` 照片墙、`records` 店内收藏；`editor` 走近工作桌，`photo` 靠近选中的照片。手机使用单独机位。导航与照片拾取驱动透视相机和物件移动，新选择可打断旧转场；减少动态直接显示目标，切走主题销毁场景。小院与道具由本项目编写，渲染方法复用 Sakura Crossing MIT 源码，未复制其完整街区、人物、纹理原图或音频。
 
-场景业务接口为 `api.spatial.publish({mode,cards,onPhoto,onEdit})`、`focus(kind,id?)` 和 `restore()`。Space 发布 `home` / `exchange`，Live 发布 `live`；卡片含 `id/src/title/subtitle/alt/isDemo`，最多 6 张。自己的卡可私藏，同伴只发布当前展示卡；本地缺自卡可用明示未保存的 seed。Live 的照片 `src` 只取原 photo store 已加载的授权 blob，项目预置图保留示例标记，不把 `photoId` 转为公共网址。
+场景业务接口为 `api.spatial.publish({mode,cards,onPhoto,onEdit})`、`focus(kind,id?)` 和 `restore()`。本人主页发布 `home`，本地示例发布 `exchange`，Live 发布 `live`；卡片含 `id/src/title/subtitle/alt/isDemo`，最多 6 张。首页可展示本人私卡，同伴只发布当前展示卡；缺自卡时的本地 seed 明示示例。联网照片 `src` 只取 photo store 已加载的授权 blob，不把 `photoId` 转为公共网址。
 
 照片加载后重新发布，清缓存、退出或权限失效时先清空场景再释放 blob。场景点击复用现有预览、编辑器、指定两卡申请和双联；HTML 按钮使用相同 focus。弹窗关闭恢复基础机位，替换弹窗时延后恢复，避免抢新镜头。没有新增网络照片接口、交换状态或数据库表。
 
@@ -88,7 +92,7 @@ python scripts/datasets/download_hf_catalogue.py
 
 ### A. 保留的静态交付：本地情景演示
 
-首页点「做一张卡」或工作桌打开本地制卡；点照片先预览，再选择编辑或交换。流程使用一场预置活动与两个明确标识的示例角色 A / B；没有自卡时的 seed 仅作示例，用户保存后才进入自己的卡片状态。评委可以制卡、切换角色、发起申请、接受或拒绝、查看结果。两个角色仍在同一浏览器中模拟；示例区不常驻首页下方。
+首页点「体验示例」进入本地工作区，再制卡或点照片预览与交换。流程使用一场预置活动与两个明确标识的示例角色 A / B；没有自卡时的 seed 仅作示例，用户保存后才进入该角色的卡片状态。评委可以制卡、切换角色、发起申请、接受或拒绝、查看结果。两个角色仍在同一浏览器中模拟；示例区不常驻首页下方。
 
 - 视图标明“本地示例”，提供角色切换、重置与返回首页。
 - 角色 A 不能在 A 的操作区替 B 接受；切到 B 视角后才能执行 B 的操作，以讲清产品规则。
@@ -108,7 +112,7 @@ python scripts/datasets/download_hf_catalogue.py
 
 服务在接受操作的事务中为双方各自生成私有纪念记录，用户无需再点击保存。双联 PNG 从接受时的快照绘制；单卡 PNG 使用自己的当前卡，两者都在浏览器生成，不另建云文件存储或新的记录种类。卡片持久化、纪念记录生成、PNG 下载是不同动作。
 
-服务检查：调用者须为房内成员，只有指定接收者可接受 / 拒绝，只有发送者可取消。私人自卡可用于定向申请；其他成员不能因此读取它。切换到房间入口不会自动退会；显式退出会隐藏自卡、取消相关 pending 并删除成员关系。旧纪念记录保留，再凭邀请码加入后可读取自己的记录。
+房内操作要求调用者为成员，只有指定接收者可接受 / 拒绝，只有发送者可取消。私人自卡可用于定向申请；其他成员不能因此读取它。切换到房间入口不会自动退会；显式退出会隐藏自卡、取消相关 pending 并删除成员关系。本人卡片与双联保留，可直接从个人收藏读取；回到房内操作仍须主动加入。
 
 **照片读取权限：** 照片主人可读；同房成员可读当前正在展示的卡所引用的照片；pending / accepted 交换的双方或拥有引用该照片的个人记录者可读。拒绝 / 取消后，仅依赖该 pending 的共享权限失效。accepted 交换持续保留读取依据：删除自己的 record 不会删除对方记录，也不会撤销 accepted 交换的照片权限。已分享或下载的副本不能通过删除本人记录收回；当前没有清除全部历史照片的接口。退出后房间 API 仍需重新入会，已接受交换对照片的读取依据继续保留。
 
@@ -116,7 +120,17 @@ python scripts/datasets/download_hf_catalogue.py
 
 0.4 整合时已重启服务执行增列迁移，并读回旧森森 / 小舟匿名身份及原房间列表；这项历史结果说明当次保留的旧数据可读，不扩展成任意历史数据库迁移验证。
 
-前端空墙按成员数和自卡状态显示下一步。私卡保存后可以选择展示或保持私藏，不自动公开；为定向交换补卡时继续进入两卡确认。离开确认可复制邀请码，成功后用原有会话存储的 `rejoinCode` 预填入场栏，刷新仍保留；只有用户主动加入才恢复成员关系，成功进入房间后清除此待用码。联网票根各入口与 PNG 统一取 `decidedAt`，记录对象使用其完成时的 `createdAt`。
+前端空墙按成员数和自卡状态显示下一步。首次保存或保存私卡后，可邀请朋友、看同场卡片、主动展示、下载单卡或去收藏；不自动公开。为定向交换补卡时继续进入两卡确认。离开确认可复制邀请码，成功后用原有会话存储的 `rejoinCode` 预填入场栏；只有用户主动加入才恢复成员关系。联网票根各入口与 PNG 统一取 `decidedAt`，记录对象使用其完成时的 `createdAt`。
+
+### C. 0.9：个人收藏与入口衔接
+
+`GET /library` 在 bearer 身份下返回 `{me,rooms,cards,records}`。`rooms` 只含当前已加入房间；`cards` 只含本人的跨场次当前卡；`records` 只含本人已保存的交换双联。两类内容附 `roomId / roomCode / roomTitle / joined`，即使离场也可读。当前卡会随本人编辑更新，双联保留接受时快照；不返回他人未交换私卡，不改变照片读取权限。
+
+`DELETE /library/records/:id` 仅按记录 ID 与本人 `owner_id` 删除，离场后也可用；不删除对方副本、交换或照片。收藏页读取不自动恢复成员关系，回场只预填邀请码，等待用户点击加入。
+
+Live 的入口 payload：`roomId` 选择本人已加入场次；`intent:'make-card'` 在当前场次开编辑器，没有场次则创建后开编辑器；`intent:'invite'` 有当前场次则开邀请；`joinCode` 加 `intent:'join-room'` 仅预填加入码。携带 `songDraft:{id,title,artists,source,dataset}` 时始终走新建场次，只将 `title` 写入可编辑的歌名草稿，不改旧房间。
+
+音乐收藏独立保存为 `{version:1,tracks:[],imports:[]}`；条目含 `id / title / artists / source / dataset / savedAt`。真实精选与 HF 可留下，虚构作品仍属于示例。旧真实 Map 收藏仅导入一次，移除后不再次补回；删歌不删路线。它仅在本机，不写入 SQLite 或声明跨设备同步。
 
 ## 3. 最少数据对象
 
@@ -124,6 +138,7 @@ python scripts/datasets/download_hf_catalogue.py
 |---|---|
 | Artist / Track | 稳定 ID、`dataset`、名称、显式 `songIds`；真实精选含录音版本、`credits` / `creditSources`、日期与空的 `listenLinks`；`audioAvailable:false` |
 | OpenCatalogue | 独立 HF 精选 JSON；共同署名和数据来源，不写入原挑战图或人工核实制作工种 |
+| SavedMusic | 本机独立收藏的 `id / title / artists / source / dataset / savedAt`，不属于房间歌曲、交换快照或路线步数 |
 | Relation | 两端艺人、`dataset`、合作作品、版本、演唱角色和来源；真实共同演唱或明确示例 |
 | Event | 房间响应与新卡快照中的 `{id,title,date,city,song,isDemo}`；Map 真实合作专题与虚构示例另行标识 |
 | Moment | 场次内的歌曲或环节，如返场、全场合唱 |
@@ -163,6 +178,8 @@ stateDiagram-v2
 |---|---|
 | `GET /health` | 公开返回 `{ok:true,storage:'sqlite'}`，不泄露房间或用户 |
 | `POST /session`、`GET /session` | 创建匿名凭据；恢复用户和自己已加入房间列表 |
+| `GET /library` | `{me,rooms,cards,records}`；本人跨场次当前卡与已保存双联，附房间信息及 `joined`；离场后仍可读取 |
+| `DELETE /library/records/:id` | 仅删除本人双联，离场后也可用；返回 `{ok:true}`，不删除对方记录、交换或照片 |
 | `POST /rooms` | `{title,eventDate,city,song}` 建立自定义活动房间，返回 room state；`room.event` 含 `date`（请求字段为 `eventDate`） |
 | `POST /rooms/join` | `{code}` 按 6 位码加入，不提供公共房间检索 |
 | `GET /rooms/:id` | 获取房间、自卡、可见卡、自己参与的交换、自己的纪念记录 |
@@ -212,9 +229,9 @@ npm start
 仓库有多阶段 Dockerfile：构建前端，运行时保留 Node 24、服务和 `dist/`，以非 root 用户运行。
 
 ```powershell
-docker build -t music-map-space:0.8.0 .
+docker build -t music-map-space:0.9.0 .
 docker volume create music-map-data
-docker run -d --name music-map-space --restart unless-stopped -p 127.0.0.1:8787:8787 -v music-map-data:/app/data music-map-space:0.8.0
+docker run -d --name music-map-space --restart unless-stopped -p 127.0.0.1:8787:8787 -v music-map-data:/app/data music-map-space:0.9.0
 ```
 
 这些是部署说明，不代表已经执行。Docker 内服务监听 `0.0.0.0`，上述端口映射仍只开放到宿主机环回地址。生产由反向代理将同一 HTTPS 域名的页面和 `/api/live` 全部转发到这个 Node 实例；需要定向访问时也在入口限制站点访问。保留 `music-map-data` volume，不把数据库放进镜像或无持久磁盘的平台。采用单实例，不启用多个独立 SQLite 副本的自动横向扩容。实际托管、TLS、访问控制与备份安排尚未执行。
@@ -223,7 +240,8 @@ docker run -d --name music-map-space --restart unless-stopped -p 127.0.0.1:8787:
 
 | 项目 | 当前安排 | 记录位置 |
 |---|---|---|
-| 0.8 全屏小院与实物操作 | 六类机位、独立手机取景、授权照片贴图、工作桌与店内收藏；整合进行中，构建和交付待记录 | [项目状态](../../docs/PROJECT_STATUS.md) |
+| 0.9 本人主页与收藏 | 本机构建及主页恢复、跨场次回访、HF 带歌建场、私藏保存与邀请已实操；不扩大为部署或完整导出验收 | [项目状态](../../docs/PROJECT_STATUS.md) |
+| 0.8 全屏小院历史证据 | 六类机位、独立手机取景、授权照片贴图、工作桌与店内收藏；保留当次构建、画面和运行包记录 | [项目状态](../../docs/PROJECT_STATUS.md) |
 | 0.7 空间与数据历史证据 | 常驻透视小院、GSAP / Flip、逐人制作署名、完整 HF CSV 与 120 首开放曲库；保留当次记录 | [项目状态](../../docs/PROJECT_STATUS.md) |
 | 0.6 独立 App 历史证据 | 悬浮导航、照片卡工作台、唱片图谱与 MIT 三渲二管线，保留当次构建和画面范围 | [项目状态](../../docs/PROJECT_STATUS.md) |
 | 0.5.1 界面精简历史证据 | 首页与示例分开、紧凑图谱、按需说明与浮动滚动条，保留原版本检查 | [项目状态](../../docs/PROJECT_STATUS.md) |
@@ -239,7 +257,13 @@ docker run -d --name music-map-space --restart unless-stopped -p 127.0.0.1:8787:
 
 ## 8. 证据与待检查边界
 
-### 0.8 当前交付
+### 0.9 当前结果
+
+本机构建已完成。已操作本人主页恢复现有场次编辑器（未保存改动）、跨场次查看双联与离场自卡，以及 HF 搜索 Sam Smith → 收藏 Unholy → 带歌创建内部示例场次 → 明确选择 AI 示例图 → 私藏保存 → 收藏回看 → 返回房间邀请。离场后刷新仍可查看本人卡，重入只预填邀请码、没有自动加入。新增本人收藏读删接口沿用数据库结构及照片授权。
+
+390px 双联页已目视未见横向溢出。本轮 PNG 得到生成成功提示；下载事件工具不支持，未检查实际文件，不记为已下载或已目视 PNG。其余画面、打包、CI 与同步范围见[项目状态](../../docs/PROJECT_STATUS.md)，不代替实体手机、外部用户试用或评审部署。
+
+### 0.8 历史结果
 
 全屏小院、六类视角、独立手机镜头、授权照片与现有编辑 / 交换入口已接通。生产构建和本地运行包已更新，桌面与 390×844 模拟手机的关键画面已查看；具体范围、资源处理与 GitHub / CI 见[项目状态](../../docs/PROJECT_STATUS.md)。静态模型按相同几何、材质、阴影和动作分组实例化；这不代表实体手机性能已达标。没有新增测试套件、后端协议或数据库迁移。
 
@@ -293,4 +317,4 @@ docker run -d --name music-map-space --restart unless-stopped -p 127.0.0.1:8787:
 | 线上部署 | 评审实际可访问，API 同源，磁盘持续保留 | 尚未部署；Dockerfile 存在不等于容器已运行 |
 | 音频与真实元数据 | 来源及实际能力准确 | 尚未接入 |
 
-以上 0.2.0 运行证据由整合者及接口检查协作者提供，当时没有新增或运行测试框架 / 套件。本次文档同步没有新增检查；0.4.0 / 0.5.0 / 0.5.1 / 0.6 / 0.7 按历史范围保留，0.8 由任务记录记实，不将局部检查扩展成未执行的环境或路径。
+以上 0.2.0 运行证据由整合者及接口检查协作者提供，当时没有新增或运行测试框架 / 套件。本次文档同步没有新增检查；0.4.0 / 0.5.0 / 0.5.1 / 0.6 / 0.7 / 0.8 按历史范围保留，0.9 由任务记录记实，不将局部检查扩展成未执行的环境或路径。

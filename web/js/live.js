@@ -32,16 +32,21 @@ export function mountLive(container, api) {
   let interval;
   let currentModal = null;
   let requestTarget = null;
-  let joinCode = new URLSearchParams(location.search).get('room') || session?.rejoinCode || '';
+  const entryPayload = api.getState().routePayload || {};
+  let songDraft = typeof entryPayload.songDraft?.title === 'string' ? entryPayload.songDraft : null;
+  const requestedRoomId = typeof entryPayload.roomId === 'string' ? entryPayload.roomId : null;
+  let makeRequested = entryPayload.intent === 'make-card';
+  let inviteRequested = entryPayload.intent === 'invite';
+  let joinCode = entryPayload.intent === 'join-room' ? String(entryPayload.joinCode || '') : new URLSearchParams(location.search).get('room') || session?.rejoinCode || '';
   let entryName = '';
   let draft = null;
   let version = 0;
   let photoPreparing = false;
   let photoSelection = 0;
-  let createRequested = api.getState().routePayload?.intent === 'create-room';
-  let eventDraft = { title: '', eventDate: '', city: '', song: '' };
+  let createRequested = entryPayload.intent === 'create-room' || Boolean(songDraft) || (makeRequested && !session?.roomId && !requestedRoomId);
+  let eventDraft = { title: '', eventDate: '', city: '', song: songDraft?.title.slice(0, 80) || '' };
   const photos = createPhotoStore(() => session?.token, signal);
-  if (createRequested) api.update(state => { state.routePayload = null; });
+  if (createRequested || makeRequested || inviteRequested || requestedRoomId || entryPayload.intent === 'join-room') api.update(state => { state.routePayload = null; });
 
   container.innerHTML = `<div class="live-page"><div id="live-surface" aria-live="off"></div><dialog class="live-dialog" aria-labelledby="live-dialog-title"><div id="live-dialog-content"></div></dialog></div>`;
   const surface = container.querySelector('#live-surface');
@@ -260,7 +265,7 @@ export function mountLive(container, api) {
   function entryView() {
     const sampleA = { ownerName: '你的舞台', photoKey: 'stage', perspective: 'stage', momentId: 'encore', caption: '灯亮起时，我记得这一面。', event: demoEvent };
     const sampleB = { ownerName: '朋友的人海', photoKey: 'crowd', perspective: 'crowd', momentId: 'encore', caption: '原来那一刻，你看见的是这样。', event: demoEvent };
-    return `<header class="live-entry-head"><button class="text-button" data-live-action="demo">${icon('arrow-left')} 返回同场</button></header>${banner()}<div class="live-entry-grid"><section class="live-entry-copy"><h1>和朋友一起</h1><div class="live-gate"><div class="live-gate-heading"><b>${session ? `你好，${escape(session.user.name)}` : '进入同场'}</b><span>${checking ? '正在连接…' : healthy ? '已连接' : '未连接'}</span></div><form data-live-form="entry">${session ? '' : `<label class="live-field">现场昵称<input name="name" value="${escape(entryName)}" placeholder="例如：小满" autocomplete="nickname" maxlength="20" required></label>`}<label class="live-field">邀请码 <span>加入房间时填写</span><input name="code" value="${escape(joinCode)}" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="6 位数字" autocomplete="off"></label><div class="live-gate-actions"><button class="button ${createRequested ? 'button--secondary' : 'button--primary'}" type="submit" name="intent" value="join" ${!healthy ? 'disabled' : ''}>加入同场 ${icon('arrow-right')}</button><button class="button ${createRequested ? 'button--primary' : 'button--secondary'}" type="submit" name="intent" value="create" formnovalidate ${!healthy ? 'disabled' : ''}>创建同场 ${icon('plus')}</button></div></form>${!healthy && !checking ? `<div class="live-unavailable"><p>连接失败，可返回体验示例。</p><button class="text-button" data-live-action="reconnect">重试连接</button></div>` : ''}<p class="live-gate-note">身份保存在当前浏览器，清除网站数据后无法找回。</p></div>${session && rooms.length ? `<div class="live-recent"><span class="eyebrow">最近的房间</span>${rooms.map(item => `<button data-live-action="resume" data-room-id="${escape(item.id)}"><span>${escape(item.title)}</span><small>${escape(item.code)}</small>${icon('arrow-right')}</button>`).join('')}</div>` : ''}</section><aside class="live-entry-art" aria-label="两张现场卡构成双联记忆的示意"><div class="live-entry-pair">${miniCard(sampleA)}${miniCard(sampleB)}</div><small>AI 示例照片</small></aside></div>`;
+    return `<header class="live-entry-head"><button class="text-button" data-live-action="demo">${icon('arrow-left')} 返回同场</button></header>${banner()}<div class="live-entry-grid"><section class="live-entry-copy"><h1>和朋友一起</h1><div class="live-gate"><div class="live-gate-heading"><b>${session ? `你好，${escape(session.user.name)}` : '进入同场'}</b><span>${checking ? '正在连接…' : healthy ? '已连接' : '未连接'}</span></div><form data-live-form="entry">${songDraft ? `<p class="live-form-note">带着《${escape(songDraft.title)}》创建自己的同场。</p>` : ""}${session ? '' : `<label class="live-field">现场昵称<input name="name" value="${escape(entryName)}" placeholder="例如：小满" autocomplete="nickname" maxlength="20" required></label>`}<label class="live-field" ${songDraft ? "hidden" : ""}>邀请码 <span>加入房间时填写</span><input name="code" value="${escape(joinCode)}" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="6 位数字" autocomplete="off"></label><div class="live-gate-actions"><button class="button ${createRequested ? 'button--secondary' : 'button--primary'}" type="submit" name="intent" value="join" ${songDraft ? "hidden" : ""} ${!healthy ? 'disabled' : ''}>加入同场 ${icon('arrow-right')}</button><button class="button ${createRequested ? 'button--primary' : 'button--secondary'}" type="submit" name="intent" value="create" formnovalidate ${!healthy ? 'disabled' : ''}>创建同场 ${icon('plus')}</button></div></form>${!healthy && !checking ? `<div class="live-unavailable"><p>连接失败，可返回体验示例。</p><button class="text-button" data-live-action="reconnect">重试连接</button></div>` : ''}<p class="live-gate-note">身份保存在当前浏览器，清除网站数据后无法找回。</p></div>${session && rooms.length ? `<div class="live-recent"><span class="eyebrow">最近的房间</span>${rooms.map(item => `<button data-live-action="resume" data-room-id="${escape(item.id)}"><span>${escape(item.title)}</span><small>${escape(item.code)}</small>${icon('arrow-right')}</button>`).join('')}</div>` : ''}</section><aside class="live-entry-art" aria-label="两张现场卡构成双联记忆的示意"><div class="live-entry-pair">${miniCard(sampleA)}${miniCard(sampleB)}</div><small>AI 示例照片</small></aside></div>`;
   }
 
   function emptyWall(own) {
@@ -272,8 +277,12 @@ export function mountLive(container, api) {
     return `<div class="live-empty-wall"><h3>${title}</h3><p>${detail}</p><button class="button button--secondary" data-live-action="${action}">${label} ${icon('arrow-up-right')}</button></div>`;
   }
 
-  function openPrivateCardSaved() {
-    openModal('card-saved', '现场卡已保存', `<div class="live-saved-note">${icon('check')}<div><strong>现场卡已私下保存</strong><p>展示后，房间成员可见。</p></div></div><div class="live-saved-actions"><button class="button button--primary" data-live-action="download-card">保存我的卡片 ${icon('arrow-up-right')}</button><button class="button button--secondary" data-live-action="visibility">展示到本场</button></div><button class="text-button" data-live-action="close">先保持私藏</button>`, '', room.ownCard?.id);
+  function openCardSaved() {
+    const own = room.ownCard;
+    const hasCards = room.cards.some(card => card.ownerId !== room.me.id && card.isPublic);
+    const action = hasCards ? 'wall' : room.room.memberCount < 2 ? 'invite' : own.isPublic ? 'wall' : 'visibility';
+    const label = { wall: '看看同场卡片', invite: '邀请朋友一起', visibility: '展示到本场' }[action];
+    openModal('card-saved', '现场卡已保存', `<div class="live-saved-note">${icon('check')}<div><strong>${own.isPublic ? '已展示到本场' : '这张卡先为你私藏'}</strong><p>${own.isPublic ? '房间成员可以看见，交换仍需双方同意。' : '只有你可见，也可以用它向朋友申请交换。'}</p></div></div><div class="live-saved-actions"><button class="button button--primary" data-live-action="${action}">${label} ${icon('arrow-right')}</button><button class="button button--secondary" data-live-action="download-card">下载我的卡片 ${icon('arrow-up-right')}</button>${!own.isPublic && action !== 'visibility' ? '<button class="text-button" data-live-action="visibility">展示到本场</button>' : ''}<button class="text-button" data-live-action="collection">去我的记录</button></div><button class="text-button" data-live-action="close">先收好</button>`, '', own.id);
   }
 
   function roomView() {
@@ -283,7 +292,7 @@ export function mountLive(container, api) {
     const incoming = room.exchanges.filter(ex => ex.to === room.me.id && ex.status === 'pending');
     const outgoing = room.exchanges.filter(ex => ex.from === room.me.id && ex.status === 'pending');
     const resolved = room.exchanges.filter(ex => ex.status !== 'pending').slice(-6).reverse();
-    return `${banner()}<header class="live-room-head"><div><h1>${escape(event.title)}</h1><p class="live-event-meta">${escape([event.date, event.city].filter(Boolean).join(' · '))}<span> ${escape(room.me.name)} · ${room.room.memberCount} 人入场</span></p></div><div class="live-room-tools"><button class="button button--primary" data-live-action="invite">邀请朋友 ${icon('arrow-up-right')}</button><button class="text-button" data-live-action="lobby">其他房间</button></div></header>
+    return `${banner()}<header class="live-room-head"><div><h1>${escape(event.title)}</h1><p class="live-event-meta">${escape([event.date, event.city].filter(Boolean).join(' · '))}<span> ${escape(room.me.name)} · ${room.room.memberCount} 人入场</span></p></div><div class="live-room-tools"><button class="button button--primary" data-live-action="invite">邀请朋友 ${icon('arrow-up-right')}</button><button class="text-button" data-live-action="collection">我的记录</button><button class="text-button" data-live-action="lobby">其他房间</button></div></header>
     <div class="live-room-ribbon"><span>${event.song ? `♪ ${escape(event.song)}` : ''} ${event.isDemo ? '<b>示例场次</b>' : ''}</span><span data-sync role="status"></span><button class="text-button" data-live-action="refresh">${icon('rotate')} 刷新</button></div>
     ${incoming.length ? `<section class="live-incoming" aria-label="收到的交换申请"><div class="live-section-title"><span>↗</span><h2>收到的申请</h2><small>${incoming.length} 条待回应</small></div>${incoming.map(ex => `<div class="live-request-row"><div class="live-initial">${escape(ex.fromCard.ownerName.slice(0, 1))}</div><p><b>${escape(ex.fromCard.ownerName)}</b><span>想把「${escape(perspectiveName(ex.fromCard))}」与你的「${escape(perspectiveName(ex.toCard))}」放在一起。</span></p><button class="button button--primary" data-live-action="review" data-id="${escape(ex.id)}">看看这两张卡 ${icon('arrow-right')}</button></div>`).join('')}</section>` : ''}
     <div class="live-room-columns"><section class="live-own-section"><div class="live-section-title"><h2>我的现场卡</h2></div>${own ? `${miniCard(own)}<div class="live-own-meta"><span class="live-visibility ${own.isPublic ? 'is-public' : ''}">${own.isPublic ? '房间内展示' : '私藏 · 未展示'}</span><span>第 ${own.revision} 版</span></div><div class="live-own-actions"><button class="button button--secondary" data-live-action="edit">编辑现场卡</button><button class="text-button" data-live-action="download-card">保存我的卡片 ${icon('arrow-up-right')}</button><button class="text-button" data-live-action="visibility">${own.isPublic ? '从本场撤下' : '展示到本场'} ${icon('arrow-up-right')}</button></div>` : `<div class="live-empty-card"><div class="live-optical" aria-hidden="true"></div><h3>留一张现场卡</h3><button class="button button--primary" data-live-action="edit">制作我的现场卡 ${icon('plus')}</button></div>`}</section>
@@ -317,7 +326,7 @@ export function mountLive(container, api) {
 
   function openCreate() {
     createRequested = false;
-    openModal('create', '创建同场', `<form data-live-form="create"><label class="live-field">场次名称 <span>必填</span><input name="title" maxlength="60" required placeholder="例如：周五草坪音乐会" value="${escape(eventDraft.title)}"></label><div class="live-event-fields"><label class="live-field">日期 <span>选填</span><input type="date" name="eventDate" value="${escape(eventDraft.eventDate)}"></label><label class="live-field">地点 <span>选填</span><input name="city" maxlength="40" placeholder="例如：南区草坪" value="${escape(eventDraft.city)}"></label></div><label class="live-field">想一起记住的歌 <span>选填</span><input name="song" maxlength="80" placeholder="填写歌名，也可以先留空" value="${escape(eventDraft.song)}"></label><p class="live-form-note">场次创建后不能修改。</p><button class="button button--primary live-wide" type="submit">创建同场 ${icon('arrow-right')}</button></form>`);
+    openModal('create', '创建同场', `<form data-live-form="create"><label class="live-field">场次名称 <span>必填</span><input name="title" maxlength="60" required placeholder="例如：周五草坪音乐会" value="${escape(eventDraft.title)}"></label><div class="live-event-fields"><label class="live-field">日期 <span>选填</span><input type="date" name="eventDate" value="${escape(eventDraft.eventDate)}"></label><label class="live-field">地点 <span>选填</span><input name="city" maxlength="40" placeholder="例如：南区草坪" value="${escape(eventDraft.city)}"></label></div><label class="live-field">想一起记住的歌 <span>选填</span><input name="song" maxlength="80" placeholder="填写歌名，也可以先留空" value="${escape(eventDraft.song)}"></label>${songDraft ? `<p class="live-form-note">歌名已带入，可修改。请填写自己的场次。</p>` : ""}<p class="live-form-note">场次创建后不能修改。</p><button class="button button--primary live-wide" type="submit">创建同场 ${icon('arrow-right')}</button></form>`);
   }
 
   function editorPhoto() {
@@ -366,7 +375,7 @@ export function mountLive(container, api) {
     const saved = room.records.find(record => record.exchangeId === (item.exchangeId || item.id));
     const sharedTrack = a.trackId && a.trackId === b.trackId && event.song;
     const reason = matchReason(a, b);
-    openModal('ticket', '同一场，两种视角。', `<div class="live-ticket"><div class="live-ticket-mast"><span>MUSIC<br>BRINGS US<br>TOGETHER.</span><b>MM<br>× MS</b></div><div class="live-ticket-title"><span>${escape(event.title)}${event.isDemo ? ' · 示例场次' : ''}<small>${escape([event.date, event.city].filter(Boolean).join(' · '))}</small></span><strong>${escape(a.ownerName)} <i>×</i> ${escape(b.ownerName)}</strong></div><div class="live-ticket-pair">${miniCard(a)}${miniCard(b)}</div><div class="live-ticket-strip"><span>${sharedTrack ? `♪ ${escape(event.song)}` : escape(reason.title)}</span><b>EXCHANGED</b></div><div class="live-ticket-foot"><span>${escape(dateLabel(completedAt(item)))}<br>双方已同意 · ${saved ? '已保存到本房间' : '交换记录'}</span><span class="live-ticket-bars" aria-hidden="true"></span><span>YOUR VIEW.<br>THEIR VIEW.<br>ONE MEMORY.</span></div></div><div class="live-ticket-actions"><button class="button button--primary" data-live-action="download" data-id="${escape(item.exchangeId || item.id)}">保存票根图片 ${icon('arrow-up-right')}</button><button class="button button--secondary" data-live-action="map">${api.getState().space?.mapReturnId ? '继续刚才的探索' : '去音乐地图'} ${icon('compass')}</button></div>${saved ? `<button class="text-button live-delete-record" data-live-action="delete-record" data-id="${escape(saved.id)}">从我的记忆中删除</button>` : ''}`, 'live-dialog--ticket', a.ownerId === room.me.id ? b.id : a.id);
+    openModal('ticket', '同一场，两种视角。', `<div class="live-ticket"><div class="live-ticket-mast"><span>MUSIC<br>BRINGS US<br>TOGETHER.</span><b>MM<br>× MS</b></div><div class="live-ticket-title"><span>${escape(event.title)}${event.isDemo ? ' · 示例场次' : ''}<small>${escape([event.date, event.city].filter(Boolean).join(' · '))}</small></span><strong>${escape(a.ownerName)} <i>×</i> ${escape(b.ownerName)}</strong></div><div class="live-ticket-pair">${miniCard(a)}${miniCard(b)}</div><div class="live-ticket-strip"><span>${sharedTrack ? `♪ ${escape(event.song)}` : escape(reason.title)}</span><b>EXCHANGED</b></div><div class="live-ticket-foot"><span>${escape(dateLabel(completedAt(item)))}<br>双方已同意 · ${saved ? '已保存到我的记录' : '交换记录'}</span><span class="live-ticket-bars" aria-hidden="true"></span><span>YOUR VIEW.<br>THEIR VIEW.<br>ONE MEMORY.</span></div></div><div class="live-ticket-actions"><button class="button button--primary" data-live-action="download" data-id="${escape(item.exchangeId || item.id)}">保存票根图片 ${icon('arrow-up-right')}</button><button class="button button--secondary" data-live-action="collection">去我的记录 ${icon("bookmark")}</button><button class="text-button" data-live-action="map">${api.getState().space?.mapReturnId ? '继续刚才的探索' : '去音乐地图'} ${icon('compass')}</button></div>${saved ? `<button class="text-button live-delete-record" data-live-action="delete-record" data-id="${escape(saved.id)}">从我的记忆中删除</button>` : ''}`, 'live-dialog--ticket', a.ownerId === room.me.id ? b.id : a.id);
   }
 
   function openInvite() {
@@ -393,14 +402,33 @@ export function mountLive(container, api) {
           session.user = profile.user;
           rooms = profile.rooms || [];
           persist();
-          if (session.roomId && !joinCode && !createRequested && rooms.some(item => item.id === session.roomId)) setState(await request(`/rooms/${session.roomId}`));
+          if (!createRequested) {
+            const roomId = requestedRoomId || (!joinCode ? session.roomId : null);
+            if (roomId && rooms.some(item => item.id === roomId)) setState(await request(`/rooms/${roomId}`));
+            else if (requestedRoomId) errorMessage = '你已不在这个房间。可从收藏中使用邀请码重新加入。';
+          }
         } catch (error) {
           if (error.status === 401) { roomAuthorized = false; clearPhotos(); session = null; persist(); errorMessage = '原身份已失效，请重新留下昵称入场。'; }
           else throw error;
         }
       }
     } catch (error) { healthy = false; showError(error); }
-    finally { checking = false; render(); if (healthy && session && createRequested) openCreate(); }
+    finally {
+      if (!signal.aborted) {
+        checking = false;
+        if (makeRequested && !room && !requestedRoomId && !joinCode) createRequested = true;
+        render();
+        if (healthy && session) {
+          if (createRequested) openCreate();
+          else if (room) openEntryAction();
+        }
+      }
+    }
+  }
+
+  function openEntryAction() {
+    if (makeRequested) { makeRequested = false; openEditor(); }
+    else if (inviteRequested) { inviteRequested = false; openInvite(); }
   }
 
   container.addEventListener('submit', event => {
@@ -409,7 +437,7 @@ export function mountLive(container, api) {
     event.preventDefault();
     const data = new FormData(form);
     if (form.dataset.liveForm === 'entry') {
-      const intent = event.submitter?.value || 'join';
+      const intent = songDraft ? 'create' : event.submitter?.value || 'join';
       const name = String(data.get('name') || '').trim();
       entryName = name;
       joinCode = String(data.get('code') || '').trim();
@@ -423,10 +451,12 @@ export function mountLive(container, api) {
         if (intent === 'create') { render(); openCreate(); return; }
         const next = await request('/rooms/join', { method: 'POST', body: { code: joinCode } });
         joinCode = '';
+        createRequested = false;
         history.replaceState(null, '', `${location.pathname}#/live`);
         version += 1;
         setState(next);
         api.toast('入场成功，先留住你的这一面');
+        openEntryAction();
       });
     }
     if (form.dataset.liveForm === 'create') {
@@ -438,8 +468,16 @@ export function mountLive(container, api) {
         history.replaceState(null, '', `${location.pathname}#/live`);
         setState(next);
         eventDraft = { title: '', eventDate: '', city: '', song: '' };
-        api.toast('同场已建好。先做自己的卡，再邀请朋友');
-        openEditor();
+        songDraft = null;
+        makeRequested = false;
+        if (inviteRequested) {
+          inviteRequested = false;
+          api.toast('同场已建好，把邀请码留给朋友');
+          openInvite();
+        } else {
+          api.toast('同场已建好，先留下自己的现场卡');
+          openEditor();
+        }
       });
     }
     if (form.dataset.liveForm === 'card') {
@@ -447,6 +485,7 @@ export function mountLive(container, api) {
       if (!draft.photoId && !draft.uploadDataUrl && !draft.useExample) { showError(new Error('先选择一张自己的照片，或明确选用下方示例图。')); return; }
       const target = typeof requestTarget === 'string' ? requestTarget : null;
       const currentDraft = draft;
+      const firstCard = !room.ownCard;
       const body = { photoKey: draft.photoKey, photoId: draft.photoId || null, perspective: data.get('perspective'), momentId: data.get('momentId'), caption: String(data.get('caption')).trim(), trackId: data.has('track') ? 'co-0' : '', isPublic: data.has('isPublic') };
       act(async () => {
         const saveHint = modal.querySelector('[data-save-visibility]');
@@ -463,7 +502,7 @@ export function mountLive(container, api) {
         closeModal();
         api.toast(body.isPublic ? '现场卡已保存，也展示到本房间了' : '现场卡已私下保存');
         if (target) openRequest(target);
-        else if (!body.isPublic) openPrivateCardSaved();
+        else if (firstCard || !body.isPublic) openCardSaved();
       });
     }
   }, { signal });
@@ -534,6 +573,18 @@ export function mountLive(container, api) {
     if (action === 'reconnect') connect();
     if (action === 'refresh') { hydratePhotos(); refresh(true); }
     if (action === 'invite') openInvite();
+    if (action === 'collection') { closeModal(); api.navigate('records'); }
+    if (action === 'wall') {
+      closeModal();
+      queueMicrotask(() => {
+        const wall = surface.querySelector('.live-wall-section');
+        if (!signal.aborted && wall) {
+          wall.setAttribute('tabindex', '-1');
+          wall.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'start' });
+          wall.focus({ preventScroll: true });
+        }
+      });
+    }
     if (action === 'edit') openEditor();
     if (action === 'request') openRequest(id);
     if (action === 'review') openExchange(id);
@@ -599,7 +650,7 @@ export function mountLive(container, api) {
     });
     if (action === 'delete-record') openModal('delete', '从我的记忆中删除这张票？', `<p class="live-modal-intro">只删除你保存的记录，不会改动对方的记录。已经完成的交换动态仍会保留。</p><button class="button button--primary live-wide" data-live-action="confirm-delete" data-id="${escape(id)}">确认删除我的记录</button>`);
     if (action === 'confirm-delete') act(async () => { version += 1; setState(await request(`/rooms/${room.room.id}/records/${id}`, { method: 'DELETE' })); closeModal(); api.toast('已从我的记忆中删除'); });
-    if (action === 'leave') openModal('leave', '离开房间？', `<p class="live-modal-intro">你的现场卡会撤下，待回应申请会取消。共同记忆仍保留，使用同一浏览器和邀请码再次入场后可以查看。</p><div class="live-return-slip"><label class="live-field">重新入场的邀请码<input readonly value="${escape(room.room.code)}" data-room-code aria-label="重新入场的邀请码"></label><button class="button button--secondary" data-live-action="copy-code">复制邀请码 ${icon('arrow-up-right')}</button></div><button class="button button--primary live-wide" data-live-action="confirm-leave">确认离开</button>`);
+    if (action === 'leave') openModal('leave', '离开房间？', `<p class="live-modal-intro">你的现场卡会撤下，待回应申请会取消。自己的卡片和已收藏双联仍在「我的记录」中。</p><div class="live-return-slip"><label class="live-field">重新入场的邀请码<input readonly value="${escape(room.room.code)}" data-room-code aria-label="重新入场的邀请码"></label><button class="button button--secondary" data-live-action="copy-code">复制邀请码 ${icon('arrow-up-right')}</button></div><button class="button button--primary live-wide" data-live-action="confirm-leave">确认离开</button>`);
     if (action === 'confirm-leave') act(async () => {
       version += 1;
       const roomId = room.room.id;

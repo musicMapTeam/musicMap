@@ -263,8 +263,9 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
       if (next) {
         slot.object.userData.action = { type: 'photo', id: next.id };
         const owner = next.subtitle?.split(' · ')[0] || '现场';
-        slot.button.textContent = `${owner}的卡`;
-        slot.button.setAttribute('aria-label', `查看${owner}的照片${next.isDemo ? '，示例' : ''}`);
+        const label = currentView === 'space' && !next.local && next.eventTitle ? next.eventTitle : `${owner}的卡`;
+        slot.button.textContent = label.length > 12 ? `${label.slice(0, 11)}…` : label;
+        slot.button.setAttribute('aria-label', `查看${label}${next.isDemo ? '，示例' : ''}`);
       }
       if (!changed) return;
       if (slot.texture) { slot.texture.dispose(); textures.delete(slot.texture); slot.texture = null; }
@@ -285,7 +286,8 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
       texture.colorSpace = THREE.SRGBColorSpace; texture.minFilter = THREE.LinearFilter; texture.generateMipmaps = false;
       slot.texture = texture; textures.add(texture);
     });
-    caption.querySelector('[data-world-caption]').textContent = cards.length ? `${cards.length} 张${currentView === 'live' ? '可见现场卡' : '本地示例'} · 双向同意后交换` : '音乐 · 照片 · 此刻';
+    const scope = cards.every(card => card.local) ? '示例卡' : currentView === 'live' ? '可见现场卡' : '我的现场卡';
+    caption.querySelector('[data-world-caption]').textContent = cards.length ? `${cards.length} 张${scope}` : '音乐 · 照片 · 此刻';
     renderer.shadowMap.needsUpdate = true; projectPins(); draw();
   }
   function picked(event) {

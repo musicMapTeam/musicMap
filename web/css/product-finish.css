@@ -1,0 +1,55 @@
+/* 0.9: the visitor's own nights, songs and memories form one continuous app. */
+.home-photo-loading { display:flex; flex-direction:column; gap:12px; align-items:center; justify-content:center; height:100%; color:var(--muted); font-size:12px; }
+.home-return { position:absolute; right:24px; bottom:20px; display:flex; align-items:center; justify-content:flex-end; gap:9px; max-width:420px; color:var(--muted); font-size:11px; }
+.home-return:empty { display:none; }
+.home-return button { display:inline-flex; align-items:center; gap:8px; max-width:100%; border:1px solid var(--studio-border); border-radius:999px; background:var(--studio-panel); color:var(--text); padding:9px 14px; font-size:11px; box-shadow:var(--studio-soft-shadow); }
+.home-return button .icon { width:14px; height:14px; flex-shrink:0; }
+.home-return button:hover { background:var(--studio-well); }
+.collection-page { width:100%; }
+html[data-theme] .live-dialog--editor .live-editor-event { margin:0 0 13px; padding-bottom:10px; font-size:12px; }
+html[data-theme] .live-dialog--editor .live-upload-preview { height:150px; border-radius:12px; }
+html[data-theme] .live-dialog--editor .live-upload-empty { gap:5px; }
+html[data-theme] .live-dialog--editor .live-upload-empty strong { font-size:14px; }
+html[data-theme] .live-dialog--editor .live-upload-empty>.icon { width:24px; height:24px; margin:0; }
+html[data-theme] .live-dialog--editor .live-form-note { margin:8px 0; font-size:10px; }
+html[data-theme] .live-dialog--editor .live-example-picker { margin:10px 0 16px; padding:0; font-size:12px; }
+html[data-theme] .live-dialog--editor .live-example-picker summary { padding:7px 0; }
+html[data-theme] .live-dialog--editor .live-photo-choices img { height:95px; object-fit:cover; }
+html[data-theme] .live-dialog--editor fieldset { margin:14px 0; }
+html[data-theme] .live-dialog--editor legend { font-size:12px; margin-bottom:9px; }
+html[data-theme] .live-dialog--editor .live-perspectives { gap:7px; }
+html[data-theme] .live-dialog--editor .live-perspectives label>span { padding:9px 11px; }
+html[data-theme] .live-dialog--editor .live-perspectives b { font-size:13px; margin-bottom:2px; }
+html[data-theme] .live-dialog--editor .live-perspectives small { font-size:10px; }
+html[data-theme] .live-dialog--editor .live-field { margin:14px 0; font-size:12px; }
+html[data-theme] .live-dialog--editor textarea { min-height:76px; font-size:14px; padding:10px 12px; }
+html[data-theme] .live-dialog--editor .live-check { margin:13px 0; font-size:12px; }
+html[data-theme] .live-dialog--editor .live-check small { font-size:10px; }
+html[data-theme] .live-dialog--editor .live-editor-save { margin-top:14px; padding:12px; border-radius:12px; }
+html[data-theme] .live-dialog--editor .live-editor-save>span { font-size:11px; }
+html[data-theme] .live-dialog--editor .live-editor-save .button { margin-top:8px; }
+html[data-theme] .collection-page .records-filters { display:flex; width:fit-content; max-width:100%; gap:2px; }
+html[data-theme] .collection-page .records-filters button { padding:9px 13px; white-space:nowrap; font-size:12px; }
+html[data-theme='sakura'] .home-return { position:fixed; z-index:5; right:33px; bottom:209px; max-width:310px; pointer-events:auto; }
+html[data-theme='sakura'] .live-room-head { display:block; }
+html[data-theme='sakura'] .live-room-head h1 { font-size:22px; line-height:1.4; margin:0 0 7px; }
+html[data-theme='sakura'] .live-room-tools { margin-top:12px; gap:12px; }
+html[data-theme='sakura'] .live-empty-wall { min-height:0; padding:20px; border-radius:17px; }
+html[data-theme='sakura'] .live-empty-wall h3 { margin:0 0 8px; font-size:16px; }
+html[data-theme='sakura'] .live-empty-wall p { margin:0 0 14px; font-size:12px; }
+html[data-theme='sakura'] .live-empty-memory { padding:12px 0; font-size:12px; }
+html[data-theme='sakura'] .home-return button { background:#fffcf3ed; }
+html[data-theme='sakura'] .home-return>span { background:#fffcf3ed; padding:8px 12px; border-radius:14px; }
+html[data-theme='sakura'] .collection-page .records-heading { margin-bottom:18px; }
+html[data-theme='sakura'] .collection-page .records-heading>.button { font-size:11px; padding:9px 12px; }
+html[data-theme='sakura'] .collection-page .records-filters { width:100%; }
+html[data-theme='sakura'] .collection-page .records-filters button { flex:1; padding:9px 7px; }
+@media(max-width:760px) {
+  .home-return { position:relative; right:auto; bottom:auto; justify-content:center; max-width:100%; padding:0 8px; }
+  html[data-theme='sakura'] .home-return { position:fixed; left:22px; right:22px; bottom:214px; max-width:none; justify-content:center; }
+  html[data-theme] .collection-page .records-heading { gap:12px; }
+  html[data-theme] .collection-page .records-heading h1 { font-size:23px; }
+  html[data-theme] .collection-page .records-heading>.button { font-size:11px; padding:9px 12px; }
+  html[data-theme] .collection-page .records-filters { width:100%; }
+  html[data-theme] .collection-page .records-filters button { flex:1; padding:9px 7px; font-size:11px; }
+}

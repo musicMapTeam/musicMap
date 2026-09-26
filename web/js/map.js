@@ -1,4 +1,5 @@
 import { MAP_DATA_VERSION, catalogues, artistById, songs, edges, artistName, datasetForArtist, artistsInDataset, otherArtist, getNeighbors, isReachable } from './map-data.js';
+import { getSavedMusic, toggleSavedMusic, saveMusic, importSavedMusic, subscribeSavedMusic } from './music-library.js';
 import '../css/map.css';
 
 const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
@@ -10,6 +11,21 @@ const sessionDataset = session => session?.dataset || datasetForArtist(session?.
 const catalogueFor = session => catalogues[sessionDataset(session)];
 const dateLabel = timestamp => new Date(timestamp).toLocaleDateString('zh-CN', { month: 'long', day: 'numeric' });
 let lastPresentedArtist = null;
+
+function songDraft(song) {
+  return { id: song.id, title: song.title, artists: song.artists.map(artistName), source: song.sourceUrl || '', dataset: 'real' };
+}
+
+function songIsSaved(session, id) {
+  return songs[id]?.dataset === 'real' ? getSavedMusic().some(item => item.id === id) : session.saved.some(item => item.id === id);
+}
+
+export function importLegacyMapMusic(api) {
+  const tracks = api.getState().map.sessions.flatMap(session => session.saved
+    .filter(item => songs[item.id]?.dataset === 'real')
+    .map(item => ({ ...songDraft(songs[item.id]), savedAt: item.savedAt || session.updated || session.created })));
+  return importSavedMusic(tracks.sort((a, b) => b.savedAt - a.savedAt));
+}
 
 function createSession(start, type = 'roam', target = null, returnRoamId = null) {
   const now = Date.now();
@@ -95,11 +111,11 @@ function tracksHTML(session, trackIds, api, source = '', showVersion = false, sh
   return trackIds.map((id, index) => {
     const song = songs[id];
     if (!song) return '';
-    const saved = session.saved.some(item => item.id === id);
+    const saved = songIsSaved(session, id);
     return `<div class="map-track">
       <span class="map-track__index" aria-hidden="true">${String(index + 1).padStart(2, '0')}</span>
       <div class="map-track__copy">${song.credits?.length ? button('credits', `${escapeHTML(song.title)}<span aria-hidden="true">↗</span>`, 'map-track__title', `data-id="${id}" data-session="${session.id}" aria-label="查看《${escapeHTML(song.title)}》的作品署名"`) : `<strong>${escapeHTML(song.title)}</strong>`}<span>${song.artists.map(artistName).map(escapeHTML).join(' / ')}</span>${showVersion && (song.recordingLabel || song.versionLabel) ? `<small>${escapeHTML(song.recordingLabel || song.versionLabel)}</small>` : !showVersion && song.creditSummary ? `<small class="map-track__credit-preview">${escapeHTML(song.creditSummary)}</small>` : ''}</div>
-      <div class="map-track__actions">${listenHTML(song, api)}${button('save', api.icon(saved ? 'check' : 'plus'), `icon-button map-track__save ${saved ? 'is-saved' : ''}`, `data-id="${id}" data-session="${session.id}" data-source="${escapeHTML(source)}" aria-label="${saved ? '移除' : '留下'}《${escapeHTML(song.title)}》" aria-pressed="${saved}" title="${saved ? '已留下，点击移除' : '留下这首作品'}"`)}</div>
+      <div class="map-track__actions">${listenHTML(song, api)}${song.dataset === 'real' ? button('take-song', '带到现场', 'button button--quiet map-track__take', `data-id="${id}" data-session="${session.id}" aria-label="把《${escapeHTML(song.title)}》带到现场"`) : ''}${button('save', api.icon(saved ? 'check' : 'plus'), `icon-button map-track__save ${saved ? 'is-saved' : ''}`, `data-id="${id}" data-session="${session.id}" data-source="${escapeHTML(source)}" aria-label="${saved ? '移除' : '留下'}《${escapeHTML(song.title)}》" aria-pressed="${saved}" title="${saved ? '已留下，点击移除' : '留下这首作品'}"`)}</div>
     </div>${showCredits ? creditsHTML(song, api) : ''}`;
   }).join('');
 }
@@ -115,7 +131,7 @@ function discoveryHTML(session, api, undo) {
   if (edge) {
     const origin = escapeHTML(artistName(previous.id));
     const destination = escapeHTML(artistName(node.id));
-    const saved = edge.song && session.saved.some(item => item.id === edge.song);
+    const saved = edge.song && songIsSaved(session, edge.song);
     const source = `通过${artistName(previous.id)}与${artistName(node.id)}的合作作品留下`;
     const canUndo = undo?.sessionId === session.id && undo.item.id === edge.song;
     return `<section class="map-discovery" aria-label="当前连接的作品">
@@ -222,7 +238,7 @@ function panelHTML(map, api, recordsOnly = false) {
   if (panel === 'artist' && session) { const artist = artistById[currentNode(session).id]; content = `<span class="eyebrow">${catalogue.label} · ${isReal ? '入选合作' : '示例作品'}</span><h2>${escapeHTML(artist.name)}</h2><p class="map-panel-description">${isReal ? '作品与制作署名 · 无内置音频' : '虚构作品，无音源。'}</p>${tracksHTML(session, artist.songIds, api, `在${artist.name}的${isReal ? '入选合作作品' : '示例作品'}中留下`, true, true)}`; }
   if (panel === 'credits' && session) {
     const song = songs[map.view.creditSongId];
-    if (song?.credits?.length) content = `<div class="map-credit-heading"><span class="map-credit-disc" style="--credit-tone:${artistById[song.artists[0]].color}" aria-hidden="true"></span><div><span class="eyebrow">作品署名</span><h2>${escapeHTML(song.title)}</h2><p>${escapeHTML(song.recordingLabel)}</p></div></div>${creditsHTML(song, api, true)}<div class="map-credit-bottom"><span>无内置音频</span>${button('save', `${api.icon(session.saved.some(item => item.id === song.id) ? 'check' : 'plus')} ${session.saved.some(item => item.id === song.id) ? '已留下' : '留下作品'}`, 'button button--quiet', `data-id="${song.id}" data-session="${session.id}" data-source="查看作品制作署名后留下" aria-pressed="${session.saved.some(item => item.id === song.id)}"`)}</div>`;
+    if (song?.credits?.length) content = `<div class="map-credit-heading"><span class="map-credit-disc" style="--credit-tone:${artistById[song.artists[0]].color}" aria-hidden="true"></span><div><span class="eyebrow">作品署名</span><h2>${escapeHTML(song.title)}</h2><p>${escapeHTML(song.recordingLabel)}</p></div></div>${creditsHTML(song, api, true)}<div class="map-credit-bottom"><span>无内置音频</span>${button('take-song', '带到现场', 'button button--quiet', `data-id="${song.id}" data-session="${session.id}"`)}${button('save', `${api.icon(songIsSaved(session, song.id) ? 'check' : 'plus')} ${songIsSaved(session, song.id) ? '已留下' : '留下作品'}`, 'button button--quiet', `data-id="${song.id}" data-session="${session.id}" data-source="查看作品制作署名后留下" aria-pressed="${songIsSaved(session, song.id)}"`)}</div>`;
   }
   if (panel === 'relations' && session) {
     const id = currentNode(session).id;
@@ -381,17 +397,22 @@ function attachInteractions(container, api, recordsOnly) {
         positionNodes();
         break;
       case 'save': {
-        let removed = false;
+        const selectedSession = sessionById(map, sessionId);
+        if (!selectedSession || !songs[id]) break;
+        const real = songs[id].dataset === 'real';
+        const previousLibraryEntry = real ? getSavedMusic().find(item => item.id === id) : null;
+        let removed;
+        try { removed = real ? !toggleSavedMusic(songDraft(songs[id])) : selectedSession.saved.some(item => item.id === id); }
+        catch { api.toast('收藏还未保存，请检查浏览器存储空间后重试'); break; }
         mutate(state => {
           const selected = sessionById(state, sessionId);
           if (!selected || !songs[id]) return;
           const index = selected.saved.findIndex(item => item.id === id);
-          if (index >= 0) {
-            const [item] = selected.saved.splice(index, 1);
-            state.undo = { sessionId: selected.id, item, index };
-            removed = true;
+          if (removed) {
+            const item = index >= 0 ? selected.saved.splice(index, 1)[0] : { id, source: '在曲目收藏中留下', savedAt: previousLibraryEntry?.savedAt || Date.now() };
+            state.undo = { sessionId: selected.id, item, index: index >= 0 ? index : selected.saved.length, libraryTrack: previousLibraryEntry };
           } else {
-            selected.saved.push({ id, source: control.dataset.source || '在探索回顾中留下', savedAt: Date.now() });
+            if (index < 0) selected.saved.push({ id, source: control.dataset.source || '在探索回顾中留下', savedAt: Date.now() });
             state.undo = null;
           }
           selected.updated = Date.now();
@@ -399,7 +420,12 @@ function attachInteractions(container, api, recordsOnly) {
         api.toast(removed ? '已移除，可撤销' : '已留下这首作品');
         break;
       }
-      case 'undo':
+      case 'undo': {
+        const entry = map.undo;
+        if (entry && songs[entry.item.id]?.dataset === 'real') {
+          try { saveMusic(entry.libraryTrack || { ...songDraft(songs[entry.item.id]), savedAt: entry.item.savedAt }); }
+          catch { api.toast('收藏还未恢复，请检查浏览器存储空间后重试'); break; }
+        }
         mutate(state => {
           const undo = state.undo;
           const selected = undo && sessionById(state, undo.sessionId);
@@ -411,6 +437,7 @@ function attachInteractions(container, api, recordsOnly) {
         });
         api.toast('已恢复');
         break;
+      }
       case 'finish':
         mutate(state => { const selected = activeSession(state); if (!selected) return; selected.status = 'ended'; selected.updated = Date.now(); state.view.panel = 'recap'; state.view.reviewId = selected.id; });
         break;
@@ -448,10 +475,23 @@ function attachInteractions(container, api, recordsOnly) {
         });
         api.toast('已删除这条记录');
         break;
-      case 'space':
-        api.update(state => { state.space.mapReturnId = session?.id || null; });
-        api.navigate('space', sessionDataset(session) === 'real' ? { from: 'real-map', intent: 'create-room', resumeSessionId: session.id } : null);
+      case 'take-song': {
+        if (songs[id]?.dataset !== 'real') break;
+        const original = sessionById(map, sessionId) || session;
+        api.update(state => { state.space.mapReturnId = original?.id || null; });
+        api.navigate('live', { intent: 'create-room', songDraft: songDraft(songs[id]), resumeSessionId: original?.id });
         break;
+      }
+      case 'space': {
+        api.update(state => { state.space.mapReturnId = session?.id || null; });
+        if (sessionDataset(session) === 'real') {
+          const suggestion = getSavedMusic().find(track => track.dataset === 'real' && session.saved.some(item => item.id === track.id));
+          const payload = { from: 'real-map', intent: 'create-room', resumeSessionId: session.id };
+          if (suggestion) { const { savedAt, ...draft } = suggestion; payload.songDraft = draft; }
+          api.navigate('live', payload);
+        } else api.navigate('space', { showDemo: true });
+        break;
+      }
     }
   }, { signal });
 
@@ -580,7 +620,22 @@ function attachInteractions(container, api, recordsOnly) {
     svg.innerHTML = `<g class="map-orbit-ring" fill="none" stroke-width="1"><ellipse cx="${width / 2}" cy="${height / 2}" rx="${Math.min(width * 0.34, 270)}" ry="${height * 0.31}"/></g><g class="map-relation-lines" fill="none" stroke-width="1" ${session.mode === 'style' ? 'stroke-dasharray="3 7"' : ''}>${coordinates.map(([x, y], index) => `<path d="M${width / 2},${height / 2} Q${(width / 2 + x) / 2 + (index % 2 ? 14 : -14)},${(height / 2 + y) / 2 + 12} ${x},${y}"/>`).join('')}</g>`;
   }
 
+  const unsubscribeSavedMusic = subscribeSavedMusic(tracks => {
+    const savedIds = new Set(tracks.map(track => track.id));
+    container.querySelectorAll('[data-map-action="save"]').forEach(control => {
+      const song = songs[control.dataset.id];
+      if (song?.dataset !== 'real') return;
+      const saved = savedIds.has(song.id);
+      control.classList.toggle('is-saved', saved);
+      control.setAttribute('aria-pressed', String(saved));
+      control.setAttribute('aria-label', `${saved ? '移除' : '留下'}《${song.title}》`);
+      control.title = saved ? '已留下，点击移除' : '留下这首作品';
+      control.innerHTML = `${api.icon(saved ? 'check' : 'plus')}${control.classList.contains('map-track__save') ? '' : saved ? ' 已留下' : ' 留下作品'}`;
+    });
+  });
+
   return () => {
+    unsubscribeSavedMusic();
     abort.abort();
     resize?.disconnect();
     if (dialog?.open) dialog.close();

@@ -159,6 +159,7 @@ function makeLifecycle(container, api) {
       cards: visibleSpaceCards(state).map(({ card, saved }) => ({
         id: card.id,
         isOwn: card.owner === state.actor,
+        local: true,
         src: cardPhoto(card),
         title: card.caption || momentName(card),
         subtitle: `${actorName(card.owner)} · ${saved ? '本地示例' : '未保存的示例'}`,
@@ -548,7 +549,7 @@ function makeLifecycle(container, api) {
         });
         break;
       }
-      case 'home': showDemo = false; api.navigate('space'); break;
+      case 'home': showDemo = false; api.navigate('space', { home: true }); break;
       case 'space': showDemo = true; api.navigate('space', { eventId: SPACE_EVENT.id }); break;
       case 'live': api.navigate('live'); break;
       case 'reset': reset(); break;
@@ -671,7 +672,11 @@ export function mountSpace(container, api) {
   lifecycle.publishScene();
   const requestedTarget = state.routePayload?.requestTarget;
   const requestedExchange = state.routePayload?.exchangeId;
-  if (state.routePayload?.editCard) {
+  const previewCard = state.routePayload?.previewCardId;
+  if (previewCard) {
+    api.update(updated => { delete updated.routePayload.previewCardId; });
+    queueMicrotask(() => { if (container.isConnected) lifecycle.openPhoto(previewCard); });
+  } else if (state.routePayload?.editCard) {
     api.update((updated) => { delete updated.routePayload.editCard; });
     queueMicrotask(() => { if (container.isConnected) lifecycle.openEditor(); });
   } else if (requestedTarget) {
