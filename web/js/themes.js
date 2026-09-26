@@ -26,7 +26,7 @@ export function mountThemes() {
   let sceneHost = null;
   let disposeScene = null;
   function syncScene() {
-    const hero = document.querySelector('.sp-hero');
+    const hero = document.querySelector('.space-scene-slot');
     const wantsScene = document.documentElement.dataset.theme === 'sakura';
     if (sceneHost && (!sceneHost.isConnected || !wantsScene)) {
       disposeScene?.();
@@ -41,9 +41,6 @@ export function mountThemes() {
       hero.prepend(sceneHost);
       disposeScene = mountSakuraScene(sceneHost);
     }
-    const note = hero?.querySelector('.sp-hero__image-note');
-    const label = wantsScene ? '原创场景示意' : 'AI 场景示意';
-    if (note && note.textContent !== label) note.textContent = label;
   }
 
   function applyTheme(id, save = true) {
@@ -72,7 +69,7 @@ export function mountThemes() {
     if (event.key === STORAGE_KEY) applyTheme(event.newValue, false);
   });
   // Space can rerender its own content after changing demo roles. Attach the
-  // decoration to the current hero; never rerender any business UI for a theme.
+  // scene to the current desk; never rerender any business UI for a theme.
   const observer = new MutationObserver(syncScene);
   observer.observe(document.querySelector('#main-content'), { childList: true, subtree: true });
   applyTheme(document.documentElement.dataset.theme, false);

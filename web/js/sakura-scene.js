@@ -1,10 +1,13 @@
 import * as THREE from 'three';
+import { createCelMaterials } from './vendor/sakura/toon.js';
+import { Pipeline } from './vendor/sakura/post.js';
+import { PAL } from './vendor/sakura/palette.js';
 
-/** Original procedural diorama. No downloaded models, textures or reference code. */
+/** Original music street, rendered with Sakura Crossing's MIT cel/ink pipeline. */
 export function mountSakuraScene(host) {
   let renderer;
   try {
-    renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'low-power' });
+    renderer = new THREE.WebGLRenderer({ antialias: false, stencil: false, powerPreference: 'low-power' });
   } catch {
     host.classList.add('sakura-scene--fallback');
     const fallback = document.createElement('div');
@@ -18,64 +21,66 @@ export function mountSakuraScene(host) {
   const canvas = renderer.domElement;
   canvas.className = 'sakura-scene__canvas';
   canvas.setAttribute('role', 'img');
-  canvas.setAttribute('aria-label', '原创场景示意：樱花树下的唱片小店与街角舞台，灯串、长椅和慢慢转动的黑胶唱片。');
+  canvas.setAttribute('aria-label', '樱花音乐街角：唱片小店、街边舞台、灯串和飘落的花瓣。');
   host.append(canvas);
-  renderer.setClearColor(0x000000, 0);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+  renderer.setClearColor(PAL.skyHaze, 1);
+  renderer.setPixelRatio(1);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.NoToneMapping;
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
   renderer.shadowMap.autoUpdate = false;
 
   const scene = new THREE.Scene();
-  const camera = new THREE.OrthographicCamera(-6, 6, 5, -5, .1, 70);
-  camera.position.set(9, 7.8, 12);
-  camera.lookAt(0, 1.2, 0);
+  scene.background = new THREE.Color(PAL.skyMid);
+  scene.fog = new THREE.Fog(PAL.fog, 24, 46);
+  const camera = new THREE.OrthographicCamera(-6, 6, 5, -5, .1, 80);
+  camera.position.set(8.5, 6.6, 13);
+  camera.lookAt(0, 1.55, 0);
   const world = new THREE.Group();
   world.rotation.y = -.12;
   scene.add(world);
   const textures = new Set();
   const geometries = new Set();
   const materials = new Set();
-  const gradient = new THREE.DataTexture(new Uint8Array([105, 183, 255]), 3, 1, THREE.RedFormat);
-  gradient.minFilter = THREE.NearestFilter;
-  gradient.magFilter = THREE.NearestFilter;
-  gradient.generateMipmaps = false;
-  gradient.needsUpdate = true;
-  textures.add(gradient);
+  const skySurface = document.createElement('canvas');
+  skySurface.width = 2; skySurface.height = 128;
+  const skyContext = skySurface.getContext('2d');
+  const skyGradient = skyContext.createLinearGradient(0, 0, 0, 128);
+  skyGradient.addColorStop(0, '#abcce6');
+  skyGradient.addColorStop(.64, '#dce7ed');
+  skyGradient.addColorStop(1, '#f5e9de');
+  skyContext.fillStyle = skyGradient; skyContext.fillRect(0, 0, 2, 128);
+  const skyTexture = new THREE.CanvasTexture(skySurface);
+  skyTexture.colorSpace = THREE.SRGBColorSpace;
+  textures.add(skyTexture); scene.background = skyTexture;
+  const celMaterials = createCelMaterials();
   const palette = {
-    cream: '#f8ecd0', plaster: '#fff8e7', sand: '#e3cfae', green: '#315a4b',
-    leaf: '#668372', mint: '#b0c5ab', rose: '#edabb3', blush: '#f4c3c8',
-    petal: '#ffe0dc', coral: '#bc6f76', wood: '#aa735b', ink: '#354a40',
-    glass: '#afcbc0', black: '#2c3934', gold: '#e8c576',
+    cream: '#f2e7d3', plaster: '#faf6ef', sand: '#e3ddd8', green: '#42696a',
+    leaf: '#6b9694', mint: '#b0c5ab', rose: '#fbc6d8', blush: '#fedde2',
+    petal: '#fff0f4', coral: '#d28091', wood: '#ac8480', ink: '#39324f',
+    glass: '#94baca', black: '#3c394c', gold: '#e8c576', road: '#a4a2b8',
   };
   const toon = Object.fromEntries(Object.entries(palette).map(([name, color]) => {
-    const material = new THREE.MeshToonMaterial({ color, gradientMap: gradient });
-    materials.add(material);
+    const material = celMaterials.cel({ color, bands: ['rose', 'blush', 'petal'].includes(name) ? 'soft' : 3, flat: false });
     return [name, material];
   }));
-  const outline = new THREE.LineBasicMaterial({ color: '#435246', transparent: true, opacity: .58 });
-  const crownOutline = new THREE.MeshBasicMaterial({ color: '#b7757e', side: THREE.BackSide });
-  materials.add(outline); materials.add(crownOutline);
   const geometry = item => { geometries.add(item); return item; };
   const boxGeo = geometry(new THREE.BoxGeometry(1, 1, 1));
   const cylinderGeo = geometry(new THREE.CylinderGeometry(1, 1, 1, 20));
-  const sphereGeo = geometry(new THREE.SphereGeometry(1, 12, 8));
+  const sphereGeo = geometry(new THREE.SphereGeometry(1, 20, 14));
 
-  function mesh(shape, material, position, scale = [1, 1, 1], parent = world, edged = false) {
+  function mesh(shape, material, position, scale = [1, 1, 1], parent = world) {
     const item = new THREE.Mesh(shape, material);
     item.position.set(...position);
     item.scale.set(...scale);
     item.castShadow = true;
     item.receiveShadow = true;
     parent.add(item);
-    if (edged) {
-      const edges = new THREE.LineSegments(geometry(new THREE.EdgesGeometry(shape, 35)), outline);
-      item.add(edges);
-    }
+    // The ink pass draws silhouettes and creases from depth; no wireframe edges.
     return item;
   }
-  const box = (position, scale, material = toon.cream, parent = world, edged = true) => mesh(boxGeo, material, position, scale, parent, edged);
+  const box = (position, scale, material = toon.cream, parent = world) => mesh(boxGeo, material, position, scale, parent);
   const cylinder = (position, scale, material = toon.green, parent = world) => mesh(cylinderGeo, material, position, scale, parent);
   const ball = (position, scale, material = toon.rose, parent = world) => mesh(sphereGeo, material, position, scale, parent);
   function rod(a, b, radius, material = toon.wood, parent = world) {
@@ -102,20 +107,47 @@ export function mountSakuraScene(host) {
     return mesh(geometry(new THREE.PlaneGeometry(width, height)), material, [0, 0, 0]);
   }
 
-  scene.add(new THREE.HemisphereLight('#fff6e8', '#a2ad92', 1.65));
-  const sun = new THREE.DirectionalLight('#fff1d6', 2.25);
-  sun.position.set(-4, 8, 6); sun.castShadow = true;
-  sun.shadow.mapSize.set(1024, 1024);
-  Object.assign(sun.shadow.camera, { left: -7, right: 7, top: 7, bottom: -7, near: 1, far: 24 });
-  sun.shadow.bias = -.0008;
-  sun.shadow.normalBias = .025;
+  scene.add(new THREE.HemisphereLight(PAL.hemiSky, PAL.hemiGround, 1.12));
+  const sun = new THREE.DirectionalLight(PAL.sun, 2.25);
+  sun.position.set(-5.2, 8.2, 6.6); sun.castShadow = true;
+  sun.shadow.mapSize.set(2048, 2048);
+  Object.assign(sun.shadow.camera, { left: -8, right: 8, top: 8, bottom: -8, near: .5, far: 32 });
+  sun.shadow.bias = -.0004;
+  sun.shadow.normalBias = .007;
   scene.add(sun);
+  const fill = new THREE.DirectionalLight(PAL.fill, 1.08);
+  fill.position.set(6, 3.8, -5.5); scene.add(fill);
+  const bounce = new THREE.DirectionalLight(0xd8cbe8, .34);
+  bounce.position.set(1, -3, 4); scene.add(bounce);
+
+  // A quiet street extends beyond the shop. The scene has a foreground and
+  // fading neighbourhood instead of sitting on an isolated presentation plinth.
+  const pavement = box([0, -.12, -8.3], [65, .18, 24], toon.sand, world);
+  pavement.castShadow = false;
+  const road = box([0, -.14, 8.5], [65, .14, 10], toon.road, world);
+  road.castShadow = false;
+  box([0, -.015, 3.47], [65, .14, .16], toon.plaster, world);
+  for (let i = -5; i < 6; i += 1) box([i * 3.3, -.055, 8.5], [1.25, .008, .1], toon.plaster, world);
+  const distantWall = celMaterials.cel({ color: '#d5dce5', bands: 'soft', flat: false });
+  const distantRoof = celMaterials.cel({ color: '#939bab', bands: 'soft', flat: false });
+  const distantWindow = celMaterials.flat({ color: '#aebdc9' });
+  for (let i = -3; i < 5; i += 1) {
+    const x = i * 4.5 + .6;
+    const h = 2.6 + ((i + 3) % 3) * .65;
+    const house = box([x, h / 2 - .1, -9.8], [3.6, h, 2.1], distantWall, world);
+    house.castShadow = false;
+    const roof = box([x, h, -9.8], [3.85, .18, 2.45], distantRoof, world); roof.castShadow = false;
+    for (const dx of [-.95, .8]) {
+      const window = box([x + dx, h - .85, -8.72], [.65, .86, .03], distantWindow, world);
+      window.castShadow = false;
+    }
+  }
 
   // A small, tangible island with a paper-coloured pavement edge.
   box([0, -.18, 0], [8.7, .35, 5.7], toon.sand);
   box([0, .025, 0], [8.65, .08, 5.65], toon.cream);
-  box([0, .072, 2.27], [8.5, .018, .68], toon.plaster, world, false);
-  for (let i = 0; i < 8; i += 1) box([-3.8 + i * 1.08, .09, 2.27], [.012, .012, .68], toon.sand, world, false);
+  box([0, .072, 2.27], [8.5, .018, .68], toon.plaster, world);
+  for (let i = 0; i < 8; i += 1) box([-3.8 + i * 1.08, .09, 2.27], [.012, .012, .68], toon.sand, world);
   box([.35, .18, -.75], [4.25, .28, 2.6], toon.sand);
   box([.35, 1.45, -.83], [3.85, 2.35, 2.18], toon.plaster);
   box([.35, .44, .28], [3.96, .26, .1], toon.green);
@@ -127,7 +159,7 @@ export function mountSakuraScene(host) {
   roofBack.rotation.x = -.42;
   box([.35, 3.26, -.83], [4.58, .11, .12], toon.leaf);
   for (let i = 0; i < 10; i += 1) {
-    const seam = box([-1.61 + i * .435, 3.031, -.18], [.022, .013, 1.41], toon.leaf, world, false);
+    const seam = box([-1.61 + i * .435, 3.031, -.18], [.022, .013, 1.41], toon.leaf, world);
     seam.rotation.x = .42;
   }
   box([-1.03, 1.22, .28], [.69, 1.86, .08], toon.green);
@@ -141,13 +173,13 @@ export function mountSakuraScene(host) {
   const shopSign = label('SIDE B  RECORDS', 2.5, .55, '#fff4db', '#315a4b');
   shopSign.position.set(.35, 2.49, .3);
   for (let i = 0; i < 12; i += 1) {
-    const awning = box([-1.74 + i * .38, 2.05, .7], [.385, .07, .94], i % 2 ? toon.plaster : toon.rose, world, false);
+    const awning = box([-1.74 + i * .38, 2.05, .7], [.385, .07, .94], i % 2 ? toon.plaster : toon.rose, world);
     awning.rotation.x = .18;
-    box([-1.74 + i * .38, 1.93, 1.16], [.383, .19, .065], i % 2 ? toon.plaster : toon.rose, world, false);
+    box([-1.74 + i * .38, 1.93, 1.16], [.383, .19, .065], i % 2 ? toon.plaster : toon.rose, world);
   }
   box([.35, .23, 1.28], [4.4, .32, 1.62], toon.wood);
   box([.35, .409, 1.28], [4.41, .035, 1.62], toon.cream);
-  for (let i = 0; i < 7; i += 1) box([-1.58 + i * .63, .433, 1.28], [.015, .012, 1.6], toon.sand, world, false);
+  for (let i = 0; i < 7; i += 1) box([-1.58 + i * .63, .433, 1.28], [.015, .012, 1.6], toon.sand, world);
   box([.35, .115, 2.23], [2.6, .16, .42], toon.wood);
 
   // Speakers face the audience. A physical record carries the slow motion.
@@ -170,7 +202,7 @@ export function mountSakuraScene(host) {
     groove.rotation.x = -Math.PI / 2; groove.castShadow = false;
   }
   cylinder([0, .024, 0], [.112, .006, .112], toon.rose, record);
-  box([.035, .03, 0], [.016, .01, .12], toon.plaster, record, false);
+  box([.035, .03, 0], [.016, .01, .12], toon.plaster, record);
   rod([.87, 1.2, 1.14], [.76, 1.24, 1.55], .016, toon.sand);
   rod([.76, 1.24, 1.55], [.53, 1.22, 1.61], .016, toon.sand);
   const frontSign = label('ONE NIGHT, TWO VIEWS', 1.29, .3, '#fff4db', '#315a4b');
@@ -205,11 +237,13 @@ export function mountSakuraScene(host) {
       const position = [Math.cos(angle) * ring * size, height - .2 + (random() - .5) * .59, Math.sin(angle) * ring * size];
       const scale = [.58 * size, (.46 + random() * .16) * size, .57 * size];
       const crown = ball(position, scale, [toon.rose, toon.blush, toon.petal][i % 3], tree);
-      const edge = new THREE.Mesh(sphereGeo, crownOutline); edge.scale.setScalar(1.013); crown.add(edge);
+      crown.receiveShadow = false;
     }
   }
   sakuraTree(-3.02, -.83, 3.42, 1.06);
   sakuraTree(3.13, -1.69, 3.72, 1.02);
+  sakuraTree(-8, -4.1, 4.1, 1.3);
+  sakuraTree(8.4, -4.8, 4.3, 1.2);
   // Hand-placed petals on the pavement stay visible in the still composition.
   const petalShape = new THREE.Shape();
   petalShape.moveTo(0, -.5); petalShape.bezierCurveTo(-.5, -.15, -.5, .35, -.14, .5);
@@ -236,6 +270,18 @@ export function mountSakuraScene(host) {
     const lamp = ball([point.x, point.y - .165, point.z], [.059, .075, .059], lampMaterial); lamp.castShadow = false;
   }
 
+  const pipeline = new Pipeline(renderer, scene, camera, { pixelBudget: 2e6, maxPixelRatio: 1.5 });
+  // The source street works in much larger units. Here the camera-to-shop
+  // distance is ~16 units; keep its linework while letting rear houses fade.
+  const ink = pipeline.ink.mat.uniforms;
+  ink.uFadeStart.value = 20;
+  ink.uFadeEnd.value = 36;
+  ink.uSkyDepth.value = 65;
+  ink.uStrength.value = .8;
+  ink.uSens.value = .0038;
+  pipeline.grade.mat.uniforms.uVignette.value = .06;
+  pipeline.grade.mat.uniforms.uSaturation.value = 1.08;
+
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   let visible = true;
   let disposed = false;
@@ -252,7 +298,7 @@ export function mountSakuraScene(host) {
     });
     falling.instanceMatrix.needsUpdate = true;
   }
-  function draw() { if (!disposed && width && height) renderer.render(scene, camera); }
+  function draw() { if (!disposed && width && height) pipeline.render(); }
   function tick(now) {
     frame = 0;
     if (disposed || !visible || document.hidden || reducedMotion.matches) return;
@@ -273,13 +319,12 @@ export function mountSakuraScene(host) {
     const bounds = host.getBoundingClientRect();
     width = Math.round(bounds.width); height = Math.round(bounds.height);
     if (!width || !height || disposed) return;
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
-    renderer.setSize(width, height, false);
     const aspect = width / height;
-    const viewHeight = Math.max(7.7, 10.6 / aspect);
+    const viewHeight = Math.max(6.6, 9.8 / aspect);
     camera.left = -viewHeight * aspect / 2; camera.right = viewHeight * aspect / 2;
     camera.top = viewHeight / 2; camera.bottom = -viewHeight / 2;
     camera.updateProjectionMatrix();
+    pipeline.setSize(width, height);
     renderer.shadowMap.needsUpdate = true;
     draw();
   }
@@ -300,6 +345,7 @@ export function mountSakuraScene(host) {
     document.removeEventListener('visibilitychange', updateMotion);
     reducedMotion.removeEventListener('change', updateMotion);
     geometries.forEach(item => item.dispose()); materials.forEach(item => item.dispose()); textures.forEach(item => item.dispose());
+    celMaterials.dispose(); pipeline.dispose();
     sun.shadow.dispose();
     scene.clear(); renderer.renderLists.dispose(); renderer.dispose(); renderer.forceContextLoss();
     canvas.remove(); host.classList.remove('sakura-scene');

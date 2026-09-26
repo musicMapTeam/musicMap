@@ -1,0 +1,43 @@
+{
+  "repository": "https://github.com/Kenton-GMI/sakura-crossing",
+  "commit": "de01898e89c7f6ab3fad93fa802f0f5ac66fbd81",
+  "license": "MIT",
+  "licenseFile": "../../../assets/licenses/sakura-crossing-MIT.txt",
+  "copyright": "Copyright (c) 2026 Kenton Wang",
+  "copiedAt": "2026-09-27",
+  "upstreamThreeVersion": "0.180.0",
+  "integrationThreeVersion": "0.186.1",
+  "scope": "Cel materials, palette and scene-depth ink / color grade / FXAA. No upstream world, player, input, texture artwork or audio.",
+  "files": [
+    {
+      "path": "toon.js",
+      "upstreamPath": "src/core/toon.js",
+      "upstreamSha256": "03fa64e7863dfd9260f3d0b859262ac1858282a48ad536a52e56959e13ef44ac",
+      "modified": true,
+      "changes": [
+        "Wrap material and ramp caches in createCelMaterials() so each mounted scene owns and disposes its resources.",
+        "Remove unused world material shortcuts. Retain the cel tint shader patch and customProgramCacheKey.",
+        "Read Three 0.186.1 lights_toon_pars_fragment.glsl.js: the irradiance patch anchor matches the current source."
+      ]
+    },
+    {
+      "path": "post.js",
+      "upstreamPath": "src/core/post.js",
+      "upstreamSha256": "3232d66acf48423c921e0b6f6ebdce0f0251683090acc89b91eff6568c8eeeff",
+      "modified": true,
+      "changes": [
+        "Add orthographicDepthToViewZ selection from the host camera; synchronize projection mode and clipping planes on setSize.",
+        "Add maxPixelRatio option, default 1.5, and 2 million render-target pixel budget; allow downsampling beyond that budget.",
+        "Use lighter line width for a small scene; remove the upstream unused enabled.grade flag, retaining the linear-to-sRGB grade pass.",
+        "Correct the blanket claim about second differences on arbitrary perspective planes."
+      ]
+    },
+    {
+      "path": "palette.js",
+      "upstreamPath": "src/core/palette.js",
+      "upstreamSha256": "51ecd369145a17e77b565b8c0785f249a55b764f7f975ac80b711863b53bd588",
+      "modified": false
+    }
+  ],
+  "hostIntegration": "../../sakura-scene.js owns original shop / street geometry, lighting, gradient sky, composition, local scale parameters and lifecycle. The host preserves reduced motion, 30 fps updates, visibility suspension and cleanup."
+}

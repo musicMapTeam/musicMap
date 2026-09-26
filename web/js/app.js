@@ -7,6 +7,9 @@ import '../css/theme-sakura.css';
 import '../css/theme-zine.css';
 import 'overlayscrollbars/overlayscrollbars.css';
 import '../css/compact.css';
+import '../css/app-studio.css';
+import '../css/space-studio.css';
+import '../css/map-studio.css';
 import { OverlayScrollbars } from 'overlayscrollbars';
 import { mountThemes } from './themes.js';
 import { icon } from './icons.js';
@@ -117,13 +120,13 @@ function navItems() {
 
 function shell() {
   root.innerHTML = `
-    <header class="app-masthead">
+    <header class="app-masthead app-studio-shell">
       <button class="brand" data-nav="space" aria-label="Music Map 首页">
         <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
         <span class="brand-wordmark">music<span class="brand-light">map</span></span>
       </button>
       <nav class="primary-nav" aria-label="主要导航">${navItems()}</nav>
-      <div class="masthead-tools"><button class="demo-help icon-button" id="demo-help" aria-label="关于 Music Map" aria-haspopup="dialog" aria-controls="about-dialog">${icon('info')}</button><button class="theme-launcher" id="theme-launcher" aria-haspopup="dialog" aria-controls="theme-dialog"><span class="theme-launcher__swatch" aria-hidden="true"></span><span data-theme-name>声浪现场</span></button></div>
+      <div class="masthead-tools"><button class="theme-launcher" id="theme-launcher" aria-haspopup="dialog" aria-controls="theme-dialog"><span class="theme-launcher__swatch" aria-hidden="true"></span><span data-theme-name>声浪现场</span></button><button class="demo-help icon-button" id="demo-help" aria-label="关于 Music Map" aria-haspopup="dialog" aria-controls="about-dialog">${icon('info')}</button></div>
     </header>
     <div class="app-body">
       <div id="storage-warning" class="storage-warning" role="alert" hidden>这次修改尚未保存到浏览器，当前页面内容仍保留。可减少上传图片后重试。<button id="retry-save">重试保存</button></div>

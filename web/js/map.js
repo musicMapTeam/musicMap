@@ -65,7 +65,7 @@ function evidenceHTML(edge, api) {
 }
 
 function catalogueSwitchHTML(dataset) {
-  return `<div class="map-catalogue"><div class="map-catalogue__switch" role="group" aria-label="选择音乐图谱">${Object.values(catalogues).map(item => button('dataset', item.id === 'real' ? '真实合作' : '情景示例', item.id === dataset ? 'is-active' : '', `data-dataset="${item.id}" aria-pressed="${item.id === dataset}"`)).join('')}</div><p>${dataset === 'real' ? '11 位艺人 · 10 首合作' : '9 位虚构艺人'}</p></div>`;
+  return `<div class="map-catalogue"><div class="map-catalogue__switch" role="group" aria-label="选择音乐图谱">${Object.values(catalogues).map(item => button('dataset', item.id === 'real' ? '真实合作' : '情景示例', item.id === dataset ? 'is-active' : '', `data-dataset="${item.id}" aria-pressed="${item.id === dataset}"`)).join('')}</div></div>`;
 }
 
 function tracksHTML(session, trackIds, api, source = '', showVersion = false) {
@@ -124,38 +124,36 @@ function mapHTML(map, api, presentation = 'quiet') {
   const isChallenge = session.type === 'challenge';
   const isComplete = session.status === 'complete';
   const isEventArtist = ['a', 'b'].includes(node.id);
-  return `<section class="map-experience map-experience--compact map-experience--${presentation}" aria-label="音乐关系探索">
-    <div class="map-heading map-heading--compact">
-      <div class="map-heading__title"><h1>${isChallenge ? '合作挑战' : '音乐地图'}</h1></div>
-      <div class="map-heading__aside"><div class="map-heading__actions">${button('search', `${api.icon('compass')} 换个起点`, 'button button--quiet')}${button('challenge', '合作挑战')}</div></div>
-    </div>
-    ${catalogueSwitchHTML(dataset)}
+  return `<section class="map-experience map-studio map-experience--${presentation}" aria-label="音乐关系探索">
+    <header class="map-studio-head">
+      <div class="map-studio-title"><h1>${isChallenge ? '合作挑战' : '音乐地图'}</h1>${catalogueSwitchHTML(dataset)}</div>
+      <div class="map-studio-tools">${button('search', api.icon('compass'), 'icon-button', 'aria-label="换个起点" title="换个起点"')}${button('challenge', '合作挑战', 'button button--quiet')}</div>
+    </header>
     ${isChallenge ? `<div class="map-challenge-banner"><div><span class="map-challenge-banner__label">${isComplete ? '已抵达' : '挑战中'}</span><strong>${escapeHTML(artistName(session.start))} ${api.icon('arrow-right')} ${escapeHTML(artistName(session.target))}</strong></div><span><b>${session.path.length - 1}</b> 步</span>${button('return-roam', '返回漫游', 'button button--quiet', `data-session="${session.id}"`)}</div>` : ''}
     <div class="map-workspace">
       <div class="map-stage-column">
-        <div class="map-stage-top"><div class="map-mode-switch" aria-label="关系类型">${catalogue.hasStyle ? `${button('mode', '合作', session.mode === 'co' ? 'is-active' : '', `data-mode="co" aria-pressed="${session.mode === 'co'}"`)}${button('mode', '策展标签', session.mode === 'style' ? 'is-active' : '', `data-mode="style" aria-pressed="${session.mode === 'style'}" ${isChallenge ? 'disabled title="挑战只沿合作关系前进"' : ''}`)}` : '<span class="map-mode-caption">合作关系</span>'}</div><div class="map-stage-tools">${button('relations', '来源', 'button button--quiet')}${button('rotate', api.icon('rotate'), 'icon-button', 'aria-label="旋转关系图" title="旋转关系图"')}</div></div>
-        ${discoveryHTML(session, api, map.undo)}
-        <div class="map-stage" data-map-stage tabindex="0" role="group" aria-label="${escapeHTML(artist.name)}的关系图。可拖动或使用方向键旋转，也可展开「全部连接」选择艺人。">
-          <div class="map-optical-field" aria-hidden="true"><span></span><span></span></div>
+        <div class="map-stage-top"><div class="map-mode-switch" aria-label="关系类型">${catalogue.hasStyle ? `${button('mode', '合作', session.mode === 'co' ? 'is-active' : '', `data-mode="co" aria-pressed="${session.mode === 'co'}"`)}${button('mode', '策展标签', session.mode === 'style' ? 'is-active' : '', `data-mode="style" aria-pressed="${session.mode === 'style'}" ${isChallenge ? 'disabled title="挑战只沿合作关系前进"' : ''}`)}` : `<span class="map-mode-caption">${neighbors.length} 条连接</span>`}</div><div class="map-stage-tools">${button('relations', '连接与来源', 'button button--quiet')}${button('rotate', api.icon('rotate'), 'icon-button', 'aria-label="旋转关系图" title="旋转关系图"')}</div></div>
+        <div class="map-stage" data-map-stage tabindex="0" role="group" aria-label="${escapeHTML(artist.name)}的关系图。可拖动或使用方向键旋转，也可打开「连接与来源」选择艺人。">
           <svg class="map-graph-lines" data-map-lines aria-hidden="true"></svg>
-          <span class="map-stage__axis map-stage__axis--x" aria-hidden="true"></span><span class="map-stage__axis map-stage__axis--y" aria-hidden="true"></span>
           <button type="button" class="map-node map-node--center ${artist.name.length > 3 ? 'map-node--long' : ''}" data-map-action="artist" style="--node-tone:${artist.color}" aria-label="查看${escapeHTML(artist.name)}的${isReal ? '入选合作作品' : '示例作品'}">
-            <span class="map-node__disc" aria-hidden="true"><i></i></span><span class="map-node__name">${escapeHTML(artist.name)}</span><span class="map-node__hint">看作品 ${api.icon('arrow-up-right')}</span>
+            <span class="map-node__disc" aria-hidden="true"><i>${escapeHTML(artist.name.slice(0, 1))}</i></span><span class="map-node__name">${escapeHTML(artist.name)}</span><span class="map-node__hint">${artist.songIds.length} 首作品 ${api.icon('arrow-up-right')}</span>
           </button>
-          ${neighbors.map(edge => { const next = artistById[otherArtist(edge, node.id)]; return `<button type="button" class="map-node map-node--orbit" data-map-action="move" data-id="${next.id}" style="--node-tone:${next.color}" aria-label="沿${escapeHTML(edge.reason)}探索${escapeHTML(next.name)}" ${isComplete ? 'disabled' : ''}><span class="map-node__disc" aria-hidden="true"><i></i></span><span class="map-node__name">${escapeHTML(next.name)}</span><span class="map-node__tag">${escapeHTML(edge.song ? songs[edge.song].title : edge.reason)}</span></button>`; }).join('')}
+          ${neighbors.map(edge => { const next = artistById[otherArtist(edge, node.id)]; return `<button type="button" class="map-node map-node--orbit" data-map-action="move" data-id="${next.id}" style="--node-tone:${next.color}" aria-label="沿${escapeHTML(edge.reason)}探索${escapeHTML(next.name)}" ${isComplete ? 'disabled' : ''}><span class="map-node__disc" aria-hidden="true"><i>${escapeHTML(next.name.slice(0, 1))}</i></span><span class="map-node__name">${escapeHTML(next.name)}</span><span class="map-node__tag">${escapeHTML(edge.song ? songs[edge.song].title : edge.reason)}</span></button>`; }).join('')}
           ${!neighbors.length ? '<span class="map-stage__no-links">暂无收录连接</span>' : ''}
         </div>
-        <div class="map-route-bar"><div class="map-route-controls">${button('back', api.icon('arrow-left'), 'icon-button', `aria-label="返回上一位${isChallenge ? '并撤销一步' : ''}" ${session.path.length < 2 || isComplete ? 'disabled' : ''}`)}${button('reset', api.icon('rotate'), 'icon-button', `aria-label="回到起点" ${session.path.length < 2 || isComplete ? 'disabled' : ''}`)}</div><div class="map-route-trail" aria-label="当前路线">${session.path.map((step, index) => `<span ${index === session.path.length - 1 ? 'aria-current="step"' : ''}>${escapeHTML(artistName(step.id))}</span>`).join('<span class="map-route-trail__arrow" aria-hidden="true">/</span>')}</div>${button('recap', `${session.saved.length} 首留下 ${api.icon('arrow-up-right')}`, 'button button--quiet', `data-session="${session.id}"`)}</div>
       </div>
       <aside class="map-artist-panel" aria-label="${escapeHTML(artist.name)}的作品与连接">
-        <div class="map-artist-panel__heading"><h2>${escapeHTML(artist.name)}</h2><span class="map-artist-mark" style="--node-tone:${artist.color}" aria-hidden="true"></span></div>
-        <div class="map-section-label"><h3>${isReal ? '入选合作' : '示例作品 · 无音频'}</h3></div>
+        <div class="map-artist-panel__heading"><div><span class="map-card-label">${isReal ? '合作唱片' : '示例作品 · 无音频'}</span><h2>${escapeHTML(artist.name)}</h2></div><span class="map-artist-mark" style="--node-tone:${artist.color}" aria-hidden="true"></span></div>
         ${tracksHTML(session, artist.songIds, api, `在${artist.name}的${isReal ? '入选合作作品' : '示例作品'}中留下`)}
         <details class="map-connections"><summary>全部连接 <span>${neighbors.length}</span></summary><div class="map-neighbor-list">${neighbors.map(edge => { const next = artistById[otherArtist(edge, node.id)]; return `<button type="button" class="map-neighbor" data-map-action="move" data-id="${next.id}" ${isComplete ? 'disabled' : ''}><span class="map-neighbor__tone" style="--node-tone:${next.color}" aria-hidden="true"></span><span><strong>${escapeHTML(next.name)}</strong><small>${edge.song ? `《${escapeHTML(songs[edge.song].title)}》` : escapeHTML(edge.reason)}</small></span>${api.icon('arrow-up-right')}</button>`; }).join('') || '<p class="map-inline-empty">本专题暂无收录。</p>'}</div></details>
       </aside>
     </div>
+    <div class="map-studio-dock">
+      ${discoveryHTML(session, api, map.undo)}
+      <div class="map-route-bar"><div class="map-route-controls">${button('back', api.icon('arrow-left'), 'icon-button', `aria-label="返回上一位${isChallenge ? '并撤销一步' : ''}" ${session.path.length < 2 || isComplete ? 'disabled' : ''}`)}${button('reset', api.icon('rotate'), 'icon-button', `aria-label="回到起点" ${session.path.length < 2 || isComplete ? 'disabled' : ''}`)}</div><div class="map-route-trail" aria-label="当前路线">${session.path.map((step, index) => `<span ${index === session.path.length - 1 ? 'aria-current="step"' : ''}>${escapeHTML(artistName(step.id))}</span>`).join('<span class="map-route-trail__arrow" aria-hidden="true">·</span>')}</div>${button('recap', `${session.saved.length} 首收藏`, 'button button--quiet', `data-session="${session.id}"`)}</div>
+    </div>
     ${undoHTML(map, api)}
-    <div class="map-foot"><div>${isChallenge ? button('recap', isComplete ? '挑战结果' : '回顾路线', 'button button--quiet', `data-session="${session.id}"`) : button('finish', '结束探索', 'button button--quiet')}</div>${button('space', `${api.icon('users')} ${isReal ? '创建自己的同场' : isEventArtist ? '去关联示例现场' : '去示例现场'} ${api.icon('arrow-up-right')}`, 'button button--quiet map-space-link', `title="${isReal ? '为自己的活动创建房间，可返回这次探索' : '回声现场 · 虚构情景'}"`)}</div>
+    <div class="map-foot"><div>${isChallenge ? button('recap', isComplete ? '挑战结果' : '回顾路线', 'button button--quiet', `data-session="${session.id}"`) : button('finish', '结束探索', 'button button--quiet')}</div>${button('space', `${api.icon('users')} ${isReal ? '去同场' : isEventArtist ? '关联示例现场' : '示例现场'} ${api.icon('arrow-up-right')}`, 'button button--quiet map-space-link', `title="${isReal ? '为自己的活动创建房间，可返回这次探索' : '回声现场 · 虚构情景'}"`)}</div>
     ${panelHTML(map, api)}
   </section>`;
 }
@@ -197,11 +195,11 @@ function panelHTML(map, api, recordsOnly = false) {
   const isReal = dataset === 'real';
   let content = '';
   if (panel === 'search') content = `<span class="eyebrow">${catalogue.label}</span><h2>换个起点</h2><p class="map-panel-description">开启新探索，当前记录保留。</p><label class="map-search-label" for="map-artist-search">${availableArtists.length} 位艺人</label><input id="map-artist-search" class="map-input" type="search" placeholder="${isReal ? '搜索名字，如 周杰伦、JJ Lin' : '搜索名字或标签，如 林间、民谣'}" value="${escapeHTML(map.view.query)}" autocomplete="off"><div class="map-search-results" data-map-search-results>${searchResultsHTML(map.view.query, dataset)}</div>`;
-  if (panel === 'challenge') content = `<span class="eyebrow">${catalogue.label}</span><h2>合作挑战</h2><p class="map-panel-description">沿合作关系到达终点，不限时间与步数。挑战单独保存，可随时返回漫游。</p><form data-map-challenge-form><label class="map-field">起点<select name="start">${availableArtists.map(artist => `<option value="${artist.id}" ${map.view.challengeStart === artist.id ? 'selected' : ''}>${escapeHTML(artist.name)}</option>`).join('')}</select></label><label class="map-field">终点<select name="target">${availableArtists.map(artist => `<option value="${artist.id}" ${map.view.challengeEnd === artist.id ? 'selected' : ''}>${escapeHTML(artist.name)}</option>`).join('')}</select></label><p class="map-form-error" data-map-challenge-error role="alert">${escapeHTML(map.view.challengeError)}</p><button class="button button--primary" type="submit">开始挑战 ${api.icon('arrow-right')}</button></form><p class="map-storage-note">每次连接计 1 步，返回撤销 1 步。仅使用本图谱已收录的关系。</p>`;
-  if (panel === 'artist' && session) { const artist = artistById[currentNode(session).id]; content = `<span class="eyebrow">${catalogue.label} · ${isReal ? '入选合作' : '示例作品'}</span><h2>${escapeHTML(artist.name)}</h2><p class="map-panel-description">${isReal ? '「去听」打开 YouTube 官方 MV，受地区与登录条件限制。本站无内置播放。' : '虚构作品，无音源。'}</p>${tracksHTML(session, artist.songIds, api, `在${artist.name}的${isReal ? '入选合作作品' : '示例作品'}中留下`, true)}`; }
+  if (panel === 'challenge') content = `<span class="eyebrow">${catalogue.label}</span><h2>合作挑战</h2><p class="map-panel-description">沿合作找到终点，进度自动保留。</p><form data-map-challenge-form><label class="map-field">起点<select name="start">${availableArtists.map(artist => `<option value="${artist.id}" ${map.view.challengeStart === artist.id ? 'selected' : ''}>${escapeHTML(artist.name)}</option>`).join('')}</select></label><label class="map-field">终点<select name="target">${availableArtists.map(artist => `<option value="${artist.id}" ${map.view.challengeEnd === artist.id ? 'selected' : ''}>${escapeHTML(artist.name)}</option>`).join('')}</select></label><p class="map-form-error" data-map-challenge-error role="alert">${escapeHTML(map.view.challengeError)}</p><button class="button button--primary" type="submit">开始挑战 ${api.icon('arrow-right')}</button></form><p class="map-storage-note">每次连接计 1 步，返回撤销 1 步。仅使用本图谱已收录的关系。</p>`;
+  if (panel === 'artist' && session) { const artist = artistById[currentNode(session).id]; content = `<span class="eyebrow">${catalogue.label} · ${isReal ? '入选合作' : '示例作品'}</span><h2>${escapeHTML(artist.name)}</h2><p class="map-panel-description">${isReal ? '官方 MV · 新标签页打开' : '虚构作品，无音源。'}</p>${tracksHTML(session, artist.songIds, api, `在${artist.name}的${isReal ? '入选合作作品' : '示例作品'}中留下`, true)}`; }
   if (panel === 'relations' && session) {
     const id = currentNode(session).id;
-    content = `<span class="eyebrow">${catalogue.label} · ${modeName(session.mode)}</span><h2>连接来源</h2><p class="map-panel-description">${isReal ? '按发布方的共同演唱署名整理。「去听」打开 YouTube 官方 MV，受地区与登录条件限制；本站无内置播放。' : '虚构合作与人工策展标签，无音源，未使用模型推理。'}</p>${getNeighbors(id, session.mode, dataset).map(edge => `<section class="map-relation-proof"><h3>${escapeHTML(artistName(id))} <span>↔</span> ${escapeHTML(artistName(otherArtist(edge, id)))}</h3><p>${escapeHTML(edge.evidence)}</p>${edge.dataset === 'real' ? `<p class="map-relation-credits">${songs[edge.song].credits.map(credit => `${escapeHTML(artistName(credit.artistId))} · ${escapeHTML(credit.role)}`).join(' / ')}<br>核对日期：${edge.checkedAt}</p>` : ''}${evidenceHTML(edge, api)}${edge.song ? tracksHTML(session, [edge.song], api, `通过${artistName(edge.a)}与${artistName(edge.b)}的合作作品留下`, true) : ''}</section>`).join('') || '<p class="map-inline-empty">本图谱暂无收录。</p>'}`;
+    content = `<span class="eyebrow">${catalogue.label} · ${modeName(session.mode)}</span><h2>连接来源</h2><p class="map-panel-description">${isReal ? '按共同演唱署名整理。官方 MV 可能受地区或登录限制。' : '虚构示例，无音源。标签由人工整理。'}</p>${getNeighbors(id, session.mode, dataset).map(edge => `<section class="map-relation-proof"><div class="map-relation-title"><h3>${escapeHTML(artistName(id))} <span>↔</span> ${escapeHTML(artistName(otherArtist(edge, id)))}</h3>${button('move', api.icon('arrow-up-right'), 'icon-button', `data-id="${otherArtist(edge, id)}" aria-label="前往${escapeHTML(artistName(otherArtist(edge, id)))}" ${session.status === 'complete' ? 'disabled' : ''}`)}</div><p>${escapeHTML(edge.evidence)}</p>${edge.dataset === 'real' ? `<p class="map-relation-credits">${songs[edge.song].credits.map(credit => `${escapeHTML(artistName(credit.artistId))} · ${escapeHTML(credit.role)}`).join(' / ')}<br>核对日期：${edge.checkedAt}</p>` : ''}${evidenceHTML(edge, api)}${edge.song ? tracksHTML(session, [edge.song], api, `通过${artistName(edge.a)}与${artistName(edge.b)}的合作作品留下`, true) : ''}</section>`).join('') || '<p class="map-inline-empty">本图谱暂无收录。</p>'}`;
   }
   if (panel === 'recap' && session) content = recapHTML(session, api);
   if (panel === 'delete' && session) content = `<h2>删除这次探索？</h2><p class="map-panel-description">将删除从${escapeHTML(artistName(session.start))}出发的路线、分支和作品清单，无法恢复。</p><div class="map-panel-actions">${button('delete-confirm', '删除记录', 'button button--primary', `data-session="${session.id}"`)}${button('close', '保留')}</div>`;
@@ -533,11 +531,13 @@ function attachInteractions(container, api, recordsOnly) {
       const rotatedZ = -x * Math.sin(yaw) + z * Math.cos(yaw);
       const rotatedY = y * Math.cos(pitch) - rotatedZ * Math.sin(pitch);
       const depth = y * Math.sin(pitch) + rotatedZ * Math.cos(pitch);
-      let px = rotatedX * Math.min(width * 0.33, 240);
+      let px = rotatedX * Math.min(width * 0.34, 270);
       let py = rotatedY * height * 0.34;
       const distance = Math.hypot(px, py);
-      const minimum = width < 480 ? 104 : 127;
+      const minimum = width < 480 ? 123 : 174;
       if (distance < minimum) { const factor = minimum / Math.max(distance, 0.01); px *= factor; py *= factor; }
+      px = Math.max(-width / 2 + 55, Math.min(width / 2 - 55, px));
+      py = Math.max(-height / 2 + 65, Math.min(height / 2 - 65, py));
       const scale = 0.87 + (depth + 1) * 0.065;
       node.style.transform = `translate(calc(-50% + ${px}px), calc(-50% + ${py}px)) scale(${scale})`;
       node.style.opacity = String(0.78 + (depth + 1) * 0.1);
@@ -546,7 +546,7 @@ function attachInteractions(container, api, recordsOnly) {
     });
     const svg = stage.querySelector('[data-map-lines]');
     svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
-    svg.innerHTML = `<g fill="none" stroke="rgba(112,221,207,.10)" stroke-width="1"><ellipse cx="${width / 2}" cy="${height / 2}" rx="${width * 0.39}" ry="${height * 0.37}"/><ellipse cx="${width / 2}" cy="${height / 2}" rx="${width * 0.39}" ry="${height * 0.13}" transform="rotate(${yaw * 18 - 18} ${width / 2} ${height / 2})"/><ellipse cx="${width / 2}" cy="${height / 2}" rx="${width * 0.16}" ry="${height * 0.38}" transform="rotate(${pitch * 20 + 27} ${width / 2} ${height / 2})"/></g><g fill="none" stroke="${session.mode === 'co' ? 'rgba(112,221,207,.55)' : 'rgba(255,126,89,.58)'}" stroke-width="1.2" ${session.mode === 'style' ? 'stroke-dasharray="4 6"' : ''}>${coordinates.map(([x, y], index) => `<path d="M${width / 2},${height / 2} Q${(width / 2 + x) / 2 + (index % 2 ? 20 : -20)},${(height / 2 + y) / 2 + 18} ${x},${y}"/>`).join('')}</g>`;
+    svg.innerHTML = `<g class="map-orbit-ring" fill="none" stroke-width="1"><ellipse cx="${width / 2}" cy="${height / 2}" rx="${Math.min(width * 0.34, 270)}" ry="${height * 0.31}"/></g><g class="map-relation-lines" fill="none" stroke-width="1" ${session.mode === 'style' ? 'stroke-dasharray="3 7"' : ''}>${coordinates.map(([x, y], index) => `<path d="M${width / 2},${height / 2} Q${(width / 2 + x) / 2 + (index % 2 ? 14 : -14)},${(height / 2 + y) / 2 + 12} ${x},${y}"/>`).join('')}</g>`;
   }
 
   return () => {

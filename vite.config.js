@@ -7,6 +7,7 @@ const licenseText = readFileSync(new URL('./web/assets/licenses/phosphor-MIT.txt
 const qrLicenseText = readFileSync(new URL('./web/assets/licenses/qrcode-generator-MIT.txt', import.meta.url), 'utf8');
 const threeLicenseText = readFileSync(new URL('./web/assets/licenses/three-MIT.txt', import.meta.url), 'utf8');
 const scrollbarLicenseText = readFileSync(new URL('./web/assets/licenses/overlayscrollbars-MIT.txt', import.meta.url), 'utf8');
+const sakuraLicenseText = readFileSync(new URL('./web/assets/licenses/sakura-crossing-MIT.txt', import.meta.url), 'utf8');
 
 export default defineConfig({
   root: fileURLToPath(new URL('./web', import.meta.url)),
@@ -25,6 +26,7 @@ export default defineConfig({
         bundle['index.html'].source += `\n<!-- qrcode-generator 2.0.4, MIT License\n${qrLicenseText}\n-->\n`;
         bundle['index.html'].source += `\n<!-- Three.js 0.186.1, MIT License\n${threeLicenseText}\n-->\n`;
         bundle['index.html'].source += `\n<!-- OverlayScrollbars 2.16.0, MIT License\n${scrollbarLicenseText}\n-->\n`;
+        bundle['index.html'].source += `\n<!-- Sakura Crossing renderer adaptation, MIT License\n${sakuraLicenseText}\n-->\n`;
       },
     },
   ],
