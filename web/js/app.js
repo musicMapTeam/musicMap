@@ -18,7 +18,7 @@ let saveFailed = false;
 let recordsFilter = 'all';
 
 function initialState() {
-  return { version: 1, view: 'explore', actor: 'a', map: createMapState(), space: createSpaceState(), routePayload: null };
+  return { version: 1, view: 'space', actor: 'a', map: createMapState(), space: createSpaceState(), routePayload: null };
 }
 
 function load() {
@@ -61,6 +61,7 @@ function update(mutator) {
 
 function navigate(view, payload = null) {
   if (!views.includes(view)) return;
+  if (view === 'space' && payload?.intent === 'create-room') view = 'live';
   state.view = view;
   state.routePayload = payload;
   const nextUrl = new URL(location.href);
@@ -89,8 +90,9 @@ function updateChrome() {
   document.title = `${sectionNames[state.view]} · Music Map × Space`;
   document.querySelectorAll('[data-view-label]').forEach(el => { el.textContent = sectionNames[state.view]; });
   const identity = document.querySelector('.identity');
-  if (identity) identity.hidden = !['space', 'records'].includes(state.view);
-  const modeNames = { explore: '示例音乐图谱', space: '示例场次', records: '当前浏览器', live: '独立身份 · 同场交换' };
+  if (identity) identity.hidden = state.view !== 'records';
+  const currentMap = state.map.sessions.find(item => item.id === state.map.activeId);
+  const modeNames = { explore: currentMap?.dataset === 'real' ? '真实合作精选' : '情景示例图谱', space: '同场记忆', records: '当前浏览器', live: '邀请入场 · 自主分享' };
   document.querySelectorAll('[data-mode-label]').forEach(el => { el.textContent = modeNames[state.view]; });
   document.querySelectorAll('[data-footer-status]').forEach(el => { el.textContent = state.view === 'live' ? '房间成员可见，双方同意才交换' : '本地记录保存在当前浏览器'; });
 }
@@ -132,13 +134,13 @@ function shell() {
     <dialog id="about-dialog" class="about-dialog" aria-labelledby="about-title">
       <div class="about-top"><span class="eyebrow">MUSIC, WITH PEOPLE.</span><button class="icon-button" id="close-about" aria-label="关闭演示说明">${icon('x')}</button></div>
       <h2 id="about-title">顺着声音，<br><em>找到彼此。</em></h2>
-      <p>从艺人关系出发，进入同一场 Space。用自己的现场卡，交换另一个人的视角。</p>
+      <p>顺着真实合作发现音乐。散场以后，用另一个人的视角，补完整你记住的那一刻。</p>
       <div class="about-path" aria-label="选择体验入口">
-        <button data-nav="explore"><span>01</span><div><b>发现一首合作</b><small>点击地图里的艺人，看看声音怎样相连。</small></div>${icon('arrow-right')}</button>
+        <button data-nav="explore"><span>01</span><div><b>发现一首合作</b><small>顺着有来源的合作作品探索，到官方页面听歌。</small></div>${icon('arrow-right')}</button>
         <button data-nav="space"><span>02</span><div><b>先体验一次换卡</b><small>用示例角色走过制卡、同意与留下记忆。</small></div>${icon('arrow-right')}</button>
-        <button data-nav="live"><span>03</span><div><b>邀请朋友同场</b><small>创建房间，双方在自己的浏览器里操作。</small></div>${icon('arrow-right')}</button>
+        <button data-nav="live"><span>03</span><div><b>邀请朋友同场</b><small>命名你们的场次，用自己的照片留下不同视角。</small></div>${icon('arrow-right')}</button>
       </div>
-      <div class="about-facts"><p><b>先体验，再邀请</b><span>本地情景演示可切换 Lin 与阿遥，体验申请、接受与拒绝。也可以通过邀请码进入真实双人房间，由各自设备操作；联网体验需要可用的共享服务。</span></p><p><b>两种体验，清楚区分</b><span>本地记录保存在当前浏览器；在线房间的内容向房间成员展示，双方同意后才交换。示例艺人、场次与生成图片用于说明体验，不代表真实到场，尚未接入真实音频。</span></p></div>
+      <div class="about-facts"><p><b>先体验，再邀请</b><span>本地情景演示可切换 Lin 与阿遥，体验申请、接受与拒绝。也可以通过邀请码进入真实双人房间，由各自设备操作；联网体验需要可用的共享服务。</span></p><p><b>两种体验，清楚区分</b><span>本地记录保存在当前浏览器；联网卡默认私藏，主动展示后才供房间成员查看。真实合作精选提供官方外链；本地情景的虚构艺人、场次与生成配图用于说明体验，不代表真实到场。</span></p></div>
       <button class="button button--primary" id="start-experience">继续体验 ${icon('arrow-right')}</button>
     </dialog>`;
   root.addEventListener('click', event => {

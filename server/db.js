@@ -31,6 +31,15 @@ db.exec(`
     joined_at TEXT NOT NULL,
     PRIMARY KEY (room_id, user_id)
   );
+  CREATE TABLE IF NOT EXISTS photos (
+    id TEXT PRIMARY KEY,
+    room_id TEXT NOT NULL REFERENCES rooms(id),
+    owner_id TEXT NOT NULL REFERENCES users(id),
+    mime TEXT NOT NULL CHECK (mime = 'image/jpeg'),
+    data BLOB NOT NULL,
+    created_at TEXT NOT NULL
+  );
+  CREATE INDEX IF NOT EXISTS idx_photos_room_owner ON photos(room_id, owner_id);
   CREATE TABLE IF NOT EXISTS cards (
     id TEXT PRIMARY KEY,
     room_id TEXT NOT NULL REFERENCES rooms(id),
@@ -77,6 +86,17 @@ db.exec(`
   );
   CREATE INDEX IF NOT EXISTS idx_records_room_owner ON records(room_id, owner_id);
 `);
+
+// Additive migration keeps existing rooms, cards and accepted snapshots intact.
+for (const [table, additions] of [
+  ['rooms', { event_date: 'TEXT', city: 'TEXT', song: 'TEXT' }],
+  ['cards', { photo_id: 'TEXT REFERENCES photos(id)', perspective: 'TEXT' }],
+]) {
+  const columns = new Set(db.prepare(`PRAGMA table_info(${table})`).all().map((column) => column.name));
+  for (const [column, definition] of Object.entries(additions)) {
+    if (!columns.has(column)) db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+  }
+}
 
 export const get = (sql, ...values) => db.prepare(sql).get(...values);
 export const all = (sql, ...values) => db.prepare(sql).all(...values);

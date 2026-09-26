@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-CN" data-ready="false">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=1920,height=1080">
+  <title>同一刻，另一面 · 0.4 封面排版源</title>
+  <style>
+    :root { --ink:#0c1016; --paper:#f2efe7; --mint:#70ddcf; --coral:#ff7e59; --muted:#b5c4c1; }
+    * { box-sizing:border-box; margin:0; }
+    html,body { width:1920px; height:1080px; overflow:hidden; background:var(--ink); color:var(--paper); }
+    body { font-family:"Microsoft YaHei",sans-serif; }
+    main { position:relative; display:flex; flex-direction:column; width:100%; height:100%; padding:48px 72px 40px; gap:28px; isolation:isolate; }
+    header,footer { display:flex; align-items:center; justify-content:space-between; gap:36px; }
+    header { padding-bottom:23px; border-bottom:1px solid #f2efe749; }
+    .brand { font:700 27px Consolas,"Microsoft YaHei",monospace; letter-spacing:-.035em; }
+    .brand em { color:var(--mint); font-style:normal; }
+    .edition { color:var(--muted); font:24px Consolas,monospace; }
+    .hero { display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,1fr); align-items:center; flex:1; min-height:0; gap:52px; }
+    .copy { display:flex; flex-direction:column; align-items:flex-start; gap:33px; min-width:0; }
+    .kicker { color:var(--mint); font:24px Consolas,"Microsoft YaHei",monospace; letter-spacing:.09em; }
+    h1 { font-size:156px; line-height:1.15; font-weight:900; letter-spacing:-.075em; }
+    h1 span { display:block; }
+    h1 span:last-child { color:var(--mint); margin-left:88px; }
+    .promise { font-size:38px; line-height:1.65; max-width:830px; color:var(--paper); }
+    .tags { display:flex; gap:20px; align-items:center; margin-top:7px; }
+    .tags span { font-size:24px; line-height:1.5; }
+    .tags i { width:5px; height:5px; background:var(--coral); border-radius:50%; }
+    .ticket-hero { display:flex; align-items:center; justify-content:center; min-width:0; height:820px; position:relative; }
+    #ticket { display:none; width:auto; max-width:100%; height:776px; object-fit:contain; transform:rotate(3deg); filter:drop-shadow(18px 24px 30px #0008); }
+    .missing { width:100%; height:700px; border:1px dashed #b5c4c17a; display:flex; flex-direction:column; gap:20px; align-items:center; justify-content:center; color:var(--muted); font-size:26px; line-height:1.6; text-align:center; padding:45px; }
+    .missing strong { color:var(--coral); font-size:34px; }
+    html[data-ready="true"] #ticket { display:block; }
+    html[data-ready="true"] .missing { display:none; }
+    footer { min-height:42px; border-top:1px solid #f2efe72d; padding-top:21px; color:var(--muted); font-size:20px; line-height:1.4; }
+    footer b { font-weight:400; color:var(--coral); }
+    .rings { position:absolute; z-index:-1; width:1100px; height:1100px; border-radius:50%; right:-430px; top:-240px; opacity:.13; background:repeating-radial-gradient(circle,transparent 0 18px,var(--mint) 19px 21px,transparent 22px 39px); }
+    .rings.second { width:800px; height:800px; right:470px; top:auto; bottom:-610px; opacity:.18; background:repeating-radial-gradient(circle,transparent 0 16px,var(--coral) 17px 19px,transparent 20px 35px); }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="rings" aria-hidden="true"></div><div class="rings second" aria-hidden="true"></div>
+    <header><p class="brand">MUSIC MAP <em>×</em> MUSIC SPACE</p><p class="edition">MVP 0.4 / 2026</p></header>
+    <section class="hero">
+      <div class="copy">
+        <p class="kicker">ONE MOMENT. ANOTHER SIDE.</p>
+        <h1 aria-label="同一刻，另一面"><span>同一刻，</span><span>另一面</span></h1>
+        <p class="promise">用另一个视角，补完整你记住的那一晚</p>
+        <div class="tags"><span>自己的现场</span><i></i><span>另一种视角</span><i></i><span>共同的纪念</span></div>
+      </div>
+      <div class="ticket-hero">
+        <img id="ticket" src="assets/ticket-0.4.png" alt="0.4 应用实际导出的双人纪念票">
+        <div class="missing"><strong>待接入 0.4 实际导出票根</strong><p>当前是封面排版源，尚未渲染最终封面。</p><p>assets/ticket-0.4.png</p></div>
+      </div>
+    </section>
+    <footer><span>音乐探索 × 现场视角交换</span><span>应用实际导出票根 · <b>演示照片由 AI 生成</b></span></footer>
+  </main>
+  <script>
+    const ticket = document.querySelector('#ticket');
+    const ready = () => { document.documentElement.dataset.ready = String(ticket.naturalWidth > 0); };
+    ticket.addEventListener('load', ready);
+    ticket.addEventListener('error', ready);
+    if (ticket.complete) ready();
+  </script>
+</body>
+</html>

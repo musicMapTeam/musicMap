@@ -1,0 +1,127 @@
+{
+  "date": "2026-09-27",
+  "captureMethod": "Tabbit native Playwright page.screencast",
+  "capturedBy": "integration agent",
+  "rawLocalOnly": true,
+  "identity": "Same Tabbit browser, A on 127.0.0.1 and B on localhost, isolated localStorage and bearer identities; not two physical devices",
+  "photos": "Project AI-generated demo photos uploaded through file inputs; not real audience photos",
+  "sources": [
+    {
+      "file": "00-space-opening.webm",
+      "durationSeconds": 13.4,
+      "bytes": 1104436,
+      "codec": "vp8",
+      "width": 1600,
+      "height": 900,
+      "fps": "25/1",
+      "sha256": "26206F9C3876B95EB1DE7F9FD6E35DEDB4B795AF8F7B2F94AD2828B2A60AC445"
+    },
+    {
+      "file": "01-host-create.webm",
+      "durationSeconds": 10.12,
+      "bytes": 597334,
+      "codec": "vp8",
+      "width": 1600,
+      "height": 900,
+      "fps": "25/1",
+      "sha256": "15E4D3BEC21D7CB7AE71676EB35196344CF404B2FABA93951144B6BC9C9EA4BB"
+    },
+    {
+      "file": "01b-private-invite.webm",
+      "durationSeconds": 5.64,
+      "bytes": 367871,
+      "codec": "vp8",
+      "width": 1600,
+      "height": 900,
+      "fps": "25/1",
+      "sha256": "028033CB4D1672566EBC20FE85064FBE9BE2E79A97AB2D51E7CBCF24646047ED"
+    },
+    {
+      "file": "02-guest-perspective.webm",
+      "durationSeconds": 11.52,
+      "bytes": 724498,
+      "codec": "vp8",
+      "width": 1600,
+      "height": 900,
+      "fps": "25/1",
+      "sha256": "4CF9F92E4DDA5983F079F0F28D5861FE614E96ED466133462A5A9AE7C4059A22"
+    },
+    {
+      "file": "02b-guest-card.webm",
+      "durationSeconds": 5.64,
+      "bytes": 557175,
+      "codec": "vp8",
+      "width": 1600,
+      "height": 900,
+      "fps": "25/1",
+      "sha256": "A6037004121C2B5DFD7C906E340C87FDAB89C235D4D45E0A3A7A3DDEE988F4BE"
+    },
+    {
+      "file": "03-host-request.webm",
+      "durationSeconds": 15.92,
+      "bytes": 1218240,
+      "codec": "vp8",
+      "width": 1600,
+      "height": 900,
+      "fps": "25/1",
+      "sha256": "0318B64C4D39EC2FCDA0C3D5F94AED2A80DC28D4FCD40A09ED8A5B93675B9395"
+    },
+    {
+      "file": "04-guest-accept.webm",
+      "durationSeconds": 22.84,
+      "bytes": 1699797,
+      "codec": "vp8",
+      "width": 1600,
+      "height": 900,
+      "fps": "25/1",
+      "sha256": "4B870941C2A0942B50C1EDB8FBCD48C9740F5B3A4DCD978AA9F7723FF7A08099"
+    },
+    {
+      "file": "05b-host-download.webm",
+      "durationSeconds": 9.92,
+      "bytes": 612905,
+      "codec": "vp8",
+      "width": 1600,
+      "height": 900,
+      "fps": "25/1",
+      "sha256": "15F2708582539B3498E4ADCE779C573447F24F43AEAD5BCDA53CB773395314E0"
+    },
+    {
+      "file": "06-map-real.webm",
+      "durationSeconds": 17.76,
+      "bytes": 1128512,
+      "codec": "vp8",
+      "width": 1600,
+      "height": 900,
+      "fps": "25/1",
+      "sha256": "BC65C6509793C656B0972F9BFFD7F5367B53292DA1F4A1222E4B6D8BBE38235C"
+    }
+  ],
+  "video": {
+    "file": "../music-map-space-demo.mp4",
+    "durationSeconds": 106,
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "codec": "h264",
+    "audioStreams": 0,
+    "bytes": 7199962,
+    "sha256": "2129B8228FFD0EB3FECA328DD407DCB6F9A49C063CFE9C800EF5BF3A8E03F15C"
+  },
+  "cover": {
+    "file": "../cover.png",
+    "width": 1920,
+    "height": 1080,
+    "bytes": 385709,
+    "capturedAndViewedBy": "integration agent via Tabbit",
+    "sha256": "15DAE5E8A2F871A8ACD31C9728BCD34688227B3F6360DE18629E0A3FF792D062"
+  },
+  "ticket": {
+    "file": "assets/ticket-0.4.png",
+    "width": 1600,
+    "height": 1800,
+    "bytes": 1097920,
+    "source": "Actual PNG downloaded from 0.4 application",
+    "sha256": "C3B4365AEF846EA906BDA6587ABD29058A10FC2527B9EB1554D247AD6260EA11"
+  }
+}

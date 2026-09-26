@@ -1,0 +1,117 @@
+{
+  "version": "0.4.0",
+  "status": "ready-to-render",
+  "title": "同一刻，另一面",
+  "subtitle": "用另一个视角，补完整你记住的那一晚",
+  "recordedAt": "2026-09-27",
+  "sessionEvidence": "A 森森使用127.0.0.1、B 小舟使用localhost；同一Tabbit浏览器中不同来源的localStorage/Bearer身份，非两台实体设备。",
+  "photoEvidence": "经文件选择器上传本项目AI生成的stage/crowd示例图片，不是真实观众照片。",
+  "segments": [
+    {
+      "id": "00-opening", "file": "raw/00-space-opening.webm", "in": 0, "out": 8.5, "hold": 0.5,
+      "chapter": "MUSIC SPACE / 同一刻，另一面", "sessionLabel": "MVP 0.4 · 实际操作录屏",
+      "sourceNote": "Space新首页原生screencast，原片13.40秒。", "editNote": "取前8.5秒介绍产品，末帧定格0.5秒供阅读；未使用后段点击。",
+      "footnote": "演示照片由 AI 生成，不代表真实演出",
+      "captions": [
+        {"start": 0, "end": 4, "text": "一个人的视角，只记得现场的一面。"},
+        {"start": 4, "end": 9, "text": "用另一个视角，补完整你记住的那一晚。"}
+      ]
+    },
+    {
+      "id": "01-a-create", "file": "raw/01-host-create.webm", "in": 0, "out": 10.12, "hold": 2.88,
+      "chapter": "01 / 留下自己的这一面", "sessionLabel": "A 森森 · 独立会话",
+      "sourceNote": "A填写自定义活动、从文件选择器上传演示图、选择舞台视角与文案、私藏。",
+      "editNote": "完整原速使用，末帧定格2.88秒；保存后的私藏结果继续见下一片。",
+      "footnote": "A/B 为同一浏览器的独立来源会话 · 演示照片由 AI 生成",
+      "captions": [
+        {"start": 0, "end": 5, "text": "写下活动、日期与共同的歌，建立自己的房间。"},
+        {"start": 5, "end": 10, "text": "上传一张照片，标记视角，再留下一句当时的感受。"},
+        {"start": 10, "end": 13, "text": "默认先为自己私藏。"}
+      ]
+    },
+    {
+      "id": "01b-private-invite", "file": "raw/01b-private-invite.webm", "in": 0, "out": 5.64, "hold": 1.36,
+      "chapter": "01 / 先留给自己，也可以邀请朋友", "sessionLabel": "A 森森 · 独立会话",
+      "sourceNote": "私卡保存成功、单卡下载、邀请二维码和房间码。",
+      "editNote": "完整原速使用，末帧定格1.36秒；邀请码仅为本地演示，不宣称外网可访问。",
+      "footnote": "本地演示房间 · A/B 为独立来源会话 · 演示照片由 AI 生成",
+      "captions": [
+        {"start": 0, "end": 3, "text": "这一张已经留好，也能单独导出。"},
+        {"start": 3, "end": 7, "text": "用房间码，邀请记得同一刻的人。"}
+      ]
+    },
+    {
+      "id": "02-b-join", "file": "raw/02-guest-perspective.webm", "in": 0, "out": 2, "hold": 1,
+      "chapter": "02 / 朋友带来另一面", "sessionLabel": "B 小舟 · 独立会话",
+      "sourceNote": "B在localhost独立身份输入邀请码加入，原片后段为定位等待。",
+      "editNote": "只使用前2秒；排除后9.52秒定位等待，末帧定格1秒。",
+      "footnote": "A/B 为同一浏览器的独立来源会话 · 演示照片由 AI 生成",
+      "captions": [{"start": 0, "end": 3, "text": "朋友用自己的身份，进入同一场。"}]
+    },
+    {
+      "id": "02b-b-card", "file": "raw/02b-guest-card.webm", "in": 0, "out": 5.64, "hold": 2.36,
+      "chapter": "02 / 同一首歌，另一种目光", "sessionLabel": "B 小舟 · 独立会话",
+      "sourceNote": "B上传AI人海演示图，填写视角与感受，保存并展示。",
+      "editNote": "完整原速使用，末帧定格2.36秒供阅读。",
+      "footnote": "A/B 为同一浏览器的独立来源会话 · 演示照片由 AI 生成",
+      "captions": [
+        {"start": 0, "end": 4, "text": "你的舞台，我的人海；同一晚，也各不相同。"},
+        {"start": 4, "end": 8, "text": "主动展示后，同房的人才看见这一面。"}
+      ]
+    },
+    {
+      "id": "03-a-request", "file": "raw/03-host-request.webm", "in": 0, "out": 15.92, "hold": 2.08,
+      "chapter": "03 / 用我的这一面，换你的那一面", "sessionLabel": "A 森森 · 独立会话",
+      "sourceNote": "A看两种视角与共同点，打开两卡确认，发送申请并看到待回应反馈。",
+      "editNote": "完整原速使用，末帧定格2.08秒；保留发起后等待状态。",
+      "footnote": "A/B 为同一浏览器的独立来源会话 · 演示照片由 AI 生成",
+      "captions": [
+        {"start": 0, "end": 6, "text": "同一环节，不同视角。理由写得清楚，选择由你来做。"},
+        {"start": 6, "end": 12, "text": "发出前，先看清这一次要交换的两张卡。"},
+        {"start": 12, "end": 18, "text": "申请已发出，等对方亲自回应。"}
+      ]
+    },
+    {
+      "id": "04-b-review", "file": "raw/04-guest-accept.webm", "in": 0, "out": 7.2, "hold": 0,
+      "chapter": "04 / 这一次，我们都同意", "sessionLabel": "B 小舟 · 独立会话",
+      "sourceNote": "B收到申请、打开两张快照查看。",
+      "editNote": "保留前7.2秒；随后去除7.2至15.2秒的阅读停顿，后续操作按原顺序继续。",
+      "footnote": "A/B 为同一浏览器的独立来源会话 · 演示照片由 AI 生成",
+      "captions": [{"start": 0, "end": 7.2, "text": "接收者看到的是申请当时的两张快照。"}]
+    },
+    {
+      "id": "04b-b-accept", "file": "raw/04-guest-accept.webm", "in": 15.2, "out": 22.84, "hold": 1.16,
+      "chapter": "04 / 这一次，我们都同意", "sessionLabel": "B 小舟 · 独立会话",
+      "sourceNote": "同一B会话在原片15.2秒后点击愿意，实际显示双联结果。",
+      "editNote": "原速保留接受及结果，末帧定格1.16秒；未把申请剪成自动接受。",
+      "footnote": "A/B 为同一浏览器的独立来源会话 · 演示照片由 AI 生成",
+      "captions": [
+        {"start": 0, "end": 4, "text": "只有对方愿意，交换才会完成。"},
+        {"start": 4, "end": 8.8, "text": "双方同意后，各自留下一份双联纪念。"}
+      ]
+    },
+    {
+      "id": "05-a-ticket", "file": "raw/05b-host-download.webm", "in": 0, "out": 9.92, "hold": 2.08,
+      "chapter": "05 / 把那一晚，补完整", "sessionLabel": "A 森森 · 独立会话",
+      "sourceNote": "A已同步打开票根，向下查看两图并点击下载；实际导出PNG已取得。",
+      "editNote": "完整原速使用，末帧定格2.08秒；排除05-host-ticket.webm错误定位等待。",
+      "footnote": "A/B 为同一浏览器的独立来源会话 · 演示照片由 AI 生成",
+      "captions": [
+        {"start": 0, "end": 5, "text": "回到发起者，双联纪念也已经留下。"},
+        {"start": 5, "end": 12, "text": "将它导出为图片，留住两个人共同的片刻。"}
+      ]
+    },
+    {
+      "id": "06-map", "file": "raw/06-map-real.webm", "in": 0, "out": 17.76, "hold": 2.24,
+      "chapter": "06 / 从合作作品，发现下一首歌", "sessionLabel": "Music Map · 真实合作专题",
+      "sourceNote": "实际探索周杰伦到张惠妹，并打开为什么相连的作品依据面板。",
+      "editNote": "完整原速使用，末帧定格2.24秒；不宣称内置音频或已访问外部平台。",
+      "footnote": "真实合作小专题与官方外链 · 当前未内置音频",
+      "captions": [
+        {"start": 0, "end": 6, "text": "在 Music Map，沿合作作品发现下一位艺人。"},
+        {"start": 6, "end": 14, "text": "周杰伦到张惠妹：相连的理由，有作品与官方来源可查。"},
+        {"start": 14, "end": 20, "text": "同一刻，另一面。用另一个视角，补完整那一晚。"}
+      ]
+    }
+  ]
+}

@@ -13,6 +13,8 @@ const PREFIX = '/api/live';
 const EVENT_ID = 'echo-live-2026';
 const CAPACITY = 24;
 const BODY_LIMIT = 8192;
+const PHOTO_LIMIT = 300 * 1024;
+const PHOTO_BODY_LIMIT = 420 * 1024;
 const now = () => new Date().toISOString();
 const hash = (value) => createHash('sha256').update(value).digest('hex');
 
@@ -64,15 +66,15 @@ const limitCleanup = setInterval(() => {
 }, 60_000);
 limitCleanup.unref();
 
-async function readJSON(request) {
-  if (Number(request.headers['content-length'] || 0) > BODY_LIMIT) {
-    fail(413, 'BODY_TOO_LARGE', '提交内容过大；联网卡片仅支持两张预置图片。');
+async function readJSON(request, maximum = BODY_LIMIT) {
+  if (Number(request.headers['content-length'] || 0) > maximum) {
+    fail(413, 'BODY_TOO_LARGE', '提交内容过大，请压缩照片或缩短文字后重试。');
   }
   const chunks = [];
   let length = 0;
   for await (const chunk of request) {
     length += chunk.length;
-    if (length > BODY_LIMIT) fail(413, 'BODY_TOO_LARGE', '提交内容过大。');
+    if (length > maximum) fail(413, 'BODY_TOO_LARGE', '提交内容过大。');
     chunks.push(chunk);
   }
   if (!length) return {};
@@ -109,16 +111,26 @@ function requireRoom(roomId, userId) {
 function roomSummary(room) {
   return {
     id: room.id, code: room.code, title: room.title, eventId: room.event_id,
+    event: roomEvent(room),
     capacity: CAPACITY,
     memberCount: get('SELECT COUNT(*) AS total FROM room_members WHERE room_id = ?', room.id).total,
   };
 }
 
-function cardJSON(card) {
+function roomEvent(room) {
+  if (room.event_id === EVENT_ID) {
+    return { id: EVENT_ID, title: '回声现场', date: '2026-09-26', city: '广州', song: '把晚风借给你', isDemo: true };
+  }
+  return { id: room.event_id, title: room.title, date: room.event_date || '', city: room.city || '', song: room.song || '', isDemo: false };
+}
+
+function cardJSON(card, room) {
   if (!card) return null;
   return {
     id: card.id, ownerId: card.owner_id, ownerName: card.owner_name,
-    eventId: EVENT_ID, photoKey: card.photo_key, caption: card.caption,
+    eventId: room.event_id, event: roomEvent(room),
+    photoKey: card.photo_key, photoId: card.photo_id || null,
+    perspective: card.perspective || card.photo_key, caption: card.caption,
     momentId: card.moment_id, trackId: card.track_id, isPublic: Boolean(card.is_public),
     revision: card.revision, createdAt: card.created_at, updatedAt: card.updated_at,
   };
@@ -134,7 +146,7 @@ function roomState(room, user) {
     JOIN users u ON u.id = c.owner_id
     JOIN room_members m ON m.room_id = c.room_id AND m.user_id = c.owner_id
     WHERE c.room_id = ? AND (c.is_public = 1 OR c.owner_id = ?)
-    ORDER BY c.created_at, c.id`, room.id, user.id).map(cardJSON);
+    ORDER BY c.created_at, c.id`, room.id, user.id).map((card) => cardJSON(card, room));
   const exchanges = all(`SELECT * FROM exchanges
     WHERE room_id = ? AND (from_user_id = ? OR to_user_id = ?) ORDER BY created_at, id`, room.id, user.id, user.id)
     .map((exchange) => ({
@@ -165,6 +177,39 @@ function newRoomCode() {
   fail(503, 'ROOM_UNAVAILABLE', '暂时无法创建房间，请稍后再试。');
 }
 
+function jpegPhoto(dataUrl) {
+  if (typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image/jpeg;base64,')) {
+    fail(400, 'INVALID_PHOTO', '请先将照片转换为 JPEG 后上传。');
+  }
+  const encoded = dataUrl.slice('data:image/jpeg;base64,'.length);
+  if (!encoded || encoded.length % 4 !== 0 || !/^[A-Za-z0-9+/]+={0,2}$/.test(encoded)) {
+    fail(400, 'INVALID_PHOTO', '照片内容无效，请重新选择照片。');
+  }
+  const bytes = Buffer.from(encoded, 'base64');
+  if (bytes.length > PHOTO_LIMIT) fail(413, 'PHOTO_TOO_LARGE', '照片请压缩至 300 KB 以内。');
+  if (bytes.length < 4 || bytes[0] !== 0xff || bytes[1] !== 0xd8 || bytes[2] !== 0xff || bytes[bytes.length - 2] !== 0xff || bytes[bytes.length - 1] !== 0xd9) {
+    fail(400, 'INVALID_PHOTO', '照片不是有效的 JPEG 文件。');
+  }
+  return bytes;
+}
+
+function mayReadPhoto(photo, userId) {
+  if (photo.owner_id === userId) return true;
+  const displayed = get(`SELECT 1 FROM cards c
+    JOIN room_members viewer ON viewer.room_id = c.room_id AND viewer.user_id = ?
+    JOIN room_members owner ON owner.room_id = c.room_id AND owner.user_id = c.owner_id
+    WHERE c.room_id = ? AND c.photo_id = ? AND c.is_public = 1`, userId, photo.room_id, photo.id);
+  if (displayed) return true;
+  const exchanged = get(`SELECT 1 FROM exchanges
+    WHERE room_id = ? AND (from_user_id = ? OR to_user_id = ?) AND status IN ('pending', 'accepted')
+      AND (json_extract(from_card, '$.photoId') = ? OR json_extract(to_card, '$.photoId') = ?)`,
+  photo.room_id, userId, userId, photo.id, photo.id);
+  if (exchanged) return true;
+  return Boolean(get(`SELECT 1 FROM records WHERE room_id = ? AND owner_id = ?
+    AND (json_extract(from_card, '$.photoId') = ? OR json_extract(to_card, '$.photoId') = ?)`,
+  photo.room_id, userId, photo.id, photo.id));
+}
+
 async function api(request, response, path) {
   const method = request.method;
   const ip = request.socket.remoteAddress || 'unknown';
@@ -189,14 +234,32 @@ async function api(request, response, path) {
     return json(response, 200, { user, rooms });
   }
 
+  const photoRoute = /^\/photos\/([a-f0-9-]{36})$/.exec(path);
+  if (method === 'GET' && photoRoute) {
+    const photo = get('SELECT id, room_id, owner_id, mime FROM photos WHERE id = ?', photoRoute[1]);
+    if (!photo || !mayReadPhoto(photo, user.id)) fail(404, 'PHOTO_UNAVAILABLE', '这张照片不可查看。');
+    const { data } = get('SELECT data FROM photos WHERE id = ?', photo.id);
+    response.writeHead(200, { 'Content-Type': photo.mime, 'Content-Length': data.length, 'Cache-Control': 'no-store' });
+    return response.end(Buffer.from(data));
+  }
+
   if (method === 'POST' && path === '/rooms') {
     rateLimit(`create-room:${user.id}`, 5, 60 * 60_000);
     const data = await readJSON(request);
-    const title = text(data.title, '房间名称', 60, '回声现场 · 我们的房间');
+    const title = text(data.title, '活动名称', 60);
     if (!title) fail(400, 'INVALID_INPUT', '请填写房间名称。');
+    const eventDate = text(data.eventDate, '日期', 10, '');
+    if (eventDate && (!/^\d{4}-\d{2}-\d{2}$/.test(eventDate)
+      || !Number.isFinite(Date.parse(`${eventDate}T00:00:00Z`))
+      || new Date(`${eventDate}T00:00:00Z`).toISOString().slice(0, 10) !== eventDate)) {
+      fail(400, 'INVALID_INPUT', '日期请使用有效的 YYYY-MM-DD 格式，或留空。');
+    }
+    const city = text(data.city, '城市', 40, '');
+    const song = text(data.song, '共同歌曲', 80, '');
     const room = transaction(() => {
       const id = randomUUID();
-      run('INSERT INTO rooms (id, code, title, event_id, creator_id, created_at) VALUES (?, ?, ?, ?, ?, ?)', id, newRoomCode(), title, EVENT_ID, user.id, now());
+      run(`INSERT INTO rooms (id, code, title, event_id, creator_id, created_at, event_date, city, song)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, id, newRoomCode(), title, `room:${id}`, user.id, now(), eventDate, city, song);
       run('INSERT INTO room_members (room_id, user_id, joined_at) VALUES (?, ?, ?)', id, user.id, now());
       return get('SELECT * FROM rooms WHERE id = ?', id);
     });
@@ -226,6 +289,21 @@ async function api(request, response, path) {
   const action = route[2];
   if (method === 'GET' && action === '') return json(response, 200, roomState(room, user));
 
+  if (method === 'POST' && action === '/photos') {
+    rateLimit(`photo-minute:${user.id}`, 12, 60_000);
+    rateLimit(`photo-hour:${user.id}`, 60, 60 * 60_000);
+    const data = await readJSON(request, PHOTO_BODY_LIMIT);
+    const bytes = jpegPhoto(data.dataUrl);
+    const photoId = transaction(() => {
+      requireRoom(room.id, user.id);
+      const id = randomUUID();
+      run('INSERT INTO photos (id, room_id, owner_id, mime, data, created_at) VALUES (?, ?, ?, ?, ?, ?)',
+        id, room.id, user.id, 'image/jpeg', bytes, now());
+      return id;
+    });
+    return json(response, 201, { photoId });
+  }
+
   if (method === 'PUT' && action === '/card') {
     const data = await readJSON(request);
     const photoKey = choice(data.photoKey, ['stage', 'crowd'], '图片');
@@ -233,16 +311,21 @@ async function api(request, response, path) {
     const momentId = choice(data.momentId, ['encore', 'chorus', 'lights'], '时刻');
     const trackId = choice(data.trackId, ['co-0', ''], '音乐');
     const isPublic = boolean(data.isPublic);
+    const perspective = choice(data.perspective ?? photoKey, ['stage', 'crowd', 'friends', 'detail'], '视角');
+    const photoId = data.photoId == null ? null : text(data.photoId, '照片', 36);
     transaction(() => {
       requireRoom(room.id, user.id);
+      if (photoId !== null && !get('SELECT 1 FROM photos WHERE id = ? AND room_id = ? AND owner_id = ?', photoId, room.id, user.id)) {
+        fail(400, 'PHOTO_UNAVAILABLE', '只能使用你在这个房间上传的照片，请重新选择。');
+      }
       const old = findCard(room.id, user.id);
       const time = now();
-      run(`INSERT INTO cards (id, room_id, owner_id, photo_key, caption, moment_id, track_id, is_public, revision, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      run(`INSERT INTO cards (id, room_id, owner_id, photo_key, caption, moment_id, track_id, is_public, revision, created_at, updated_at, photo_id, perspective)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(room_id, owner_id) DO UPDATE SET photo_key = excluded.photo_key, caption = excluded.caption,
           moment_id = excluded.moment_id, track_id = excluded.track_id, is_public = excluded.is_public,
-          revision = excluded.revision, updated_at = excluded.updated_at`,
-      old?.id || randomUUID(), room.id, user.id, photoKey, caption, momentId, trackId, Number(isPublic), (old?.revision || 0) + 1, old?.created_at || time, time);
+          revision = excluded.revision, updated_at = excluded.updated_at, photo_id = excluded.photo_id, perspective = excluded.perspective`,
+      old?.id || randomUUID(), room.id, user.id, photoKey, caption, momentId, trackId, Number(isPublic), (old?.revision || 0) + 1, old?.created_at || time, time, photoId, perspective);
       if (old?.is_public && !isPublic) cancelPending(room.id, old.id);
     });
     return json(response, 200, roomState(room, user));
@@ -283,7 +366,7 @@ async function api(request, response, path) {
       }
       run(`INSERT INTO exchanges (id, room_id, from_user_id, to_user_id, from_card_id, to_card_id, pair_key, from_card, to_card, status, created_at)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)`, randomUUID(), room.id, user.id, target.owner_id, own.id, target.id,
-      pairKey, JSON.stringify(cardJSON(own)), JSON.stringify(cardJSON(target)), now());
+      pairKey, JSON.stringify(cardJSON(own, room)), JSON.stringify(cardJSON(target, room)), now());
     });
     return json(response, 201, roomState(room, user));
   }
@@ -309,7 +392,7 @@ async function api(request, response, path) {
           const otherName = ownerId === exchange.from_user_id ? to.ownerName : from.ownerName;
           run(`INSERT INTO records (id, room_id, owner_id, exchange_id, title, from_card, to_card, created_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, randomUUID(), room.id, ownerId, exchange.id,
-          `回声现场 · 与${otherName}的双联记忆`, exchange.from_card, exchange.to_card, time);
+          `${roomEvent(room).title} · 与${otherName}的双联记忆`, exchange.from_card, exchange.to_card, time);
         }
       }
     });

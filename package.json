@@ -1,10 +1,12 @@
 {
   "name": "music-map-space",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "type": "module",
   "description": "Music discovery and consent-based live-event card exchange",
-  "engines": { "node": ">=24.0.0" },
+  "engines": {
+    "node": ">=24.0.0"
+  },
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "vite build",
@@ -13,6 +15,7 @@
     "start": "node server/index.js"
   },
   "devDependencies": {
+    "qrcode-generator": "2.0.4",
     "vite": "8.3.1",
     "vite-plugin-singlefile": "2.3.3"
   }

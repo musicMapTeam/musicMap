@@ -1,9 +1,11 @@
-// Fictional fixtures carried forward from product/prototype/demo-data.js.
-// These names, tracks and links demonstrate the product, not a real catalogue.
-export const MAP_DATA_VERSION = 'fictional-2026-09-v1';
+import { REAL_CATALOGUE_VERSION, realArtists, realSongs, realEdges } from './map-catalogue.js';
+
+// Original fictional IDs remain stable for saved routes and the Space demo.
+// Real artists have a separate ID namespace and are never joined to this graph.
+export const MAP_DATA_VERSION = 'catalogues-2026-09-v1';
 export const MAP_EVENT_ID = 'echo-live-2026';
 
-export const artists = [
+const fictionalArtists = [
   { id: 'a', name: '林间', tag: '流行 / R&B', color: '#df8a72', bio: '从熟悉的旋律出发', songs: ['晚风来信', '慢半拍', '回声里的你'] },
   { id: 'b', name: '乔屿', tag: '流行 / 灵魂乐', color: '#a7c7ca', bio: '温柔声线，城市夜色', songs: ['零点以后', '雨停之前', '留一盏灯'] },
   { id: 'c', name: '夏禾', tag: '流行 / 民谣', color: '#b6c590', bio: '把日常唱成小小风景', songs: ['晴天邮局', '山的另一边', '长椅'] },
@@ -15,11 +17,19 @@ export const artists = [
   { id: 'i', name: '孤岛来客', tag: '实验 / 氛围', color: '#aab3c0', bio: '暂无合作连接的示例艺人', songs: ['无人的海', '缓慢生长', '漂浮'] },
 ];
 
+export const catalogues = {
+  real: { id: 'real', label: '真实合作精选', version: REAL_CATALOGUE_VERSION, start: 'real-jay', target: 'real-gem', hasStyle: false },
+  fictional: { id: 'fictional', label: '情景示例', version: 'fictional-2026-09-v1', start: 'a', target: 'f', hasStyle: true },
+};
+export const artists = [
+  ...realArtists,
+  ...fictionalArtists.map(artist => ({ ...artist, dataset: 'fictional', songIds: artist.songs.map((_, index) => `${artist.id}-${index}`) })),
+];
 export const artistById = Object.fromEntries(artists.map(artist => [artist.id, artist]));
-export const songs = Object.fromEntries(artists.flatMap(artist => artist.songs.map((title, index) => {
+export const songs = { ...realSongs, ...Object.fromEntries(fictionalArtists.flatMap(artist => artist.songs.map((title, index) => {
   const id = `${artist.id}-${index}`;
-  return [id, { id, title, artists: [artist.id], audioAvailable: false }];
-})));
+  return [id, { id, title, artists: [artist.id], dataset: 'fictional', audioAvailable: false }];
+}))) };
 
 const cooperation = [
   ['a', 'b', '把晚风借给你'], ['a', 'c', '晴天来信'], ['a', 'd', '城市夜航'], ['a', 'g', '夏日回声'],
@@ -32,28 +42,32 @@ const style = [
 ];
 
 export const edges = [
+  ...realEdges,
   ...cooperation.map(([a, b, title], index) => {
     const id = `co-${index}`;
-    songs[id] = { id, title, artists: [a, b], audioAvailable: false };
-    return { id, a, b, mode: 'co', song: id, reason: '共同演唱', evidence: `示例合作作品《${title}》；虚构关系，仅用于交互演示。` };
+    songs[id] = { id, title, artists: [a, b], dataset: 'fictional', audioAvailable: false };
+    return { id, a, b, dataset: 'fictional', mode: 'co', song: id, reason: '共同演唱', evidence: `示例合作作品《${title}》；虚构关系，仅用于交互演示。` };
   }),
   ...style.map(([a, b, reason], index) => ({
-    id: `style-${index}`, a, b, mode: 'style', reason,
-    evidence: `以「${reason}」连接的示例风格标签，未使用音频分析或推荐模型；不代表合作关系。`,
+    id: `style-${index}`, a, b, dataset: 'fictional', mode: 'style', reason,
+    evidence: `以「${reason}」连接的人工策展示例标签，未使用音频分析或推荐模型；不代表合作关系。`,
   })),
 ];
 
 export const artistName = id => artistById[id]?.name || '未收录艺人';
+export const datasetForArtist = id => artistById[id]?.dataset;
+export const artistsInDataset = dataset => artists.filter(artist => artist.dataset === dataset);
 export const otherArtist = (edge, id) => edge.a === id ? edge.b : edge.a;
-export const getNeighbors = (id, mode = 'co') => edges.filter(edge => edge.mode === mode && (edge.a === id || edge.b === id));
+export const getNeighbors = (id, mode = 'co', dataset = datasetForArtist(id)) => edges.filter(edge => edge.dataset === dataset && edge.mode === mode && (edge.a === id || edge.b === id));
 
-export function isReachable(start, target) {
+export function isReachable(start, target, dataset = datasetForArtist(start)) {
+  if (!dataset || datasetForArtist(target) !== dataset) return false;
   const visited = new Set([start]);
   const queue = [start];
   for (let index = 0; index < queue.length; index += 1) {
     const id = queue[index];
     if (id === target) return true;
-    for (const edge of getNeighbors(id, 'co')) {
+    for (const edge of getNeighbors(id, 'co', dataset)) {
       const next = otherArtist(edge, id);
       if (!visited.has(next)) {
         visited.add(next);
