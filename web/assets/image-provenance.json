@@ -5,7 +5,7 @@
   "mode": "built-in",
   "useCase": "photorealistic-natural",
   "factualStatus": "Synthetic fictional concert imagery. Not photographs of any real event, user, artist, or venue.",
-  "editing": "None. Original PNG tool outputs copied byte-for-byte into web/assets.",
+  "editing": "Original PNG outputs retained unchanged. Runtime copies re-encoded to WebP using FFmpeg libwebp quality 88, same 1536x1024 dimensions and composition, 2026-09-27.",
   "assets": [
     {
       "file": "stage-scene.png",
@@ -29,6 +29,26 @@
       "referenceRole": "Scene and lighting reference only; new camera position.",
       "prompt": "Use case: photorealistic-natural. Asset type: atmospheric landscape photograph for the second card in a live-music social app. Input image role: scene and lighting reference ONLY. Generate a new photograph from a DIFFERENT CAMERA POSITION at the SAME fictional indoor concert, retaining the reference warehouse architecture, dark right-hand balcony, simple rectangular stage truss, three warm coral luminous vertical stage columns, and teal-blue audience lighting. Camera is now on the side of the crowd at shoulder height, looking diagonally across an energetic sea of audience silhouettes towards the stage beyond them. The crowd occupies most of the composition: a handful of naturally raised arms and hands at varied heights, silhouetted from behind, believable anatomy, a candid collective moment. Anonymous distant musicians, no identifiable faces. Wide 3:2 landscape composition. Dark ink-blue shadows, cyan-teal edge light on heads and raised forearms, coral-orange stage glow and haze drifting diagonally across the scene. Authentic documentary concert photography, grain, depth, human energy, tasteful editorial finish, enough dark area for a UI caption. Preserve the same imaginary event but do not repeat the original centered rear-view composition. Output one finished PNG. No brand, logo, text, watermark, celebrity likeness, readable posters, polished CGI, giant festival stage, excessive lasers, repeated figures, deformed hands, extra fingers.",
       "generationArtifact": "exec-4f0142bd-1a9d-4f48-8ae6-c6e9302765c7.png"
+    }
+  ],
+  "runtimeDerivatives": [
+    {
+      "file": "stage-scene.webp",
+      "source": "stage-scene.png",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 75980,
+      "sha256": "dbfae3ccb5c1bde297a1677a56efaece5f1ad08e485913de7846026286e9511a",
+      "encoder": "FFmpeg libwebp -quality 88"
+    },
+    {
+      "file": "crowd-scene.webp",
+      "source": "crowd-scene.png",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 127328,
+      "sha256": "f83d7f9f126346357aa9b877ab62be56df522ee5c37d816ab55259b689309b7f",
+      "encoder": "FFmpeg libwebp -quality 88"
     }
   ]
 }

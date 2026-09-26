@@ -26,13 +26,13 @@ export const SPACE_PHOTOS = {
     id: 'stage',
     name: '我的舞台',
     description: '舞台视角 · 示例图片',
-    url: new URL('../assets/stage-scene.png', import.meta.url).href,
+    url: new URL('../assets/stage-scene.webp', import.meta.url).href,
   },
   crowd: {
     id: 'crowd',
     name: '你的人海',
     description: '人海视角 · 示例图片',
-    url: new URL('../assets/crowd-scene.png', import.meta.url).href,
+    url: new URL('../assets/crowd-scene.webp', import.meta.url).href,
   },
 };
 

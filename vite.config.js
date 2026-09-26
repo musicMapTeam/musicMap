@@ -8,6 +8,9 @@ const licenseText = readFileSync(new URL('./web/assets/licenses/phosphor-MIT.txt
 export default defineConfig({
   root: fileURLToPath(new URL('./web', import.meta.url)),
   base: './',
+  server: {
+    proxy: { '/api/live': 'http://127.0.0.1:8787' },
+  },
   plugins: [
     viteSingleFile(),
     {

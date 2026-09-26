@@ -1,12 +1,14 @@
 import '../css/base.css';
 import '../css/map.css';
 import '../css/space.css';
+import '../css/live.css';
 import { icon } from './icons.js';
 import { createMapState, mountMap, mountMapRecords } from './map.js';
 import { createSpaceState, mountSpace, mountSpaceRecords } from './space.js';
+import { mountLive } from './live.js';
 
 const STORAGE_KEY = 'music-map-space:v1';
-const views = ['explore', 'space', 'records'];
+const views = ['explore', 'space', 'records', 'live'];
 const actors = { a: 'Lin', b: '阿遥' };
 const root = document.querySelector('#app');
 const toastElement = document.querySelector('#toast');
@@ -31,6 +33,8 @@ function load() {
 const state = load();
 const initialView = location.hash.slice(2);
 if (views.includes(initialView)) state.view = initialView;
+const invitedRoom = new URLSearchParams(location.search).get('room');
+if (invitedRoom && /^\d{6}$/.test(invitedRoom)) state.view = 'live';
 
 function toast(message) {
   clearTimeout(toastTimer);
@@ -69,13 +73,18 @@ const api = { getState: () => state, update, render, navigate, toast, icon };
 function updateChrome() {
   document.querySelectorAll('[data-current-actor]').forEach(el => { el.textContent = actors[state.actor]; });
   document.querySelectorAll('[data-nav]').forEach(el => {
-    const active = el.dataset.nav === state.view;
+    const active = el.dataset.nav === (state.view === 'live' ? 'space' : state.view);
     el.classList.toggle('active', active);
     if (active) el.setAttribute('aria-current', 'page');
     else el.removeAttribute('aria-current');
   });
   const storageNote = document.querySelector('#storage-warning');
   if (storageNote) storageNote.hidden = !saveFailed;
+  const sectionNames = { explore: '发现新的声音', space: '遇见同场的人', records: '留住这次相遇', live: '邀请同场，交换视角' };
+  document.querySelectorAll('[data-view-label]').forEach(el => { el.textContent = sectionNames[state.view]; });
+  const identity = document.querySelector('.identity');
+  if (identity) identity.hidden = state.view === 'live';
+  document.querySelectorAll('[data-footer-status]').forEach(el => { el.textContent = state.view === 'live' ? '房间成员可见，双方同意才交换' : '本地记录保存在当前浏览器'; });
 }
 
 function navItems() {
@@ -91,32 +100,32 @@ function navItems() {
 
 function shell() {
   root.innerHTML = `
-    <aside class="app-rail" aria-label="主导航">
+    <header class="app-masthead">
       <button class="brand" data-nav="explore" aria-label="Music Map 首页">
         <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
-        <span>music<span class="brand-light">map</span><small>声音相连 · 同场相遇</small></span>
+        <span class="brand-wordmark">music<span class="brand-light">map</span><small>声音相连，同场相遇。</small></span>
       </button>
-      <nav class="primary-nav">${navItems()}</nav>
-      <div class="rail-bottom"><span class="edition">IN GOOD COMPANY.</span><span class="edition-number">MM / 001</span></div>
-    </aside>
+      <nav class="primary-nav" aria-label="主要导航">${navItems()}</nav>
+      <span class="masthead-note">FOLLOW THE SOUND.<br><span>FIND YOUR PEOPLE.</span></span>
+    </header>
     <div class="app-body">
       <header class="topbar">
-        <div class="topbar-breadcrumb"><span>MUSIC, WITH PEOPLE.</span><span class="topbar-divider"></span><span class="demo-tag">交互演示</span></div>
+        <div class="topbar-breadcrumb"><span data-view-label>发现新的声音</span><span class="topbar-divider"></span><span class="demo-tag">示例内容 · 两种体验</span></div>
         <div class="topbar-actions">
-          <button class="demo-help" id="demo-help" aria-label="关于演示">${icon('info')}<span>关于演示</span></button>
+          <button class="demo-help" id="demo-help" aria-label="演示说明" aria-haspopup="dialog" aria-controls="about-dialog">${icon('info')}<span>演示说明</span></button>
           <span class="identity"><span class="identity-dot"></span><span data-current-actor>${actors[state.actor]}</span></span>
         </div>
       </header>
       <div id="storage-warning" class="storage-warning" role="alert" hidden>这次修改尚未保存到浏览器，当前页面内容仍保留。可减少上传图片后重试。<button id="retry-save">重试保存</button></div>
       <main id="main-content" class="main-content" tabindex="-1"></main>
-      <footer class="app-footer"><span>MUSIC MAP × MUSIC SPACE</span><span>示例人物与场次 · 记录保存在当前浏览器</span></footer>
+      <footer class="app-footer"><span>从一个声音，到另一种相遇。</span><span>MUSIC MAP × SPACE <i aria-hidden="true">/</i> <span data-footer-status>本地记录保存在当前浏览器</span></span></footer>
     </div>
     <nav class="mobile-nav" aria-label="手机导航">${navItems()}</nav>
     <dialog id="about-dialog" class="about-dialog" aria-labelledby="about-title">
-      <div class="about-top"><span class="eyebrow">A SMALL WORLD, SHARED.</span><button class="icon-button" id="close-about" aria-label="关闭演示说明">${icon('x')}</button></div>
-      <h2 id="about-title">声音让我们靠近，<br>现场让我们相遇。</h2>
+      <div class="about-top"><span class="eyebrow">MUSIC, WITH PEOPLE.</span><button class="icon-button" id="close-about" aria-label="关闭演示说明">${icon('x')}</button></div>
+      <h2 id="about-title">顺着声音，<br><em>找到彼此。</em></h2>
       <p>从艺人关系出发，进入同一场 Space。用自己的现场卡，交换另一个人的视角。</p>
-      <div class="about-facts"><p><b>两个角色，一次相遇</b><span>在同场页切换 Lin 与阿遥，体验申请、接受与拒绝。当前是本地情景演示。</span></p><p><b>自己的选择，留在这里</b><span>记录仅保存在当前浏览器。示例艺人、场次与生成图片用于说明体验，未接入真实音频或多人联网。</span></p></div>
+      <div class="about-facts"><p><b>先体验，再邀请</b><span>本地情景演示可切换 Lin 与阿遥，体验申请、接受与拒绝。也可以通过邀请码进入真实双人房间，由各自设备操作；联网体验需要可用的共享服务。</span></p><p><b>两种体验，清楚区分</b><span>本地记录保存在当前浏览器；在线房间的内容向房间成员展示，双方同意后才交换。示例艺人、场次与生成图片用于说明体验，不代表真实到场，尚未接入真实音频。</span></p></div>
       <button class="button button--primary" id="start-experience">继续体验 ${icon('arrow-right')}</button>
     </dialog>`;
   root.addEventListener('click', event => {
@@ -142,8 +151,9 @@ function render() {
   document.body.dataset.view = state.view;
   if (state.view === 'explore') cleanup = mountMap(container, api);
   if (state.view === 'space') cleanup = mountSpace(container, api);
+  if (state.view === 'live') cleanup = mountLive(container, api);
   if (state.view === 'records') {
-    container.innerHTML = `<div class="records-page"><header class="records-heading"><span class="eyebrow">YOUR LITTLE ARCHIVE</span><h1>这一刻，<br>留给以后的自己。</h1><p class="muted">走过的音乐，交换的视角。<br>属于你的记忆，在这里慢慢积累。</p><span class="records-local">${icon('bookmark')} 仅此浏览器保存</span></header><div id="space-records"></div><div id="map-records"></div></div>`;
+    container.innerHTML = `<div class="records-page"><header class="records-heading"><span class="eyebrow">YOUR LITTLE ARCHIVE</span><h1>这一刻，<br>留给以后的自己。</h1><p class="muted">走过的音乐，交换的视角。<br>属于你的记忆，在这里慢慢积累。</p><span class="records-local">${icon('bookmark')} 情景与探索记录保存在本机</span></header><section class="records-live-link" aria-label="联网房间记忆"><div><span class="eyebrow">SHARED MEMORIES</span><h2>房间里的共同记忆</h2><p>真实同场的双联票保存在各自房间，回到房间即可查看与下载。</p></div><button class="button button--primary" data-nav="live">查看同场房间 ${icon('arrow-right')}</button></section><div id="space-records"></div><div id="map-records"></div></div>`;
     const spaceCleanup = mountSpaceRecords(container.querySelector('#space-records'), api);
     const mapCleanup = mountMapRecords(container.querySelector('#map-records'), api);
     cleanup = () => { spaceCleanup?.(); mapCleanup?.(); };

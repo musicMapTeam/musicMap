@@ -20,8 +20,20 @@ jobs:
           cache: npm
       - run: npm ci --no-audit --no-fund
       - run: npm run build
+      - run: node --check server/index.js && node --check server/db.js
       - uses: actions/upload-artifact@v7.0.1
         with:
           name: music-map-space-demo
           path: dist/index.html
+          retention-days: 14
+      - uses: actions/upload-artifact@v7.0.1
+        with:
+          name: music-map-space-runtime
+          path: |
+            dist/index.html
+            server/
+            package.json
+            README.md
+            RUN-ME.md
+            THIRD_PARTY_NOTICES.md
           retention-days: 14

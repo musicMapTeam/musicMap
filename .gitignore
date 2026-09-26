@@ -11,3 +11,10 @@ coverage/
 playwright-report/
 test-results/
 work/
+data/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+delivery/*.zip
+delivery/runtime/
+delivery/video-source/.hyperframes/
