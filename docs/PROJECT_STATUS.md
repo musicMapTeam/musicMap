@@ -17,7 +17,7 @@
 
 | 任务 | 负责人 | 当前工作 |
 | --- | --- | --- |
-| 0.7 交付与同步 | 整合者 | 新预览、运行包与 GitHub 同步收尾 |
+| 当前无进行中任务 | — | 0.7 已完成并同步；外部事项见 Todo |
 
 ## Done · 0.7.0
 
@@ -31,6 +31,8 @@
 | GSAP 交互时序 | `motion.js`、场景控制器、GSAP 3.15.0 / Flip | 可打断曲线路径、卡片换位、弹窗与页面进入；实际手机切人海，连续切页后保留同一 canvas（计数 1）。切走樱花后 canvas 为 0，切回为 1。减少动态时 explore 机位立即到位，无 travelling 状态。修复中断弹窗的内联样式残留和存储重试区域的指针事件 |
 | 构建与交付 | `dist/index.html`、`delivery/music-map-space-runtime.zip` | 最终生产构建 1,502,337 B / gzip 536.26 kB；本地完整运行包 555,179 B，原有 6 文件范围。樱花桌面与手机新截图已留在 `docs/assets/themes/`；无数据库、原始曲库或用户照片入包 |
 | 手机与许可 | 390×844 模拟视口、Vite、NOTICES | 手机首页宽与滚动宽均 390；卡片、做卡 / 邀请按钮位于底导航上方。保留 Three / Sakura MIT；GSAP 为 Standard No Charge，原版权及许可引用随 HTML。HF 仅标 bsd、无独立 LICENSE 的事实单独记录 |
+
+| GitHub 与 CI | 应用提交 [12a164f](https://github.com/musicMapTeam/musicMap/commit/12a164ffef39c3cc68504821bde59454194c2b97) | 已推送 `origin/main`，远端 HEAD 对应应用提交；原有 [run 36270083709](https://github.com/musicMapTeam/musicMap/actions/runs/36270083709) 成功。随后仅补这条交付记录 |
 
 这里只做构建、针对本轮改动的界面查看与静态代码审阅，没有新增或运行测试套件，没有重跑后端交换、照片权限或 PNG 导出。调度的 30 / 60fps 与资源释放代码不等于实体手机性能实测。现有 106 秒视频和封面仍为 0.4，评审部署与外部用户试用仍待团队处理。
 
