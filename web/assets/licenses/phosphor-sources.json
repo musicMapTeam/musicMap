@@ -1,0 +1,116 @@
+{
+  "project": "Phosphor Icons",
+  "package": "@phosphor-icons/core",
+  "version": "2.1.1",
+  "commit": "2b75f3ad12b420c9504ef05df8d2564a28f8500e",
+  "retrievedAt": "2026-09-26T22:55:53.0775746+08:00",
+  "weight": "regular",
+  "license": "MIT",
+  "licenseSource": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/LICENSE",
+  "homepage": "https://github.com/phosphor-icons/core",
+  "modification": "Preserved SVG paths/viewBox/fill. Added class=icon, dimensions 1em, aria-hidden=true, focusable=false. JSON serialized into local ES module; no runtime dependency.",
+  "icons": [
+    {
+      "name": "arrow-right",
+      "upstreamName": "arrow-right",
+      "url": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/regular/arrow-right.svg",
+      "trimmedSvgSha256": "e45bc4a12592b8723110db42c6deffdf177e4fe7704cf50324963fa0a59b2d74"
+    },
+    {
+      "name": "arrow-left",
+      "upstreamName": "arrow-left",
+      "url": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/regular/arrow-left.svg",
+      "trimmedSvgSha256": "3c2001cf957d182fc54927e4b286cc8cf66dd97830f441ca2650d42a63a9006a"
+    },
+    {
+      "name": "arrow-up-right",
+      "upstreamName": "arrow-up-right",
+      "url": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/regular/arrow-up-right.svg",
+      "trimmedSvgSha256": "44db5257b360ec04863eb6daaa41f220c8b714d23fb81403517d0a30acfda9f4"
+    },
+    {
+      "name": "plus",
+      "upstreamName": "plus",
+      "url": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/regular/plus.svg",
+      "trimmedSvgSha256": "d688feb9dd2e41c1721d6906a05a2a42e18cd774762fe706d72b2bdfd91cddc4"
+    },
+    {
+      "name": "x",
+      "upstreamName": "x",
+      "url": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/regular/x.svg",
+      "trimmedSvgSha256": "7397b15e1fa66eaf6ff9b59fe91d483cb5c3bcf75b2fe052097ab6f0593b513a"
+    },
+    {
+      "name": "check",
+      "upstreamName": "check",
+      "url": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/regular/check.svg",
+      "trimmedSvgSha256": "cbb89a8c42f283d4f846eb935e05d88c1be04462f16480e068c0f82b9ce40b12"
+    },
+    {
+      "name": "swap",
+      "upstreamName": "arrows-left-right",
+      "url": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/regular/arrows-left-right.svg",
+      "trimmedSvgSha256": "84c43373542a3ac2e7de3d22ddef0c8eb61ef6ba7a270c6aca5aa493dd40f8b4"
+    },
+    {
+      "name": "camera",
+      "upstreamName": "camera",
+      "url": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/regular/camera.svg",
+      "trimmedSvgSha256": "e1fb071d5326bc4de193746b38457a6f73c89df90d65d33eaa8386eb22b219f5"
+    },
+    {
+      "name": "image",
+      "upstreamName": "image",
+      "url": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/regular/image.svg",
+      "trimmedSvgSha256": "642a0575f7b5a7ea2f5fefa6f27a5dc57683911845b85213a7e33652c2a3179d"
+    },
+    {
+      "name": "heart",
+      "upstreamName": "heart",
+      "url": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/regular/heart.svg",
+      "trimmedSvgSha256": "312dee73d1d969631d5498012f619ccf4edbdf31e1be3e65af4f4f1b3ac1b2dd"
+    },
+    {
+      "name": "bookmark",
+      "upstreamName": "bookmark",
+      "url": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/regular/bookmark.svg",
+      "trimmedSvgSha256": "7574b29059a5b0fe27bb412ea7cb80ec014f61b564f389dac38161be2b674e6a"
+    },
+    {
+      "name": "compass",
+      "upstreamName": "compass",
+      "url": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/regular/compass.svg",
+      "trimmedSvgSha256": "00c7e42415f795fcea90bd9dc0b2c8266b4e9601d2937cb122cd03b7e9e9e198"
+    },
+    {
+      "name": "users",
+      "upstreamName": "users",
+      "url": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/regular/users.svg",
+      "trimmedSvgSha256": "b3385e4c6aa03f7e16d1b03887c2cdff9900f5a7edbd5ea5176055938ccfb908"
+    },
+    {
+      "name": "trash",
+      "upstreamName": "trash",
+      "url": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/regular/trash.svg",
+      "trimmedSvgSha256": "e6a830c0409f9e101e3695c981eef98427d39fd01f502b9cbd6900930b01f19c"
+    },
+    {
+      "name": "rotate",
+      "upstreamName": "arrow-counter-clockwise",
+      "url": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/regular/arrow-counter-clockwise.svg",
+      "trimmedSvgSha256": "4eb160d5ae781107c674481ac081962e6bce6281a646129e6c3f960b9dd5dac6"
+    },
+    {
+      "name": "info",
+      "upstreamName": "info",
+      "url": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/regular/info.svg",
+      "trimmedSvgSha256": "438a1f319d53d86e840af73fb7b1d224c9224a437b9fa449a4e2cb45a82a3552"
+    },
+    {
+      "name": "chevron-right",
+      "upstreamName": "caret-right",
+      "url": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/regular/caret-right.svg",
+      "trimmedSvgSha256": "e6dec01e074807965b7f3146b976a9b5e82c31d9c2c88aeb52e77cc2ab16c1d7"
+    }
+  ]
+}
