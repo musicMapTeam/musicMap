@@ -39,5 +39,5 @@
       "modified": false
     }
   ],
-  "hostIntegration": "../../sakura-scene.js owns original shop / street / photo wall / cabinet geometry, lighting, gradient sky and lifecycle. MVP 0.7 uses one persistent scene across routes, perspective camera shots and interruptible GSAP paths. Idle rendering targets 30 fps, camera travel targets 60 fps; these are scheduling limits, not measured device performance. Reduced motion, visibility suspension and theme-exit cleanup remain."
+  "hostIntegration": "MVP 0.8: ../../sakura-world.js builds original open shop, stage, six photo slots, worktable, interior cabinet, cat and instanced petals; ../../sakura-camera.js supplies six interruptible desktop/portrait camera shots; ../../sakura-scene.js owns lighting, picking, authorized card textures, physical photo lift, pipeline and lifecycle. One full-viewport canvas persists across routes. Idle rendering targets 30 fps, camera travel 60 fps; these are scheduling limits, not device performance measurements. Reduced motion, visibility suspension and theme-exit cleanup remain."
 }

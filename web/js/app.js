@@ -33,6 +33,8 @@ let saveFailed = false;
 let recordsFilter = 'all';
 let themeController;
 let motion;
+let spatialContext = {};
+let spatialActionVersion = 0;
 
 function initialState() {
   return { version: 1, view: 'space', actor: 'a', map: createMapState(), space: createSpaceState(), routePayload: null };
@@ -78,6 +80,7 @@ function update(mutator) {
 
 function navigate(view, payload = null) {
   if (!views.includes(view)) return;
+  spatialActionVersion++;
   if (view === 'space' && payload?.intent === 'create-room') view = 'live';
   state.view = view;
   state.routePayload = payload;
@@ -91,7 +94,31 @@ function navigate(view, payload = null) {
   document.querySelector('#main-content').focus({ preventScroll: true });
 }
 
-const api = { getState: () => state, update, render, navigate, toast, icon };
+const api = { getState: () => state, update, render, navigate, toast, icon,
+  spatial: {
+    publish(content) {
+      spatialContext = content;
+      document.body.dataset.spatialSection = content.mode || state.view;
+      themeController?.setContent(content.cards || [], content.mode);
+    },
+    focus(kind, id) { return themeController?.focus(kind, id) || Promise.resolve(true); },
+    restore() { themeController?.restore(); },
+  },
+};
+
+async function onSpatialAction(action) {
+  const version = ++spatialActionVersion;
+  if (action.type === 'navigate') { navigate(action.view, action.view === 'space' ? { home: true } : null); return; }
+  if (action.type === 'editor') {
+    if (!spatialContext.onEdit) { navigate('space', { editCard: true }); return; }
+    const arrived = await themeController.focus('editor');
+    if (arrived && version === spatialActionVersion) spatialContext.onEdit?.();
+  }
+  if (action.type === 'photo' && spatialContext.onPhoto) {
+    const arrived = await themeController.focus('photo', action.id);
+    if (arrived && version === spatialActionVersion) spatialContext.onPhoto?.(action.id);
+  }
+}
 
 function updateChrome() {
   document.querySelectorAll('[data-current-actor]').forEach(el => { el.textContent = actors[state.actor]; });
@@ -150,7 +177,7 @@ function shell() {
     const item = event.target.closest('[data-nav]');
     if (item) {
       document.querySelector('#about-dialog').close();
-      navigate(item.dataset.nav);
+      navigate(item.dataset.nav, item.dataset.nav === 'space' ? { home: true } : null);
     }
     const filter = event.target.closest('[data-records-filter]');
     if (filter) {
@@ -171,11 +198,16 @@ function shell() {
 }
 
 function render() {
+  spatialActionVersion++;
   cleanup?.();
   cleanup = null;
+  spatialContext = {};
+  themeController?.setContent([]);
   const container = document.querySelector('#main-content');
   container.replaceChildren();
   document.body.dataset.view = state.view;
+  document.body.dataset.spatialSection = state.view === 'space' ? 'home' : state.view;
+  themeController?.setView(state.view);
   if (state.view === 'explore') cleanup = mountMap(container, api);
   if (state.view === 'space') cleanup = mountSpace(container, api);
   if (state.view === 'live') cleanup = mountLive(container, api);
@@ -190,7 +222,6 @@ function render() {
     cleanup = () => { spaceCleanup?.(); mapCleanup?.(); };
   }
   updateChrome();
-  themeController?.setView(state.view);
   motion?.enter(container, state.view);
 }
 
@@ -204,7 +235,9 @@ window.addEventListener('popstate', () => {
 });
 
 shell();
-themeController = mountThemes({ navigate, view: state.view });
+themeController = mountThemes({ onAction: onSpatialAction, view: state.view,
+  onShot(key, id, travelling) { document.body.dataset.spatialShot = key; document.body.toggleAttribute('data-spatial-travelling', travelling); },
+});
 motion = mountMotion();
 mountOpenCatalogue();
 render();

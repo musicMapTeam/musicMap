@@ -20,6 +20,7 @@ export function mountLive(container, api) {
   try { session = JSON.parse(localStorage.getItem(SESSION_KEY)); } catch { /* A new session can still run in memory. */ }
   if (!session?.token) session = null;
   let room = null;
+  let roomAuthorized = false;
   let rooms = [];
   let healthy = false;
   let checking = true;
@@ -57,7 +58,11 @@ export function mountLive(container, api) {
     root.querySelectorAll('img[data-live-photo]').forEach(async image => {
       try {
         const url = await photos.load(image.dataset.livePhoto);
-        if (!signal.aborted && image.isConnected) { image.src = url; image.parentElement.querySelector('.live-photo-status')?.remove(); }
+        if (!signal.aborted && image.isConnected) {
+          image.src = url;
+          image.parentElement.querySelector('.live-photo-status')?.remove();
+          publishScene();
+        }
       } catch (error) {
         if (error.name !== 'AbortError' && image.isConnected) {
           image.alt = '照片暂时无法读取';
@@ -66,6 +71,42 @@ export function mountLive(container, api) {
         }
       }
     });
+  }
+
+  function publishScene() {
+    if (signal.aborted) return;
+    const visible = room && roomAuthorized ? [
+      ...(room.ownCard ? [room.ownCard] : []),
+      ...room.cards.filter(card => card.ownerId !== room.me.id && card.isPublic),
+    ] : [];
+    const cards = visible.map(card => {
+      const event = eventOf(card);
+      return {
+        id: card.id,
+        isOwn: card.ownerId === room.me.id,
+        src: card.photoId ? photos.peek(card.photoId) : SPACE_PHOTOS[card.photoKey]?.url || SPACE_PHOTOS.stage.url,
+        title: card.caption || momentName(card.momentId),
+        subtitle: `${card.ownerName} · ${event.isDemo ? '示例场次' : '房间内'}${card.photoId ? '' : ' · AI 示例图'}`,
+        alt: card.photoId ? `${card.ownerName}的现场照片` : `${card.ownerName}选用的 AI 示例照片`,
+        isDemo: Boolean(event.isDemo || !card.photoId),
+      };
+    }).filter(card => card.src).slice(0, 6);
+    api.spatial?.publish({ mode: 'live', cards, onPhoto: openPhoto, onEdit: room && roomAuthorized ? () => { if (!signal.aborted && !busy) openEditor(); } : null });
+  }
+
+  function clearPhotos() {
+    api.spatial?.publish({ mode: 'live', cards: [] });
+    photos.clear();
+  }
+
+  function openPhoto(id) {
+    if (signal.aborted || busy || !room || !roomAuthorized) return;
+    if (room.ownCard?.id === id) {
+      const own = room.ownCard;
+      openModal('card', '我的现场卡', `${miniCard(own)}<p class="live-modal-intro">${own.isPublic ? '房间内展示' : '私藏 · 未展示'} · 第 ${own.revision} 版</p><div class="live-ticket-actions"><button class="button button--primary" data-live-action="edit">编辑现场卡 ${icon('arrow-right')}</button><button class="button button--secondary" data-live-action="download-card">保存我的卡片 ${icon('arrow-up-right')}</button></div>`, '', own.id);
+      return;
+    }
+    if (room.cards.some(card => card.id === id && card.isPublic)) openRequest(id);
   }
   async function exportCard(card) {
     return { ...card, photoDataUrl: card.photoId ? await photos.load(card.photoId) : undefined };
@@ -128,8 +169,9 @@ export function mountLive(container, api) {
     if (signal.aborted) return;
     const old = room;
     const photoPermissionChanged = old && (old.cards.some(card => card.photoId && !next.cards.some(current => current.id === card.id && current.photoId === card.photoId)) || old.exchanges.some(ex => ex.status === 'pending' && next.exchanges.some(current => current.id === ex.id && ['declined', 'cancelled'].includes(current.status))));
-    if (photoPermissionChanged || (old?.room.id && old.room.id !== next.room.id)) photos.clear();
+    if (photoPermissionChanged || (old?.room.id && old.room.id !== next.room.id)) clearPhotos();
     room = next;
+    roomAuthorized = true;
     session.roomId = next.room.id;
     session.rejoinCode = null;
     joinCode = '';
@@ -164,6 +206,7 @@ export function mountLive(container, api) {
       }
     } catch (error) {
       if (!signal.aborted && currentVersion === version) {
+        if (error.status === 403) { roomAuthorized = false; clearPhotos(); }
         errorMessage = error.status === 403 ? '你已离开这个房间。可返回入场页，凭邀请码重新加入。' : '同步暂时中断。上次收到的内容还在，恢复连接后会继续更新。';
         updateSync();
       }
@@ -211,6 +254,7 @@ export function mountLive(container, api) {
     surface.innerHTML = room ? roomView() : entryView();
     updateSync();
     hydratePhotos(surface);
+    publishScene();
   }
 
   function entryView() {
@@ -229,7 +273,7 @@ export function mountLive(container, api) {
   }
 
   function openPrivateCardSaved() {
-    openModal('card-saved', '现场卡已保存', `<div class="live-saved-note">${icon('check')}<div><strong>现场卡已私下保存</strong><p>展示后，房间成员可见。</p></div></div><div class="live-saved-actions"><button class="button button--primary" data-live-action="download-card">保存我的卡片 ${icon('arrow-up-right')}</button><button class="button button--secondary" data-live-action="visibility">展示到本场</button></div><button class="text-button" data-live-action="close">先保持私藏</button>`);
+    openModal('card-saved', '现场卡已保存', `<div class="live-saved-note">${icon('check')}<div><strong>现场卡已私下保存</strong><p>展示后，房间成员可见。</p></div></div><div class="live-saved-actions"><button class="button button--primary" data-live-action="download-card">保存我的卡片 ${icon('arrow-up-right')}</button><button class="button button--secondary" data-live-action="visibility">展示到本场</button></div><button class="text-button" data-live-action="close">先保持私藏</button>`, '', room.ownCard?.id);
   }
 
   function roomView() {
@@ -249,15 +293,27 @@ export function mountLive(container, api) {
     ${resolved.length ? `<details class="live-history"><summary>最近交换动态 <span>${resolved.length}</span></summary>${resolved.map(ex => `<div><span>${escape(ex.from === room.me.id ? ex.toCard.ownerName : ex.fromCard.ownerName)}</span><b>${({ accepted: '交换已完成', declined: '这次没有交换', cancelled: '申请已取消' })[ex.status]}</b><small>${escape(dateLabel(ex.decidedAt || ex.createdAt))}</small></div>`).join('')}</details>` : ''}<footer class="live-room-bottom"><div class="live-footer-actions"><button class="text-button" data-live-action="map">${api.getState().space?.mapReturnId ? '继续刚才的探索' : '去音乐地图'} ${icon('compass')}</button><button class="text-button" data-live-action="leave">离开这个房间</button></div></footer>`;
   }
 
-  function openModal(name, title, content, className = '') {
+  function openModal(name, title, content, className = '', cardId = null) {
     currentModal = { name };
+    if (name === 'editor') api.spatial?.focus('editor');
+    else if (cardId) api.spatial?.focus('photo', cardId);
+    else api.spatial?.restore();
     dialog.className = `live-dialog ${className}`;
     modal.innerHTML = `<div class="live-modal-top"><span class="eyebrow">MUSIC SPACE / ${room ? escape(room.room.code) : 'TOGETHER'}</span><button class="icon-button" data-live-action="close" aria-label="关闭">${icon('x')}</button></div><h2 id="live-dialog-title">${title}</h2>${content}<p class="live-notice" data-modal-error role="alert" hidden></p>`;
     if (!dialog.open) dialog.showModal();
     hydratePhotos(modal);
   }
 
-  function closeModal() { dialog.close(); currentModal = null; photoSelection += 1; }
+  function restoreScene() {
+    queueMicrotask(() => { if (!signal.aborted && !dialog.open) api.spatial?.restore(); });
+  }
+
+  function closeModal() {
+    dialog.close();
+    currentModal = null;
+    photoSelection += 1;
+    restoreScene();
+  }
 
   function openCreate() {
     createRequested = false;
@@ -282,14 +338,16 @@ export function mountLive(container, api) {
   }
 
   function openRequest(cardId) {
-    const target = room.cards.find(card => card.id === cardId);
+    const target = room.cards.find(card => card.id === cardId && card.isPublic && card.ownerId !== room.me.id);
     if (!target) { api.toast('这张卡已被撤下，看看其他视角吧'); return; }
     if (!room.ownCard) { openEditor(cardId); return; }
     const completed = acceptedPair(target);
     if (completed) { openTicket(completed); return; }
+    const pending = room.exchanges.find(item => item.status === 'pending' && [item.fromCard, item.toCard].some(card => card.id === target.id && card.revision === target.revision));
+    if (pending) { openExchange(pending.id); return; }
     requestTarget = { id: cardId, fromRevision: room.ownCard.revision, toRevision: target.revision };
     const reason = matchReason(room.ownCard, target);
-    openModal('request', `和 ${escape(target.ownerName)}，共同署名。`, `<div class="live-pair-reason"><b>${escape(reason.title)}</b><p>${escape(reason.detail)}</p></div><div class="live-compare">${miniCard(room.ownCard, '我送出的')}${miniCard(target, '想换回的')}</div><div class="live-consent-note">${icon('swap')}<span>发送后，这张卡将分享给 ${escape(target.ownerName)}。接受后生成双联。</span></div><button class="button button--primary live-wide" data-live-action="send">发送交换申请 ${icon('arrow-right')}</button>`, 'live-dialog--wide');
+    openModal('request', `和 ${escape(target.ownerName)}，共同署名。`, `<div class="live-pair-reason"><b>${escape(reason.title)}</b><p>${escape(reason.detail)}</p></div><div class="live-compare">${miniCard(room.ownCard, '我送出的')}${miniCard(target, '想换回的')}</div><div class="live-consent-note">${icon('swap')}<span>发送后，这张卡将分享给 ${escape(target.ownerName)}。接受后生成双联。</span></div><button class="button button--primary live-wide" data-live-action="send">发送交换申请 ${icon('arrow-right')}</button>`, 'live-dialog--wide', target.id);
   }
 
   function openExchange(id) {
@@ -298,7 +356,7 @@ export function mountLive(container, api) {
     if (exchange.status === 'accepted') { openTicket(exchange); return; }
     const incoming = exchange.to === room.me.id;
     const pending = exchange.status === 'pending';
-    openModal('exchange', pending ? incoming ? '接受这次交换？' : '等待对方回应' : '交换已结束', `<p class="live-modal-intro">${pending ? '交换以眼前这两张卡为准。' : '只有双方接受，才会产生双联记忆。'}</p><div class="live-compare">${miniCard(exchange.fromCard, `${exchange.fromCard.ownerName} 的视角`)}${miniCard(exchange.toCard, `${exchange.toCard.ownerName} 的视角`)}</div>${pending ? `<div class="live-decision-actions">${incoming ? `<button class="button button--primary" data-live-action="decide" data-id="${escape(id)}" data-decision="accepted">愿意，交换这一刻 ${icon('swap')}</button><button class="text-button" data-live-action="decide" data-id="${escape(id)}" data-decision="declined">这次先不了</button>` : `<button class="button button--secondary" data-live-action="decide" data-id="${escape(id)}" data-decision="cancelled">取消这次申请</button>`}</div>` : ''}`, 'live-dialog--wide');
+    openModal('exchange', pending ? incoming ? '接受这次交换？' : '等待对方回应' : '交换已结束', `<p class="live-modal-intro">${pending ? '交换以眼前这两张卡为准。' : '只有双方接受，才会产生双联记忆。'}</p><div class="live-compare">${miniCard(exchange.fromCard, `${exchange.fromCard.ownerName} 的视角`)}${miniCard(exchange.toCard, `${exchange.toCard.ownerName} 的视角`)}</div>${pending ? `<div class="live-decision-actions">${incoming ? `<button class="button button--primary" data-live-action="decide" data-id="${escape(id)}" data-decision="accepted">愿意，交换这一刻 ${icon('swap')}</button><button class="text-button" data-live-action="decide" data-id="${escape(id)}" data-decision="declined">这次先不了</button>` : `<button class="button button--secondary" data-live-action="decide" data-id="${escape(id)}" data-decision="cancelled">取消这次申请</button>`}</div>` : ''}`, 'live-dialog--wide', incoming ? exchange.fromCard.id : exchange.toCard.id);
     currentModal.id = id;
   }
 
@@ -308,7 +366,7 @@ export function mountLive(container, api) {
     const saved = room.records.find(record => record.exchangeId === (item.exchangeId || item.id));
     const sharedTrack = a.trackId && a.trackId === b.trackId && event.song;
     const reason = matchReason(a, b);
-    openModal('ticket', '同一场，两种视角。', `<div class="live-ticket"><div class="live-ticket-mast"><span>MUSIC<br>BRINGS US<br>TOGETHER.</span><b>MM<br>× MS</b></div><div class="live-ticket-title"><span>${escape(event.title)}${event.isDemo ? ' · 示例场次' : ''}<small>${escape([event.date, event.city].filter(Boolean).join(' · '))}</small></span><strong>${escape(a.ownerName)} <i>×</i> ${escape(b.ownerName)}</strong></div><div class="live-ticket-pair">${miniCard(a)}${miniCard(b)}</div><div class="live-ticket-strip"><span>${sharedTrack ? `♪ ${escape(event.song)}` : escape(reason.title)}</span><b>EXCHANGED</b></div><div class="live-ticket-foot"><span>${escape(dateLabel(completedAt(item)))}<br>双方已同意 · ${saved ? '已保存到本房间' : '交换记录'}</span><span class="live-ticket-bars" aria-hidden="true"></span><span>YOUR VIEW.<br>THEIR VIEW.<br>ONE MEMORY.</span></div></div><div class="live-ticket-actions"><button class="button button--primary" data-live-action="download" data-id="${escape(item.exchangeId || item.id)}">保存票根图片 ${icon('arrow-up-right')}</button><button class="button button--secondary" data-live-action="map">${api.getState().space?.mapReturnId ? '继续刚才的探索' : '去音乐地图'} ${icon('compass')}</button></div>${saved ? `<button class="text-button live-delete-record" data-live-action="delete-record" data-id="${escape(saved.id)}">从我的记忆中删除</button>` : ''}`, 'live-dialog--ticket');
+    openModal('ticket', '同一场，两种视角。', `<div class="live-ticket"><div class="live-ticket-mast"><span>MUSIC<br>BRINGS US<br>TOGETHER.</span><b>MM<br>× MS</b></div><div class="live-ticket-title"><span>${escape(event.title)}${event.isDemo ? ' · 示例场次' : ''}<small>${escape([event.date, event.city].filter(Boolean).join(' · '))}</small></span><strong>${escape(a.ownerName)} <i>×</i> ${escape(b.ownerName)}</strong></div><div class="live-ticket-pair">${miniCard(a)}${miniCard(b)}</div><div class="live-ticket-strip"><span>${sharedTrack ? `♪ ${escape(event.song)}` : escape(reason.title)}</span><b>EXCHANGED</b></div><div class="live-ticket-foot"><span>${escape(dateLabel(completedAt(item)))}<br>双方已同意 · ${saved ? '已保存到本房间' : '交换记录'}</span><span class="live-ticket-bars" aria-hidden="true"></span><span>YOUR VIEW.<br>THEIR VIEW.<br>ONE MEMORY.</span></div></div><div class="live-ticket-actions"><button class="button button--primary" data-live-action="download" data-id="${escape(item.exchangeId || item.id)}">保存票根图片 ${icon('arrow-up-right')}</button><button class="button button--secondary" data-live-action="map">${api.getState().space?.mapReturnId ? '继续刚才的探索' : '去音乐地图'} ${icon('compass')}</button></div>${saved ? `<button class="text-button live-delete-record" data-live-action="delete-record" data-id="${escape(saved.id)}">从我的记忆中删除</button>` : ''}`, 'live-dialog--ticket', a.ownerId === room.me.id ? b.id : a.id);
   }
 
   function openInvite() {
@@ -337,7 +395,7 @@ export function mountLive(container, api) {
           persist();
           if (session.roomId && !joinCode && !createRequested && rooms.some(item => item.id === session.roomId)) setState(await request(`/rooms/${session.roomId}`));
         } catch (error) {
-          if (error.status === 401) { photos.clear(); session = null; persist(); errorMessage = '原身份已失效，请重新留下昵称入场。'; }
+          if (error.status === 401) { roomAuthorized = false; clearPhotos(); session = null; persist(); errorMessage = '原身份已失效，请重新留下昵称入场。'; }
           else throw error;
         }
       }
@@ -488,7 +546,8 @@ export function mountLive(container, api) {
       version += 1;
       session.roomId = null;
       persist();
-      photos.clear();
+      roomAuthorized = false;
+      clearPhotos();
       room = null;
       errorMessage = '';
       render();
@@ -547,7 +606,8 @@ export function mountLive(container, api) {
       const roomCode = room.room.code;
       await request(`/rooms/${roomId}/membership`, { method: 'DELETE' });
       closeModal();
-      photos.clear();
+      roomAuthorized = false;
+      clearPhotos();
       room = null;
       rooms = rooms.filter(item => item.id !== roomId);
       joinCode = roomCode;
@@ -561,9 +621,10 @@ export function mountLive(container, api) {
   }, { signal });
 
   dialog.addEventListener('click', event => { if (event.target === dialog && !busy) closeModal(); }, { signal });
-  dialog.addEventListener('cancel', event => { if (busy) event.preventDefault(); else { currentModal = null; photoSelection += 1; } }, { signal });
+  dialog.addEventListener('cancel', event => { event.preventDefault(); if (!busy) closeModal(); }, { signal });
+  dialog.addEventListener('close', restoreScene, { signal });
   document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); }, { signal });
   connect();
   interval = setInterval(refresh, 4000);
-  return () => { life.abort(); photos.clear(); clearInterval(interval); dialog.close(); };
+  return () => { clearPhotos(); life.abort(); clearInterval(interval); dialog.close(); };
 }

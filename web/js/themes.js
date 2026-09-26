@@ -9,7 +9,7 @@ const themes = [
 ];
 
 /** Visual state deliberately lives outside the room, card and route stores. */
-export function mountThemes({ navigate, view }) {
+export function mountThemes({ onAction, onShot, view }) {
   const launcher = document.querySelector('#theme-launcher');
   const dialog = document.createElement('dialog');
   dialog.className = 'theme-dialog';
@@ -26,11 +26,19 @@ export function mountThemes({ navigate, view }) {
   const sceneHost = document.querySelector('#sakura-world');
   let scene = null;
   let currentView = view;
+  let currentMode = view === 'space' ? 'home' : view;
+  let cards = [];
+  let focused = null;
   function syncScene() {
     const wantsScene = document.documentElement.dataset.theme === 'sakura';
     sceneHost.hidden = !wantsScene;
     if (!wantsScene) { scene?.dispose(); scene = null; }
-    if (wantsScene && !scene) scene = mountSakuraScene(sceneHost, { navigate, view: currentView });
+    if (wantsScene && !scene) {
+      scene = mountSakuraScene(sceneHost, { onAction, onShot, view: currentView });
+      scene.setContent(cards, currentMode);
+      scene.setView(currentView, { mode: currentMode, immediate: true });
+      if (focused) scene.focus(focused.kind, focused.id);
+    }
   }
 
   function applyTheme(id, save = true) {
@@ -59,5 +67,10 @@ export function mountThemes({ navigate, view }) {
     if (event.key === STORAGE_KEY) applyTheme(event.newValue, false);
   });
   applyTheme(document.documentElement.dataset.theme, false);
-  return { setView(next) { currentView = next; scene?.setView(next); } };
+  return {
+    setView(next, options = {}) { currentView = next; currentMode = options.mode || (next === 'space' ? 'home' : next); focused = null; return scene?.setView(next, { ...options, mode: currentMode }); },
+    setContent(next, mode) { cards = next; if (mode) currentMode = mode; scene?.setContent(cards, mode); },
+    focus(kind, id) { focused = { kind, id }; return scene?.focus(kind, id) || Promise.resolve(true); },
+    restore() { focused = null; return scene?.restore(); },
+  };
 }

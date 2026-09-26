@@ -1,11 +1,14 @@
 import * as THREE from 'three';
 import { gsap } from 'gsap';
+import { buildSakuraWorld } from './sakura-world.js';
+import { batchStaticMeshes } from './sakura-batch.js';
+import { createCameraDirector } from './sakura-camera.js';
 import { createCelMaterials } from './vendor/sakura/toon.js';
 import { Pipeline } from './vendor/sakura/post.js';
 import { PAL } from './vendor/sakura/palette.js';
 
 /** Original music street, rendered with Sakura Crossing's MIT cel/ink pipeline. */
-export function mountSakuraScene(host, { navigate, view = 'space' } = {}) {
+export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}) {
   let renderer;
   try {
     renderer = new THREE.WebGLRenderer({ antialias: false, stencil: false, powerPreference: 'low-power' });
@@ -15,21 +18,30 @@ export function mountSakuraScene(host, { navigate, view = 'space' } = {}) {
     fallback.className = 'sakura-scene__fallback';
     fallback.innerHTML = '<span aria-hidden="true"></span><strong>SAME SHOW.<br>ANOTHER VIEW.</strong>';
     host.append(fallback);
-    return { setView() {}, dispose() { fallback.remove(); host.classList.remove('sakura-scene--fallback'); } };
+    document.body.classList.add('spatial-fallback');
+    return { setView() {}, setContent() {}, focus: () => Promise.resolve(true), restore() {}, dispose() { fallback.remove(); host.classList.remove('sakura-scene--fallback'); document.body.classList.remove('spatial-fallback'); } };
   }
 
   host.classList.add('sakura-scene');
   const canvas = renderer.domElement;
   canvas.className = 'sakura-scene__canvas';
   canvas.setAttribute('role', 'img');
-  canvas.setAttribute('aria-label', '樱花音乐街角：唱片小店、街边舞台、灯串和飘落的花瓣。');
+  canvas.setAttribute('aria-label', '樱下音乐小院。可通过物件标记或下方导航进入唱片店、照片墙、工作桌与收藏。');
   host.append(canvas);
   const compass = document.createElement('nav');
   compass.className = 'world-compass';
   compass.setAttribute('aria-label', '音乐小院');
-  compass.innerHTML = '<span class="world-compass__label">SIDE B / 春日唱片店</span><div><button data-world-view="space">小院</button><button data-world-view="explore">唱片台</button><button data-world-view="live">照片墙</button><button data-world-view="records">收藏架</button></div>';
+  compass.innerHTML = '<span class="world-compass__label">SIDE B / 樱下唱片店</span><div><button data-world-view="space">小院</button><button data-world-view="explore">唱片店</button><button data-world-view="live">照片墙</button><button data-world-editor>工作桌</button><button data-world-view="records">收藏</button></div>';
   host.append(compass);
-  compass.addEventListener('click', event => { const button = event.target.closest('[data-world-view]'); if (button) navigate?.(button.dataset.worldView); });
+  compass.addEventListener('click', event => {
+    const button = event.target.closest('button');
+    if (!button) return;
+    onAction?.(button.hasAttribute('data-world-editor') ? { type: 'editor' } : { type: 'navigate', view: button.dataset.worldView });
+  });
+  const hotspots = document.createElement('div'); hotspots.className = 'world-hotspots'; host.append(hotspots);
+  const caption = document.createElement('div'); caption.className = 'world-caption';
+  caption.innerHTML = '<span>SIDE B RECORDS</span><strong>樱下唱片店</strong><small data-world-caption>音乐 · 照片 · 此刻</small>';
+  host.append(caption);
   renderer.setClearColor(PAL.skyHaze, 1);
   renderer.setPixelRatio(1);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -45,9 +57,7 @@ export function mountSakuraScene(host, { navigate, view = 'space' } = {}) {
   camera.position.set(8.5, 6.6, 13);
   camera.lookAt(0, 1.55, 0);
   const world = new THREE.Group();
-  world.rotation.y = -.12;
   scene.add(world);
-  function hotspot(object, destination) { object.userData.destination = destination; }
   const textures = new Set();
   const geometries = new Set();
   const materials = new Set();
@@ -97,12 +107,6 @@ export function mountSakuraScene(host, { navigate, view = 'space' } = {}) {
     item.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), to.sub(from).normalize());
     return item;
   }
-  function curve(points, color = '#485347') {
-    const path = new THREE.CatmullRomCurve3(points.map(point => new THREE.Vector3(...point)));
-    const material = new THREE.LineBasicMaterial({ color }); materials.add(material);
-    world.add(new THREE.Line(geometry(new THREE.BufferGeometry().setFromPoints(path.getPoints(40))), material));
-    return path;
-  }
   function label(text, width, height, color, background) {
     const surface = document.createElement('canvas'); surface.width = 768; surface.height = 192;
     const context = surface.getContext('2d');
@@ -117,9 +121,9 @@ export function mountSakuraScene(host, { navigate, view = 'space' } = {}) {
 
   scene.add(new THREE.HemisphereLight(PAL.hemiSky, PAL.hemiGround, 1.12));
   const sun = new THREE.DirectionalLight(PAL.sun, 2.25);
-  sun.position.set(-5.2, 8.2, 6.6); sun.castShadow = true;
+  sun.position.set(-6.2, 10.2, 8.6); sun.castShadow = true;
   sun.shadow.mapSize.set(2048, 2048);
-  Object.assign(sun.shadow.camera, { left: -8, right: 8, top: 8, bottom: -8, near: .5, far: 32 });
+  Object.assign(sun.shadow.camera, { left: -12, right: 12, top: 12, bottom: -12, near: .5, far: 32 });
   sun.shadow.bias = -.0004;
   sun.shadow.normalBias = .007;
   scene.add(sun);
@@ -128,354 +132,210 @@ export function mountSakuraScene(host, { navigate, view = 'space' } = {}) {
   const bounce = new THREE.DirectionalLight(0xd8cbe8, .34);
   bounce.position.set(1, -3, 4); scene.add(bounce);
 
-  // A quiet street extends beyond the shop. The scene has a foreground and
-  // fading neighbourhood instead of sitting on an isolated presentation plinth.
-  const pavement = box([0, -.12, -8.3], [65, .18, 24], toon.sand, world);
-  pavement.castShadow = false;
-  const road = box([0, -.14, 8.5], [65, .14, 10], toon.road, world);
-  road.castShadow = false;
-  box([0, -.015, 3.47], [65, .14, .16], toon.plaster, world);
-  for (let i = -5; i < 6; i += 1) box([i * 3.3, -.055, 8.5], [1.25, .008, .1], toon.plaster, world);
-  const distantWall = celMaterials.cel({ color: '#d5dce5', bands: 'soft', flat: false });
-  const distantRoof = celMaterials.cel({ color: '#939bab', bands: 'soft', flat: false });
-  const distantWindow = celMaterials.flat({ color: '#aebdc9' });
-  for (let i = -3; i < 5; i += 1) {
-    const x = i * 4.5 + .6;
-    const h = 2.6 + ((i + 3) % 3) * .65;
-    const house = box([x, h / 2 - .1, -9.8], [3.6, h, 2.1], distantWall, world);
-    house.castShadow = false;
-    const roof = box([x, h, -9.8], [3.85, .18, 2.45], distantRoof, world); roof.castShadow = false;
-    for (const dx of [-.95, .8]) {
-      const window = box([x + dx, h - .85, -8.72], [.65, .86, .03], distantWindow, world);
-      window.castShadow = false;
-    }
-  }
-
-  // A small, tangible island with a paper-coloured pavement edge.
-  box([0, -.18, 0], [8.7, .35, 5.7], toon.sand);
-  box([0, .025, 0], [8.65, .08, 5.65], toon.cream);
-  box([0, .072, 2.27], [8.5, .018, .68], toon.plaster, world);
-  for (let i = 0; i < 8; i += 1) box([-3.8 + i * 1.08, .09, 2.27], [.012, .012, .68], toon.sand, world);
-  box([.35, .18, -.75], [4.25, .28, 2.6], toon.sand);
-  box([.35, 1.45, -.83], [3.85, 2.35, 2.18], toon.plaster);
-  box([.35, .44, .28], [3.96, .26, .1], toon.green);
-
-  // Gabled roof, exposed ridge and quiet seam lines.
-  const roofFront = box([.35, 2.94, -.18], [4.48, .15, 1.46], toon.green);
-  roofFront.rotation.x = .42;
-  const roofBack = box([.35, 2.94, -1.48], [4.48, .15, 1.46], toon.green);
-  roofBack.rotation.x = -.42;
-  box([.35, 3.26, -.83], [4.58, .11, .12], toon.leaf);
-  for (let i = 0; i < 10; i += 1) {
-    const seam = box([-1.61 + i * .435, 3.031, -.18], [.022, .013, 1.41], toon.leaf, world);
-    seam.rotation.x = .42;
-  }
-  box([-1.03, 1.22, .28], [.69, 1.86, .08], toon.green);
-  box([-1.03, 1.55, .33], [.48, .91, .025], toon.glass);
-  ball([-.81, 1.04, .38], [.037, .037, .037], toon.gold);
-  box([.64, 1.59, .295], [2.17, 1.15, .1], toon.green);
-  box([.64, 1.59, .36], [1.99, .97, .035], toon.glass);
-  box([.64, 1.59, .39], [.045, 1, .025], toon.green);
-  box([.64, 1.59, .39], [2, .045, .025], toon.green);
-  box([.64, 1.02, .5], [2.34, .1, .48], toon.wood);
-  const shopSign = label('SIDE B  RECORDS', 2.5, .55, '#fff4db', '#315a4b');
-  shopSign.position.set(.35, 2.49, .3);
-  for (let i = 0; i < 12; i += 1) {
-    const awning = box([-1.74 + i * .38, 2.05, .7], [.385, .07, .94], i % 2 ? toon.plaster : toon.rose, world);
-    awning.rotation.x = .18;
-    box([-1.74 + i * .38, 1.93, 1.16], [.383, .19, .065], i % 2 ? toon.plaster : toon.rose, world);
-  }
-  box([.35, .23, 1.28], [4.4, .32, 1.62], toon.wood);
-  box([.35, .409, 1.28], [4.41, .035, 1.62], toon.cream);
-  for (let i = 0; i < 7; i += 1) box([-1.58 + i * .63, .433, 1.28], [.015, .012, 1.6], toon.sand, world);
-  box([.35, .115, 2.23], [2.6, .16, .42], toon.wood);
-
-  // Speakers face the audience. A physical record carries the slow motion.
-  function speaker(x) {
-    const group = new THREE.Group(); group.position.set(x, .43, 1.4); world.add(group);
-    box([0, .49, 0], [.47, .98, .45], toon.green, group);
-    for (const [y, size] of [[.3, .157], [.74, .082]]) {
-      const cone = cylinder([0, y, .239], [size, .025, size], toon.black, group); cone.rotation.x = Math.PI / 2;
-      const centre = cylinder([0, y, .256], [size * .34, .027, size * .34], toon.leaf, group); centre.rotation.x = Math.PI / 2;
-    }
-  }
-  speaker(-1.55); speaker(2.23);
-  box([.47, .76, 1.39], [1.43, .61, .67], toon.green);
-  box([.47, 1.09, 1.39], [1.56, .08, .79], toon.wood);
-  const record = new THREE.Group(); record.position.set(.27, 1.145, 1.39); world.add(record);
-  hotspot(record, 'explore');
-  cylinder([0, 0, 0], [.36, .035, .36], toon.black, record);
-  for (const radius of [.22, .265, .31]) {
-    const material = new THREE.MeshBasicMaterial({ color: '#637166', side: THREE.DoubleSide }); materials.add(material);
-    const groove = mesh(geometry(new THREE.RingGeometry(radius, radius + .005, 48)), material, [0, .021, 0], [1, 1, 1], record);
-    groove.rotation.x = -Math.PI / 2; groove.castShadow = false;
-  }
-  cylinder([0, .024, 0], [.112, .006, .112], toon.rose, record);
-  box([.035, .03, 0], [.016, .01, .12], toon.plaster, record);
-  rod([.87, 1.2, 1.14], [.76, 1.24, 1.55], .016, toon.sand);
-  rod([.76, 1.24, 1.55], [.53, 1.22, 1.61], .016, toon.sand);
-  const frontSign = label('ONE NIGHT, TWO VIEWS', 1.29, .3, '#fff4db', '#315a4b');
-  frontSign.position.set(.47, .77, 1.735);
-
-  // A bench, record crate and a tiny noticeboard make it a place to stay.
-  const bench = new THREE.Group(); bench.position.set(-2.85, .08, 1.55); bench.rotation.y = -.19; world.add(bench);
-  for (const x of [-.63, .63]) {
-    box([x, .25, 0], [.09, .5, .46], toon.green, bench);
-    box([x, .59, -.22], [.075, 1.05, .085], toon.green, bench);
-  }
-  for (const z of [-.17, .01, .19]) box([0, .5, z], [1.68, .08, .14], toon.wood, bench);
-  for (const y of [.77, .97]) box([0, y, -.24], [1.68, .13, .08], toon.wood, bench);
-  box([2.98, .34, .59], [.77, .5, .72], toon.wood);
-  for (let i = 0; i < 5; i += 1) box([2.98, .54 + (i % 2) * .035, .36 + i * .11], [.59, .55, .035], [toon.rose, toon.green, toon.plaster, toon.mint, toon.coral][i]);
-  const recordSleeve = cylinder([2.98, .58, .851], [.18, .015, .18], toon.black); recordSleeve.rotation.x = Math.PI / 2;
-  box([3.08, .36, 1.73], [.1, .65, .1], toon.green);
-  const notice = box([3.08, .92, 1.73], [.68, .76, .07], toon.rose); notice.rotation.z = -.06;
-  const noteLabel = label('LIVE / 17:00', .61, .18, '#354a40', '#edabb3'); noteLabel.position.set(3.08, .99, 1.775); noteLabel.rotation.z = -.06;
-  hotspot(notice, 'live');
-
-  // Actual places in a shared set: a freestanding photo wall and record cabinet.
-  // The coloured paper below is scene decoration, never a member's private photo.
-  const wall = new THREE.Group(); wall.position.set(-4.55, .06, -.35); wall.rotation.y = .25; world.add(wall);
-  box([0, .05, 0], [2.6, .12, 1.2], toon.cream, wall);
-  for (const x of [-1.06, 1.06]) box([x, 1.36, 0], [.09, 2.72, .1], toon.green, wall);
-  box([0, 2.64, 0], [2.32, .11, .12], toon.green, wall);
-  box([0, 1.77, -.05], [2.03, 1.51, .07], toon.wood, wall);
-  for (let i = 0; i < 4; i++) {
-    const frame = new THREE.Group(); frame.position.set(i % 2 ? .48 : -.48, i < 2 ? 2.1 : 1.41, .04); frame.rotation.z = (i % 2 ? -1 : 1) * .07; wall.add(frame);
-    box([0, 0, 0], [.7, .61, .035], toon.plaster, frame);
-    box([0, .045, .024], [.6, .4, .018], [toon.rose, toon.mint, toon.glass, toon.coral][i], frame);
-    const moon = cylinder([.14, .1, .04], [.085, .018, .085], toon.cream, frame); moon.rotation.x = Math.PI / 2;
-    box([-.11, -.065, .04], [.3, .13, .02], toon.green, frame);
-    box([0, .3, .04], [.06, .12, .06], toon.gold, frame);
-  }
-  const wallTitle = label('OUR SIDE B', 1.4, .26, '#fff4db', '#42696a'); wall.add(wallTitle); wallTitle.position.set(0, 2.42, .05);
-  hotspot(wall, 'live');
-  const shelf = new THREE.Group(); shelf.position.set(4.38, .08, .18); shelf.rotation.y = -.38; world.add(shelf);
-  box([0, 1.04, -.22], [1.65, 1.95, .12], toon.wood, shelf);
-  for (const x of [-.81, .81]) box([x, 1.04, .02], [.09, 2.08, .65], toon.green, shelf);
-  for (const y of [.13, .98, 2.04]) box([0, y, .02], [1.75, .09, .71], toon.green, shelf);
-  const sleeves = [];
-  for (let i = 0; i < 7; i++) {
-    const sleeve = box([-.6 + i * .2, .61, .01], [.13, .79, .53], [toon.rose, toon.plaster, toon.gold, toon.mint][i % 4], shelf);
-    sleeve.rotation.z = -.055; sleeves.push(sleeve);
-  }
-  for (let i = 0; i < 3; i++) {
-    box([-.52 + i * .52, 1.48, .02], [.44, .7, .09], [toon.mint, toon.rose, toon.cream][i], shelf);
-    const disc = cylinder([-.52 + i * .52, 1.51, .075], [.16, .018, .16], toon.black, shelf); disc.rotation.x = Math.PI / 2;
-    const centre = cylinder([-.52 + i * .52, 1.51, .089], [.053, .018, .053], toon.gold, shelf); centre.rotation.x = Math.PI / 2;
-  }
-  const shelfTitle = label('KEEP THE NIGHT', 1.4, .23, '#42696a', '#f2e7d3'); shelf.add(shelfTitle); shelfTitle.position.set(0, 1.98, .385);
-  hotspot(shelf, 'records');
-
-  // A sleeping shop cat gives the courtyard one quiet, authored idle gesture.
-  const cat = new THREE.Group(); cat.position.set(-2.8, .69, 1.48); world.add(cat);
-  ball([0, 0, 0], [.24, .14, .15], toon.plaster, cat);
-  ball([.18, .07, .025], [.12, .105, .105], toon.plaster, cat);
-  const earGeometry = geometry(new THREE.ConeGeometry(.055, .105, 3));
-  mesh(earGeometry, toon.coral, [.13, .18, .04], [1, 1, 1], cat);
-  mesh(earGeometry, toon.coral, [.23, .18, .04], [1, 1, 1], cat);
-  for (const x of [.14, .22]) box([x, .09, .122], [.032, .008, .012], toon.ink, cat);
-
-  let seed = 54;
-  const random = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
-  function sakuraTree(x, z, height, size) {
-    const tree = new THREE.Group(); tree.position.set(x, .08, z); world.add(tree);
-    cylinder([0, .07, 0], [.53, .14, .53], toon.sand, tree);
-    rod([0, .1, 0], [.12, height * .67, 0], .105, toon.wood, tree);
-    const branches = [[-.57, height * .76, .09], [.7, height * .82, -.04], [.08, height, -.24], [.18, height * .72, .57]];
-    branches.forEach(point => rod([.08, height * .48, 0], point, .055, toon.wood, tree));
-    for (let i = 0; i < 12; i += 1) {
-      const angle = i * 2.39996;
-      const ring = i < 8 ? .71 : .32;
-      const position = [Math.cos(angle) * ring * size, height - .2 + (random() - .5) * .59, Math.sin(angle) * ring * size];
-      const scale = [.58 * size, (.46 + random() * .16) * size, .57 * size];
-      const crown = ball(position, scale, [toon.rose, toon.blush, toon.petal][i % 3], tree);
-      crown.receiveShadow = false;
-    }
-  }
-  sakuraTree(-3.02, -.83, 3.42, 1.06);
-  sakuraTree(3.13, -1.69, 3.72, 1.02);
-  sakuraTree(-8, -4.1, 4.1, 1.3);
-  sakuraTree(8.4, -4.8, 4.3, 1.2);
-  // Hand-placed petals on the pavement stay visible in the still composition.
-  const petalShape = new THREE.Shape();
-  petalShape.moveTo(0, -.5); petalShape.bezierCurveTo(-.5, -.15, -.5, .35, -.14, .5);
-  petalShape.lineTo(0, .34); petalShape.lineTo(.14, .5); petalShape.bezierCurveTo(.5, .35, .5, -.15, 0, -.5);
-  const petalGeometry = geometry(new THREE.ShapeGeometry(petalShape, 4));
-  const petalMaterial = new THREE.MeshBasicMaterial({ color: '#e8a8b4', side: THREE.DoubleSide }); materials.add(petalMaterial);
-  for (let i = 0; i < 21; i += 1) {
-    const petal = mesh(petalGeometry, petalMaterial, [(random() - .5) * 7.5, .081, (random() - .5) * 4.8], [.12, .12, .12]);
-    petal.rotation.set(-Math.PI / 2, 0, random() * Math.PI * 2); petal.castShadow = false;
-  }
-  const falling = new THREE.InstancedMesh(petalGeometry, petalMaterial, 19); world.add(falling);
-  falling.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-  const drifts = Array.from({ length: 19 }, () => ({ x: (random() - .5) * 7.1, z: (random() - .5) * 4.1, phase: random() * 7, speed: .18 + random() * .13 }));
-  const dummy = new THREE.Object3D();
-
-  // One hanging wire, small warm lamps, no postprocessing glow.
-  rod([-3.65, .1, 1.13], [-3.65, 3.28, 1.13], .035, toon.green);
-  rod([3.72, .1, .96], [3.72, 3.55, .96], .035, toon.green);
-  const wire = curve([[-3.65, 3.28, 1.13], [-1.8, 2.95, 1.085], [0, 2.86, 1.045], [1.9, 3.08, 1], [3.72, 3.55, .96]]);
-  const lampMaterial = new THREE.MeshBasicMaterial({ color: '#ffedb2' }); materials.add(lampMaterial);
-  for (let i = 1; i < 12; i += 1) {
-    const point = wire.getPoint(i / 12);
-    rod(point.toArray(), [point.x, point.y - .13, point.z], .012, toon.green);
-    const lamp = ball([point.x, point.y - .165, point.z], [.059, .075, .059], lampMaterial); lamp.castShadow = false;
-  }
-
+  const model = buildSakuraWorld({ THREE, world, mesh, box, cylinder, ball, rod, label, geometry, toon, materials, textures });
+  batchStaticMeshes(THREE, world, { exclude: [model.roof, model.record, model.draftImageMesh, ...model.photoCards.map(card => card.object)] });
   const pipeline = new Pipeline(renderer, scene, camera, { pixelBudget: 2e6, maxPixelRatio: 1.5 });
-  // The source street works in much larger units. Here the camera-to-shop
-  // distance is ~16 units; keep its linework while letting rear houses fade.
   const ink = pipeline.ink.mat.uniforms;
-  ink.uFadeStart.value = 20;
-  ink.uFadeEnd.value = 36;
-  ink.uSkyDepth.value = 65;
-  ink.uStrength.value = .8;
-  ink.uSens.value = .0038;
+  ink.uFadeStart.value = 23; ink.uFadeEnd.value = 43; ink.uSkyDepth.value = 65;
+  ink.uStrength.value = .76; ink.uSens.value = .0038;
   pipeline.grade.mat.uniforms.uVignette.value = .06;
-  pipeline.grade.mat.uniforms.uSaturation.value = 1.08;
+  pipeline.grade.mat.uniforms.uSaturation.value = 1.06;
 
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  let visible = true;
-  let disposed = false;
-  let frame = 0;
-  let lastTime = 0;
-  let sceneTime = 0;
-  let width = 0; let height = 0;
-  let currentView = view;
-  let cameraTween;
-  let hoverTween;
-  let hovered = null;
-  const target = new THREE.Vector3(0, 1.55, 0);
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const loader = new THREE.TextureLoader();
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
-  const shots = {
-    space: { position: [10.9, 7.8, 17.5], target: [0, 1.35, .05] },
-    explore: { position: [3.7, 3.55, 6.2], target: [.43, 1.19, 1.05] },
-    live: { position: [-1.9, 3.2, 5.7], target: [-4.35, 1.5, .35] },
-    records: { position: [7.3, 3.1, 4.5], target: [4.14, 1.14, -.25] },
-  };
-  function shotFor(next) {
-    const shot = shots[next] || shots.space;
-    const endTarget = new THREE.Vector3(...shot.target);
-    const endPosition = new THREE.Vector3(...shot.position);
-    // Wide phone viewport is a compact establishing strip; preserve the set.
-    const aspect = width / height || 1;
-    const distance = aspect < .85 ? 1.18 : aspect > 1.4 ? .84 : 1;
-    endPosition.sub(endTarget).multiplyScalar(distance).add(endTarget);
-    return { endTarget, endPosition };
+  let width = 1; let height = 1;
+  let currentView = view;
+  let currentMode = view === 'space' ? 'home' : view;
+  let activePhoto = null;
+  let draftCard = null;
+  let disposed = false;
+  let visible = true;
+  let frame = 0; let lastTime = 0; let sceneTime = 0;
+  const pins = [];
+  const staticPins = [
+    ['唱片店', new THREE.Vector3(0, 2.6, 1), { type: 'navigate', view: 'explore' }],
+    ['照片墙', new THREE.Vector3(-3.8, 2.85, 1.4), { type: 'navigate', view: 'live' }],
+    ['工作桌', new THREE.Vector3(4, 1.75, 1.6), { type: 'editor' }],
+  ];
+  for (const [title, position, action] of staticPins) {
+    const button = document.createElement('button'); button.className = 'world-pin'; button.textContent = title;
+    button.addEventListener('click', () => onAction?.(action)); hotspots.append(button);
+    pins.push({ button, position, homeOnly: true });
   }
-  function setView(next, { immediate = false, force = false } = {}) {
-    if (next === currentView && !force) return;
-    currentView = next;
-    host.dataset.shot = next;
-    compass.querySelectorAll('button').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.worldView === next)));
-    cameraTween?.kill();
-    const { endTarget, endPosition } = shotFor(next);
-    if (immediate || reducedMotion.matches) {
-      camera.position.copy(endPosition); target.copy(endTarget); camera.lookAt(target); draw(); return;
-    }
-    const startPosition = camera.position.clone();
-    const startTarget = target.clone();
-    const midpoint = startPosition.clone().lerp(endPosition, .5);
-    midpoint.y += Math.min(1.25, startPosition.distanceTo(endPosition) * .13);
-    const arc = new THREE.QuadraticBezierCurve3(startPosition, midpoint, endPosition);
-    const progress = { value: 0 };
-    host.dataset.travelling = 'true';
-    cameraTween = gsap.to(progress, { value: 1, duration: 1.3, ease: 'power2.inOut',
-      onUpdate() { camera.position.copy(arc.getPoint(progress.value)); target.lerpVectors(startTarget, endTarget, progress.value); camera.lookAt(target); },
-      onComplete() { delete host.dataset.travelling; cameraTween = null; },
-      onInterrupt() { delete host.dataset.travelling; },
+  const photoSlots = model.photoCards.map((card, index) => {
+    const button = document.createElement('button'); button.className = 'world-pin world-pin--photo'; button.hidden = true;
+    const slot = { ...card, index, button, data: null, texture: null,
+      rest: { position: card.object.position.clone(), rotation: card.object.rotation.clone(), scale: card.object.scale.clone() } };
+    button.addEventListener('click', () => { if (slot.data) onAction?.({ type: 'photo', id: slot.data.id }); });
+    hotspots.append(button); card.object.visible = false;
+    return slot;
+  });
+  function draw() { if (!disposed && visible && width && height) pipeline.render(); }
+  const projected = new THREE.Vector3();
+  function positionPin(button, point, offsetY = 0) {
+    projected.copy(point).project(camera);
+    const x = (projected.x + 1) * width / 2; const y = (1 - projected.y) * height / 2 + offsetY;
+    const clearArea = width <= 760 ? (director.active.key === 'home' ? height - 240 : height * .43) : width - (director.active.key === 'home' ? 20 : 520);
+    const inArea = width <= 760 ? y < clearArea : x < clearArea;
+    button.hidden = projected.z > 1 || projected.z < -1 || x < 35 || x > width - 35 || y < 95 || y > height - 100 || !inArea;
+    if (!button.hidden) button.style.transform = `translate3d(${x}px,${y}px,0) translate(-50%,-100%)`;
+  }
+  function projectPins() {
+    camera.updateMatrixWorld(); world.updateMatrixWorld(true);
+    pins.forEach(pin => { pin.button.hidden = true; if (director.active.key === 'home') positionPin(pin.button, pin.position); });
+    photoSlots.forEach(slot => {
+      slot.button.hidden = true;
+      if (!slot.data || !['home', 'live', 'photo'].includes(director.active.key)) return;
+      const position = slot.object.getWorldPosition(new THREE.Vector3()); position.y -= .5;
+      positionPin(slot.button, position, director.active.key === 'home' ? (slot.index % 3) * 27 : 0);
     });
+  }
+  const director = createCameraDirector(camera, {
+    size: () => ({ width, height }), reduced,
+    onFrame() { projectPins(); if (reduced.matches) draw(); },
+    onShot(key, id, travelling) {
+      const distantPortrait = width <= 760 && key === 'home';
+      scene.fog.near = distantPortrait ? 43 : 24; scene.fog.far = distantPortrait ? 78 : 46;
+      ink.uFadeStart.value = distantPortrait ? 42 : 23; ink.uFadeEnd.value = distantPortrait ? 70 : 43;
+      host.dataset.shot = key;
+      if (travelling) host.dataset.travelling = 'true'; else delete host.dataset.travelling;
+      compass.querySelectorAll('button').forEach(button => {
+        const selected = button.hasAttribute('data-world-editor') ? key === 'editor' : button.dataset.worldView === (key === 'home' ? 'space' : key === 'photo' ? 'live' : key);
+        button.setAttribute('aria-pressed', String(selected));
+      });
+      caption.querySelector('strong').textContent = ({ home: '樱下唱片店', explore: '唱片里的相遇', live: '同一晚，另一面', editor: '留下一张现场卡', records: '留住的声音', photo: '这张照片的另一面' })[key];
+      onShot?.(key, id, travelling);
+    },
+  });
+  function resetPhoto(slot, immediate = false) {
+    if (!slot) return;
+    for (const property of ['position', 'rotation', 'scale']) {
+      gsap.killTweensOf(slot.object[property]);
+      const end = slot.rest[property];
+      gsap.to(slot.object[property], { x: end.x, y: end.y, z: end.z, duration: immediate || reduced.matches ? 0 : .4, ease: 'power3.out', onUpdate: () => { renderer.shadowMap.needsUpdate = true; if (reduced.matches) draw(); } });
+    }
+  }
+  function releasePhoto(immediate = false) { resetPhoto(activePhoto, immediate); activePhoto = null; }
+  function baseShot() { return currentView === 'space' ? currentMode === 'home' ? 'home' : 'live' : currentView; }
+  function setView(next, { mode, immediate = false } = {}) {
+    const changed = currentView !== next || (mode && mode !== currentMode);
+    currentView = next; currentMode = mode || (next === 'space' ? 'home' : next);
+    if (!changed && director.active.key === baseShot()) return Promise.resolve(true);
+    releasePhoto(); return director.go(baseShot(), { immediate });
+  }
+  function focus(kind, id) {
+    if (kind !== 'photo') { releasePhoto(); return director.go(kind); }
+    const slot = photoSlots.find(item => item.data?.id === id);
+    if (!slot) return director.go(baseShot());
+    if (activePhoto !== slot) {
+      releasePhoto(); activePhoto = slot;
+      gsap.to(slot.object.position, { y: slot.rest.position.y + .26, z: slot.rest.position.z + .82, duration: reduced.matches ? 0 : .7, ease: 'power3.inOut', onUpdate: () => { renderer.shadowMap.needsUpdate = true; } });
+      gsap.to(slot.object.rotation, { x: 0, y: 0, z: -.04, duration: reduced.matches ? 0 : .7, ease: 'power3.inOut' });
+      gsap.to(slot.object.scale, { x: 1.28, y: 1.28, z: 1.28, duration: reduced.matches ? 0 : .7, ease: 'power3.inOut' });
+    }
+    const point = slot.anchor.clone(); point.y += .23; point.z += .65;
+    return director.go('photo', { point, id });
+  }
+  function restore() { releasePhoto(); return director.go(baseShot()); }
+  function setContent(cards = [], mode) {
+    if (mode && mode !== currentMode) { currentMode = mode; if (!['photo', 'editor'].includes(director.active.key)) director.go(baseShot()); }
+    // A newly loaded image must not move a card that is already being viewed.
+    const remaining = new Map(cards.slice(0, 6).map(card => [card.id, card]));
+    const assigned = photoSlots.map(slot => {
+      const card = remaining.get(slot.data?.id) || null;
+      if (card) remaining.delete(card.id);
+      return card;
+    });
+    const incoming = remaining.values();
+    assigned.forEach((card, index) => { if (!card) assigned[index] = incoming.next().value || null; });
+    const nextDraft = cards.find(card => card.isOwn) || null;
+    if (draftCard?.id !== nextDraft?.id || draftCard?.src !== nextDraft?.src) {
+      model.draftImageMesh.material.map = null; model.draftImageMesh.material.color.set('#e5cdd1'); model.draftImageMesh.material.needsUpdate = true;
+    }
+    draftCard = nextDraft;
+    photoSlots.forEach((slot, index) => {
+      const next = assigned[index];
+      if (activePhoto === slot && slot.data?.id !== next?.id) { releasePhoto(true); director.go(baseShot()); }
+      const changed = slot.data?.src !== next?.src || slot.data?.id !== next?.id;
+      slot.data = next; slot.object.visible = Boolean(next); slot.button.hidden = !next;
+      if (next) {
+        slot.object.userData.action = { type: 'photo', id: next.id };
+        const owner = next.subtitle?.split(' · ')[0] || '现场';
+        slot.button.textContent = `${owner}的卡`;
+        slot.button.setAttribute('aria-label', `查看${owner}的照片${next.isDemo ? '，示例' : ''}`);
+      }
+      if (!changed) return;
+      if (slot.texture) { slot.texture.dispose(); textures.delete(slot.texture); slot.texture = null; }
+      slot.imageMesh.material.map = null; slot.imageMesh.material.needsUpdate = true;
+      if (!next?.src) return;
+      const expected = next.src;
+      const texture = loader.load(expected, loaded => {
+        if (disposed || slot.data?.src !== expected) { loaded.dispose(); textures.delete(loaded); return; }
+        const imageAspect = loaded.image.width / loaded.image.height;
+        const params = slot.imageMesh.geometry.parameters;
+        const shapeAspect = params.width / params.height;
+        if (imageAspect > shapeAspect) { loaded.repeat.x = shapeAspect / imageAspect; loaded.offset.x = (1 - loaded.repeat.x) / 2; }
+        else { loaded.repeat.y = imageAspect / shapeAspect; loaded.offset.y = (1 - loaded.repeat.y) / 2; }
+        slot.imageMesh.material.map = loaded; slot.imageMesh.material.color.set('#ffffff'); slot.imageMesh.material.needsUpdate = true;
+        if (slot.data.isOwn) { model.draftImageMesh.material.map = loaded; model.draftImageMesh.material.color.set('#ffffff'); model.draftImageMesh.material.needsUpdate = true; }
+        draw();
+      });
+      texture.colorSpace = THREE.SRGBColorSpace; texture.minFilter = THREE.LinearFilter; texture.generateMipmaps = false;
+      slot.texture = texture; textures.add(texture);
+    });
+    caption.querySelector('[data-world-caption]').textContent = cards.length ? `${cards.length} 张${currentView === 'live' ? '可见现场卡' : '本地示例'} · 双向同意后交换` : '音乐 · 照片 · 此刻';
+    renderer.shadowMap.needsUpdate = true; projectPins(); draw();
   }
   function picked(event) {
     const rect = canvas.getBoundingClientRect();
     pointer.set((event.clientX - rect.left) / rect.width * 2 - 1, -(event.clientY - rect.top) / rect.height * 2 + 1);
     raycaster.setFromCamera(pointer, camera);
-    const hit = raycaster.intersectObjects(world.children, true)[0];
+    const hit = raycaster.intersectObjects(world.children, true).find(item => { for (let node = item.object; node; node = node.parent) if (!node.visible) return false; return true; });
     let object = hit?.object;
-    while (object && !object.userData.destination) object = object.parent;
-    return object;
+    while (object && !object.userData.action) object = object.parent;
+    return object?.userData.action;
   }
-  function onPointerMove(event) {
-    if (event.pointerType === 'touch') return;
-    const object = picked(event);
-    if (object === hovered) return;
-    hovered = object;
-    canvas.style.cursor = object ? 'pointer' : '';
-    hoverTween?.kill();
-    hoverTween = gsap.to(sleeves[3].position, { z: object === shelf ? .17 : .01, duration: reducedMotion.matches ? 0 : .45, ease: 'power3.out', onUpdate: () => { if (reducedMotion.matches) draw(); } });
-  }
-  function onCanvasClick(event) { const object = picked(event); if (object) navigate?.(object.userData.destination); }
-  function onPointerLeave() { hovered = null; canvas.style.cursor = ''; hoverTween?.kill(); hoverTween = gsap.to(sleeves[3].position, { z: .01, duration: reducedMotion.matches ? 0 : .35, onUpdate: () => { if (reducedMotion.matches) draw(); } }); }
-  canvas.addEventListener('pointermove', onPointerMove);
-  canvas.addEventListener('pointerleave', onPointerLeave);
-  canvas.addEventListener('click', onCanvasClick);
-  function pose(time) {
-    record.rotation.y = time * .24;
-    cat.scale.y = 1 + Math.sin(time * 1.3) * .025;
-    notice.rotation.z = -.06 + Math.sin(time * .7) * .012;
-    noteLabel.rotation.z = notice.rotation.z;
-    drifts.forEach((drift, index) => {
-      dummy.position.set(drift.x + Math.sin(time * .38 + drift.phase) * .27, .25 + ((drift.phase + 5.2 - time * drift.speed) % 4.1 + 4.1) % 4.1, drift.z + Math.cos(time * .21 + drift.phase) * .18);
-      dummy.rotation.set(.5 + Math.sin(time * .5 + drift.phase) * .6, drift.phase + time * .13, time * .3 + drift.phase);
-      dummy.scale.setScalar(.105); dummy.updateMatrix(); falling.setMatrixAt(index, dummy.matrix);
-    });
-    falling.instanceMatrix.needsUpdate = true;
-  }
-  function draw() { if (!disposed && width && height) pipeline.render(); }
+  function onPointerMove(event) { if (event.pointerType !== 'touch') canvas.style.cursor = picked(event) ? 'pointer' : ''; }
+  function onPointerLeave() { canvas.style.cursor = ''; }
+  function onCanvasClick(event) { const action = picked(event); if (action) onAction?.(action); }
+  canvas.addEventListener('pointermove', onPointerMove); canvas.addEventListener('pointerleave', onPointerLeave); canvas.addEventListener('click', onCanvasClick);
   function tick(now) {
     frame = 0;
-    if (disposed || !visible || document.hidden || reducedMotion.matches) return;
+    if (disposed || !visible || document.hidden || reduced.matches) return;
     if (!lastTime) lastTime = now;
-    if (now - lastTime >= 1000 / (cameraTween ? 60 : 30)) {
+    if (now - lastTime >= 1000 / (director.moving || activePhoto ? 60 : 30)) {
       sceneTime += Math.min((now - lastTime) / 1000, .1); lastTime = now;
-      pose(sceneTime); draw();
+      model.update?.(sceneTime); projectPins(); draw();
     }
     frame = requestAnimationFrame(tick);
   }
   function updateMotion() {
     cancelAnimationFrame(frame); frame = 0; lastTime = 0;
     if (disposed || !visible || document.hidden) return;
-    if (reducedMotion.matches) { cameraTween?.progress(1); pose(0); draw(); }
+    if (reduced.matches) { director.finish(); photoSlots.forEach(slot => { gsap.getTweensOf([slot.object.position, slot.object.rotation, slot.object.scale]).forEach(tween => tween.progress(1)); }); model.update?.(0); projectPins(); draw(); }
     else { draw(); frame = requestAnimationFrame(tick); }
   }
   function resize() {
     const bounds = host.getBoundingClientRect();
-    width = Math.round(bounds.width); height = Math.round(bounds.height);
-    if (!width || !height || disposed) return;
-    const aspect = width / height;
-    camera.aspect = aspect;
-    camera.updateProjectionMatrix();
-    pipeline.setSize(width, height);
-    setView(currentView, { immediate: true, force: true });
-    renderer.shadowMap.needsUpdate = true;
-    draw();
+    width = Math.max(1, Math.round(bounds.width)); height = Math.max(1, Math.round(bounds.height));
+    director.resize(); pipeline.setSize(width, height); renderer.shadowMap.needsUpdate = true; projectPins(); draw();
   }
-  pose(0);
   const resizeObserver = new ResizeObserver(resize); resizeObserver.observe(host);
-  const intersectionObserver = new IntersectionObserver(entries => {
-    visible = entries[0]?.isIntersecting ?? false;
-    updateMotion();
-  }, { threshold: .01 });
+  const intersectionObserver = new IntersectionObserver(entries => { visible = entries[0]?.isIntersecting ?? false; updateMotion(); }, { threshold: .01 });
   intersectionObserver.observe(host);
-  document.addEventListener('visibilitychange', updateMotion);
-  reducedMotion.addEventListener('change', updateMotion);
-  resize(); updateMotion();
-
-  return { setView, dispose() {
-    disposed = true; cancelAnimationFrame(frame);
-    cameraTween?.kill(); hoverTween?.kill();
+  document.addEventListener('visibilitychange', updateMotion); reduced.addEventListener('change', updateMotion);
+  resize(); director.go(baseShot(), { immediate: true, force: true }); model.update?.(0); updateMotion();
+  return { setView, setContent, focus, restore, dispose() {
+    disposed = true; cancelAnimationFrame(frame); director.dispose();
+    photoSlots.forEach(slot => { gsap.killTweensOf([slot.object.position, slot.object.rotation, slot.object.scale]); });
     resizeObserver.disconnect(); intersectionObserver.disconnect();
-    document.removeEventListener('visibilitychange', updateMotion);
-    reducedMotion.removeEventListener('change', updateMotion);
+    document.removeEventListener('visibilitychange', updateMotion); reduced.removeEventListener('change', updateMotion);
+    canvas.removeEventListener('pointermove', onPointerMove); canvas.removeEventListener('pointerleave', onPointerLeave); canvas.removeEventListener('click', onCanvasClick);
+    world.traverse(object => { if (object.isInstancedMesh) object.dispose(); });
     geometries.forEach(item => item.dispose()); materials.forEach(item => item.dispose()); textures.forEach(item => item.dispose());
-    celMaterials.dispose(); pipeline.dispose();
-    sun.shadow.dispose();
-    scene.clear(); renderer.renderLists.dispose(); renderer.dispose(); renderer.forceContextLoss();
-    canvas.removeEventListener('pointermove', onPointerMove);
-    canvas.removeEventListener('pointerleave', onPointerLeave);
-    canvas.removeEventListener('click', onCanvasClick);
-    canvas.remove(); compass.remove(); host.classList.remove('sakura-scene');
+    celMaterials.dispose(); pipeline.dispose(); sun.shadow.dispose(); scene.clear(); renderer.renderLists.dispose(); renderer.dispose(); renderer.forceContextLoss();
+    canvas.remove(); compass.remove(); hotspots.remove(); caption.remove(); host.classList.remove('sakura-scene');
   } };
 }

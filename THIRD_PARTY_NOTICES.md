@@ -135,7 +135,7 @@ Actual README / license / source-file reading scope and adoption decisions are r
 - `web/js/vendor/sakura/palette.js`: unmodified upstream palette.
 - Exact upstream paths, SHA-256 values and changes: [SOURCE.json](web/js/vendor/sakura/SOURCE.json). Upstream Three 0.180.0 is adapted to the project's 0.186.1; the relevant shader anchor was read in the installed source.
 
-`web/js/sakura-scene.js` retains Music Map's original music shop geometry and composes its own street, lighting and camera. No upstream world, player movement, artwork textures or audio is distributed. Upstream stock audio is explicitly excluded from MIT and is not used. The earlier [0.5 visual-only research](references/research/2026-09-27/sakura-visual-reference.md) remains a historical record; the [0.6 adoption note](references/research/2026-09-27/indie-app-direction.md) describes the current scope.
+`web/js/sakura-world.js`, `sakura-scene.js` and `sakura-camera.js` contain Music Map's original geometry, scene integration and camera direction. No upstream world, player movement, artwork textures or audio is distributed. Upstream stock audio is explicitly excluded from MIT and is not used. The earlier [0.5 visual-only research](references/research/2026-09-27/sakura-visual-reference.md) remains a historical record; the [0.6 adoption note](references/research/2026-09-27/indie-app-direction.md) describes the current scope.
 
 [Three](https://github.com/mrdoob/three.js), package **0.186.1**, is an actual browser runtime dependency for the independently authored scene. License: **MIT**, Copyright © 2010-2026 three.js authors. The complete license is copied to [web/assets/licenses/three-MIT.txt](web/assets/licenses/three-MIT.txt); `package-lock.json` records the exact package integrity. Vite retains the full copyright and permission notice in the standalone HTML, including the runtime package. Its presence in the 0.5 production output was read during integration.
 
@@ -143,7 +143,7 @@ Actual README / license / source-file reading scope and adoption decisions are r
 
 [GSAP](https://gsap.com/), pinned npm package **3.15.0**, supplies camera interpolation, UI entrance timelines and Flip card transitions. Copyright 2008–2026, GreenSock. All rights reserved. License: [Standard No Charge GSAP License](https://gsap.com/community/standard-license/), **not MIT**. The source copyright, author and license reference are retained in [gsap-notice.txt](web/assets/licenses/gsap-notice.txt) and embedded in the single HTML. No GSAP source modifications. This application does not expose an animation authoring tool.
 
-The 0.7 scene remains original procedural geometry. Its persistent set, perspective camera shots, photo wall, record cabinet, cat and GSAP path controller are written for Music Map. The vendor renderer modules and their pinned upstream commit remain as documented above.
+The 0.8 scene remains original procedural geometry. Its full-viewport courtyard, open shop, stage, six photo slots, worktable, interior cabinet, instanced petals, cat, physical photo lift and interruptible desktop/portrait GSAP camera director are written for Music Map. Photo textures use only project examples or cards already authorized by the existing application. The vendor renderer modules and their pinned upstream commit remain as documented above.
 
 ## Hugging Face factual music metadata (MVP 0.7.0)
 

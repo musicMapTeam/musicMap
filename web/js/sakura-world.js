@@ -1,0 +1,551 @@
+/**
+ * Original procedural set for the music courtyard.
+ * World units are metres; the shop faces +Z. The owner controls the camera,
+ * lights, animation clock, photo maps and disposal of the supplied resources.
+ */
+export function buildSakuraWorld({ THREE, world, mesh, box, cylinder, ball, rod, label, geometry, toon, materials, textures }) {
+  const group = (name, position = [0, 0, 0], parent = world) => {
+    const object = new THREE.Group(); object.name = name;
+    object.position.set(...position); parent.add(object); return object;
+  };
+  const action = (object, value) => { object.userData.action = value; return object; };
+  const registerMaterial = material => { materials.add(material); return material; };
+  const basic = color => registerMaterial(new THREE.MeshBasicMaterial({ color }));
+  const creamInk = basic('#eee2bf');
+  const darkInk = basic('#3e514c');
+  const warmLamp = basic('#fff1c8');
+  const paper = basic('#fff9ec');
+  const warmWood = toon.wood;
+
+  let seed = 267;
+  const random = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+  const square = new THREE.Shape();
+  square.moveTo(-.32, -.4); square.lineTo(.32, -.4); square.quadraticCurveTo(.4, -.4, .4, -.32);
+  square.lineTo(.4, .32); square.quadraticCurveTo(.4, .4, .32, .4);
+  square.lineTo(-.32, .4); square.quadraticCurveTo(-.4, .4, -.4, .32);
+  square.lineTo(-.4, -.32); square.quadraticCurveTo(-.4, -.4, -.32, -.4);
+  const roundedGeometry = geometry(new THREE.ExtrudeGeometry(square, {
+    depth: .8, steps: 1, bevelEnabled: true, bevelSize: .1, bevelThickness: .1, bevelSegments: 3, curveSegments: 4,
+  }));
+  roundedGeometry.translate(0, 0, -.4);
+  const roundBox = (position, scale, material = toon.cream, parent = world) => mesh(roundedGeometry, material, position, scale, parent);
+  const ringGeometry = geometry(new THREE.TorusGeometry(1, .028, 6, 40));
+  const leafGeometry = geometry(new THREE.SphereGeometry(1, 10, 6));
+  function tube(points, radius, material = toon.green, parent = world) {
+    const path = new THREE.CatmullRomCurve3(points.map(point => new THREE.Vector3(...point)));
+    return mesh(geometry(new THREE.TubeGeometry(path, 18, radius, 7, false)), material, [0, 0, 0], [1, 1, 1], parent);
+  }
+  function sign(text, position, width, height, color = '#f7eddb', background = '#42696a', parent = world) {
+    const plane = label(text, width, height, color, background);
+    parent.add(plane); plane.position.set(...position); plane.castShadow = false; return plane;
+  }
+  function noShadow(object) { object.castShadow = false; return object; }
+
+  // Ground continues beyond the composition. A winding, slightly imperfect
+  // sequence of stone pavers leads from the foreground into the open shop.
+  noShadow(box([0, -.16, -1], [58, .22, 48], toon.sand));
+  noShadow(roundBox([-.2, -.015, .1], [13.8, .16, 10.7], toon.cream));
+  const stoneColors = [toon.plaster, toon.sand, toon.cream];
+  for (let i = 0; i < 7; i++) {
+    const stone = roundBox([Math.sin(i * .54) * .4, .095, 5.45 - i * .69], [.94 + (i % 2) * .18, .09, .56], stoneColors[i % 3]);
+    stone.rotation.y = Math.sin(i * 1.8) * .11; stone.castShadow = false;
+  }
+  for (let i = 0; i < 5; i++) {
+    const stone = roundBox([-1.05 - i * .62, .081, 2.21 + Math.sin(i * .6) * .18], [.58, .075, .42], stoneColors[(i + 1) % 3]);
+    stone.rotation.y = -.15 + i * .06; stone.castShadow = false;
+  }
+  for (let i = 0; i < 5; i++) {
+    const stone = roundBox([1.18 + i * .59, .081, 2.64 - i * .11], [.53, .075, .46], stoneColors[i % 3]);
+    stone.rotation.y = .15 - i * .04; stone.castShadow = false;
+  }
+
+  // A real three-sided interior: the facade is an opening, not a painted cube.
+  const shop = group('open-record-shop', [0, 0, -1.5]);
+  box([0, .075, 0], [4.92, .22, 3.92], toon.sand, shop);
+  const floorColors = [toon.wood, toon.cream, toon.sand];
+  for (let x = 0; x < 12; x++) {
+    box([-2.205 + x * .401, .209, 0], [.392, .045, 3.72], floorColors[x % 5 === 0 ? 1 : 0], shop);
+    // Quiet nail heads and one seam per plank are enough in a close camera.
+    for (const z of [-1.66, 1.66]) {
+      const nail = cylinder([-2.205 + x * .401, .235, z], [.013, .004, .013], toon.ink, shop);
+      nail.castShadow = false;
+    }
+  }
+  box([-2.34, 1.6, 0], [.15, 2.8, 3.8], toon.plaster, shop);
+  box([2.34, 1.6, 0], [.15, 2.8, 3.8], toon.plaster, shop);
+  box([0, 1.6, -1.84], [4.8, 2.8, .15], toon.plaster, shop);
+  for (const x of [-2.24, 2.24]) box([x, .41, 0], [.08, .38, 3.7], toon.green, shop);
+  box([0, .41, -1.75], [4.5, .38, .08], toon.green, shop);
+  for (const x of [-2.32, 2.32]) {
+    box([x, 1.62, 1.85], [.18, 2.86, .18], toon.green, shop);
+    box([x, 2.87, 0], [.16, .16, 3.88], warmWood, shop);
+  }
+  box([0, 2.88, 1.85], [4.72, .22, .2], toon.green, shop);
+  box([0, .14, 2.18], [4.96, .2, .63], warmWood, shop);
+  box([0, .25, 2.18], [4.95, .035, .61], toon.cream, shop);
+  for (const x of [-1.84, 1.84]) {
+    // Folded shutters visibly frame a wide, usable entrance.
+    const shutter = group('folded-entrance-shutter', [x, 1.49, 1.71], shop);
+    shutter.rotation.y = x < 0 ? -.45 : .45;
+    roundBox([0, 0, 0], [.58, 2.35, .08], toon.green, shutter);
+    for (let j = 0; j < 7; j++) box([0, -.9 + j * .29, .052], [.45, .038, .025], toon.leaf, shutter);
+    ball([x < 0 ? .16 : -.16, -.06, .081], [.033, .033, .028], toon.gold, shutter);
+  }
+
+  // Window, shelf and a small framed print keep the room legible from inside.
+  roundBox([-.92, 1.95, -1.73], [1.68, 1.12, .07], toon.green, shop);
+  box([-.92, 1.95, -1.68], [1.46, .91, .025], toon.glass, shop);
+  box([-.92, 1.95, -1.65], [.045, .96, .035], toon.cream, shop);
+  box([-.92, 1.95, -1.65], [1.48, .045, .035], toon.cream, shop);
+  box([-.92, 1.37, -1.57], [1.86, .08, .35], warmWood, shop);
+  for (const x of [-1.58, -.25]) {
+    rod([x, 2.59, -1.56], [x, 1.42, -1.56], .036, toon.coral, shop);
+    for (let j = 0; j < 3; j++) box([x + (j - 1) * .075, 2.1, -1.55], [.08, 1.02, .052], toon.rose, shop);
+  }
+  const print = roundBox([.89, 2.33, -1.71], [.69, .64, .055], warmWood, shop);
+  box([.89, 2.33, -1.672], [.56, .52, .014], toon.cream, shop);
+  noShadow(ball([.96, 2.39, -1.645], [.15, .15, .011], toon.coral, shop));
+  noShadow(box([.89, 2.16, -1.64], [.51, .09, .011], toon.leaf, shop));
+  print.userData.decorative = true;
+  sign('LISTEN SLOWLY', [0, 2.64, 1.971], 1.65, .19, '#f7eddb', '#42696a', shop);
+  // Pendant fittings belong to the roof group so a close overhead camera can
+  // remove the whole ceiling without leaving a cable across the composition.
+  const roof = group('removable-shop-roof', [0, 0, -1.5]);
+  const roofSlope = Math.atan2(.78, 2.65);
+  const roofLength = Math.hypot(2.65, .78);
+  for (const side of [-1, 1]) {
+    const pitch = box([side * 1.325, 3.43, 0], [roofLength, .13, 4.32], toon.green, roof);
+    pitch.rotation.z = -side * roofSlope;
+    for (let i = 0; i < 9; i++) {
+      const seam = box([side * 1.325, 3.505, -1.97 + i * .493], [roofLength, .024, .032], toon.leaf, roof);
+      seam.rotation.z = -side * roofSlope;
+    }
+    box([side * 2.66, 3.028, 0], [.1, .14, 4.37], toon.leaf, roof);
+  }
+  box([0, 3.851, 0], [.12, .12, 4.44], toon.leaf, roof);
+  const gableShape = new THREE.Shape();
+  gableShape.moveTo(-2.45, 0); gableShape.lineTo(2.45, 0); gableShape.lineTo(0, .72); gableShape.closePath();
+  const gableGeometry = geometry(new THREE.ExtrudeGeometry(gableShape, { depth: .08, bevelEnabled: false }));
+  for (const z of [-2, 1.91]) mesh(gableGeometry, toon.cream, [0, 3.02, z], [1, 1, 1], roof);
+  sign('SIDE B', [0, 3.281, 2.007], 1.12, .3, '#42696a', '#f2e7d3', roof);
+  for (const x of [-1.15, 1.15]) {
+    rod([x, 3.13, .48], [x, 2.63, .48], .019, toon.ink, roof);
+    const shadeGeometry = geometry(new THREE.CylinderGeometry(.12, .27, .2, 24, 1, true));
+    mesh(shadeGeometry, toon.green, [x, 2.57, .48], [1, 1, 1], roof);
+    noShadow(ball([x, 2.53, .48], [.11, .065, .11], warmLamp, roof));
+  }
+
+  // Counter outside the opening: platter, grooves, spindle, articulated arm,
+  // receiver controls and an upright sleeve read at a close tabletop angle.
+  const counter = action(group('record-counter', [0, 0, .8]), { type: 'navigate', view: 'explore' });
+  roundBox([0, .61, 0], [2.08, 1.05, .78], toon.green, counter);
+  roundBox([0, 1.17, 0], [2.26, .14, .94], warmWood, counter);
+  for (let i = 0; i < 14; i++) box([-.96 + i * .147, .67, .399], [.058, .69, .021], toon.leaf, counter);
+  sign('PLAY SOMETHING GOOD', [0, .899, .424], 1.59, .18, '#efe4c7', '#42696a', counter);
+  const turntable = roundBox([-.28, 1.296, -.015], [1.12, .12, .69], toon.cream, counter);
+  turntable.userData.action = { type: 'navigate', view: 'explore' };
+  const record = action(group('spinning-vinyl', [-.45, 1.37, .8]), { type: 'navigate', view: 'explore' });
+  cylinder([0, 0, 0], [.275, .024, .275], toon.black, record);
+  for (const radius of [.158, .187, .218, .25]) {
+    const groove = noShadow(mesh(ringGeometry, toon.leaf, [0, .014, 0], [radius, radius, radius], record));
+    groove.rotation.x = -Math.PI / 2;
+  }
+  cylinder([0, .02, 0], [.085, .012, .085], toon.coral, record);
+  box([.016, .029, 0], [.012, .007, .079], paper, record);
+  cylinder([0, .044, 0], [.014, .055, .014], toon.gold, record);
+  cylinder([.097, 1.385, -.206], [.035, .075, .035], toon.gold, counter);
+  rod([.097, 1.435, -.206], [.147, 1.459, .144], .011, toon.ink, counter);
+  rod([.147, 1.459, .144], [.015, 1.439, .181], .011, toon.ink, counter);
+  roundBox([.008, 1.419, .18], [.059, .038, .039], toon.black, counter);
+  roundBox([.707, 1.372, -.025], [.41, .24, .41], toon.green, counter);
+  for (const x of [.593, .718, .823]) {
+    const knob = cylinder([x, 1.37, .199], [.035, .03, .035], toon.gold, counter); knob.rotation.x = Math.PI / 2;
+  }
+  box([.7, 1.441, .188], [.245, .035, .018], warmLamp, counter);
+  const sleeveStand = group('now-playing-sleeve', [.57, 1.58, -.286], counter);
+  sleeveStand.rotation.x = -.14;
+  roundBox([0, 0, 0], [.49, .49, .032], toon.coral, sleeveStand);
+  const sleeveDisc = cylinder([0, .015, .03], [.146, .012, .146], toon.ink, sleeveStand); sleeveDisc.rotation.x = Math.PI / 2;
+  const sleeveCentre = cylinder([0, .015, .041], [.049, .012, .049], toon.gold, sleeveStand); sleeveCentre.rotation.x = Math.PI / 2;
+  sign('SIDE A', [0, -.187, .023], .28, .068, '#f7eddb', '#d28091', sleeveStand);
+
+  // Interior record cabinet, open at the front. Gaps and slanted sleeves keep
+  // it from reading as a solid bookshelf cube in the records camera.
+  const shelf = action(group('memory-record-cabinet', [1.45, 0, -2.3]), { type: 'navigate', view: 'records' });
+  box([0, 1.15, -.275], [1.4, 2.18, .07], warmWood, shelf);
+  for (const x of [-.72, .72]) roundBox([x, 1.15, 0], [.09, 2.28, .67], toon.green, shelf);
+  for (const y of [.15, .83, 1.52, 2.25]) box([0, y, 0], [1.53, .075, .71], toon.green, shelf);
+  box([0, .51, .02], [.055, .58, .61], toon.green, shelf);
+  const sleeveColors = [toon.rose, toon.cream, toon.mint, toon.gold, toon.coral];
+  for (let row = 0; row < 2; row++) {
+    for (let i = 0; i < 10; i++) {
+      const item = roundBox([-.594 + i * .13, .487 + row * .689, .038], [.092, .56 - (i % 3) * .028, .45], sleeveColors[(i + row * 2) % sleeveColors.length], shelf);
+      item.rotation.z = (i < 4 ? -.055 : .018);
+      noShadow(box([item.position.x, item.position.y + .105, .268], [.041, .1, .009], paper, shelf));
+    }
+  }
+  for (let i = 0; i < 3; i++) {
+    const album = group(`face-out-album-${i}`, [-.455 + i * .457, 1.871, .053], shelf);
+    roundBox([0, 0, 0], [.39, .5, .03], sleeveColors[i * 2], album);
+    const disc = cylinder([0, .025, .027], [.12, .009, .12], toon.black, album); disc.rotation.x = Math.PI / 2;
+    const dot = cylinder([0, .025, .033], [.041, .01, .041], toon.cream, album); dot.rotation.x = Math.PI / 2;
+    sign(['01', '02', '03'][i], [0, -.19, .023], .115, .065, '#42696a', ['#fbc6d8', '#b0c5ab', '#d28091'][i], album);
+  }
+  sign('KEEP THE NIGHT', [0, 2.255, .373], 1.01, .12, '#f2e7d3', '#42696a', shelf);
+
+  // Working desk: paper is a physical surface with a pen, tape, scissors and
+  // instant camera, instead of UI controls painted across a flat backdrop.
+  const desk = action(group('card-making-desk', [4, 0, 1.6]), { type: 'editor' });
+  for (const x of [-.77, .77]) for (const z of [-.43, .43]) {
+    rod([x, .1, z], [x * .91, 1.04, z * .91], .045, toon.green, desk);
+  }
+  roundBox([0, 1.03, 0], [1.93, .115, 1.35], warmWood, desk);
+  roundBox([0, 1.093, .035], [1.1, .021, .84], toon.cream, desk);
+  const draft = group('unfinished-photo-card', [-.095, 1.113, .03], desk);
+  draft.rotation.y = -.08;
+  roundBox([0, 0, 0], [.51, .012, .65], paper, draft);
+  const draftImageMaterial = registerMaterial(new THREE.MeshBasicMaterial({ color: '#ffffff' }));
+  const draftImageMesh = noShadow(mesh(geometry(new THREE.PlaneGeometry(.435, .425)), draftImageMaterial, [0, .014, -.04], [1, 1, 1], draft));
+  draftImageMesh.name = 'current-card-draft-image';
+  draftImageMesh.rotation.x = -Math.PI / 2;
+  box([-.054, .011, .245], [.28, .007, .012], toon.leaf, draft);
+  box([-.088, .011, .281], [.211, .007, .009], toon.sand, draft);
+  for (let i = 0; i < 3; i++) {
+    const scrap = roundBox([.428, 1.113 + i * .006, .19], [.28, .007, .37], [toon.mint, toon.rose, paper][i], desk);
+    scrap.rotation.y = .22 + i * .12;
+  }
+  rod([-.655, 1.115, -.16], [-.58, 1.115, .22], .015, toon.green, desk);
+  const pencilTip = geometry(new THREE.ConeGeometry(.018, .06, 8));
+  const tip = mesh(pencilTip, toon.cream, [-.574, 1.115, .247], [1, 1, 1], desk); tip.rotation.x = Math.PI / 2;
+  const tapeRing = noShadow(mesh(geometry(new THREE.TorusGeometry(.09, .028, 10, 32)), toon.coral, [.704, 1.139, .34], [1, 1, 1], desk));
+  tapeRing.rotation.x = -Math.PI / 2;
+  for (const x of [.48, .65]) {
+    const loop = noShadow(mesh(geometry(new THREE.TorusGeometry(.041, .011, 8, 20)), toon.green, [x, 1.114, -.293], [1, 1, 1], desk));
+    loop.rotation.x = -Math.PI / 2;
+  }
+  rod([.505, 1.115, -.264], [.619, 1.115, -.045], .009, toon.sand, desk);
+  rod([.623, 1.12, -.264], [.509, 1.12, -.045], .009, toon.sand, desk);
+  const instantCamera = group('instant-camera', [-.601, 1.259, -.36], desk);
+  instantCamera.rotation.y = -.14;
+  roundBox([0, 0, 0], [.47, .31, .24], toon.cream, instantCamera);
+  roundBox([0, -.088, .013], [.49, .13, .265], toon.coral, instantCamera);
+  const lens = cylinder([0, .026, .143], [.083, .055, .083], toon.green, instantCamera); lens.rotation.x = Math.PI / 2;
+  const lensGlass = cylinder([0, .026, .178], [.056, .019, .056], toon.ink, instantCamera); lensGlass.rotation.x = Math.PI / 2;
+  box([-.14, .09, .129], [.081, .052, .013], warmLamp, instantCamera);
+  box([0, -.109, .151], [.26, .015, .013], toon.ink, instantCamera);
+  const stool = group('desk-stool', [4.09, 0, 2.76]);
+  cylinder([0, .66, 0], [.3, .085, .3], toon.cream, stool);
+  for (let i = 0; i < 3; i++) {
+    const angle = i * Math.PI * 2 / 3;
+    rod([Math.cos(angle) * .22, .09, Math.sin(angle) * .22], [Math.cos(angle) * .15, .63, Math.sin(angle) * .15], .032, toon.green, stool);
+  }
+
+  // A circular timber stage, quiet enough to remain a small courtyard gig.
+  const stage = action(group('tree-side-stage', [-4, 0, .5]), { type: 'navigate', view: 'live' });
+  cylinder([0, .15, 0], [1.2, .23, 1.2], warmWood, stage);
+  cylinder([0, .279, 0], [1.21, .04, 1.21], toon.cream, stage);
+  for (let i = -3; i <= 3; i++) {
+    const z = i * .285;
+    const halfWidth = Math.sqrt(1.19 ** 2 - z ** 2);
+    noShadow(box([0, .302, z], [halfWidth * 2, .006, .015], warmWood, stage));
+  }
+  for (let i = 0; i < 3; i++) {
+    const angle = i * Math.PI * 2 / 3;
+    rod([.43, .337, .35], [.43 + Math.cos(angle) * .25, .315, .35 + Math.sin(angle) * .25], .016, toon.ink, stage);
+  }
+  rod([.43, .35, .35], [.43, 1.59, .35], .018, toon.ink, stage);
+  rod([.43, 1.56, .35], [.04, 1.75, .35], .014, toon.ink, stage);
+  const microphone = roundBox([-.014, 1.767, .35], [.175, .057, .063], toon.ink, stage);
+  microphone.rotation.z = -.15;
+  tube([[.09, 1.754, .35], [.35, 1.49, .375], [.47, .48, .383], [.86, .306, .74]], .009, toon.ink, stage);
+  const performanceStool = group('performance-stool', [-.43, .3, -.17], stage);
+  cylinder([0, .52, 0], [.23, .08, .23], toon.green, performanceStool);
+  for (const x of [-.155, .155]) for (const z of [-.155, .155]) rod([x, 0, z], [x * .85, .5, z * .85], .025, warmWood, performanceStool);
+  const guitar = group('acoustic-guitar', [-.78, .62, .05], stage);
+  guitar.rotation.z = -.19; guitar.rotation.y = .1;
+  ball([0, 0, 0], [.2, .215, .07], toon.gold, guitar);
+  ball([0, .225, 0], [.16, .171, .061], toon.gold, guitar);
+  const soundHole = cylinder([0, .159, .063], [.062, .012, .062], toon.ink, guitar); soundHole.rotation.x = Math.PI / 2;
+  roundBox([0, .518, -.012], [.061, .48, .037], warmWood, guitar);
+  roundBox([0, .793, -.017], [.083, .119, .043], toon.cream, guitar);
+  box([0, -.022, .073], [.103, .033, .011], toon.ink, guitar);
+  for (let i = 0; i < 4; i++) rod([-.017 + i * .011, -.011, .084], [-.017 + i * .011, .825, .023], .0017, creamInk, guitar);
+  for (const x of [-.06, .06]) for (const y of [.766, .813]) ball([x, y, -.012], [.019, .011, .013], toon.gold, guitar);
+  const speaker = group('small-stage-speaker', [.79, .3, -.52], stage);
+  roundBox([0, .3, 0], [.38, .59, .33], toon.green, speaker);
+  for (const [y, radius] of [[.21, .113], [.443, .052]]) {
+    const cone = cylinder([0, y, .17], [radius, .02, radius], toon.ink, speaker); cone.rotation.x = Math.PI / 2;
+    const cap = cylinder([0, y, .186], [radius * .37, .015, radius * .37], toon.leaf, speaker); cap.rotation.x = Math.PI / 2;
+  }
+
+  // Six detachable photograph slots. Only the first two are initially visible;
+  // the owner fills/hides the others using cards it is actually allowed to show.
+  // The paper never contains a clip: it can be lifted cleanly from the stand.
+  const photoWall = group('two-view-photo-wall', [-3.8, 0, 1.4]);
+  for (const x of [-1.56, 1.56]) {
+    box([x, 1.32, 0], [.074, 2.55, .085], toon.green, photoWall);
+    roundBox([x, .093, 0], [.47, .075, .58], toon.sand, photoWall);
+  }
+  box([0, 2.575, 0], [3.26, .087, .096], toon.green, photoWall);
+  for (const y of [2.414, 1.274]) tube([[-1.57, y, .013], [0, y - .054, .013], [1.57, y, .013]], .008, toon.wood, photoWall);
+  sign('ONE NIGHT / TWO SIDES', [0, 2.566, .062], 1.65, .125, '#f6edda', '#42696a', photoWall);
+  const photoCards = ['stage', 'crowd', 'slot-2', 'slot-3', 'slot-4', 'slot-5'].map((id, index) => {
+    const x = (index % 3 - 1) * 1.04;
+    const y = index < 3 ? 1.903 : .763;
+    const object = action(group(`photo-${id}`, [x, y, .065], photoWall), { type: 'photo', id });
+    object.rotation.z = index % 2 ? -.028 : .03;
+    object.visible = index < 2;
+    roundBox([0, 0, 0], [.86, .975, .022], paper, object);
+    const imageMaterial = registerMaterial(new THREE.MeshBasicMaterial({ color: '#ffffff' }));
+    const imageMesh = noShadow(mesh(geometry(new THREE.PlaneGeometry(.742, .741)), imageMaterial, [0, .043, .016], [1, 1, 1], object));
+    imageMesh.name = `photo-image-${id}`;
+    // Clip remains on the stand when the card is picked up.
+    roundBox([x, y + .478, .064], [.063, .138, .051], toon.gold, photoWall);
+    world.updateMatrixWorld(true);
+    return { id, object, imageMesh, anchor: object.getWorldPosition(new THREE.Vector3()) };
+  });
+
+  function pot(position, size = 1, flowers = false, parent = world) {
+    const planter = group('courtyard-planter', position, parent);
+    const potGeometry = geometry(new THREE.CylinderGeometry(.19, .133, .31, 14));
+    mesh(potGeometry, toon.coral, [0, .155 * size, 0], [size, size, size], planter);
+    cylinder([0, .298 * size, 0], [.198 * size, .046 * size, .198 * size], toon.cream, planter);
+    cylinder([0, .32 * size, 0], [.165 * size, .009 * size, .165 * size], toon.wood, planter);
+    for (let i = 0; i < 5; i++) {
+      const angle = i * 2.4;
+      const end = [Math.cos(angle) * .13 * size, (.54 + (i % 2) * .11) * size, Math.sin(angle) * .13 * size];
+      rod([0, .3 * size, 0], end, .008 * size, toon.green, planter);
+      const leaf = mesh(leafGeometry, i % 2 ? toon.leaf : toon.mint, [end[0] * .7, end[1] * .87, end[2] * .7], [.079 * size, .16 * size, .028 * size], planter);
+      leaf.rotation.set(.35, angle, .45);
+      if (flowers) {
+        for (let j = 0; j < 5; j++) {
+          const theta = j * Math.PI * 2 / 5;
+          ball([end[0] + Math.cos(theta) * .045 * size, end[1], end[2] + Math.sin(theta) * .045 * size], [.032 * size, .02 * size, .032 * size], i % 2 ? toon.blush : toon.rose, planter);
+        }
+        ball(end, [.018 * size, .023 * size, .018 * size], toon.gold, planter);
+      }
+    }
+    return planter;
+  }
+  pot([-2.63, .085, .29], 1.18, true);
+  pot([2.69, .085, .09], 1.1, false);
+  pot([4.74, 1.093, 1.077], .56, true);
+  pot([-.76, .238, -2.84], .75, false);
+  pot([-5.21, .085, 2.56], .85, true);
+
+  // Branch geometry supports the crown. Clusters are instanced by colour so
+  // the canopy is rich without one draw call per blossom-shaped volume.
+  const crownGeometry = geometry(new THREE.IcosahedronGeometry(1, 2));
+  const crownBins = [[], [], []];
+  function cherryTree(position, scale, canopyCount = 48) {
+    const tree = group('cherry-tree', position);
+    tree.scale.setScalar(scale);
+    tube([[0, .035, 0], [.08, 1.14, -.03], [-.035, 2.24, .11], [.24, 3.13, .02]], .135, warmWood, tree);
+    const endpoints = [[-1.02, 3.5, -.32], [.93, 3.59, -.49], [-.58, 3.27, .89], [.98, 3.36, .81], [.17, 4.06, .12]];
+    endpoints.forEach((end, index) => {
+      const start = [.02, 1.76 + index * .135, .04];
+      tube([start, [end[0] * .4, end[1] - .67, end[2] * .4], end], .049 + (index % 2) * .008, warmWood, tree);
+      rod(end, [end[0] * 1.22, end[1] + .22, end[2] * 1.22], .023, warmWood, tree);
+    });
+    for (let i = 0; i < 5; i++) {
+      const angle = i * 1.256;
+      rod([0, .11, 0], [Math.cos(angle) * .45, .02, Math.sin(angle) * .45], .035, warmWood, tree);
+    }
+    for (let i = 0; i < canopyCount; i++) {
+      const angle = i * 2.399963;
+      const radius = Math.sqrt((i + .4) / canopyCount) * 1.55;
+      const local = new THREE.Vector3(Math.cos(angle) * radius, 3.82 + Math.cos(radius * 1.15) * .38 + (random() - .5) * .35, Math.sin(angle) * radius * .78);
+      local.multiplyScalar(scale).add(new THREE.Vector3(...position));
+      const size = (.38 + random() * .16) * scale;
+      crownBins[i % 3].push({ position: local, scale: [size * (1.05 + random() * .24), size * (.73 + random() * .19), size], rotation: random() * Math.PI });
+    }
+    return tree;
+  }
+  cherryTree([-4.5, .045, -1.5], 1.06, 64);
+  cherryTree([5.3, .02, -3.5], .88, 48);
+  cherryTree([-9.2, -.02, -6.7], .95, 39);
+  cherryTree([9.4, -.02, -7.4], 1.08, 39);
+  const transform = new THREE.Object3D();
+  [toon.rose, toon.blush, toon.petal].forEach((material, index) => {
+    const data = crownBins[index];
+    const canopies = new THREE.InstancedMesh(crownGeometry, material, data.length);
+    canopies.name = `cherry-canopy-${index}`; canopies.castShadow = true; canopies.receiveShadow = false;
+    data.forEach((item, n) => {
+      transform.position.copy(item.position); transform.scale.set(...item.scale); transform.rotation.set(.1, item.rotation, .12);
+      transform.updateMatrix(); canopies.setMatrixAt(n, transform.matrix);
+    });
+    world.add(canopies);
+  });
+
+  // A fence ends the courtyard, followed by a quiet lane and low-contrast
+  // roofs. Background construction deliberately avoids a wall of bare boxes.
+  const fence = group('courtyard-fence');
+  for (let i = 0; i < 14; i++) {
+    const x = -6.52 + i;
+    roundBox([x, .51, -4.51], [.12, 1.03, .13], toon.mint, fence);
+  }
+  for (const y of [.35, .8]) box([0, y, -4.48], [13.6, .07, .065], toon.leaf, fence);
+  for (const x of [-6.52, 6.52]) {
+    for (let i = 1; i < 8; i++) roundBox([x, .4, -4.5 + i * .89], [.11, .81, .11], toon.mint, fence);
+    for (const y of [.3, .67]) box([x, y, -.94], [.055, .065, 7.1], toon.leaf, fence);
+  }
+  const quietPlaster = basic('#d6dcd7');
+  const quietRoof = basic('#b7c8c6');
+  const quietGlass = basic('#c2d2d3');
+  const quietTrim = basic('#c9d2c7');
+  for (let i = 0; i < 5; i++) {
+    const neighbour = group(`quiet-neighbour-${i}`, [-11 + i * 5.2, -.08, -10.8 - (i % 2) * 1.4]);
+    const h = 2.1 + (i % 3) * .43;
+    noShadow(roundBox([0, h / 2, 0], [3.4, h, 2.6], quietPlaster, neighbour));
+    for (const side of [-1, 1]) {
+      const pitch = noShadow(box([side * .89, h + .26, 0], [1.95, .1, 3], quietRoof, neighbour)); pitch.rotation.z = side * -.27;
+    }
+    for (const x of [-.83, .8]) {
+      noShadow(box([x, h - .72, 1.318], [.71, .9, .019], quietGlass, neighbour));
+      noShadow(box([x, h - .72, 1.337], [.035, .94, .018], quietTrim, neighbour));
+      noShadow(box([x, h - 1.2, 1.36], [.83, .046, .12], quietTrim, neighbour));
+    }
+    noShadow(box([0, .6, 1.323], [.55, 1.2, .015], quietTrim, neighbour));
+  }
+  const shrubGeometry = geometry(new THREE.IcosahedronGeometry(1, 1));
+  const shrubMaterials = [toon.mint, toon.leaf];
+  for (let i = 0; i < 20; i++) {
+    const x = -6.25 + i * .665;
+    const shrub = mesh(shrubGeometry, shrubMaterials[i % 2], [x, .32, -4.12 + Math.sin(i * .7) * .15], [.45, .34 + (i % 3) * .06, .37]);
+    shrub.rotation.y = i * .3;
+  }
+
+  // Small stones and fallen petals belong to the floor rather than the air.
+  const pebbleGeometry = geometry(new THREE.IcosahedronGeometry(1, 1));
+  const pebbles = new THREE.InstancedMesh(pebbleGeometry, toon.sand, 70);
+  pebbles.name = 'garden-gravel'; pebbles.receiveShadow = true;
+  for (let i = 0; i < 70; i++) {
+    const side = i % 2 ? -1 : 1;
+    transform.position.set(side * (5.25 + random() * .76), .047, -3.5 + random() * 7.2);
+    transform.scale.set(.045 + random() * .055, .025 + random() * .025, .033 + random() * .07);
+    transform.rotation.set(0, random() * Math.PI, .2); transform.updateMatrix(); pebbles.setMatrixAt(i, transform.matrix);
+  }
+  world.add(pebbles);
+  const petalShape = new THREE.Shape();
+  petalShape.moveTo(0, -.5); petalShape.bezierCurveTo(-.49, -.17, -.42, .33, -.12, .48);
+  petalShape.lineTo(0, .33); petalShape.lineTo(.12, .48); petalShape.bezierCurveTo(.42, .33, .49, -.17, 0, -.5);
+  const petalGeometry = geometry(new THREE.ShapeGeometry(petalShape, 4));
+  const petalMaterial = registerMaterial(new THREE.MeshBasicMaterial({ color: '#e9b6c6', side: THREE.DoubleSide }));
+  const petals = new THREE.InstancedMesh(petalGeometry, petalMaterial, 65);
+  petals.name = 'fallen-petals';
+  for (let i = 0; i < 65; i++) {
+    const angle = random() * Math.PI * 2;
+    const radius = .5 + random() * 2.5;
+    transform.position.set(-4.45 + Math.cos(angle) * radius, .088, -1.12 + Math.sin(angle) * radius);
+    transform.scale.setScalar(.065 + random() * .045); transform.rotation.set(-Math.PI / 2, 0, random() * 6.28);
+    transform.updateMatrix(); petals.setMatrixAt(i, transform.matrix);
+  }
+  world.add(petals);
+
+  // Twenty individually phased petals belong to the two nearby trees. They
+  // have a slight curled surface and tumble through depth, never a screen-space
+  // overlay. Their paths stay behind the photo wall and outside the shop walls.
+  const driftingGeometry = geometry(new THREE.ShapeGeometry(petalShape, 7));
+  const driftingVertices = driftingGeometry.attributes.position;
+  for (let i = 0; i < driftingVertices.count; i++) {
+    const x = driftingVertices.getX(i); const y = driftingVertices.getY(i);
+    driftingVertices.setZ(i, .3 * x * x + .105 * y * y - .045 * Math.sin(y * Math.PI));
+  }
+  driftingGeometry.computeVertexNormals();
+  const driftingPetals = new THREE.InstancedMesh(driftingGeometry, petalMaterial, 20);
+  driftingPetals.name = 'slow-drifting-cherry-petals';
+  driftingPetals.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+  driftingPetals.frustumCulled = false;
+  // A decorative petal crossing a ray must never steal a click from a card.
+  driftingPetals.raycast = () => {};
+  const drifts = Array.from({ length: 20 }, (_, index) => {
+    const left = index < 12;
+    return {
+      x: (left ? -4.5 : 5.3) + (random() - .5) * (left ? 1.3 : 1.05),
+      z: (left ? -1.5 : -3.5) + (random() - .5) * .94,
+      top: (left ? 4.18 : 3.58) + random() * .26,
+      length: 16 + random() * 9,
+      phase: (index + random() * .7) / 20,
+      angle: random() * Math.PI * 2,
+      sideways: left ? .2 + random() * .2 : -.24 - random() * .2,
+      forward: left ? .28 + random() * .24 : 1.5 + random() * .65,
+      size: .078 + random() * .041,
+    };
+  });
+  function posePetals(time) {
+    drifts.forEach((drift, index) => {
+      const progress = (time / drift.length + drift.phase) % 1;
+      const wind = progress * Math.PI * 2;
+      transform.position.set(
+        drift.x + drift.sideways * progress + Math.sin(wind * 1.2 + drift.angle) * .17,
+        drift.top - (drift.top + .24) * progress,
+        drift.z + drift.forward * progress + Math.sin(wind * .8 + drift.angle) * .13,
+      );
+      transform.rotation.set(
+        .35 + Math.sin(wind * 1.35 + drift.angle) * .72,
+        drift.angle + wind * .43,
+        drift.angle * .6 + wind * .8,
+      );
+      // Birth is concealed by the crown; the floor hides the end of a fall.
+      transform.scale.setScalar(drift.size * THREE.MathUtils.smoothstep(progress, 0, .065));
+      transform.updateMatrix(); driftingPetals.setMatrixAt(index, transform.matrix);
+    });
+    driftingPetals.instanceMatrix.needsUpdate = true;
+  }
+  posePetals(0);
+  world.add(driftingPetals);
+
+  // One strand connects the stage, storefront and worktable. No point lights
+  // are introduced here; warm flat bulbs remain readable in the cel palette.
+  const wires = [
+    [[-5.9, 3.39, 1.06], [-3.1, 2.97, 1.35], [0, 3.06, 1.48]],
+    [[0, 3.06, 1.48], [3, 2.93, 1.45], [5.86, 3.43, 1.1]],
+  ];
+  for (const x of [-5.9, 5.86]) {
+    rod([x, .09, 1.1], [x, 3.48, 1.1], .036, toon.green);
+    ball([x, 3.49, 1.1], [.059, .059, .059], toon.gold);
+  }
+  wires.forEach(points => {
+    tube(points, .012, toon.ink);
+    const path = new THREE.CatmullRomCurve3(points.map(point => new THREE.Vector3(...point)));
+    for (let i = 1; i < 8; i++) {
+      const point = path.getPoint(i / 8);
+      rod(point.toArray(), [point.x, point.y - .12, point.z], .008, toon.ink);
+      cylinder([point.x, point.y - .13, point.z], [.031, .038, .031], toon.green);
+      noShadow(ball([point.x, point.y - .187, point.z], [.06, .075, .06], warmLamp));
+    }
+  });
+
+  // A sleeping cat by the entrance has a breathing body and a separate tail.
+  const cat = group('sleeping-shop-cat', [2.42, .24, .58]);
+  const catBody = ball([0, .14, 0], [.29, .16, .18], toon.cream, cat);
+  catBody.userData.dynamic = true;
+  ball([.195, .24, .07], [.135, .115, .118], toon.cream, cat);
+  const earGeometry = geometry(new THREE.ConeGeometry(.054, .095, 3));
+  mesh(earGeometry, toon.coral, [.13, .355, .079], [1, 1, .6], cat);
+  mesh(earGeometry, toon.coral, [.249, .355, .079], [1, 1, .6], cat);
+  for (const x of [.158, .235]) box([x, .264, .182], [.036, .006, .008], darkInk, cat);
+  ball([.2, .239, .193], [.012, .009, .008], toon.coral, cat);
+  tube([[-.24, .11, -.06], [-.34, .091, .076], [-.18, .061, .213], [.019, .065, .2]], .041, toon.cream, cat);
+  ball([.168, .048, .141], [.118, .041, .05], toon.cream, cat);
+
+  const anchors = {
+    home: new THREE.Vector3(-.2, 1.55, -.05),
+    explore: new THREE.Vector3(-.1, 1.35, .8),
+    live: new THREE.Vector3(-3.8, 1.73, 1.48),
+    stage: new THREE.Vector3(-4, 1.16, .5),
+    editor: new THREE.Vector3(4, 1.12, 1.6),
+    records: new THREE.Vector3(1.45, 1.28, -2.08),
+  };
+  // Textures created by label() are already registered by the owner helper;
+  // externally supplied photo maps must be added to the same textures Set.
+  void textures;
+  return {
+    roof, record, photoCards, desk, draftImageMesh, shelf, anchors,
+    update(time) {
+      record.rotation.y = time * .27;
+      catBody.scale.y = .16 * (1 + Math.sin(time * 1.35) * .035);
+      posePetals(time);
+    },
+  };
+}
