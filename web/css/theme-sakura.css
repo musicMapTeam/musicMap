@@ -1,0 +1,210 @@
+/* Sakura screening: cream paper, bottle-green ink and a small original street stage.
+   Load after the shared theme bridge. Functional markup and photographs are intact. */
+html[data-theme="sakura"] {
+  --sk-ink: var(--theme-ink, #304a3e);
+  --sk-paper: #faf5e8;
+  --sk-pink: #ecc3c6;
+  --sk-rose: #9b5664;
+  --sk-green: #3d6653;
+  --sk-line: #405d4330;
+}
+
+/* A real split composition keeps the scene out of the text and action area. */
+html[data-theme="sakura"] .sp-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 44fr) minmax(0, 56fr);
+  grid-template-rows: 1fr auto;
+  min-height: 554px;
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid var(--sk-line);
+  border-radius: 22px 22px 5px 5px;
+  background: var(--sk-paper);
+  color: var(--sk-ink);
+  box-shadow: 0 12px 35px #4b58410a;
+}
+html[data-theme="sakura"] .sp-hero :is(.sp-hero__image, .sp-hero__scrim, .sp-hero__optic, .sp-hero__second) { display: none; }
+html[data-theme="sakura"] .sp-hero > .theme-world {
+  display: block;
+  position: relative;
+  inset: auto;
+  grid-column: 2;
+  grid-row: 1 / 3;
+  z-index: 0;
+  min-width: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 554px;
+  align-self: stretch;
+  overflow: hidden;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 66% 25%, #f5dbd45e 0, #f5dbd400 61%), #f3efdf;
+  border-left: 1px solid #71866c10;
+}
+html[data-theme="sakura"] .sakura-scene__canvas { display: block; width: 100%; height: 100%; position: relative; z-index: 1; }
+html[data-theme="sakura"] .sp-hero__content {
+  position: relative;
+  inset: auto;
+  grid-column: 1;
+  grid-row: 1;
+  z-index: 2;
+  width: auto;
+  max-width: none;
+  align-self: center;
+  padding: 38px 34px 26px 38px;
+  color: var(--sk-ink);
+  background: var(--sk-paper);
+}
+html[data-theme="sakura"] .sp-hero__eyebrow { color: var(--sk-green); font-size: 10px; letter-spacing: .13em; flex-wrap: wrap; gap: 9px; }
+html[data-theme="sakura"] .sp-hero__eyebrow .sp-scene-tag { color: #626e5e; border-color: #3d66533b; padding-left: 11px; font-size: 10px; }
+html[data-theme="sakura"] .sp-hero h1 {
+  margin: 30px 0 22px;
+  color: var(--sk-ink);
+  font-size: clamp(51px, 5.9vw, 78px);
+  font-weight: 780;
+  letter-spacing: -.058em;
+  line-height: 1.12;
+  text-shadow: none;
+}
+html[data-theme="sakura"] .sp-hero h1 em { color: var(--sk-rose); }
+html[data-theme="sakura"] .sp-hero__content > p { max-width: 30em; color: #5b6859; font-size: 14px; line-height: 1.95; margin: 0 0 26px; }
+html[data-theme="sakura"] .sp-hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 22px; }
+html[data-theme="sakura"] .sp-hero .sp-hero__cta {
+  min-height: 48px;
+  padding: 12px 17px;
+  border: 1px solid var(--sk-green);
+  border-radius: 6px;
+  background: var(--sk-green);
+  color: #fff9eb;
+  box-shadow: 0 3px 0 #254530;
+  font-size: 13px;
+  white-space: nowrap;
+}
+html[data-theme="sakura"] .sp-hero .sp-hero__cta:hover { background: #2f523f; border-color: #2f523f; color: #fff9eb; }
+html[data-theme="sakura"] .sp-hero .sp-hero__cta:active { transform: translateY(2px); box-shadow: 0 1px 0 #254530; }
+html[data-theme="sakura"] .sp-hero__demo { color: var(--sk-ink); font-size: 13px; }
+html[data-theme="sakura"] .sp-hero__demo > span { color: #65705f; font-size: 11px; }
+html[data-theme="sakura"] .sp-hero__content > .sp-hero__room-note { position: static; margin: 18px 0 0; max-width: none; font-size: 12px; line-height: 1.7; color: #6d7364; }
+html[data-theme="sakura"] .sp-hero__event {
+  position: relative;
+  inset: auto;
+  grid-column: 1;
+  grid-row: 2;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  margin: 0 34px 27px 38px;
+  padding: 18px 0 0;
+  border-top: 1px solid var(--sk-line);
+  color: var(--sk-ink);
+}
+html[data-theme="sakura"] .sp-hero__event-number { color: var(--sk-rose); font-size: 13px; line-height: 1; }
+html[data-theme="sakura"] .sp-hero__event div > span { color: #67715f; font-size: 10px; }
+html[data-theme="sakura"] .sp-hero__event strong { color: var(--sk-ink); font-size: 14px; line-height: 1.7; }
+html[data-theme="sakura"] .sp-hero__event em { display: block; margin: 0; color: #7b7968; font-size: 11px; }
+html[data-theme="sakura"] .sp-hero__image-note { display: block; flex-basis: 100%; margin: 1px 0 0; text-align: left; color: #77806d; font-size: 10px; }
+
+/* Fallback keeps a designed space if this browser cannot create a WebGL context. */
+html[data-theme="sakura"] .sakura-scene__fallback { display: grid; align-content: center; justify-items: center; gap: 30px; min-height: inherit; height: 100%; padding: 35px; color: var(--sk-green); }
+html[data-theme="sakura"] .sakura-scene__fallback > span { display: block; width: 160px; aspect-ratio: 1; border-radius: 50%; border: 1px solid #35584180; background: radial-gradient(circle, #edbac0 0 17%, transparent 17.5%), repeating-radial-gradient(circle, #385c49 0 3px, #466955 4px 5px, #385c49 6px 9px); box-shadow: 18px 12px 0 #f7dfdc; }
+html[data-theme="sakura"] .sakura-scene__fallback strong { text-align: center; font: 850 28px/1.12 var(--font-display, Arial, sans-serif); letter-spacing: -.045em; }
+
+/* Physical cards: preserve the user's photographs, change only their paper. */
+html[data-theme="sakura"] :is(.sp-ticket, .live-card, .sp-memory, .live-memory) {
+  background: #fffaf0;
+  border: 1px solid #7c8b6b30;
+  border-radius: 10px;
+  box-shadow: 3px 4px 0 #aab39619;
+  color: var(--sk-ink);
+}
+html[data-theme="sakura"] :is(.sp-ticket__paper, .live-card-content, .sp-memory__body) { background: #fffaf0; color: var(--sk-ink); }
+html[data-theme="sakura"] .sp-ticket__paper { background-image: repeating-linear-gradient(0deg, #7b806403 0 1px, transparent 1px 4px); }
+html[data-theme="sakura"] :is(.sp-ticket__caption, .live-card-author, .sp-memory__body h3) { color: var(--sk-ink); }
+html[data-theme="sakura"] :is(.sp-ticket__song, .live-card-track) { color: #486953; border-color: var(--sk-line); }
+html[data-theme="sakura"] :is(.sp-ticket__event, .sp-ticket__author, .live-card-author small) { color: #67725f; }
+html[data-theme="sakura"] :is(.sp-ticket__stub, .sp-duet__stub, .live-ticket-strip) { background: #e7ead8; border-color: #62795551; color: var(--sk-ink); }
+html[data-theme="sakura"] :is(.sp-ticket__stub::before, .sp-ticket__stub::after, .sp-duet__stub::before, .sp-duet__stub::after, .sp-duet::before, .sp-duet::after) { background: var(--bg, #f6f1e4); }
+html[data-theme="sakura"] :is(.sp-duet, .live-ticket) { border: 1px solid #69805c3b; background: #fffaf0; color: var(--sk-ink); box-shadow: 4px 7px 0 #9aab7d21; }
+html[data-theme="sakura"] .sp-duet__top { background: #f2e3df; color: #77505a; border-color: #ad899275; }
+html[data-theme="sakura"] .sp-duet__side { background: #fffaf0; }
+html[data-theme="sakura"] .sp-duet__byline > span:last-child { color: var(--sk-green); }
+html[data-theme="sakura"] .sp-duet__side--coral .sp-duet__byline > span:last-child { color: var(--sk-rose); }
+html[data-theme="sakura"] .live-ticket-mast { border-color: var(--sk-green); }
+html[data-theme="sakura"] .live-ticket-mast > b { background: var(--sk-pink); color: var(--sk-rose); }
+html[data-theme="sakura"] .live-ticket-title i { color: var(--sk-rose); }
+html[data-theme="sakura"] :is(.sp-dialog, .live-dialog, .map-dialog) { background: var(--sk-paper); color: var(--sk-ink); border: 1px solid #6b7b5a54; border-radius: 14px; box-shadow: 0 22px 90px #33483435; }
+html[data-theme="sakura"] :is(.sp-dialog, .live-dialog, .map-dialog)::backdrop { background: #2f443c66; backdrop-filter: blur(6px); }
+html[data-theme="sakura"] :is(.sp-editor__submit, .live-editor-save) { background: #f3efdf; border-color: var(--sk-line); box-shadow: 0 -8px 22px #61724710; }
+
+/* The map becomes a printed neighbourhood plan, with record-shaped landmarks. */
+html[data-theme="sakura"] .map-workspace { background: #faf6e9; border: 1px solid #78856c47; border-radius: 15px; box-shadow: 4px 6px 0 #9baa8619; }
+html[data-theme="sakura"] .map-stage-column { background: repeating-linear-gradient(0deg, #48664a06 0 1px, transparent 1px 28px), repeating-linear-gradient(90deg, #48664a06 0 1px, transparent 1px 28px); }
+html[data-theme="sakura"] .map-optical-field { opacity: .14; color: #74886b; }
+html[data-theme="sakura"] .map-artist-panel { background: #eef0e2; border-color: #7f8d7240; }
+html[data-theme="sakura"] .map-node__disc { border-color: #759577; background: #e7eadc; box-shadow: inset 0 0 0 7px #fffaf043, 0 5px 0 #647d5020; }
+html[data-theme="sakura"] .map-node__disc::before,
+html[data-theme="sakura"] .map-node__disc::after { border-color: #69876448; }
+html[data-theme="sakura"] .map-node__disc i { border-color: #517052; background: #78957a; box-shadow: none; }
+html[data-theme="sakura"] .map-node:hover .map-node__disc { border-color: #355a42; box-shadow: 0 5px 0 #647d5040; }
+html[data-theme="sakura"] .map-node--orbit::before { background: #f7f3e6; border: 1px solid #72886632; border-radius: 8px 16px 8px 16px; box-shadow: none; filter: none; }
+html[data-theme="sakura"] .map-node--orbit .map-node__disc,
+html[data-theme="sakura"] .map-node--orbit:hover .map-node__disc { background: #dce6d2; border-color: #527453; box-shadow: none; }
+html[data-theme="sakura"] .map-node--center { background: #efd0cd; box-shadow: 0 0 0 9px #eecbce4d, 0 0 0 18px #eecbce26; }
+html[data-theme="sakura"] .map-node--center .map-node__disc { background: #edd3cf; border-color: #b0777f; box-shadow: inset 0 0 0 7px #fff3e95c; }
+html[data-theme="sakura"] .map-node--center .map-node__disc::before,
+html[data-theme="sakura"] .map-node--center .map-node__disc::after { border-color: #9c667540; }
+html[data-theme="sakura"] :is(.map-node__name, .map-node--center .map-node__name) { color: #304c3d; }
+html[data-theme="sakura"] :is(.map-node__tag, .map-node__hint, .map-node--center .map-node__tag) { color: #64715b; }
+html[data-theme="sakura"] .map-discovery { background: #edf0df; border-color: #708965; border-radius: 0 9px 9px 0; }
+html[data-theme="sakura"] .map-discovery--first { background: #f6e7e2; border-color: #b17c86; }
+html[data-theme="sakura"] .map-discovery--first .map-discovery__label { color: #935464; }
+html[data-theme="sakura"] .map-catalogue__switch button.is-active { border-color: var(--sk-rose); }
+
+/* Live retains invitation and consent surfaces, in soft daylight. */
+html[data-theme="sakura"] .live-entry-art { border-radius: 18px 18px 5px 5px; background: #dce7d4; color: var(--sk-green); border: 1px solid #69806429; }
+html[data-theme="sakura"] .live-art-type i { -webkit-text-stroke-color: #4c7258; }
+html[data-theme="sakura"] .live-entry-pair .live-card { box-shadow: 0 10px 18px #48624424; }
+html[data-theme="sakura"] :is(.live-incoming, .sp-exchange-notice--incoming) { background: #f3dfde; border-color: #ae7580; color: var(--sk-ink); }
+html[data-theme="sakura"] .live-room-ribbon { border-color: #788e673d; background: transparent; }
+html[data-theme="sakura"] :is(.live-empty-card, .live-saved-note, .live-return-slip) { background: #f4eddf; color: var(--sk-ink); border-color: #6980524d; border-radius: 8px; }
+html[data-theme="sakura"] .live-upload-preview { border: 1px dashed #6c875960; border-radius: 9px; background: #e8eddf; }
+html[data-theme="sakura"] .live-upload-preview > span { background: #faf5e8ed; color: #485e49; }
+html[data-theme="sakura"] .live-invite-layout { background: #e2e8d5; border: 1px solid #78936c3d; border-radius: 10px; }
+html[data-theme="sakura"] :is(.live-match, .live-pair-reason) { border-color: #789168; }
+html[data-theme="sakura"] .live-pair-reason { background: #e9eddd; }
+html[data-theme="sakura"] .live-local-link { background: #f3e3dd; color: #80575a; border-color: #b78485; }
+
+@media (max-width: 1080px) and (min-width: 761px) {
+  html[data-theme="sakura"] .sp-hero { grid-template-columns: minmax(0, 46fr) minmax(0, 54fr); }
+  html[data-theme="sakura"] .sp-hero__content { padding: 30px 25px 24px 28px; }
+  html[data-theme="sakura"] .sp-hero h1 { font-size: 58px; }
+  html[data-theme="sakura"] .sp-hero__content > p { font-size: 13px; }
+  html[data-theme="sakura"] .sp-hero__actions { gap: 15px; }
+  html[data-theme="sakura"] .sp-hero__event { margin-left: 28px; margin-right: 25px; }
+}
+@media (max-width: 760px) {
+  html[data-theme="sakura"] .sp-hero { display: flex; flex-direction: column; min-height: 0; border-radius: 14px 14px 4px 4px; }
+  html[data-theme="sakura"] .sp-hero__content { order: 1; align-self: stretch; padding: 26px 24px 24px; }
+  html[data-theme="sakura"] .sp-hero h1 { font-size: clamp(47px, 13vw, 65px); margin: 26px 0 19px; line-height: 1.1; }
+  html[data-theme="sakura"] .sp-hero__content > p { max-width: none; margin-bottom: 23px; font-size: 13px; line-height: 1.9; }
+  html[data-theme="sakura"] .sp-hero__actions { gap: 17px; }
+  html[data-theme="sakura"] .sp-hero .sp-hero__cta { font-size: 12px; padding-inline: 13px; }
+  html[data-theme="sakura"] .sp-hero__demo { font-size: 12px; }
+  html[data-theme="sakura"] .sp-hero__demo > span { font-size: 10px; }
+  html[data-theme="sakura"] .sp-hero__content > .sp-hero__room-note { font-size: 11px; margin: 16px 0 0; }
+  html[data-theme="sakura"] .sp-hero > .theme-world { order: 2; flex: 0 0 260px; height: 260px; min-height: 260px; width: 100%; border-left: 0; border-top: 1px solid #6d815014; border-bottom: 1px solid #6d815014; }
+  html[data-theme="sakura"] .sp-hero__event { order: 3; margin: 0; padding: 20px 24px; border: 0; gap: 9px 14px; }
+  html[data-theme="sakura"] .sp-hero__event-number { font-size: 12px; }
+  html[data-theme="sakura"] .sp-hero__event strong { font-size: 14px; }
+  html[data-theme="sakura"] .sp-hero__image-note { margin-top: 2px; font-size: 9px; }
+  html[data-theme="sakura"] .sakura-scene__fallback { gap: 16px; padding: 20px; }
+  html[data-theme="sakura"] .sakura-scene__fallback > span { width: 118px; }
+  html[data-theme="sakura"] .sakura-scene__fallback strong { font-size: 22px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme="sakura"] .sp-hero *,
+  html[data-theme="sakura"] .sp-hero *::before,
+  html[data-theme="sakura"] .sp-hero *::after { animation: none !important; transition: none !important; }
+}

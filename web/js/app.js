@@ -2,6 +2,10 @@ import '../css/base.css';
 import '../css/map.css';
 import '../css/space.css';
 import '../css/live.css';
+import '../css/themes.css';
+import '../css/theme-sakura.css';
+import '../css/theme-zine.css';
+import { mountThemes } from './themes.js';
 import { icon } from './icons.js';
 import { createMapState, mountMap, mountMapRecords } from './map.js';
 import { createSpaceState, mountSpace, mountSpaceRecords } from './space.js';
@@ -116,7 +120,7 @@ function shell() {
         <span class="brand-wordmark">music<span class="brand-light">map</span><small>声音相连，同场相遇。</small></span>
       </button>
       <nav class="primary-nav" aria-label="主要导航">${navItems()}</nav>
-      <span class="masthead-note">FOLLOW THE SOUND.<br><span>FIND YOUR PEOPLE.</span></span>
+      <button class="theme-launcher" id="theme-launcher" aria-haspopup="dialog" aria-controls="theme-dialog"><span class="theme-launcher__swatch" aria-hidden="true"></span><span><b>外观</b><small data-theme-name>声浪现场</small></span>${icon('swap')}</button>
     </header>
     <div class="app-body">
       <header class="topbar">
@@ -199,4 +203,5 @@ window.addEventListener('popstate', () => {
 });
 
 shell();
+mountThemes();
 render();

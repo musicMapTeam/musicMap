@@ -5,6 +5,7 @@ import { readFileSync } from 'node:fs';
 
 const licenseText = readFileSync(new URL('./web/assets/licenses/phosphor-MIT.txt', import.meta.url), 'utf8');
 const qrLicenseText = readFileSync(new URL('./web/assets/licenses/qrcode-generator-MIT.txt', import.meta.url), 'utf8');
+const threeLicenseText = readFileSync(new URL('./web/assets/licenses/three-MIT.txt', import.meta.url), 'utf8');
 
 export default defineConfig({
   root: fileURLToPath(new URL('./web', import.meta.url)),
@@ -21,6 +22,7 @@ export default defineConfig({
         // The standalone HTML also distributes the embedded Phosphor SVG paths.
         bundle['index.html'].source += `\n<!-- Phosphor Icons, MIT License\n${licenseText}\n-->\n`;
         bundle['index.html'].source += `\n<!-- qrcode-generator 2.0.4, MIT License\n${qrLicenseText}\n-->\n`;
+        bundle['index.html'].source += `\n<!-- Three.js 0.186.1, MIT License\n${threeLicenseText}\n-->\n`;
       },
     },
   ],

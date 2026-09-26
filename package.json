@@ -1,6 +1,6 @@
 {
   "name": "music-map-space",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": true,
   "type": "module",
   "description": "Music discovery and consent-based live-event card exchange",
@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "qrcode-generator": "2.0.4",
+    "three": "0.186.1",
     "vite": "8.3.1",
     "vite-plugin-singlefile": "2.3.3"
   }
