@@ -4,14 +4,14 @@
 
 ## 本地开发
 
-使用 Node.js 24（见 `.nvmrc`；工具最低要求 `>=22.12.0`）。按锁文件安装后运行：
+使用 Node.js 24（见 `.nvmrc`；应用最低要求 `>=24.0.0`，后端使用内置 SQLite）。按锁文件安装后运行：
 
 ```sh
 npm ci
 npm run dev
 ```
 
-开发服务器只监听 `127.0.0.1`。构建和预览：
+开发真实房间时，在另一个终端运行 `npm run server`；Vite 把 `/api/live` 代理到 `127.0.0.1:8787`。服务器默认只监听本机。构建和预览：
 
 ```sh
 npm run build
@@ -19,6 +19,8 @@ npm run preview
 ```
 
 构建工具固定为 Vite `8.3.1` 与 `vite-plugin-singlefile` `2.3.3`，目标为单文件 HTML 交付。构建成功只说明产物生成；正式部署与在线可访问性需要分别记录证据。`dist/` 是本地产物，不提交 Git。
+
+完整生产版本使用 `npm run build` 后 `npm start`，同一个 Node 服务提供页面和真实交换接口；`npm run preview` 仅预览静态演示。后端代码在 `server/`，本地数据库在忽略的 `data/`；不能把数据库或临时会话令牌放入 Git。
 
 ## 一次改动怎么做
 

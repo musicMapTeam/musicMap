@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="zh-CN" data-resolution="landscape">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=1920, height=1080">
+  <title>Music Map × Music Space · 功能流程展示</title>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <style>
+    @font-face { font-family: "Microsoft YaHei"; src: local("Microsoft YaHei"); font-weight: 400; }
+    @font-face { font-family: "Microsoft YaHei"; src: local("Microsoft YaHei Bold"); font-weight: 700 900; }
+    @font-face { font-family: "Consolas"; src: local("Consolas"); font-weight: 400; }
+    @font-face { font-family: "Consolas"; src: local("Consolas Bold"); font-weight: 700; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 1920px; height: 1080px; overflow: hidden; background: #0c1016; }
+    body { font-family: "Microsoft YaHei", sans-serif; color: #f2efe7; }
+    :root { --ink: #0c1016; --paper: #f2efe7; --mint: #70ddcf; --coral: #ff7e59; --muted: #b5c4c1; }
+    #root { position: relative; width: 1920px; height: 1080px; overflow: hidden; }
+    .scene { position: absolute; inset: 0; width: 1920px; height: 1080px; overflow: hidden; background: var(--ink); }
+    .scene:not(:first-child) { opacity: 0; }
+    .scene-content { position: relative; display: flex; flex-direction: column; width: 100%; height: 100%; padding: 52px 72px 42px; gap: 24px; box-sizing: border-box; }
+    .masthead { display: flex; align-items: center; justify-content: space-between; gap: 32px; min-height: 53px; padding-bottom: 19px; border-bottom: 1px solid #f2efe746; }
+    .wordmark { font: 700 26px Consolas, "Microsoft YaHei", monospace; letter-spacing: -.045em; }
+    .wordmark em { color: var(--mint); font-style: normal; }
+    .edition { font-size: 21px; font-weight: 400; letter-spacing: .06em; color: var(--muted); }
+    .scene-grid { display: grid; grid-template-columns: 448px 1fr; gap: 48px; align-items: center; flex: 1; min-height: 0; }
+    .copy { display: flex; flex-direction: column; gap: 27px; min-width: 0; }
+    .step { font: 400 23px Consolas, "Microsoft YaHei", monospace; letter-spacing: .06em; color: var(--mint); }
+    h2 { font-size: 78px; line-height: 1.23; letter-spacing: -.055em; font-weight: 900; max-width: 448px; }
+    h2 em { display: block; color: var(--coral); font-style: normal; }
+    .body-copy { font-size: 29px; line-height: 1.75; font-weight: 400; color: var(--muted); max-width: 438px; }
+    .notes { display: flex; flex-direction: column; gap: 14px; margin-top: 5px; }
+    .notes p { font-size: 23px; line-height: 1.6; color: var(--paper); }
+    .notes p::before { content: '—'; color: var(--mint); margin-right: 14px; }
+    .screen { min-width: 0; display: flex; align-items: center; justify-content: center; width: 100%; height: 724px; }
+    .screen img { display: block; max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; border: 1px solid #f2efe741; }
+    .screen--ticket { position: relative; gap: 40px; }
+    .screen--ticket img { max-height: 738px; box-shadow: 0 22px 60px #0006; }
+    .image-tag { font-size: 22px; color: var(--mint); writing-mode: vertical-rl; letter-spacing: .12em; }
+    .subtitle { padding-top: 24px; border-top: 1px solid #f2efe746; display: flex; justify-content: space-between; align-items: center; gap: 36px; min-height: 91px; }
+    .subtitle p { font-size: 30px; line-height: 1.55; font-weight: 400; color: var(--paper); max-width: 1430px; }
+    .folio { font: 400 24px Consolas, monospace; white-space: nowrap; color: var(--muted); letter-spacing: .04em; }
+    .opart { position: absolute; width: 630px; height: 630px; border-radius: 50%; background: repeating-radial-gradient(circle at center, transparent 0 11px, #70ddcf 12px 14px, transparent 15px 24px); opacity: .12; right: -260px; top: -300px; pointer-events: none; }
+    .opart--coral { background: repeating-radial-gradient(circle at center, transparent 0 11px, #ff7e59 12px 14px, transparent 15px 24px); top: auto; bottom: -430px; right: 290px; width: 740px; height: 740px; }
+    .intro-grid { grid-template-columns: 900px 1fr; gap: 64px; }
+    .intro-title { display: flex; flex-direction: column; gap: 16px; font-size: 116px; line-height: 1.12; letter-spacing: -.06em; font-weight: 900; }
+    .intro-title span:last-child { color: var(--mint); }
+    .intro-copy { font-size: 34px; color: var(--muted); line-height: 1.6; max-width: 750px; }
+    .intro-product { display: flex; gap: 24px; align-items: center; margin-top: 25px; }
+    .intro-product b { font-size: 24px; font-weight: 700; padding: 12px 19px; border: 1px solid var(--coral); color: var(--coral); }
+    .intro-product span { font-size: 24px; color: var(--muted); }
+    .intro-art { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; height: 744px; }
+    .intro-art img { height: 705px; width: auto; transform: rotate(4deg); box-shadow: 20px 30px 70px #0005; border: 1px solid #f2efe7; }
+    .intro-art .stamp { position: absolute; right: 0; bottom: 34px; font: 700 21px Consolas, "Microsoft YaHei", monospace; padding: 14px 18px; transform: rotate(-5deg); background: var(--coral); color: var(--ink); }
+    .scene--ticket .copy { gap: 23px; }
+    .scene--ticket h2 { font-size: 85px; }
+    .scene--live .step { color: var(--coral); }
+    .scene--mobile .scene-grid { grid-template-columns: 566px 1fr; gap: 70px; }
+    .scene--mobile h2 { max-width: 566px; font-size: 89px; }
+    .scene--mobile .body-copy { max-width: 536px; }
+    .mobile-gallery { display: flex; justify-content: center; align-items: center; gap: 78px; height: 728px; }
+    .phone-shot { height: 724px; width: auto; border: 1px solid #70ddcf91; box-shadow: 18px 18px 0 #70ddcf13; }
+    .mini-ticket { height: 552px; width: auto; transform: rotate(4deg); }
+    .outro-grid { display: flex; flex-direction: column; justify-content: center; align-items: start; gap: 32px; flex: 1; }
+    .outro-title { font-size: 111px; font-weight: 900; letter-spacing: -.055em; line-height: 1.2; max-width: 1550px; }
+    .outro-title em { display: inline; font-style: normal; color: var(--mint); }
+    .outro-summary { font-size: 34px; color: var(--muted); line-height: 1.7; max-width: 1400px; }
+    .scope { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 60px; width: 1480px; margin-top: 28px; padding-top: 28px; border-top: 1px solid #70ddcf5a; }
+    .scope p { font-size: 27px; line-height: 1.7; color: var(--paper); }
+    .scope b { color: var(--coral); font-weight: 600; margin-right: 18px; }
+    .outro-opart { position: absolute; bottom: -310px; right: -120px; width: 790px; height: 790px; opacity: .2; }
+  </style>
+</head>
+<body>
+<div id="root" data-composition-id="music-map-space" data-start="0" data-duration="94" data-width="1920" data-height="1080">
+  <section id="s-intro" class="scene" data-layout-allow-overflow style="z-index:1">
+    <div class="opart" data-layout-ignore></div><div class="opart opart--coral" data-layout-ignore></div>
+    <div class="scene-content">
+      <header class="masthead"><span class="wordmark">MUSIC MAP <em>×</em> MUSIC SPACE</span><span class="edition">功能流程展示 / 2026</span></header>
+      <div class="scene-grid intro-grid">
+        <div class="copy"><p class="step">DISCOVER. MEET. REMEMBER.</p><h1 class="intro-title"><span>从一首歌。</span><span>到同场的人。</span></h1><p class="intro-copy">沿音乐关系发现新声音，用一张现场卡，交换另一种目光。</p><div class="intro-product"><b>音乐探索 × 现场社交</b><span>中文静音演示</span></div></div>
+        <div class="intro-art"><img src="assets/ticket.png" alt="应用实际导出的双人纪念票"><span class="stamp">实际导出票根</span></div>
+      </div>
+      <footer class="subtitle"><p>以下画面来自实际运行页面与导出产物，以截图编排展示功能流程。</p><span class="folio">01 / 08</span></footer>
+    </div>
+  </section>
+  <section id="s-map" class="scene" data-layout-allow-overflow style="z-index:2">
+    <div class="opart" data-layout-ignore></div>
+    <div class="scene-content">
+      <header class="masthead"><span class="wordmark">MUSIC MAP <em>×</em> MUSIC SPACE</span><span class="edition">功能流程展示 · 实际页面截图</span></header>
+      <div class="scene-grid"><div class="copy"><p class="step">01 / 音乐地图</p><h2>从喜欢的人，<em>听见新关系。</em></h2><p class="body-copy">选一个艺人作为起点，沿合作与作品关系，走向下一站。</p><div class="notes"><p>关系旁有作品依据</p><p>可留下、返回与继续探索</p></div></div><figure class="screen"><img src="assets/map-detail.png" alt="音乐地图的关系节点与作品依据"></figure></div>
+      <footer class="subtitle"><p>当前使用 9 位虚构艺人与示例作品，先把“为什么关联”说明白。</p><span class="folio">02 / 08</span></footer>
+    </div>
+  </section>
+  <section id="s-space" class="scene" data-layout-allow-overflow style="z-index:3">
+    <div class="opart opart--coral" data-layout-ignore></div>
+    <div class="scene-content">
+      <header class="masthead"><span class="wordmark">MUSIC MAP <em>×</em> MUSIC SPACE</span><span class="edition">功能流程展示 · 实际页面截图</span></header>
+      <div class="scene-grid"><div class="copy"><p class="step">02 / 进入本场</p><h2>同一晚。<em>不同目光。</em></h2><p class="body-copy">一张照片、一首歌或一个环节、一句感受，组成你的现场卡。</p><div class="notes"><p>照片默认私有</p><p>展示与交换，分别选择</p></div></div><figure class="screen"><img src="assets/space.png" alt="Space 现场首页与清楚的本地演示入口"></figure></div>
+      <footer class="subtitle"><p>本地情景可切换两个示例角色；真人换卡从独立的房间入口进入。</p><span class="folio">03 / 08</span></footer>
+    </div>
+  </section>
+  <section id="s-exchange" class="scene" data-layout-allow-overflow style="z-index:4">
+    <div class="opart" data-layout-ignore></div>
+    <div class="scene-content">
+      <header class="masthead"><span class="wordmark">MUSIC MAP <em>×</em> MUSIC SPACE</span><span class="edition">功能流程展示 · 真实房间流程截图</span></header>
+      <div class="scene-grid"><div class="copy"><p class="step">03 / 发出申请</p><h2>先看清，<em>再交换。</em></h2><p class="body-copy">申请指定眼前的两张卡。你选择送出的视角，对方决定是否接住。</p><div class="notes"><p>接收方可接受或拒绝</p><p>发送方可取消申请</p></div></div><figure class="screen"><img src="assets/exchange.png" alt="联网房间中指定双方现场卡的交换申请确认"></figure></div>
+      <footer class="subtitle"><p>共同歌曲是开口的理由。只有双方同意，这两张卡才真正交换。</p><span class="folio">04 / 08</span></footer>
+    </div>
+  </section>
+  <section id="s-ticket" class="scene scene--ticket" data-layout-allow-overflow style="z-index:5">
+    <div class="opart" data-layout-ignore></div><div class="opart opart--coral" data-layout-ignore></div>
+    <div class="scene-content">
+      <header class="masthead"><span class="wordmark">MUSIC MAP <em>×</em> MUSIC SPACE</span><span class="edition">功能流程展示 · 实际导出产物</span></header>
+      <div class="scene-grid"><div class="copy"><p class="step">04 / 留下双联记忆</p><h2>这一晚，<em>有了两面。</em></h2><p class="body-copy">两张照片保留各自的作者与原话，拼成一份共同记忆。</p><div class="notes"><p>已确认交换的卡片快照</p><p>保存记录 · 下载票根图片</p></div></div><figure class="screen screen--ticket"><span class="image-tag">来自产品「保存票根图片」</span><img src="assets/ticket.png" alt="实际生成并下载的双人纸质纪念票"></figure></div>
+      <footer class="subtitle"><p>这是一张实际导出的票根。保存不代表获得再次公开对方照片的许可。</p><span class="folio">05 / 08</span></footer>
+    </div>
+  </section>
+  <section id="s-live" class="scene scene--live" data-layout-allow-overflow style="z-index:6">
+    <div class="opart opart--coral" data-layout-ignore></div>
+    <div class="scene-content">
+      <header class="masthead"><span class="wordmark">MUSIC MAP <em>×</em> MUSIC SPACE</span><span class="edition">功能流程展示 · 真实房间流程截图</span></header>
+      <div class="scene-grid"><div class="copy"><p class="step">05 / 和朋友同场</p><h2>一张邀请，<em>各自入场。</em></h2><p class="body-copy">创建或加入邀请码房间。双方使用独立身份，在各自页面里操作。</p><div class="notes"><p>双方同意后生成交换记录</p><p>SQLite 保存已确认的快照</p></div></div><figure class="screen"><img src="assets/live.png" alt="两个独立身份已进入同一真实房间"></figure></div>
+      <footer class="subtitle"><p>此画面来自两个独立示例会话；联网房间与本地 A/B 情景分别保存。</p><span class="folio">06 / 08</span></footer>
+    </div>
+  </section>
+  <section id="s-mobile" class="scene scene--mobile" data-layout-allow-overflow style="z-index:7">
+    <div class="opart" data-layout-ignore></div>
+    <div class="scene-content">
+      <header class="masthead"><span class="wordmark">MUSIC MAP <em>×</em> MUSIC SPACE</span><span class="edition">功能流程展示 · 移动端真实页面</span></header>
+      <div class="scene-grid"><div class="copy"><p class="step">06 / 散场以后</p><h2>声音会停。<em>记忆留下。</em></h2><p class="body-copy">在手机上重开双联记忆，再从音乐出发。</p><div class="notes"><p>探索记录与现场记忆分开</p><p>不会把探索过当作到过场</p></div></div><div class="mobile-gallery"><img class="phone-shot" src="assets/mobile.png" alt="390 像素移动端真实双联记忆页面"><img class="mini-ticket" src="assets/ticket.png" alt="可下载的实际双联票根"></div></div>
+      <footer class="subtitle"><p>把你拍到的，留给也记得的人。</p><span class="folio">07 / 08</span></footer>
+    </div>
+  </section>
+  <section id="s-outro" class="scene" data-layout-allow-overflow style="z-index:8">
+    <div class="opart outro-opart" data-layout-ignore></div>
+    <div class="scene-content">
+      <header class="masthead"><span class="wordmark">MUSIC MAP <em>×</em> MUSIC SPACE</span><span class="edition">功能流程展示 / END</span></header>
+      <div class="outro-grid"><p class="step">DISCOVER. MEET. REMEMBER.</p><h2 class="outro-title">从发现音乐，<em>到记住彼此。</em></h2><p class="outro-summary">让“听过同一首歌”，变成一次自然的交流。</p><div class="scope"><p><b>已呈现</b>音乐地图 · 现场卡 · 双向交换 · 票根导出</p><p><b>两种模式</b>本地情景 · 独立身份房间</p><p><b>示例内容</b>艺人、歌曲、场次与预置现场图</p><p><b>当前范围</b>未接真实音频 · 尚未公网部署</p></div></div>
+      <footer class="subtitle"><p>Music Map × Music Space · 2026 · 字幕静音版</p><span class="folio">08 / 08</span></footer>
+    </div>
+  </section>
+</div>
+<script>
+  window.__timelines = window.__timelines || {};
+  const tl = gsap.timeline({ paused: true });
+  const scenes = [
+    { id: 's-intro', at: 0 }, { id: 's-map', at: 8 }, { id: 's-space', at: 21 },
+    { id: 's-exchange', at: 33 }, { id: 's-ticket', at: 46 }, { id: 's-live', at: 60 },
+    { id: 's-mobile', at: 75 }, { id: 's-outro', at: 84 }
+  ];
+  scenes.forEach((scene, index) => {
+    const sel = '#' + scene.id;
+    const t = scene.at + 0.2;
+    if (index > 0) {
+      const previous = '#' + scenes[index - 1].id;
+      if (index === 4 || index === 7) {
+        // These whole-scene crossfades are the transition, not a pre-transition exit.
+        tl.to(previous, { opacity: 0, duration: 0.55, ease: 'power2.inOut' }, scene.at);
+        tl.fromTo(sel, { opacity: 0 }, { opacity: 1, duration: 0.55, ease: 'power2.inOut', immediateRender: false }, scene.at);
+      } else {
+        tl.to(previous, { x: -1920, duration: 0.5, ease: 'power3.inOut' }, scene.at);
+        tl.fromTo(sel, { x: 1920, opacity: 1 }, { x: 0, opacity: 1, duration: 0.5, ease: 'power3.inOut', immediateRender: false }, scene.at);
+        tl.set(previous, { opacity: 0 }, scene.at + 0.5);
+      }
+    }
+    tl.from(sel + ' .masthead', { opacity: 0, y: -10, duration: 0.4, ease: 'sine.out' }, t);
+    tl.from(sel + ' .step', { opacity: 0, x: -18, duration: 0.42, ease: 'power2.out' }, t + 0.08);
+    tl.from(sel + ' h1, ' + sel + ' h2', { opacity: 0, y: 46, duration: 0.68, ease: 'expo.out' }, t + 0.12);
+    tl.from(sel + ' .body-copy, ' + sel + ' .intro-copy, ' + sel + ' .outro-summary', { opacity: 0, y: 22, duration: 0.55, ease: 'power3.out' }, t + 0.32);
+    const visual = document.querySelector(sel + ' .screen, ' + sel + ' .intro-art, ' + sel + ' .mobile-gallery');
+    if (visual) tl.from(visual, { opacity: 0, x: 55, scale: 0.985, duration: 0.82, ease: 'power4.out' }, t + 0.3);
+    tl.from(sel + ' .notes p, ' + sel + ' .scope p, ' + sel + ' .intro-product', { opacity: 0, x: 16, duration: 0.46, stagger: 0.1, ease: 'circ.out' }, t + 0.72);
+    tl.from(sel + ' .subtitle', { opacity: 0, y: 14, duration: 0.42, ease: 'power1.out' }, t + 0.56);
+    tl.from(sel + ' .opart', { opacity: 0, scale: 0.93, duration: 1.1, ease: 'sine.out' }, t);
+    tl.to(sel + ' .opart', { rotation: 12, duration: index === 0 ? 7 : 10, ease: 'none' }, t + 1.2);
+  });
+  tl.to('#s-outro .scene-content', { opacity: 0, duration: 0.65, ease: 'power2.in' }, 93.1);
+  window.__timelines['music-map-space'] = tl;
+</script>
+</body>
+</html>
