@@ -15,7 +15,7 @@
 
 ## Doing
 
-应用实现与本轮视觉检查已完成，正在整理交付和同步 GitHub。
+无。0.5.0 本轮实现、视觉收尾、运行包和源码同步已完成；外部部署与正式参赛仍见 Todo。
 
 ## Done · 0.5.0
 
@@ -29,9 +29,10 @@
 | 三主题 PNG | `ticket-export.js` | 新主题导出前固定所选风格，原声浪绘制保留；实际下载樱花双联 1,082,449 B、刊物双联 1,099,741 B，均 1600×1800 并已目视。此处使用 0.4 内部演示上传的项目 AI 图，不代表真实观众照片；没有逐项重跑单卡全部分支 |
 | 参考与许可 | `references/research/2026-09-27/sakura-visual-reference.md`、NOTICES、Three MIT | 参考固定提交，借鉴美术原则；不复制 Sakura Crossing 源码 / 原图 / 音频。实际 Three 完整 MIT 副本及单 HTML 许可注释已保留 |
 | 文档与构建 | README、设计规范、产品三文档、Vite | 文档 1.5；生产构建成功，单 HTML 1,226,498 B / gzip约451.69 KB。无新测试套件，不重复无关后端流程 |
-| 本地运行包 | `delivery/music-map-space-runtime.zip` | 468,929 B，原有6文件范围；页面含完整Third-party许可证，不含数据库、上传照片或凭据 |
+| GitHub 与 CI | 实现提交 [135b136](https://github.com/musicMapTeam/musicMap/commit/135b1360772c08ce774e7a27218e10c95a773cb1) | 已推送 `origin/main`；[run 36265132031](https://github.com/musicMapTeam/musicMap/actions/runs/36265132031) 成功，原有构建工作流完成。随后文档收尾不改变已检查应用源码 |
+| 本地运行包 | `delivery/music-map-space-runtime.zip` | 468,909 B，原有6文件范围；页面含完整第三方许可证，不含数据库、上传照片或凭据 |
 
-边界：现有 106 秒视频与封面仍为 0.4 真实流程展示，不含三主题。未新增公网部署、实体手机或外部用户试用；内存释放为代码审阅和 canvas 移除观察，不等同于 GPU 性能剖析。GitHub 同步状态在收尾时更新。
+边界：现有 106 秒视频与封面仍为 0.4 真实流程展示，不含三主题。未新增公网部署、实体手机或外部用户试用；内存释放为代码审阅和 canvas 移除观察，不等同于 GPU 性能剖析。
 
 ## Done · 0.4.0
 

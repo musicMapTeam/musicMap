@@ -7,7 +7,7 @@
 | [music-map-space-demo.mp4](music-map-space-demo.mp4) | 0.4 实际操作演示视频 | 106秒、1920×1080、30fps、H.264、7,199,962字节（约6.87MiB）；中文字幕、无音轨，不含新主题 |
 | [cover.png](cover.png) | 0.4 参赛封面 | 1920×1080、385,709字节、PNG；已目视 |
 | [三套主题预览](../docs/VISUAL_THEMES.md) | 0.5 生产页面实际截图 | 三张1440×1000 PNG，声浪现场 / 樱下放映 / 独立刊物；与源码一同留档 |
-| `music-map-space-runtime.zip` | 0.5 本地完整运行包，不提交Git | 468,929字节，6个文件；构建页面 + Node/SQLite后端 + 运行说明；不含数据库、用户照片或凭据 |
+| `music-map-space-runtime.zip` | 0.5 本地完整运行包，不提交Git | 468,909字节，6个文件；构建页面 + Node/SQLite后端 + 运行说明；不含数据库、用户照片或凭据 |
 | `../dist/index.html` | 0.5 本地单文件情景演示，不提交Git | 1,226,498字节；含三套主题与Three完整许可，无需后端可展示真实Map和本地Space，联网照片需要完整服务 |
 | [recording-source/](recording-source/) | 0.4录屏和封面的编辑源 | 原片摘要、精确剪点、FFmpeg字幕合成脚本、HTML封面、实际导出票根 |
 | [video-source/](video-source/) | 0.2 / 0.3历史展示源 | 旧截图编排源；旧视频和封面可由Git历史取得，不作为本轮录屏 |
