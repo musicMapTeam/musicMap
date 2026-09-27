@@ -5,6 +5,22 @@ const escape = value => String(value ?? '').replace(/[&<>"']/g, character => ({ 
 
 /** The front door belongs to the visitor; the two-character demo is optional. */
 export function mountHome(container, api) {
+  // The title is written once; data and photo loads only repaint the paper, so its entrance never replays.
+  container.innerHTML = `<section class="space-page space-page--home space-studio space-studio--home home-studio" aria-labelledby="home-title">
+    <div class="home-cover">
+      <header class="home-hero">
+        <p class="home-hero__kicker"><i aria-hidden="true"></i>音乐现场 · 散场以后</p>
+        <h1 id="home-title" class="home-hero__title"><span>同一刻，</span><span>另一面。</span></h1>
+        <p class="home-hero__lede">用另一位观众的视角，补完整你记住的那一晚。</p>
+        <ol class="home-hero__steps" aria-label="怎么交换"><li>交换现场照片</li><li>双方同意</li><li>两人署名的双联票根</li></ol>
+      </header>
+      <div class="home-paper home-paper--compact" data-home-paper></div>
+    </div>
+    <div class="home-fallback-cards" data-home-fallback></div>
+  </section>`;
+  const page = container.firstElementChild;
+  const paper = page.querySelector('[data-home-paper]');
+  const fallback = page.querySelector('[data-home-fallback]');
   const life = new AbortController();
   const { signal } = life;
   let session = null;
@@ -45,20 +61,16 @@ export function mountHome(container, api) {
   }
   function render() {
     if (signal.aborted) return;
-    const recentOpen = Boolean(container.querySelector('[data-home-recent]')?.open);
+    const recentOpen = Boolean(paper.querySelector('[data-home-recent]')?.open);
     const cards = entries();
     const recentRoom = catalogue?.rooms.find(room => room.id === session?.roomId) || catalogue?.rooms[0];
     const personal = cards.filter(card => !card.local);
-    container.innerHTML = `<div class="space-page space-page--home space-studio space-studio--home home-studio" aria-labelledby="home-title">
-      <h1 id="home-title" class="sr-only">樱下放映</h1>
-      <div class="home-paper home-paper--compact">
-        ${personal.length ? `<details class="home-recent" data-home-recent ${recentOpen ? 'open' : ''}><summary><span>最近现场</span><small>${catalogue.cards.length}</small>${api.icon('chevron-right')}</summary><div class="home-memory-list">${personal.map(card => `<button class="home-memory" data-home="photo" data-id="${escape(card.id)}" aria-label="查看${escape(card.title)}"><span class="home-memory__image">${card.src ? `<img src="${escape(card.src)}" alt="${escape(card.alt)}">` : api.icon('image')}</span><span class="home-memory__copy"><small>${card.exampleImage ? 'AI 示例图 · ' : ''}我的现场</small><strong>${escape(card.title)}</strong></span>${api.icon('arrow-up-right')}</button>`).join('')}</div></details>` : `<div class="home-first-card"><span class="home-first-card__art" aria-hidden="true">${api.icon('camera')}</span><strong>留住这一晚</strong></div>`}
-        <div class="home-paper__actions"><button class="button button--primary" data-home="make">${api.icon('plus')}记录我的现场</button><button class="button button--secondary" data-home="invite">${api.icon('users')}邀请朋友</button></div>
-        <div class="home-paper__foot">${recentRoom ? `<button data-home="resume" data-room="${escape(recentRoom.id)}" title="${escape(recentRoom.title)}">继续本场 ${api.icon('arrow-right')}</button>` : `<button data-home="join">我有邀请码 ${api.icon('arrow-right')}</button>`}<button data-home="demo">体验示例 ${api.icon('arrow-up-right')}</button></div>
-        ${loading ? '<span class="home-paper__status" role="status">正在找回你的现场…</span>' : ''}${error ? `<div class="home-paper__status" role="status">${escape(error)} <button data-home="retry">重试</button></div>` : ''}
-      </div>
-      <div class="home-fallback-cards">${cards.map(card => `<button data-home="photo" data-id="${escape(card.id)}">${card.src ? `<img src="${escape(card.src)}" alt="${escape(card.alt)}">` : ''}<span>${escape(card.title)}${card.local ? ' · 示例' : ''}</span></button>`).join('')}</div>
-    </div>`;
+    page.classList.toggle('home-studio--returning', personal.length > 0);
+    paper.innerHTML = `${personal.length ? `<details class="home-recent" data-home-recent ${recentOpen ? 'open' : ''}><summary><span>最近现场</span><small>${catalogue.cards.length}</small>${api.icon('chevron-right')}</summary><div class="home-memory-list">${personal.map(card => `<button class="home-memory" data-home="photo" data-id="${escape(card.id)}" aria-label="查看${escape(card.title)}"><span class="home-memory__image">${card.src ? `<img src="${escape(card.src)}" alt="${escape(card.alt)}">` : api.icon('image')}</span><span class="home-memory__copy"><small>${card.exampleImage ? 'AI 示例图 · ' : ''}我的现场</small><strong>${escape(card.title)}</strong></span>${api.icon('arrow-up-right')}</button>`).join('')}</div></details>` : `<div class="home-first-card"><span class="home-first-card__art" aria-hidden="true">${api.icon('camera')}</span><span class="home-first-card__copy"><strong>留住这一晚</strong><small>照片默认私藏，双方同意才交换</small></span></div>`}
+      <div class="home-paper__actions"><button class="button button--primary" data-home="make">${api.icon('plus')}记录我的现场</button><button class="button button--secondary" data-home="invite">${api.icon('users')}邀请朋友</button></div>
+      <div class="home-paper__foot">${recentRoom ? `<button data-home="resume" data-room="${escape(recentRoom.id)}" title="${escape(recentRoom.title)}">继续本场 ${api.icon('arrow-right')}</button>` : ''}<button data-home="join">我有邀请码 ${api.icon('arrow-right')}</button><button data-home="demo">体验示例 ${api.icon('arrow-up-right')}</button></div>
+      ${loading ? '<span class="home-paper__status" role="status">正在找回你的现场…</span>' : ''}${error ? `<div class="home-paper__status" role="status">${escape(error)} <button data-home="retry">重试</button></div>` : ''}`;
+    fallback.innerHTML = cards.map(card => `<button data-home="photo" data-id="${escape(card.id)}">${card.src ? `<img src="${escape(card.src)}" alt="${escape(card.alt)}">` : ''}<span>${escape(card.title)}${card.local ? ' · 示例' : ''}</span></button>`).join('');
     publish();
   }
   async function load() {

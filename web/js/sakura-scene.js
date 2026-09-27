@@ -7,7 +7,25 @@ import { createSakuraMusic } from './sakura-music.js';
 import { createSakuraFraming } from './sakura-framing.js';
 import { createCelMaterials } from './vendor/sakura/toon.js';
 import { Pipeline } from './vendor/sakura/post.js';
-import { PAL } from './vendor/sakura/palette.js';
+
+// Night venue values live here so the vendored palette stays untouched.
+const NIGHT = {
+  fog: '#4b3f72', hemiSky: '#6f7fc0', hemiGround: '#4a2f4f', moon: '#b9c6ff', fill: '#ffb08a',
+  lamp: '#ffc98a', bulb: '#ffcf8a', stage: '#ffc4a8', table: '#fff4e6', ink: '#1d1a33', gradeShadow: '#e3e4f7', clear: '#2a2750',
+  // v=.5 is the horizon; the warm band sits just behind the far hills.
+  sky: [[0, '#0e1233'], [.3, '#141a40'], [.45, '#1d2150'], [.5, '#2e2a5e'], [.51, '#4a3c78'], [.525, '#9a5a86'], [.54, '#e0907e'], [.56, '#8a587e'], [.58, '#4b3f72'], [1, '#2a2750']],
+};
+// Only intensities change at runtime: adding or hiding a light would recompile every material.
+const PRESETS = {
+  night: { hemi: 1.35, sun: .85, fill: .32, shopGlow: 7, festoonL: 6, festoonR: 6, stageSpot: 48, tableSpot: 0 },
+  explore: { hemi: 1.2, sun: .3, fill: .2, shopGlow: 0, festoonL: 6, festoonR: 6, stageSpot: 48, tableSpot: 190 },
+  records: { hemi: 1.35, sun: .7, fill: .3, shopGlow: 6.5, festoonL: 6, festoonR: 6, stageSpot: 48, tableSpot: 0 },
+  // The worktable is under the right half of the string lights; they burn a little brighter while a card is made.
+  editor: { hemi: 1.4, sun: .8, fill: .36, shopGlow: 7, festoonL: 6, festoonR: 9.5, stageSpot: 48, tableSpot: 0 },
+};
+// The shop light hangs by the door at night and under the right pendant, over the cabinet, in the records view.
+const SHOP_GLOW_AT = { night: [0, 2.35, -.55], explore: [0, 2.35, -.55], editor: [0, 2.35, -.55], records: [1.15, 2.3, -1.05] };
+let introPlayed = false;
 
 /** Original music street, rendered with Sakura Crossing's MIT cel/ink pipeline. */
 export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}) {
@@ -18,7 +36,8 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
     host.classList.add('sakura-scene--fallback');
     const fallback = document.createElement('div');
     fallback.className = 'sakura-scene__fallback';
-    fallback.innerHTML = '<span aria-hidden="true"></span><strong>SAME SHOW.<br>ANOTHER VIEW.</strong>';
+    fallback.setAttribute('aria-hidden', 'true');
+    fallback.innerHTML = '<span></span>';
     host.append(fallback);
     document.body.classList.add('spatial-fallback');
     return { setView() {}, setContent() {}, setMusic() {}, musicControl() {}, focus: () => Promise.resolve(true), restore() {}, dispose() { fallback.remove(); host.classList.remove('sakura-scene--fallback'); document.body.classList.remove('spatial-fallback'); } };
@@ -28,12 +47,12 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
   const canvas = renderer.domElement;
   canvas.className = 'sakura-scene__canvas';
   canvas.setAttribute('role', 'img');
-  canvas.setAttribute('aria-label', '樱下音乐小院。可通过物件标记或下方导航进入唱片店、照片墙、工作桌与收藏。');
+  canvas.setAttribute('aria-label', '夜晚的樱下音乐小院，串灯亮着。可通过物件标记或下方导航进入唱片店、照片墙、工作桌与收藏。');
   host.append(canvas);
   const compass = document.createElement('nav');
   compass.className = 'world-compass';
   compass.setAttribute('aria-label', '音乐小院');
-  compass.innerHTML = '<span class="world-compass__label">SIDE B / 樱下放映</span><div><button data-world-view="space">小院</button><button data-world-view="explore">唱片店</button><button data-world-view="live">照片墙</button><button data-world-editor>工作桌</button><button data-world-view="records">收藏</button></div>';
+  compass.innerHTML = '<div><button data-world-view="space">小院</button><button data-world-view="explore">唱片店</button><button data-world-view="live">照片墙</button><button data-world-editor>工作桌</button><button data-world-view="records">收藏</button></div>';
   host.append(compass);
   compass.addEventListener('click', event => {
     const button = event.target.closest('button');
@@ -42,9 +61,9 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
   });
   const hotspots = document.createElement('div'); hotspots.className = 'world-hotspots'; host.append(hotspots);
   const caption = document.createElement('div'); caption.className = 'world-caption';
-  caption.innerHTML = '<span>SIDE B / MUSIC &amp; MEMORIES</span><strong>樱下放映</strong><small data-world-caption>音乐 · 照片 · 此刻</small>';
+  caption.innerHTML = '<strong>小院</strong>';
   host.append(caption);
-  renderer.setClearColor(PAL.skyHaze, 1);
+  renderer.setClearColor(NIGHT.clear, 1);
   renderer.setPixelRatio(1);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.NoToneMapping;
@@ -54,8 +73,7 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
   renderer.localClippingEnabled = true;
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(PAL.skyMid);
-  scene.fog = new THREE.Fog(PAL.fog, 24, 46);
+  scene.fog = new THREE.Fog(NIGHT.fog, 24, 46);
   const camera = new THREE.PerspectiveCamera(39, 1, .1, 80);
   camera.position.set(8.5, 6.6, 13);
   camera.lookAt(0, 1.55, 0);
@@ -64,16 +82,16 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
   const textures = new Set();
   const geometries = new Set();
   const materials = new Set();
+  // A world-fixed equirectangular sky: the horizon glow follows the camera's pitch.
   const skySurface = document.createElement('canvas');
-  skySurface.width = 2; skySurface.height = 128;
+  skySurface.width = 4; skySurface.height = 256;
   const skyContext = skySurface.getContext('2d');
-  const skyGradient = skyContext.createLinearGradient(0, 0, 0, 128);
-  skyGradient.addColorStop(0, '#abcce6');
-  skyGradient.addColorStop(.64, '#dce7ed');
-  skyGradient.addColorStop(1, '#f5e9de');
-  skyContext.fillStyle = skyGradient; skyContext.fillRect(0, 0, 2, 128);
+  const skyGradient = skyContext.createLinearGradient(0, 0, 0, 256);
+  NIGHT.sky.forEach(([stop, color]) => skyGradient.addColorStop(stop, color));
+  skyContext.fillStyle = skyGradient; skyContext.fillRect(0, 0, 4, 256);
   const skyTexture = new THREE.CanvasTexture(skySurface);
   skyTexture.colorSpace = THREE.SRGBColorSpace;
+  skyTexture.mapping = THREE.EquirectangularReflectionMapping;
   textures.add(skyTexture); scene.background = skyTexture;
   const celMaterials = createCelMaterials();
   const palette = {
@@ -122,18 +140,27 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
     return mesh(geometry(new THREE.PlaneGeometry(width, height)), material, [0, 0, 0]);
   }
 
-  scene.add(new THREE.HemisphereLight(PAL.hemiSky, PAL.hemiGround, 1.12));
-  const sun = new THREE.DirectionalLight(PAL.sun, 2.25);
-  sun.position.set(-6.2, 10.2, 8.6); sun.castShadow = true;
+  // Eight permanent lights. The moon is the only shadow caster and never moves.
+  const hemi = new THREE.HemisphereLight(NIGHT.hemiSky, NIGHT.hemiGround, PRESETS.night.hemi); scene.add(hemi);
+  const sun = new THREE.DirectionalLight(NIGHT.moon, PRESETS.night.sun);
+  sun.position.set(7.5, 12, 2); sun.castShadow = true;
   sun.shadow.mapSize.set(2048, 2048);
   Object.assign(sun.shadow.camera, { left: -12, right: 12, top: 12, bottom: -12, near: .5, far: 32 });
   sun.shadow.bias = -.0004;
   sun.shadow.normalBias = .007;
   scene.add(sun);
-  const fill = new THREE.DirectionalLight(PAL.fill, 1.08);
-  fill.position.set(6, 3.8, -5.5); scene.add(fill);
-  const bounce = new THREE.DirectionalLight(0xd8cbe8, .34);
-  bounce.position.set(1, -3, 4); scene.add(bounce);
+  const fill = new THREE.DirectionalLight(NIGHT.fill, PRESETS.night.fill);
+  fill.position.set(2, 3, 9); scene.add(fill);
+  const shopGlow = new THREE.PointLight(NIGHT.lamp, PRESETS.night.shopGlow, 6.5, 2); shopGlow.position.set(0, 2.35, -.55); scene.add(shopGlow);
+  const festoonL = new THREE.PointLight(NIGHT.bulb, PRESETS.night.festoonL, 4.5, 2); festoonL.position.set(-3.3, 2.7, 2.45); scene.add(festoonL);
+  const festoonR = new THREE.PointLight(NIGHT.bulb, PRESETS.night.festoonR, 4.5, 2); festoonR.position.set(3.4, 2.65, 2.35); scene.add(festoonR);
+  // A par can on the left festoon pole lights the stage.
+  const stageSpot = new THREE.SpotLight(NIGHT.stage, PRESETS.night.stageSpot, 9, .38, .5, 2); stageSpot.position.set(-5.82, 3.3, 1.1);
+  stageSpot.target.position.set(-4, .32, .35); scene.add(stageSpot, stageSpot.target);
+  // Kept dark except in the record-shop view, where it lights the pull-out table from above.
+  const tableSpot = new THREE.SpotLight(NIGHT.table, PRESETS.night.tableSpot, 0, .42, .3, 2); tableSpot.position.set(0, 9.5, -1.1);
+  tableSpot.target.position.set(0, 1.2, -1.3); scene.add(tableSpot, tableSpot.target);
+  const rig = { hemi, sun, fill, shopGlow, festoonL, festoonR, stageSpot, tableSpot };
 
   const model = buildSakuraWorld({ THREE, world, mesh, box, cylinder, ball, rod, label, geometry, toon, cel: celMaterials.cel, materials, textures });
   // Capture original object bounds before static meshes are moved into batches.
@@ -163,10 +190,61 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
   const ink = pipeline.ink.mat.uniforms;
   ink.uFadeStart.value = 23; ink.uFadeEnd.value = 43; ink.uSkyDepth.value = 65;
   ink.uStrength.value = .76; ink.uSens.value = .0038;
-  pipeline.grade.mat.uniforms.uVignette.value = .06;
-  pipeline.grade.mat.uniforms.uSaturation.value = 1.06;
+  ink.uInk.value.set(NIGHT.ink); ink.uStrength.value = .72;
+  const grade = pipeline.grade.mat.uniforms;
+  grade.uVignette.value = .2; grade.uSaturation.value = 1.12; grade.uLift.value = .02; grade.uWarmth.value = .035;
+  grade.uShadowTint.value.set(NIGHT.gradeShadow);
 
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  let lighting = '';
+  let intro = null;
+  const presetName = key => PRESETS[key] ? key : 'night';
+  function applyLighting(key, immediate) {
+    const name = presetName(key);
+    // onShot runs at departure and arrival; a repeated preset must not restart the fade.
+    if (name === lighting) return;
+    lighting = name;
+    intro?.progress(1); intro = null;
+    for (const [light, value] of Object.entries(PRESETS[name])) {
+      gsap.killTweensOf(rig[light]);
+      if (immediate) rig[light].intensity = value;
+      else gsap.to(rig[light], { intensity: value, duration: .9, ease: 'power2.inOut' });
+    }
+    const [x, y, z] = SHOP_GLOW_AT[name];
+    gsap.killTweensOf(shopGlow.position);
+    if (immediate) shopGlow.position.set(x, y, z);
+    else gsap.to(shopGlow.position, { x, y, z, duration: .9, ease: 'power2.inOut' });
+  }
+  /** First mount only: the courtyard switches its lamps on once, in under 1.4 seconds. */
+  function playIntro() {
+    const glow = model.night;
+    if (introPlayed || reduced.matches || !glow) return;
+    introPlayed = true;
+    const preset = PRESETS[lighting] || PRESETS.night;
+    const lamp = glow.lampColor.clone();
+    const state = { haloOpacity: glow.haloMaterial.opacity, beamOpacity: glow.beamMaterial.opacity, windows: glow.windowGlow.emissiveIntensity, lamp: 1 };
+    // Held dark until the first frames are on screen, so start-up work does not swallow the fade.
+    intro = gsap.timeline({ paused: true, onComplete: () => { intro = null; } });
+    requestAnimationFrame(() => requestAnimationFrame(() => { if (intro && !disposed) intro.play(); }));
+    const dark = { haloOpacity: 0, beamOpacity: 0, windows: .08, lamp: .25 };
+    const apply = () => {
+      glow.haloMaterial.opacity = dark.haloOpacity; glow.beamMaterial.opacity = dark.beamOpacity;
+      glow.windowGlow.emissiveIntensity = dark.windows; glow.warmLamp.color.copy(lamp).multiplyScalar(dark.lamp);
+    };
+    for (const light of ['shopGlow', 'festoonL', 'festoonR', 'stageSpot', 'tableSpot']) rig[light].intensity = 0;
+    rig.hemi.intensity = preset.hemi * .72; rig.fill.intensity = 0;
+    apply();
+    intro.to(rig.hemi, { intensity: preset.hemi, duration: 1.1, ease: 'sine.out' }, 0)
+      .to(rig.fill, { intensity: preset.fill, duration: .9, ease: 'sine.out' }, .15)
+      .to(dark, { windows: state.windows, duration: .7, ease: 'power2.out', onUpdate: apply }, .1)
+      .to(rig.shopGlow, { intensity: preset.shopGlow, duration: .7, ease: 'power2.out' }, .1)
+      .to(dark, { lamp: 1, haloOpacity: state.haloOpacity, duration: .6, ease: 'power2.out', onUpdate: apply }, .35)
+      .to(rig.festoonL, { intensity: preset.festoonL, duration: .6, ease: 'power2.out' }, .35)
+      .to(rig.festoonR, { intensity: preset.festoonR, duration: .6, ease: 'power2.out' }, .47)
+      .to(rig.tableSpot, { intensity: preset.tableSpot, duration: .6, ease: 'power2.out' }, .47)
+      .to(rig.stageSpot, { intensity: preset.stageSpot, duration: .55, ease: 'power3.out' }, .8)
+      .to(dark, { beamOpacity: state.beamOpacity, duration: .55, ease: 'power3.out', onUpdate: apply }, .8);
+  }
   const loader = new THREE.TextureLoader();
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
@@ -177,7 +255,7 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
   let draftCard = null;
   let disposed = false;
   let visible = true;
-  let frame = 0; let lastTime = 0; let sceneTime = 0;
+  let frame = 0; let lastTime = 0; let sceneTime = 0; let queuedDraw = 0;
   const pins = [];
   const staticPins = [
     ['唱片店', new THREE.Vector3(0, 2.6, 1), { type: 'navigate', view: 'explore' }],
@@ -200,13 +278,13 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
   let director;
   const framing = createSakuraFraming(host, {
     getShot: () => director?.active.key || (view === 'space' ? 'home' : view),
-    onChange() { if (!disposed) { director?.reframe(); projectPins(); draw(); } },
-    onLabelsChange() { if (!disposed) { projectPins(); if (reduced.matches) draw(); } },
+    onChange() { if (!disposed) { director?.reframe(); projectPins(); requestDraw(); } },
+    onLabelsChange() { if (!disposed) { projectPins(); if (reduced.matches) requestDraw(); } },
   });
   pins.forEach(pin => framing.watchLabel(pin.button)); photoSlots.forEach(slot => framing.watchLabel(slot.button));
   const music = createSakuraMusic({ world, cel: celMaterials.cel, host: hotspots, canvas, camera, reduced, onAction, framing,
     isActive: () => director.active.key === 'explore' && !director.travelling && !framing.layout.blocked,
-    onChange() { renderer.shadowMap.needsUpdate = true; if (reduced.matches) { projectPins(); draw(); } },
+    onChange() { renderer.shadowMap.needsUpdate = true; if (reduced.matches) requestDraw(); },
   });
   function boundsForShot(key, id) {
     if (key !== 'photo') return subjectBounds[key] || subjectBounds.live;
@@ -217,7 +295,16 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
     return new THREE.Box3().setFromCenterAndSize(center, extent);
   }
   const courtyardCenter = subjectBounds.home.getCenter(new THREE.Vector3());
+  // Without the animation loop (reduced motion), every tween update and content change asks for a frame.
+  // One table update fires dozens of those synchronously, so they share the next frame instead of each
+  // re-rendering shadows and post-processing on the spot.
+  function requestDraw() {
+    if (disposed || queuedDraw) return;
+    queuedDraw = requestAnimationFrame(() => { queuedDraw = 0; if (!disposed) { projectPins(); draw(); } });
+  }
   function draw() {
+    // A direct draw also answers a pending request.
+    if (queuedDraw) { cancelAnimationFrame(queuedDraw); queuedDraw = 0; }
     if (disposed || !visible || !width || !height) return;
     // Reframing can move the camera back on small screens; keep haze beyond the venue.
     scene.fog.near = Math.max(24, camera.position.distanceTo(courtyardCenter) + 7);
@@ -228,26 +315,30 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
   function positionPin(button, point, offsetY = 0) {
     projected.copy(point).project(camera);
     const x = (projected.x + 1) * width / 2; const y = (1 - projected.y) * height / 2 + offsetY;
-    button.hidden = projected.z > 1 || projected.z < -1 || !framing.placeLabel(button, x, y, 'bottom');
+    const placed = projected.z <= 1 && projected.z >= -1 && framing.placeLabel(button, x, y, 'bottom');
+    // A label with keyboard focus stays put; hiding it would drop focus to the page.
+    button.hidden = !placed && button !== document.activeElement;
     if (!button.hidden) button.style.transform = `translate3d(${x}px,${y}px,0) translate(-50%,-100%)`;
   }
   function projectPins() {
     camera.updateMatrixWorld(); world.updateMatrixWorld(true);
     framing.beginLabels();
     music.project(camera, width, height, director.active.key === 'explore');
-    pins.forEach(pin => { pin.button.hidden = true; if (director.active.key === 'home') positionPin(pin.button, pin.position); });
+    // Visibility is assigned once per frame, never toggled, so a focused label keeps its focus.
+    pins.forEach(pin => { if (director.active.key === 'home') positionPin(pin.button, pin.position); else pin.button.hidden = true; });
     photoSlots.forEach(slot => {
-      slot.button.hidden = true;
-      if (!slot.data || !['home', 'live', 'photo'].includes(director.active.key)) return;
+      // The front door reaches personal cards through its paper; labels belong to the wall itself.
+      if (!slot.data || !['live', 'photo'].includes(director.active.key)) { slot.button.hidden = true; return; }
       const position = slot.object.getWorldPosition(new THREE.Vector3()); position.y -= .5;
-      positionPin(slot.button, position, director.active.key === 'home' ? (slot.index % 3) * 27 : 0);
+      positionPin(slot.button, position);
     });
   }
   director = createCameraDirector(camera, {
     size: () => ({ width, height }), reduced,
     getLayout: key => framing.get(key), getBounds: boundsForShot,
-    onFrame() { projectPins(); if (reduced.matches) draw(); },
+    onFrame() { projectPins(); if (reduced.matches) requestDraw(); },
     onShot(key, id, travelling) {
+      applyLighting(key, !travelling || reduced.matches);
       model.roof.visible = key !== 'explore';
       model.exploreShadowBlockers.forEach(object => { object.castShadow = key !== 'explore'; });
       // The close view makes room at the back for the pull-out record table.
@@ -262,7 +353,7 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
         const selected = button.hasAttribute('data-world-editor') ? key === 'editor' : button.dataset.worldView === (key === 'home' ? 'space' : key === 'photo' ? 'live' : key);
         button.setAttribute('aria-pressed', String(selected));
       });
-      caption.querySelector('strong').textContent = ({ home: '樱下放映', explore: '唱片店', live: '照片墙', editor: '工作桌', records: '收藏架', photo: '现场卡' })[key];
+      caption.querySelector('strong').textContent = ({ home: '小院', explore: '唱片店', live: '照片墙', editor: '工作桌', records: '收藏架', photo: '现场卡' })[key];
       onShot?.(key, id, travelling);
     },
   });
@@ -271,7 +362,7 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
     for (const property of ['position', 'rotation', 'scale']) {
       gsap.killTweensOf(slot.object[property]);
       const end = slot.rest[property];
-      gsap.to(slot.object[property], { x: end.x, y: end.y, z: end.z, duration: immediate || reduced.matches ? 0 : .4, ease: 'power3.out', onUpdate: () => { renderer.shadowMap.needsUpdate = true; if (reduced.matches) draw(); } });
+      gsap.to(slot.object[property], { x: end.x, y: end.y, z: end.z, duration: immediate || reduced.matches ? 0 : .4, ease: 'power3.out', onUpdate: () => { renderer.shadowMap.needsUpdate = true; if (reduced.matches) requestDraw(); } });
     }
   }
   function releasePhoto(immediate = false) { resetPhoto(activePhoto, immediate); activePhoto = null; }
@@ -338,15 +429,12 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
         else { loaded.repeat.y = imageAspect / shapeAspect; loaded.offset.y = (1 - loaded.repeat.y) / 2; }
         slot.imageMesh.material.map = loaded; slot.imageMesh.material.color.set('#ffffff'); slot.imageMesh.material.needsUpdate = true;
         if (slot.data.isOwn) { model.draftImageMesh.material.map = loaded; model.draftImageMesh.material.color.set('#ffffff'); model.draftImageMesh.material.needsUpdate = true; }
-        draw();
+        requestDraw();
       });
       texture.colorSpace = THREE.SRGBColorSpace; texture.minFilter = THREE.LinearFilter; texture.generateMipmaps = false;
       slot.texture = texture; textures.add(texture);
     });
-    const scope = cards.every(card => card.local) ? '示例卡' : currentView === 'live' ? '可见现场卡' : '我的现场卡';
-    const firstVisit = currentView === 'space' && currentMode === 'home' && cards.every(card => card.local);
-    caption.querySelector('[data-world-caption]').textContent = firstVisit ? '留一张卡，换一个视角' : cards.length ? `${cards.length} 张${scope}` : '音乐 · 照片 · 此刻';
-    renderer.shadowMap.needsUpdate = true; projectPins(); draw();
+    renderer.shadowMap.needsUpdate = true; projectPins(); requestDraw();
   }
   function picked(event) {
     const rect = canvas.getBoundingClientRect();
@@ -370,7 +458,7 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
     frame = 0;
     if (disposed || !visible || document.hidden || reduced.matches) return;
     if (!lastTime) lastTime = now;
-    if (now - lastTime >= 1000 / (director.moving || activePhoto ? 60 : 30)) {
+    if (now - lastTime >= 1000 / (director.moving || activePhoto || intro?.isActive() ? 60 : 30)) {
       sceneTime += Math.min((now - lastTime) / 1000, .1); lastTime = now;
       model.update?.(sceneTime); projectPins(); draw();
     }
@@ -379,21 +467,23 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
   function updateMotion() {
     cancelAnimationFrame(frame); frame = 0; lastTime = 0;
     if (disposed || !visible || document.hidden) return;
-    if (reduced.matches) { director.finish(); music.finish(); photoSlots.forEach(slot => { gsap.getTweensOf([slot.object.position, slot.object.rotation, slot.object.scale]).forEach(tween => tween.progress(1)); }); model.update?.(0); projectPins(); draw(); }
+    if (reduced.matches) { intro?.progress(1); gsap.getTweensOf([...Object.values(rig), shopGlow.position]).forEach(tween => tween.progress(1)); director.finish(); music.finish(); photoSlots.forEach(slot => { gsap.getTweensOf([slot.object.position, slot.object.rotation, slot.object.scale]).forEach(tween => tween.progress(1)); }); model.update?.(0); projectPins(); draw(); }
     else { draw(); frame = requestAnimationFrame(tick); }
   }
   function resize() {
     const bounds = host.getBoundingClientRect();
     width = Math.max(1, Math.round(bounds.width)); height = Math.max(1, Math.round(bounds.height));
+    grade.uVignette.value = width <= 760 ? .12 : .2;
     framing.measure(director.active.key); director.resize(); pipeline.setSize(width, height); renderer.shadowMap.needsUpdate = true; projectPins(); draw();
   }
   const resizeObserver = new ResizeObserver(resize); resizeObserver.observe(host);
   const intersectionObserver = new IntersectionObserver(entries => { visible = entries[0]?.isIntersecting ?? false; updateMotion(); }, { threshold: .01 });
   intersectionObserver.observe(host);
   document.addEventListener('visibilitychange', updateMotion); reduced.addEventListener('change', updateMotion);
-  resize(); director.go(baseShot(), { immediate: true, force: true }); model.update?.(0); updateMotion();
+  resize(); director.go(baseShot(), { immediate: true, force: true }); model.update?.(0); playIntro(); updateMotion();
   return { setView, setContent, setMusic: music.setMusic, musicControl: music.control, focus, restore, dispose() {
-    disposed = true; cancelAnimationFrame(frame); director.dispose();
+    disposed = true; cancelAnimationFrame(frame); cancelAnimationFrame(queuedDraw); director.dispose();
+    intro?.kill(); gsap.killTweensOf([...Object.values(rig), shopGlow.position]);
     music.dispose();
     framing.dispose();
     photoSlots.forEach(slot => { gsap.killTweensOf([slot.object.position, slot.object.rotation, slot.object.scale]); });
