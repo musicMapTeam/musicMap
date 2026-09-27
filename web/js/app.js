@@ -113,6 +113,7 @@ const api = { getState: () => state, update, render, navigate, toast, icon,
     },
     focus(kind, id) { return themeController?.focus(kind, id) || Promise.resolve(true); },
     restore() { themeController?.restore(); },
+    musicControl(command) { return themeController?.musicControl(command); },
   },
 };
 

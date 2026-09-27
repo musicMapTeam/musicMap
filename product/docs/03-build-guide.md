@@ -1,16 +1,17 @@
 # 实施与演示规格
 
-版本：2.3 · 2026-09-27，对应应用 MVP 0.12.0。产品范围见[产品方案](01-product-plan.md)，比赛交付见[交付方案](02-delivery-plan.md)。本轮把音乐关系接入常驻 Three 场景，统一现场票签、照片托盘、纪念册与内页，沿用后端接口、照片权限与数据库结构。本轮构建和浏览器结果见[项目状态](../../docs/PROJECT_STATUS.md)记录；第 8 节旧证据保留原版本。
+版本：2.4 · 2026-09-27，对应应用 MVP 0.13.0。产品范围见[产品方案](01-product-plan.md)，比赛交付见[交付方案](02-delivery-plan.md)。本轮显示稳定的完整关系网，分开选中与行走，接入点线读依据、最短链查询与视图控制；后端接口、照片权限与数据库结构沿用。本轮构建和浏览器结果见[项目状态](../../docs/PROJECT_STATUS.md)记录；第 8 节旧证据保留原版本。
 
 ## 1. 技术决定
 
 | 部分 | 当前实现 | 边界 |
 |---|---|---|
 | 页面 | HTML / CSS / JavaScript ES 模块；Vite 8.3.1 + vite-plugin-singlefile 2.3.3 | 复用当前原生 JavaScript，不迁移框架 |
-| 视觉 | Three 0.186.1 常驻小院与唱片关系桌 + Sakura Crossing cel / 深度描线 / 调色 / FXAA；DOM 纸件与投影标签，GSAP 3.15.0 / Flip 管镜头、抬卡和弹窗 | 仅保留 sakura，手机独立机位；WebGL 不可用时保留普通 DOM / SVG 图与页面操作 |
+| 视觉 | Three 0.186.1 常驻小院与完整唱片关系网 + Sakura Crossing cel / 深度描线 / 调色 / FXAA；DOM 纸件与投影标签，GSAP 3.15.0 / Flip 管镜头、抬卡和弹窗 | 仅保留 sakura，手机独立机位；WebGL 不可用时使用同一布局的 DOM / SVG 二维全网 |
 | 场景外壳 | `web/js/themes.js` 固定管理樱花场景 | 不读写或监听旧外观键；旧键即便存在也无效果，不改业务存储 |
 | 滚动 | OverlayScrollbars 2.16.0 增强 body，自动隐藏的 6px 浮动条；弹窗使用原生细条 | 保留浏览器滚动与键盘导航；仅前端依赖 |
-| 内容 | 11 位艺人、10 首作品、10 条共同演唱关系与逐人制作署名；独立 HF 开放曲库 120 首；保留虚构示例及两张 AI 生成图 | 共同署名不推断制作工种；试听链接撤下，QQ 同版本直达待核；不内置音频 |
+| 内容 | 12 位艺人、13 份合作录音、13 条共同演唱边、2 个独立回路及逐人署名；独立 HF 开放曲库 120 首；保留虚构示例及两张 AI 生成图 | 录音室、联唱现场和英文版分别限定；共同署名不直接成为合唱边，不内置音频 |
+| 关系网 | `map-network.js` 按数据集 / 模式生成并缓存确定性布局，BFS 查询一条最短链 | 完整指当前收录图；查询不写探索路径、事件或步数，不用于替用户完成挑战 |
 | 本地情景状态 | localStorage `music-map-space:v1`，两个示例角色 | 仅当前浏览器；可选本机照片，不上传服务 |
 | 音乐收藏 | localStorage `music-map-saved-music:v1`，真实精选与 HF 作品 | 独立于探索路线，仅当前浏览器；保留来源和数据集 |
 | 联网身份 | 匿名 bearer 凭据，浏览器保存于 `music-map-live:v1` | 不是手机号账号，无找回与跨设备身份迁移 |
@@ -20,15 +21,17 @@
 | 数据库 | SQLite，默认 `data/music-map.sqlite`，事务与 WAL；用户照片存独立表的 BLOB | 单实例 + 持久磁盘；图片不写入公开目录，`data/` 和数据库 sidecars 不提交 |
 | 输出 | 单个 `dist/index.html`；联网服务同时提供它和 API；浏览器绘制主题单卡 / 双联 PNG | 具体构建与导出检查见项目状态；只托管 HTML 可跑 Map 和本地演示，不能运行后端 |
 
-源码分工：外壳 `web/js/app.js`、本人主页 `home.js`、Map `map.js` / `map-data.js` / `map-catalogue.js`、开放曲库 `open-catalogue.js`、音乐收藏 `music-library.js`、本地示例 `space.js`、联网房间 `live.js`、现场收藏 `live-library.js`、照片 `live-photo.js`、票根 `ticket-export.js`、界面动画 `motion.js`；服务入口 `server/index.js`，数据库 `server/db.js`。使用 hash 路由，依赖由锁文件固定。Three 场景随功能切换镜头，HTML 层负责输入与业务操作；OverlayScrollbars 调整滚动条呈现。没有引入 React、测试框架或推理模型。
+源码分工：外壳 `web/js/app.js`、本人主页 `home.js`、Map `map.js` / `map-network.js` / `map-data.js` / `map-catalogue.js`、开放曲库 `open-catalogue.js`、音乐收藏 `music-library.js`、本地示例 `space.js`、联网房间 `live.js`、现场收藏 `live-library.js`、照片 `live-photo.js`、票根 `ticket-export.js`、界面动画 `motion.js`；服务入口 `server/index.js`，数据库 `server/db.js`。使用 hash 路由，依赖由锁文件固定。Three 场景随功能切换镜头，HTML 层负责输入与业务操作；OverlayScrollbars 调整滚动条呈现。没有引入 React、测试框架或推理模型。
 
-### 0.12 页面与操作
+### 0.13 页面与操作
 
 - 顶部品牌与一套空间导航连接小院、唱片店、照片墙和收藏。封套内页、场次票签、工作纸和纪念册共用暖纸、细墨线、纸角与索引；说明仅出现在相关决定处。
 - `home.js` 读取本人收藏，保留近期私人卡入口；无卡时预置内容注明示例。记录入口进入真实制卡，邀请入口有房间直接展示邀请码，无房间走昵称→创建→邀请。首页提供邀请码入口；邀请码在入场页填写，加入由用户确认。
 - 没有 hash 的访问直接进入首页，不被上次页面覆盖；返回空 hash 同样回首页。邀请链接仍进入对应入场流程。点本人卡进收藏，点示例进明确的本地情景。
 - `space.js` 保留本地双角色和旧 payload；普通首页与示例不混用身份、计数或记录。`#sakura-world` 全屏小院承担主画面。
-- Map 以唱片关系桌承载当前艺人与合法邻居，实体细线表达数据中的连接，HTML 艺人标签随物件投影。封套索引和路线纸条调用原探索逻辑，作品内页保留逐人署名及具体工种来源，开放曲库独立搜索；WebGL 不可用时保留普通关系图。没有试听链接或站内播放器。
+- Map 在同一樱花纸桌上发布当前数据集的全量节点与边，使用稳定布局；HTML 标签随物件投影。选中任意艺人只查看，点线打开对应录音、工种与来源；明确沿当前节点合法边「前往」才记一步，保留完成挑战的实际条件。
+- 漫游的「找关联」用 BFS 查当前数据集与关系类型内的一条最短链，只高亮结果；不写用户的探索路径、移动事件或步数。查询不可达不代表现实中没有合作；挑战不提供查询入口。
+- Three 全网提供平移、缩放、适配全图和触摸输入处理；二维降级沿用相同节点、边、布局与业务动作。手机模拟视口、真机双指与手势冲突检查按实际执行记录，不由代码存在推断通过。
 - 收藏、取消和撤销恢复 Map 焦点、折叠状态与滚动；订阅同步按钮和计数。移除真实曲目收藏不删除探索历史。
 - 我的收藏以纪念册与索引呈现，默认本人现场，另有音乐、路线和示例。双联为空且仍在场时回到已有房间换卡；身份失效给重新入场入口，401 说明新身份无法带回旧记录。私人收藏不批量发布到照片墙。
 - 房间以场次票签和照片托盘为主体，同场卡片、共同记忆与动态使用可展开目录；轮询重绘保留目录展开状态。收到的待回应申请保持显式入口，其他房间与离开留在 `details.live-room-menu`；异常连接、私藏与同意状态保留。
@@ -44,9 +47,10 @@
 | `web/css/themes.css` / `theme-sakura.css` | 纸面 token、浅色业务页面、樱花卡片与表单；`theme-zine.css` 删除 |
 | `web/css/app-studio.css` / `space-studio.css` / `map-studio.css` | 既有外壳、照片工作台和图谱的基础构图 |
 | `web/js/sakura-world.js` | 原创小院、店铺雨篷、印刷唱片、樱树、照片墙、工作桌与收藏道具 |
-| `web/js/sakura-music.js` | 原创唱片关系桌、实体连接、艺人投影标签与物件动作，复用同一场景和 cel 材质 |
+| `web/js/map-network.js` | 当前图全量节点 / 边、缓存稳定布局与最短链查询；Three 和二维降级共用 |
+| `web/js/sakura-music.js` | 原创完整唱片关系网、可点击实体连接、艺人投影标签、平移缩放与物件动作，复用同一场景和 cel 材质 |
 | `web/js/sakura-scene.js` | Three 场景、透视机位、授权卡片贴图、拾取、镜头控制与销毁 |
-| `web/css/map-spatial.css` | 场景探索的封套索引、路线纸条、投影标签与普通图降级 |
+| `web/css/map-spatial.css` | 场景探索的封套索引、路线纸条、投影标签、视图控制与二维全网降级 |
 | `web/css/spatial-world.css` | 全屏场景、HTML 操作层与手机构图 |
 | `web/js/motion.js` | GSAP / Flip 驱动卡片和弹窗，支持减少动态 |
 | `web/js/open-catalogue.js` / `music-library.js` | HF 搜索与独立本机音乐收藏，保留来源和数据集 |
@@ -61,7 +65,7 @@
 
 业务接口沿用 `api.spatial.publish({mode,cards,onPhoto,onEdit})`、`focus(kind,id?)`、`restore()`。本人主页发布 `home`，示例发布 `exchange`，Live 发布 `live`；卡片含 `id/src/title/subtitle/alt/isDemo`，最多 6 张。首页可展示本人私卡，同伴只发布当前展示卡；缺自卡的 seed 明示示例。联网 `src` 只来自已授权读取的 blob，不把照片 ID 改为公共网址。清缓存、退出或撤权前先撤下场景贴图，再释放 blob。
 
-Map 使用同一 `publish` 入口发布 `mode:'explore'`、`music` 与 `onMusic`。`music` 从当前 session 提取中心艺人、邻居、关系说明与视角；场景的 `setMusic` 更新唱片与细线。唱片拾取及投影标签回调复用原 `runAction`，不新建图谱状态、不绕过挑战完成条件；离开探索清除当前音乐展示。DOM / SVG 图仍作为 WebGL 不可用时的操作入口。场景销毁释放关系桌自己的纹理、材质、几何和监听。
+Map 使用同一 `publish` 入口发布 `mode:'explore'`、`music` 与 `onMusic`。`music` 按数据集与模式发布完整节点、边、稳定坐标，并携带当前探索节点、选中、已走过和查询高亮状态；`setMusic` 更新画面。场景拾取及投影标签回调到同一 Map 动作入口，`select` / `edge` 只改变查看状态，`move` 校验当前节点的合法邻居后才写 session 的路径与事件。`musicControl` 接缩放、适配全图和定位选中，DOM / SVG 全网保留对应操作；离开探索清除音乐展示。场景销毁释放关系桌自己的纹理、材质、几何和监听。
 
 场景拾取复用已有预览、编辑、申请和双联操作，关闭弹窗恢复基础机位，替换弹窗时延后恢复。小院几何、程序纹理与构图由本项目编写；渲染方法复用 Sakura Crossing MIT 源码，未复制其完整街区、人物、纹理原图或音频。Three 0.180.0 的上游 shader 补丁已按项目 0.186.1 适配；独立材质池、透视深度描线与 FXAA 保持。空闲 30fps / 转场 60fps 是调度目标，不是设备实测保证。
 
@@ -71,9 +75,11 @@ PNG 只保留樱花绘制。双联取已接受快照，单卡取本人的当前�
 
 Three 与 Sakura Crossing 模块保留 MIT 许可，GSAP 使用 Standard No Charge 许可。固定提交和改动见[源码清单](../../web/js/vendor/sakura/SOURCE.json)与[第三方说明](../../THIRD_PARTY_NOTICES.md)。0.5 的[研究记录](../../references/research/2026-09-27/sakura-visual-reference.md)保留原历史范围。
 
-### 0.7 数据来源与复现
+### 数据来源与复现
 
-`map-catalogue.js` 的 10 首精选使用 `real-vocal-2026-09-v2`，稳定 ID 与共同演唱边保持。`credits[]` 每项包含 `name`、`role`、`sourceId` 和可选 `artistId`；幕后人员可以没有图节点。`creditSources[]` 提供来源 URL、标题和核对日期。`creditsScope: 'selected-verified'` 表示只列已核实分工，不承诺完整名单。详情按人合并工种，来源仍精确到工种；见[署名取证记录](../../references/research/2026-09-27/collaboration-roles.md)。
+`map-catalogue.js` 的 13 份精选合作录音使用 `real-vocal-2026-09-v3`。原 11 个艺人及 10 首作品 / 边的稳定 ID 保持，增加孙燕姿与 3 份特定录音；当前共 12 个艺人、13 条边、2 个独立回路。《黑暗骑士》共唱者是阿信本人；2020 双 J 联唱按一份现场节目记录；《Stay With You》英文版与中文词作、现场版分别限定。见[本轮取证](../../references/research/2026-09-27/vocal-network-expansion.md)，原 10 首的[工种记录](../../references/research/2026-09-27/collaboration-roles.md)保留历史来源。
+
+`credits[]` 每项包含 `name`、`role`、`sourceId` 和可选 `artistId`；幕后人员可以没有图节点。`creditSources[]` 提供来源 URL、标题和核对日期。`creditsScope: 'selected-verified'` 表示只列已核实分工，不承诺完整名单。详情按人合并工种，来源仍精确到工种；制作、编曲和同名艺人不自动生成共同演唱边。
 
 Hugging Face 数据：`maharshipandya/spotify-tracks-dataset`，固定 revision `635b034f69257814eff850a5c2b3346fe458134f`。完整 `dataset.csv` 位于 `data/external/spotify-tracks-dataset/`，共 **114,000 行、20,118,244 B**；同目录有清单、文件树和数据卡副本。复现：
 
@@ -239,9 +245,9 @@ npm start
 仓库有多阶段 Dockerfile：构建前端，运行时保留 Node 24、服务和 `dist/`，以非 root 用户运行。
 
 ```powershell
-docker build -t music-map-space:0.12.0 .
+docker build -t music-map-space:0.13.0 .
 docker volume create music-map-data
-docker run -d --name music-map-space --restart unless-stopped -p 127.0.0.1:8787:8787 -v music-map-data:/app/data music-map-space:0.12.0
+docker run -d --name music-map-space --restart unless-stopped -p 127.0.0.1:8787:8787 -v music-map-data:/app/data music-map-space:0.13.0
 ```
 
 这些是部署说明，不代表已经执行。Docker 内服务监听 `0.0.0.0`，上述端口映射仍只开放到宿主机环回地址。生产由反向代理将同一 HTTPS 域名的页面和 `/api/live` 全部转发到这个 Node 实例；需要定向访问时也在入口限制站点访问。保留 `music-map-data` volume，不把数据库放进镜像或无持久磁盘的平台。采用单实例，不启用多个独立 SQLite 副本的自动横向扩容。实际托管、TLS、访问控制与备份安排尚未执行。
@@ -250,7 +256,7 @@ docker run -d --name music-map-space --restart unless-stopped -p 127.0.0.1:8787:
 
 | 项目 | 当前安排 | 记录位置 |
 |---|---|---|
-| 0.12 场景与界面融合 | 场景内的唱片关系桌、封套索引、场次票签、照片托盘、纪念册与统一内页；本轮构建和实际画面按任务记录登记 | [项目状态](../../docs/PROJECT_STATUS.md) |
+| 0.13 完整关系网 | 稳定全网、选中与行走分离、点线读依据、最短链查询、平移缩放与二维全网；本轮构建和实际画面按任务记录登记 | [项目状态](../../docs/PROJECT_STATUS.md) |
 | 0.10 制卡与成品预览历史证据 | 首次樱花、同表单两步制卡、真实 PNG 预览、收藏保位与首页返回；保留当时的构建和实操范围 | [项目状态](../../docs/PROJECT_STATUS.md) |
 | 0.9 本人主页与收藏历史证据 | 当时的构建及主页恢复、跨场次回访、HF 带歌建场、私藏保存与邀请实操保留 | [项目状态](../../docs/PROJECT_STATUS.md) |
 | 0.8 全屏小院历史证据 | 六类机位、独立手机取景、授权照片贴图、工作桌与店内收藏；保留当次构建、画面和运行包记录 | [项目状态](../../docs/PROJECT_STATUS.md) |
@@ -269,9 +275,9 @@ docker run -d --name music-map-space --restart unless-stopped -p 127.0.0.1:8787:
 
 ## 8. 证据与待检查边界
 
-### 0.12 当前整合
+### 0.13 当前整合
 
-当前规格将音乐关系接入小院的唱片桌，现场、制卡、收藏与详情统一为小院里的纸件。本轮构建、实际浏览器画面、运行包、PR 与合并结果只以[项目状态](../../docs/PROJECT_STATUS.md)为准；0.11 及更早证据保留原范围，实体手机和外部用户试用仍未完成。
+当前规格在樱花纸桌上显示完整精选网络，选中、查询、沿边行走分别处理，其他页面沿用统一纸件。本轮构建、实际浏览器画面、运行包、PR 与合并结果只以[项目状态](../../docs/PROJECT_STATUS.md)为准；0.12 及更早证据保留原范围，实体手机双指与外部用户试用不预先记作通过。
 
 ### 0.10 历史结果
 
@@ -337,4 +343,4 @@ docker run -d --name music-map-space --restart unless-stopped -p 127.0.0.1:8787:
 | 线上部署 | 评审实际可访问，API 同源，磁盘持续保留 | 尚未部署；Dockerfile 存在不等于容器已运行 |
 | 音频与真实元数据 | 来源及实际能力准确 | 尚未接入 |
 
-以上 0.2.0 运行证据由整合者及接口检查协作者提供，当时没有新增或运行测试框架 / 套件。本次文档同步没有新增检查；0.4.0 至 0.11 按历史范围保留，0.12 由任务记录记实，不将局部检查扩展成未执行的环境或路径。
+以上 0.2.0 运行证据由整合者及接口检查协作者提供，当时没有新增或运行测试框架 / 套件。本次文档同步没有新增检查；0.4.0 至 0.12 按历史范围保留，0.13 由任务记录记实，不将局部检查扩展成未执行的环境或路径。
