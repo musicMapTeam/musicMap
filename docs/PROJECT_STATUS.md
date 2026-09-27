@@ -16,11 +16,7 @@
 
 ## Doing
 
-| 任务 | 负责人 | 范围 |
-| --- | --- | --- |
-| PR 与合并 | root | `feat/spatial-interface`，本轮应用与文档已完成本地检查，待 GitHub CI |
-
-当前分支 `feat/spatial-interface`。用户要求所有页面融入同一小院的设计语言，音乐探索成为场景内可操作唱片关系。
+本轮开发已完成；GitHub 自动检查与合并记录见 [PR #2](https://github.com/musicMapTeam/musicMap/pull/2)。用户要求所有页面融入同一小院的设计语言，音乐探索成为场景内可操作唱片关系。
 
 ## Done · 0.12.0
 
@@ -32,6 +28,7 @@
 | 布局与动作 | 场景、镜头、纸件 CSS | 手机照片标签放到票签和托盘之间，两张照片标签可见；纪念册 `scrollWidth/clientWidth=390/390`。减少动态使用完整 yoyo 进度收尾；资源释放与路由清理为代码审阅，未做 GPU 性能或 WebGL 降级专项实测 |
 | 构建与交付 | root：Vite、`delivery/` | 构建成功，60 模块；HTML 1,804,738 B / gzip 613.75 kB。完整 ZIP 634,057 B，6 文件：页面、两个后端文件、package、运行说明与来源许可；无数据库、用户照片或 HF 原始 CSV。无新依赖、后端接口或数据库迁移 |
 | 文档与版本 | spatial_docs、root | MVP 0.12.0 / 文档 2.3；README、三份产品文档、视觉规范、交付说明和变更记录同步。旧图与视频保留原版本范围 |
+| GitHub | [PR #2](https://github.com/musicMapTeam/musicMap/pull/2) | 实现与本地证据从 `feat/spatial-interface` 提交；按用户授权，在现有 CI 通过后合并，检查与合并时间以 PR 记录为准 |
 
 本轮仅做生产构建、上述改动路径的浏览器操作及静态审阅，没有新增或运行测试套件。390×844 是模拟视口；实体手机、公网部署、正式视频和用户试用仍在 Todo。截图为内部示例，非目标用户验证。
 
