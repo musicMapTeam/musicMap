@@ -16,9 +16,7 @@
 
 ## Doing
 
-| 任务 | 负责人 | 范围 |
-| --- | --- | --- |
-| PR 与合并 | root | `feat/music-network` 已完成本地构建与改动路径操作；等待 GitHub 现有检查后合并 |
+无开发任务进行中。0.13 本地实现与验收已提交 [PR #3](https://github.com/musicMapTeam/musicMap/pull/3)，CI 与合并状态以 PR 记录为准。
 
 ## Done · 0.13.0
 
@@ -32,6 +30,7 @@
 | 数据集切换 | root：生产页面 | 切至情景示例的策展标签，显示「标签图谱」「9 人 · 8 条标签连接」，旧查询清空；返回真实合作可选择林俊杰。最终 canvas 为 1，桌面 scrollWidth / clientWidth 为 1440 / 1440 |
 | 构建与运行包 | root：Vite、`delivery/music-map-space-runtime.zip` | 最终构建成功，61 模块；HTML 1,824,072 B / gzip 619.80 kB。ZIP 640,234 B，6 文件：页面、两个后端文件、package、运行说明与来源许可；无数据库、用户照片或 HF 原始 CSV。无新依赖或后端迁移 |
 | 版本与文档 | spatial_docs、root | MVP 0.13.0 / 文档 2.4；README、三份产品文档、视觉、比赛当前介绍、交付和变更记录同步。旧图、0.4 视频和历史验收保持原版本边界 |
+| GitHub | [PR #3](https://github.com/musicMapTeam/musicMap/pull/3) | 实现从 `feat/music-network` 提交；沿用既有 Build demo 工作流，按用户授权在检查通过后合并。检查结果及合并时间以 PR 为准 |
 
 本轮只做生产构建、上述 UI 路径与静态审阅，没有新增或运行测试套件。390×844 是模拟视口；实体手机双指 / 帧率、公网部署、正式比赛视频与目标用户试用仍未完成。完整图指当前已收录数据集，不是完整华语音乐百科。
 
