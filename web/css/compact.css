@@ -6,8 +6,6 @@ html { scrollbar-width:thin; scrollbar-color:var(--line) transparent; }
 .primary-nav .nav-item { min-height:44px; padding:9px 16px; }
 .masthead-tools { justify-self:end; display:flex; align-items:center; gap:12px; }
 .masthead-tools .demo-help { min-width:36px; width:36px; min-height:36px; height:36px; color:var(--muted); border:0; }
-.theme-launcher { min-height:42px; padding:8px 12px; gap:10px; border:0; font-size:12px; }
-.theme-launcher__swatch { width:23px; height:23px; }
 .main-content { padding:24px 36px; min-height:calc(100dvh - 80px); }
 .about-dialog { max-width:540px; padding:28px; }
 .about-top { align-items:center; margin-bottom:24px; }
@@ -27,10 +25,6 @@ html { scrollbar-width:thin; scrollbar-color:var(--line) transparent; }
 html[data-theme='sakura'] .space-page--home .sp-hero { min-height:580px; }
 html[data-theme='sakura'] .space-page--home .sp-hero__content { max-width:none; }
 html[data-theme='sakura'] .space-page--home .sp-hero>.theme-world { min-height:0; }
-html[data-theme='zine'] .space-page--home .sp-hero { min-height:590px; }
-html[data-theme='zine'] .space-page--home .sp-hero__content { max-width:none; }
-html[data-theme='zine'] .space-page--home .sp-hero__image { height:56%; }
-html[data-theme='zine'] .space-page--home .sp-hero__second { bottom:100px; }
 @media (min-width:761px) {
   .space-page--demo .sp-demo-header { padding-bottom:12px; }
   .space-page--demo .sp-demo-bar { padding-block:8px; }
@@ -46,16 +40,6 @@ html[data-theme='zine'] .space-page--home .sp-hero__second { bottom:100px; }
   .map-experience.map-experience--compact .map-stage { height:clamp(360px,calc(100dvh - 460px),430px); }
 }
 
-/* Compact chooser: previews do the talking. */
-.theme-dialog { width:min(850px,calc(100vw - 40px)); padding:28px; }
-.theme-dialog__top { margin-bottom:26px; align-items:center; }
-.theme-dialog__top h2 { font-size:24px; margin:0; }
-.theme-options { gap:18px; }
-.theme-option { padding:8px; }
-.theme-option__title { margin:12px 4px 4px; }
-.theme-option__title b { font-size:15px; }
-.theme-dialog__footer { margin-top:22px; padding-top:20px; }
-.theme-dialog__footer p { font-size:12px; }
 
 /* Room entry and working views retain only the next useful action. */
 .live-page { padding-bottom:0; }
@@ -105,10 +89,9 @@ dialog:hover::-webkit-scrollbar-thumb,dialog:focus-within::-webkit-scrollbar-thu
 @media (forced-colors:active) { .os-theme-music { --os-handle-bg:CanvasText; --os-handle-bg-hover:Highlight; } dialog { scrollbar-color:auto; } }
 
 @media (min-width:761px) and (max-height:780px) {
-  .space-page--home .sp-hero,html[data-theme='sakura'] .space-page--home .sp-hero,html[data-theme='zine'] .space-page--home .sp-hero { min-height:500px; }
+  .space-page--home .sp-hero,html[data-theme='sakura'] .space-page--home .sp-hero { min-height:500px; }
   .space-page--home .sp-hero h1 { font-size:clamp(60px,6vw,86px); }
   html[data-theme='sakura'] .space-page--home .sp-hero h1 { font-size:clamp(50px,5.1vw,68px); }
-  html[data-theme='zine'] .space-page--home .sp-hero h1 { font-size:clamp(56px,6vw,86px); }
 }
 @media (max-width:1150px) and (min-width:761px) {
   .app-masthead { grid-template-columns:1fr auto auto; gap:14px; padding-inline:28px; }
@@ -121,25 +104,12 @@ dialog:hover::-webkit-scrollbar-thumb,dialog:focus-within::-webkit-scrollbar-thu
   .brand-wordmark { font-size:24px; }
   .brand { min-height:42px; }
   .masthead-tools { gap:4px; }
-  .theme-launcher { padding:6px; gap:7px; font-size:11px; }
   .masthead-tools .demo-help { width:32px; min-width:32px; }
   .main-content { padding:18px 20px 28px; min-height:calc(100dvh - 130px); }
   .mobile-nav { min-height:60px; padding-block:4px; }
   .mobile-nav .nav-item { min-height:48px; gap:5px; }
-  .space-page--home .sp-hero,html[data-theme='sakura'] .space-page--home .sp-hero,html[data-theme='zine'] .space-page--home .sp-hero { height:auto; min-height:0; margin-bottom:0; }
+  .space-page--home .sp-hero,html[data-theme='sakura'] .space-page--home .sp-hero { height:auto; min-height:0; margin-bottom:0; }
   .space-page--home .sp-hero__content { max-width:none; }
-  html[data-theme='zine'] .space-page--home .sp-hero__image { height:210px; }
-  .theme-dialog { width:calc(100vw - 28px); padding:20px; }
-  .theme-dialog__top { margin-bottom:20px; }
-  .theme-options { gap:10px; }
-  .theme-option { grid-template-columns:94px minmax(0,1fr); padding:8px; gap:12px; }
-  .theme-preview { grid-row:auto; min-height:0; height:92px; }
-  .theme-option .theme-preview strong { font-size:20px; }
-  .theme-option--festival .theme-preview strong { font-size:18px; }
-  .theme-option--zine .theme-preview strong { font-size:21px; }
-  .theme-option__title { align-self:center; margin:0; }
-  .theme-dialog__footer { padding-top:16px; margin-top:18px; gap:12px; }
-  .theme-dialog__footer .button { min-width:84px; }
   .records-heading h1 { font-size:30px; }
   .records-heading .button { padding-inline:12px; font-size:12px; }
   .live-entry-head { margin-bottom:22px; }

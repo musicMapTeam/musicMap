@@ -1,14 +1,14 @@
 # 实施与演示规格
 
-版本：2.1 · 2026-09-27，对应应用 MVP 0.10.0。产品范围见[产品方案](01-product-plan.md)，比赛交付见[交付方案](02-delivery-plan.md)。本轮调整首次主题、联网制卡、导出预览及收藏后的界面位置，沿用后端接口、照片权限与数据库结构。本轮构建和浏览器结果见[项目状态](../../docs/PROJECT_STATUS.md)记录；第 8 节旧证据保留原版本。
+版本：2.2 · 2026-09-27，对应应用 MVP 0.11.0。产品范围见[产品方案](01-product-plan.md)，比赛交付见[交付方案](02-delivery-plan.md)。本轮只保留樱下放映，统一空间导航，修整邀请、草稿与回访，沿用后端接口、照片权限与数据库结构。本轮构建和浏览器结果见[项目状态](../../docs/PROJECT_STATUS.md)记录；第 8 节旧证据保留原版本。
 
 ## 1. 技术决定
 
 | 部分 | 当前实现 | 边界 |
 |---|---|---|
 | 页面 | HTML / CSS / JavaScript ES 模块；Vite 8.3.1 + vite-plugin-singlefile 2.3.3 | 复用当前原生 JavaScript，不迁移框架 |
-| 视觉 | DOM / SVG、主题 CSS；Three 0.186.1 全屏透视小院 + Sakura Crossing cel / 深度描线 / 调色 / FXAA；GSAP 3.15.0 / Flip 管镜头、抬卡和弹窗 | sakura 为首次默认，跨路由常驻，手机独立机位，切主题销毁；zine 保留刊物方向 |
-| 外观偏好 | `web/js/themes.js`；localStorage `music-map-visual-theme:v1` | 仅保存主题 ID，与身份、路线、草稿和记录分开；切换不重载页面 |
+| 视觉 | DOM / SVG、樱花 CSS；Three 0.186.1 全屏透视小院 + Sakura Crossing cel / 深度描线 / 调色 / FXAA；GSAP 3.15.0 / Flip 管镜头、抬卡和弹窗 | 仅保留 sakura，跨路由常驻，手机独立机位；页面与 PNG 使用同一艺术方向 |
+| 场景外壳 | `web/js/themes.js` 固定管理樱花场景 | 不读写或监听旧外观键；旧键即便存在也无效果，不改业务存储 |
 | 滚动 | OverlayScrollbars 2.16.0 增强 body，自动隐藏的 6px 浮动条；弹窗使用原生细条 | 保留浏览器滚动与键盘导航；仅前端依赖 |
 | 内容 | 11 位艺人、10 首作品、10 条共同演唱关系与逐人制作署名；独立 HF 开放曲库 120 首；保留虚构示例及两张 AI 生成图 | 共同署名不推断制作工种；试听链接撤下，QQ 同版本直达待核；不内置音频 |
 | 本地情景状态 | localStorage `music-map-space:v1`，两个示例角色 | 仅当前浏览器；可选本机照片，不上传服务 |
@@ -22,51 +22,50 @@
 
 源码分工：外壳 `web/js/app.js`、本人主页 `home.js`、Map `map.js` / `map-data.js` / `map-catalogue.js`、开放曲库 `open-catalogue.js`、音乐收藏 `music-library.js`、本地示例 `space.js`、联网房间 `live.js`、现场收藏 `live-library.js`、照片 `live-photo.js`、票根 `ticket-export.js`、界面动画 `motion.js`；服务入口 `server/index.js`，数据库 `server/db.js`。使用 hash 路由，依赖由锁文件固定。Three 场景随功能切换镜头，HTML 层负责输入与业务操作；OverlayScrollbars 调整滚动条呈现。没有引入 React、测试框架或推理模型。
 
-### 0.10 页面与操作
+### 0.11 页面与操作
 
-- 外壳使用桌面悬浮左导轨、手机底部导航和右上角外观工具。`app-studio.css` 统一间距、颜色、圆角与操作层；保留原 hash 路由和既有身份、示例、探索存储。
-- 普通首页由 `home.js` 读取本人现场收藏，展示最近的本人卡；没有卡时的预置内容注明示例。「记录我的现场」或工作桌进入真实制卡，「邀请朋友」进入房间邀请或入场。切换照片只更新选中属性，不重建卡片 DOM；点本人卡进收藏，点示例进本地情景。浏览器返回空 hash 时回首页。
-- `space.js` 保留显式本地双角色工作区及旧业务 payload；普通首页与示例不混用身份、计数或记录。樱花首页由 `#sakura-world` 全屏小院承担主画面，其他主题保留照片卡叠。
-- Map 使用 `.map-studio` 与 `map-studio.css`：首字彩色唱片节点、单条低对比轨道、真实关系线、作品短浮卡和底部路线。`map-credits.css` 呈现逐人署名，作品名与“谁做了什么”打开详情；各工种有独立来源。顶部“开放曲库”打开独立搜索弹窗，原邻居、挑战、路径与记录含义保持。试听链接撤下，不新增站内播放器。
-- 收藏、取消与撤销后保留 Map 视角，恢复操作焦点、折叠状态与滚动位置；音乐收藏订阅同步按钮和当前收藏计数。取消真实曲目收藏不删除会话中的探索历史。
-- 「我的记录」默认「我的现场」，另有「音乐收藏」「探索路线」「示例」。现场收藏按本人卡片与双联浏览，详情可下载、继续场次或主动重入；个人收藏不批量发布到房间照片墙。联网房间保留照片工作区、私藏／展示和申请状态。
-- 外壳为 body 初始化 OverlayScrollbars 2.16.0，使用自动隐藏的 6px 浮动条；弹窗保持原生滚动与细条。样式随主题变化，不接管卡片、身份或交换数据。许可与来源见[第三方说明](../../THIRD_PARTY_NOTICES.md)。
+- 顶部品牌与一套空间导航连接小院、唱片店、照片墙和收藏，移除主题选择。HTML 内容采用紧凑纸面层，场景保留雨篷、印刷唱片、樱树与道具细节，说明仅出现在相关决定处。
+- `home.js` 读取本人收藏，保留近期私人卡入口；无卡时预置内容注明示例。记录入口进入真实制卡，邀请入口有房间直接展示邀请码，无房间走昵称→创建→邀请。首页提供邀请码入口；邀请码在入场页填写，加入由用户确认。
+- 没有 hash 的访问直接进入首页，不被上次页面覆盖；返回空 hash 同样回首页。邀请链接仍进入对应入场流程。点本人卡进收藏，点示例进明确的本地情景。
+- `space.js` 保留本地双角色和旧 payload；普通首页与示例不混用身份、计数或记录。`#sakura-world` 全屏小院承担主画面。
+- Map 保留唱片节点、低对比轨道、关系线、短作品浮卡和路线。作品可查看逐人署名及具体工种来源，开放曲库独立搜索。没有试听链接或站内播放器。
+- 收藏、取消和撤销恢复 Map 焦点、折叠状态与滚动；订阅同步按钮和计数。移除真实曲目收藏不删除探索历史。
+- 我的记录默认本人现场，另有音乐、路线和示例。双联为空且仍在场时回到已有房间换卡；身份失效给重新入场入口，401 说明新身份无法带回旧记录。私人收藏不批量发布到照片墙。
+- 房间把其他房间与离开收进原生 `details.live-room-menu`，不常驻版本号和正常同步时间；异常连接、待回应、私藏与同意状态保留。
+- 同一 live 页面内关闭再开编辑器，保留照片、短句、可见范围及步骤，修改后显示“草稿未保存”。保存成功或切换房间清理；草稿不落盘，刷新或切页不承诺恢复。照片处理的 `photoSelection` 和 `currentDraft` 边界继续防止旧异步结果写回新草稿。
+- body 使用 OverlayScrollbars 2.16.0 的自动隐藏细浮动条，弹窗保持原生滚动；许可见[第三方说明](../../THIRD_PARTY_NOTICES.md)。
 
-### 外观模块与生命周期
+### 樱花模块与生命周期
 
 | 文件 | 职责 |
 | --- | --- |
-| `web/index.html` | 首屏读取独立偏好键，仅接受 `festival` / `sakura` / `zine`；首次默认 sakura，保留有效旧偏好 |
-| `web/js/themes.js` | 右上角主题按钮与选择对话框、偏好保存、根节点 `data-theme`、主题色和色彩模式；与业务状态独立 |
-| `web/css/themes.css` | 主题选择入口、共享样式和外观切换基础 |
-| `web/css/theme-sakura.css` / `theme-zine.css` | 樱下放映 / 独立刊物的页面、卡片、表单和结果视觉；festival 沿用基础样式 |
-| `web/css/app-studio.css` / `space-studio.css` / `map-studio.css` | 在旧主题样式之后加载；统一 0.6 外壳、照片卡工作台与唱片图谱构图 |
-| `web/js/sakura-world.js` | 原创小院、开放唱片店、树下舞台、照片墙、工作桌与店内收藏模型 |
-| `web/js/sakura-scene.js` | Three 0.186.1 场景、透视机位、卡片贴图、拾取、镜头控制与销毁 |
-| `web/css/spatial-world.css` | 全屏樱花场景、当前功能的 HTML 操作层与手机构图 |
-| `web/js/motion.js` | GSAP 3.15.0 / Flip 驱动卡片和弹窗动画，三主题共用并支持减少动态 |
-| `web/js/open-catalogue.js` | HF 精选数据搜索与展示，和人工核实制作名单分开 |
-| `web/js/home.js` / `live-library.js` | 本人主页、跨场次现场收藏和授权照片展示 |
-| `web/js/music-library.js` | 独立本机音乐收藏；真实精选与 HF 作品的来源、保存和移除 |
-| `web/css/map-credits.css` | 作品按人合并工种、署名表与逐工种来源标记 |
-| `web/js/vendor/sakura/` | MIT `toon.js` / `post.js` / `palette.js`；cel 材质、彩色阴影、深度描线、调色与 FXAA；`SOURCE.json` 记录固定提交及适配 |
-| `web/js/ticket-export.js` / `web/css/memory-export.css` | 按主题绘制单卡 / 双联 PNG；原生 dialog 展示实际成品，提供下载与可用的文件分享 |
+| `web/index.html` | 固定首屏 `data-theme="sakura"`，不读取历史主题偏好 |
+| `web/js/themes.js` | 名称沿用，固定管理常驻樱花场景；无主题按钮、选择弹窗或偏好同步 |
+| `web/css/themes.css` / `theme-sakura.css` | 纸面 token、浅色业务页面、樱花卡片与表单；`theme-zine.css` 删除 |
+| `web/css/app-studio.css` / `space-studio.css` / `map-studio.css` | 既有外壳、照片工作台和图谱的基础构图 |
+| `web/js/sakura-world.js` | 原创小院、店铺雨篷、印刷唱片、樱树、照片墙、工作桌与收藏道具 |
+| `web/js/sakura-scene.js` | Three 场景、透视机位、授权卡片贴图、拾取、镜头控制与销毁 |
+| `web/css/spatial-world.css` | 全屏场景、HTML 操作层与手机构图 |
+| `web/js/motion.js` | GSAP / Flip 驱动卡片和弹窗，支持减少动态 |
+| `web/js/open-catalogue.js` / `music-library.js` | HF 搜索与独立本机音乐收藏，保留来源和数据集 |
+| `web/js/home.js` / `live-library.js` | 本人主页、跨场次收藏、授权照片及回访入口 |
+| `web/css/map-credits.css` | 按人合并工种与逐工种来源 |
+| `web/js/vendor/sakura/` | MIT cel、彩色阴影、深度描线、调色与 FXAA；`SOURCE.json` 固定上游提交 |
+| `web/js/ticket-export.js` / `web/css/memory-export.css` | 仅绘制樱花单卡和双联，原生 dialog 展示 PNG 成品，提供下载和可用的文件分享 |
 
-外观通过右上角主题按钮即时选择，按钮显示当前主题名，存储键为 **`music-map-visual-theme:v1`**。没有有效偏好时默认 sakura；有效旧偏好原样保留。模块不调用业务保存、换角色、退出房间、申请或接受操作，不重载页面。首屏与跨标签同步使用同一主题白名单；业务存储和匿名凭据保持原有键。主题规范见 [VISUAL_THEMES.md](../../docs/VISUAL_THEMES.md)。
+历史键 `music-map-visual-theme:v1` 不再读写或监听，即便存在也不影响界面；不主动迁移或清除它。匿名身份、探索、收藏和示例存储键保持不变。规范见 [VISUAL_THEMES.md](../../docs/VISUAL_THEMES.md)。
 
-`themes.js` 在 `sakura` 主题下将场景挂到全屏壳层 `#sakura-world`，同一 scene / renderer 跨 hash 路由保留。基础机位是 `home` 小院、`explore` 唱片店、`live` 照片墙、`records` 店内收藏；`editor` 走近工作桌，`photo` 靠近选中的照片。手机使用单独机位。导航与照片拾取驱动透视相机和物件移动，新选择可打断旧转场；减少动态直接显示目标，切走主题销毁场景。小院与道具由本项目编写，渲染方法复用 Sakura Crossing MIT 源码，未复制其完整街区、人物、纹理原图或音频。
+`#sakura-world` 的同一 scene / renderer 跨 hash 路由保留。基础机位为 `home`、`explore`、`live`、`records`；`editor` 走近工作桌，`photo` 靠近选中照片。手机独立取景；新选择可打断旧转场，减少动态直接显示目标。场景销毁时释放后处理目标、材质、几何、纹理、renderer 和监听。
 
-场景业务接口为 `api.spatial.publish({mode,cards,onPhoto,onEdit})`、`focus(kind,id?)` 和 `restore()`。本人主页发布 `home`，本地示例发布 `exchange`，Live 发布 `live`；卡片含 `id/src/title/subtitle/alt/isDemo`，最多 6 张。首页可展示本人私卡，同伴只发布当前展示卡；缺自卡时的本地 seed 明示示例。联网照片 `src` 只取 photo store 已加载的授权 blob，不把 `photoId` 转为公共网址。
+业务接口沿用 `api.spatial.publish({mode,cards,onPhoto,onEdit})`、`focus(kind,id?)`、`restore()`。本人主页发布 `home`，示例发布 `exchange`，Live 发布 `live`；卡片含 `id/src/title/subtitle/alt/isDemo`，最多 6 张。首页可展示本人私卡，同伴只发布当前展示卡；缺自卡的 seed 明示示例。联网 `src` 只来自已授权读取的 blob，不把照片 ID 改为公共网址。清缓存、退出或撤权前先撤下场景贴图，再释放 blob。
 
-照片加载后重新发布，清缓存、退出或权限失效时先清空场景再释放 blob。场景点击复用现有预览、编辑器、指定两卡申请和双联；HTML 按钮使用相同 focus。弹窗关闭恢复基础机位，替换弹窗时延后恢复，避免抢新镜头。没有新增网络照片接口、交换状态或数据库表。
+场景拾取复用已有预览、编辑、申请和双联操作，关闭弹窗恢复基础机位，替换弹窗时延后恢复。小院几何、程序纹理与构图由本项目编写；渲染方法复用 Sakura Crossing MIT 源码，未复制其完整街区、人物、纹理原图或音频。Three 0.180.0 的上游 shader 补丁已按项目 0.186.1 适配；独立材质池、透视深度描线与 FXAA 保持。空闲 30fps / 转场 60fps 是调度目标，不是设备实测保证。
 
-上游 Three 0.180.0 的 cel shader 补丁按本项目 0.186.1 源码位置适配；当前使用透视相机，深度描线与近远裁切同步。`createCelMaterials()` 为挂载场景创建独立的材质和色阶纹理池；`Pipeline` 控制深度墨线、调色与 FXAA。GSAP 管理镜头时间线，空闲渲染目标 30fps、转场目标 60fps；这些是调度目标，不是设备实测保证。减少动态时使用静态画面；销毁释放后处理目标、材质、几何、纹理、renderer 及监听。画面与实际性能范围按项目状态记实。
+PNG 只保留樱花绘制。双联取已接受快照，单卡取本人的当前卡；照片、文字、作者与交换数据不被视觉整理改写。预置图保留 AI 标记，上传图通过原授权 blob 读取。
 
-PNG 在开始异步加载照片和字体前确定本次导出主题；用户稍后切换页面外观，不改变已开始导出的画风。双联继续使用已接受的两卡快照，单卡使用自己的当前卡；主题不写回照片、文案、作者或交换数据。三套绘制共用照片披露逻辑，预置示例保留 AI 标识；上传照片通过既有授权 blob URL 读取，不因外观转换而改放公共目录。
+`downloadCard` / `downloadTicket` 接口不变：同一 canvas 生成 PNG，保留下载并展示实际 blob 图片，可再次下载或长按保存。仅在 `navigator.canShare({files})` 支持时显示分享，用户点击才调用 `navigator.share`；取消不报错。预览避开全局 GSAP 位移动画，关闭、下次导出、返回或离页释放对象 URL，不增加照片权限。
 
-`downloadCard` / `downloadTicket` 调用接口不变：生成同一 canvas 的 PNG，保留下载动作并用原生 dialog 预览 blob 图片，可再次下载或长按保存。仅在 `navigator.canShare({files})` 支持该文件时显示分享按钮，点击后才调用 `navigator.share`，取消不报错。预览最多 460px，避开全局 GSAP 位移动画；关闭、下一次导出、浏览器返回或离页时释放对象 URL。没有新增图片上传或读取权限。
-
-Three 与实际复用的 Sakura Crossing 模块均保留 MIT 许可；固定提交、文件哈希及本地改动见[源码清单](../../web/js/vendor/sakura/SOURCE.json)和 [THIRD_PARTY_NOTICES](../../THIRD_PARTY_NOTICES.md)。0.5 的[研究记录](../../references/research/2026-09-27/sakura-visual-reference.md)保留当时仅作视觉参考的决定，不能代替 0.6 实际代码采用范围。
+Three 与 Sakura Crossing 模块保留 MIT 许可，GSAP 使用 Standard No Charge 许可。固定提交和改动见[源码清单](../../web/js/vendor/sakura/SOURCE.json)与[第三方说明](../../THIRD_PARTY_NOTICES.md)。0.5 的[研究记录](../../references/research/2026-09-27/sakura-visual-reference.md)保留原历史范围。
 
 ### 0.7 数据来源与复现
 
@@ -111,7 +110,7 @@ python scripts/datasets/download_hf_catalogue.py
 
 各用户每房一张持久化卡片：短句 ≤80 字，环节为 `encore` / `chorus` / `lights`，视角 `perspective` 为 `stage` / `crowd` / `friends` / `detail`。`photoId` 指向本人在本房上传的照片，或为 `null`；`photoKey` 仍为 `stage` / `crowd`，作为预置图片回退。`trackId` 为 `co-0` 或空，在自定义房间仅表示是否带上本房共同歌名，不扩展成真实曲库 ID 或试听能力。
 
-编辑器使用同一个 form，在「选照片」「留一句」两个 fieldset 间切换可见性，保留输入与草稿。新卡从选图开始，已有卡直接编辑短句，可返回换图；压图完成前不能继续。环节与歌名放在「更多细节」，私藏／展示和保存结果在第二步及底部显示。步骤切换不上传、保存或公开，最终提交沿用原卡片接口。
+编辑器使用同一个 form，在「选照片」「留一句」两个 fieldset 间切换可见性，保留输入与草稿。新卡从选图开始，已有卡直接编辑短句，可返回换图；压图完成前不能继续。环节与歌名放在「更多细节」，私藏／展示和保存结果在第二步及底部显示。步骤切换不上传、保存或公开，最终提交沿用原卡片接口。关闭再开在当前页面继续草稿，成功保存或换房清理；不写 localStorage，不承诺跨页面恢复。
 
 前端调用同源 `/api/live` 并短轮询。浏览器持有随机 bearer 凭据，数据库只存其哈希；刷新可返回已加入房间。清除浏览器数据后无法找回原身份。服务不可用时显示实际错误并保留制卡输入，不伪造申请或交换成功。
 
@@ -135,7 +134,7 @@ python scripts/datasets/download_hf_catalogue.py
 
 `DELETE /library/records/:id` 仅按记录 ID 与本人 `owner_id` 删除，离场后也可用；不删除对方副本、交换或照片。收藏页读取不自动恢复成员关系，回场只预填邀请码，等待用户点击加入。
 
-Live 的入口 payload：`roomId` 选择本人已加入场次；`intent:'make-card'` 在当前场次开编辑器，没有场次则创建后开编辑器；`intent:'invite'` 有当前场次则开邀请；`joinCode` 加 `intent:'join-room'` 仅预填加入码。携带 `songDraft:{id,title,artists,source,dataset}` 时始终走新建场次，只将 `title` 写入可编辑的歌名草稿，不改旧房间。
+Live 的入口 payload：`roomId` 选择本人已加入场次；`intent:'make-card'` 在当前场次开编辑器，没有场次则创建后开编辑器；`intent:'invite'` 有当前场次则开邀请，没有场次则留昵称、创建后开邀请；`joinCode` 加 `intent:'join-room'` 仅预填加入码。携带 `songDraft:{id,title,artists,source,dataset}` 时始终走新建场次，只将 `title` 写入可编辑的歌名草稿，不改旧房间。
 
 音乐收藏独立保存为 `{version:1,tracks:[],imports:[]}`；条目含 `id / title / artists / source / dataset / savedAt`。真实精选与 HF 可留下，虚构作品仍属于示例。旧真实 Map 收藏仅导入一次，移除后不再次补回；删歌不删路线。它仅在本机，不写入 SQLite 或声明跨设备同步。
 
@@ -156,7 +155,7 @@ Live 的入口 payload：`roomId` 选择本人已加入场次；`intent:'make-ca
 | Record | 记录所有者、房间、已接受交换 ID、两卡快照；每位用户每次交换一条 |
 | LocalMemory | 本地单卡收藏、新接受后自动保存的双联，以及兼容手存的旧接受记录；与联网 Record、Map 记录分开 |
 | MapSession | `dataset`、图谱版本、类型、完成状态、起点 / 当前艺人、挑战目标、模式 / 视角、当前路径、完整事件、主动留下曲目、原漫游引用 |
-| VisualTheme | 独立 localStorage 偏好，值为 `festival` / `sakura` / `zine`；不是数据库表，不属于 Card、Exchange 或 Record 快照 |
+| Sakura presentation | 固定樱花艺术方向；无新业务对象或数据库表，不写入 Card、Exchange 或 Record 快照 |
 
 SQLite 包含用户、房间、成员、照片、卡片、交换和记录表。新交换序列化完整卡片对象，因而同时冻结照片 ID、活动、环节、视角和短句；后续换图、改卡、撤卡不改写已有快照。Map 的合作依据、Space 的共同兴趣和用户自述到场保持不同含义。
 
@@ -236,9 +235,9 @@ npm start
 仓库有多阶段 Dockerfile：构建前端，运行时保留 Node 24、服务和 `dist/`，以非 root 用户运行。
 
 ```powershell
-docker build -t music-map-space:0.10.0 .
+docker build -t music-map-space:0.11.0 .
 docker volume create music-map-data
-docker run -d --name music-map-space --restart unless-stopped -p 127.0.0.1:8787:8787 -v music-map-data:/app/data music-map-space:0.10.0
+docker run -d --name music-map-space --restart unless-stopped -p 127.0.0.1:8787:8787 -v music-map-data:/app/data music-map-space:0.11.0
 ```
 
 这些是部署说明，不代表已经执行。Docker 内服务监听 `0.0.0.0`，上述端口映射仍只开放到宿主机环回地址。生产由反向代理将同一 HTTPS 域名的页面和 `/api/live` 全部转发到这个 Node 实例；需要定向访问时也在入口限制站点访问。保留 `music-map-data` volume，不把数据库放进镜像或无持久磁盘的平台。采用单实例，不启用多个独立 SQLite 副本的自动横向扩容。实际托管、TLS、访问控制与备份安排尚未执行。
@@ -247,7 +246,8 @@ docker run -d --name music-map-space --restart unless-stopped -p 127.0.0.1:8787:
 
 | 项目 | 当前安排 | 记录位置 |
 |---|---|---|
-| 0.10 制卡与成品预览 | 首次樱花、同表单两步制卡、真实 PNG 预览、收藏保位与首页返回；构建和浏览器结果待记录 | [项目状态](../../docs/PROJECT_STATUS.md) |
+| 0.11 樱花与用户路径整理 | 单一樱花界面和 PNG、空间导航、邀请码、邀请建房、同页草稿及双联回访；本轮构建和实际画面按任务记录登记 | [项目状态](../../docs/PROJECT_STATUS.md) |
+| 0.10 制卡与成品预览历史证据 | 首次樱花、同表单两步制卡、真实 PNG 预览、收藏保位与首页返回；保留当时的构建和实操范围 | [项目状态](../../docs/PROJECT_STATUS.md) |
 | 0.9 本人主页与收藏历史证据 | 当时的构建及主页恢复、跨场次回访、HF 带歌建场、私藏保存与邀请实操保留 | [项目状态](../../docs/PROJECT_STATUS.md) |
 | 0.8 全屏小院历史证据 | 六类机位、独立手机取景、授权照片贴图、工作桌与店内收藏；保留当次构建、画面和运行包记录 | [项目状态](../../docs/PROJECT_STATUS.md) |
 | 0.7 空间与数据历史证据 | 常驻透视小院、GSAP / Flip、逐人制作署名、完整 HF CSV 与 120 首开放曲库；保留当次记录 | [项目状态](../../docs/PROJECT_STATUS.md) |
@@ -265,9 +265,13 @@ docker run -d --name music-map-space --restart unless-stopped -p 127.0.0.1:8787:
 
 ## 8. 证据与待检查边界
 
-### 0.10 当前整合
+### 0.11 当前整合
 
-首次主题、两步制卡、成品预览与收藏保位已进入实现；构建、浏览器画面、打包及同步见[项目状态](../../docs/PROJECT_STATUS.md)登记。文件分享只在支持的浏览器显示，代码存在不代表已在实体手机操作。
+当前规格统一为樱下放映，并整理入口、邀请、制卡草稿和收藏回访。本轮构建、实际浏览器画面、运行包、PR 与合并结果只以[项目状态](../../docs/PROJECT_STATUS.md)为准；检查范围逐项登记，实体手机和外部用户试用仍未完成。
+
+### 0.10 历史结果
+
+首次默认樱花、两步制卡、真实 PNG 预览与音乐收藏保位的当次构建和浏览器结果见[项目状态](../../docs/PROJECT_STATUS.md)。文件分享按钮存在不代表已在实体手机发送。
 
 ### 0.9 历史结果
 
@@ -329,4 +333,4 @@ docker run -d --name music-map-space --restart unless-stopped -p 127.0.0.1:8787:
 | 线上部署 | 评审实际可访问，API 同源，磁盘持续保留 | 尚未部署；Dockerfile 存在不等于容器已运行 |
 | 音频与真实元数据 | 来源及实际能力准确 | 尚未接入 |
 
-以上 0.2.0 运行证据由整合者及接口检查协作者提供，当时没有新增或运行测试框架 / 套件。本次文档同步没有新增检查；0.4.0 至 0.9 按历史范围保留，0.10 由任务记录记实，不将局部检查扩展成未执行的环境或路径。
+以上 0.2.0 运行证据由整合者及接口检查协作者提供，当时没有新增或运行测试框架 / 套件。本次文档同步没有新增检查；0.4.0 至 0.10 按历史范围保留，0.11 由任务记录记实，不将局部检查扩展成未执行的环境或路径。

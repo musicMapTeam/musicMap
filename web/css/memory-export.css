@@ -39,8 +39,6 @@
 .memory-export__share { min-height:34px; padding:3px 12px; border:0; color:var(--muted); background:transparent; font-size:12px; justify-self:center; }
 .memory-export__share:hover:not(:disabled) { color:var(--text); }
 .memory-export__error { margin:0; color:var(--coral); font-size:12px; line-height:1.5; text-align:center; }
-html[data-theme='zine'] .memory-export { border-radius:2px; box-shadow:8px 8px 0 #17191466; }
-html[data-theme='zine'] .memory-export__actions .button { border-radius:2px; }
 @media (max-width:520px) {
   .memory-export { width:calc(100vw - 28px); padding:14px; }
 }

@@ -188,8 +188,7 @@ function mapHTML(map, api, presentation = 'quiet') {
         </div>
       </div>
       <aside class="map-artist-panel" aria-label="${escapeHTML(artist.name)}的作品">
-        <div class="map-artist-panel__heading"><div><span class="map-card-label">${isReal ? '合作唱片' : '示例作品 · 无音频'}</span><h2>${escapeHTML(artist.name)}</h2></div><span class="map-artist-mark" style="--node-tone:${artist.color}" aria-hidden="true"></span></div>
-        ${tracksHTML(session, artist.songIds, api, `在${artist.name}的${isReal ? '入选合作作品' : '示例作品'}中留下`)}
+        <details class="map-record-shelf"><summary><i class="map-record-sleeve" style="--node-tone:${artist.color}" aria-hidden="true"></i><span><strong>${escapeHTML(artist.name)}</strong><small>${artist.songIds.length} 张${isReal ? '合作唱片' : '示例作品'}</small></span>${api.icon('chevron-right')}</summary>${tracksHTML(session, artist.songIds, api, `在${artist.name}的${isReal ? '入选合作作品' : '示例作品'}中留下`)}</details>
       </aside>
     </div>
     <div class="map-studio-dock">

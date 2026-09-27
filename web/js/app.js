@@ -4,7 +4,6 @@ import '../css/space.css';
 import '../css/live.css';
 import '../css/themes.css';
 import '../css/theme-sakura.css';
-import '../css/theme-zine.css';
 import 'overlayscrollbars/overlayscrollbars.css';
 import '../css/compact.css';
 import '../css/app-studio.css';
@@ -17,6 +16,7 @@ import '../css/library.css';
 import '../css/product-finish.css';
 import '../css/live-compose.css';
 import '../css/memory-export.css';
+import '../css/courtyard-ui.css';
 import { OverlayScrollbars } from 'overlayscrollbars';
 import { mountThemes } from './themes.js';
 import { icon } from './icons.js';
@@ -58,7 +58,7 @@ function load() {
 
 const state = load();
 const initialView = location.hash.slice(2);
-if (views.includes(initialView)) state.view = initialView;
+state.view = views.includes(initialView) ? initialView : 'space';
 const invitedRoom = new URLSearchParams(location.search).get('room');
 if (invitedRoom && /^\d{6}$/.test(invitedRoom) && (!initialView || initialView === 'live')) state.view = 'live';
 
@@ -130,7 +130,7 @@ async function onSpatialAction(action) {
 function updateChrome() {
   document.querySelectorAll('[data-current-actor]').forEach(el => { el.textContent = actors[state.actor]; });
   document.querySelectorAll('[data-nav]').forEach(el => {
-    const active = el.dataset.nav === (state.view === 'live' ? 'space' : state.view);
+    const active = el.dataset.nav === state.view;
     el.classList.toggle('active', active);
     if (active) el.setAttribute('aria-current', 'page');
     else el.removeAttribute('aria-current');
@@ -150,9 +150,10 @@ function updateChrome() {
 
 function navItems() {
   return [
-    ['explore', 'compass', '探索'],
-    ['space', 'users', '同场'],
-    ['records', 'bookmark', '我的记录'],
+    ['space', 'heart', '小院'],
+    ['explore', 'compass', '唱片店'],
+    ['live', 'users', '照片墙'],
+    ['records', 'bookmark', '我的收藏'],
   ].map(([view, name, title]) => `
     <button class="nav-item" data-nav="${view}">
       ${icon(name)}<span>${title}</span>
@@ -164,10 +165,10 @@ function shell() {
     <header class="app-masthead app-studio-shell">
       <button class="brand" data-nav="space" aria-label="Music Map 首页">
         <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
-        <span class="brand-wordmark">music<span class="brand-light">map</span></span>
+        <span class="brand-wordmark">樱下放映<small>MUSIC MAP × SPACE</small></span>
       </button>
       <nav class="primary-nav" aria-label="主要导航">${navItems()}</nav>
-      <div class="masthead-tools"><button class="theme-launcher" id="theme-launcher" aria-haspopup="dialog" aria-controls="theme-dialog"><span class="theme-launcher__swatch" aria-hidden="true"></span><span data-theme-name>声浪现场</span></button><button class="demo-help icon-button" id="demo-help" aria-label="关于 Music Map" aria-haspopup="dialog" aria-controls="about-dialog">${icon('info')}</button></div>
+      <div class="masthead-tools"><button class="courtyard-join" data-join-room>${icon('users')}输入邀请码</button><button class="demo-help icon-button" id="demo-help" aria-label="关于 Music Map" aria-haspopup="dialog" aria-controls="about-dialog">${icon('info')}</button></div>
     </header>
     <div id="sakura-world" class="spatial-world" hidden></div>
     <div class="app-body">
@@ -176,11 +177,12 @@ function shell() {
     </div>
     <nav class="mobile-nav" aria-label="手机导航">${navItems()}</nav>
     <dialog id="about-dialog" class="about-dialog" aria-labelledby="about-title">
-      <div class="about-top"><h2 id="about-title">Music Map × Space</h2><button class="icon-button" id="close-about" aria-label="关闭关于">${icon('x')}</button></div>
-      <div class="about-facts"><p><b>探索</b><span>沿合作作品发现音乐，点歌名看每个人的制作署名。</span></p><p><b>同场</b><span>邀请朋友交换现场照片。卡片默认私藏，双方同意后生成双联。</span></p><p><b>示例</b><span>Lin 与阿遥为本地演示角色，场次和配图为虚构。示例记录与房间身份保存在当前浏览器；清除网站数据后，身份无法找回。</span></p></div>
+      <div class="about-top"><h2 id="about-title">樱下放映</h2><button class="icon-button" id="close-about" aria-label="关闭关于">${icon('x')}</button></div>
+      <p class="about-intro">同一刻，另一面。</p><div class="about-facts"><p><b>现场卡</b><span>默认私藏，双方同意后交换。</span></p><p><b>唱片店</b><span>合作作品与制作署名，暂不提供音频。</span></p><p><b>示例</b><span>Lin、阿遥及预置照片均为虚构。</span></p><p><b>身份</b><span>仅在当前浏览器保留，清除网站数据后无法找回。</span></p></div>
       <button class="button button--primary" id="start-experience">知道了</button>
     </dialog>`;
   root.addEventListener('click', event => {
+    if (event.target.closest('[data-join-room]')) navigate('live', { intent: 'join-room' });
     const item = event.target.closest('[data-nav]');
     if (item) {
       document.querySelector('#about-dialog').close();
@@ -228,7 +230,7 @@ function render() {
     else if (state.routePayload?.libraryItemId || state.routePayload?.section === 'live') recordsFilter = 'live';
     else if (state.routePayload?.section === 'music') recordsFilter = 'music';
     const filters = [['live', '我的现场'], ['music', '音乐收藏'], ['map', '探索路线'], ['demo', '示例']];
-    container.innerHTML = `<div class="records-page collection-page"><header class="records-heading"><h1>我的记录</h1><button class="button button--secondary" data-collection-make>${icon('plus')}记录现场</button></header><div class="records-filters" role="group" aria-label="记录分类">${filters.map(([value, label]) => `<button data-records-filter="${value}" aria-pressed="${recordsFilter === value}">${label}</button>`).join('')}</div><div id="collection-content"></div></div>`;
+    container.innerHTML = `<div class="records-page collection-page"><header class="records-heading"><h1>我的收藏</h1><button class="button button--secondary" data-collection-make>${icon('plus')}记录现场</button></header><div class="records-filters" role="group" aria-label="记录分类">${filters.map(([value, label]) => `<button data-records-filter="${value}" aria-pressed="${recordsFilter === value}">${label}</button>`).join('')}</div><div id="collection-content"></div></div>`;
     const content = container.querySelector('#collection-content');
     if (recordsFilter === 'live') cleanup = mountLiveLibrary(content, api);
     if (recordsFilter === 'music') cleanup = mountSavedMusic(content, api);

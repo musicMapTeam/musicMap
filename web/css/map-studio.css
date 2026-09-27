@@ -137,7 +137,6 @@
 }
 
 :root[data-theme='sakura'] .map-studio { --map-disc: #424940; --map-disc-line: #d5d8ad1a; }
-:root[data-theme='zine'] .map-studio { --map-disc: #22261e; --map-disc-line: #bcc08e20; }
 
 @media (max-width: 1100px) {
   :root .map-studio {

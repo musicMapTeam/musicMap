@@ -4,9 +4,7 @@
   --studio-shadow:0 16px 48px #02080d28,0 2px 5px #02080d1c;
   --studio-soft-shadow:0 5px 20px #02080d20; --studio-radius:24px;
 }
-html[data-theme="festival"] { --bg:#12191e; --surface:#1b2329; --surface-raised:#252e34; --line:#e8f1ee22; --text:#eceee8; --muted:#98a8ad; --mint:#a1d8bc; --button-fill:#a1d8bc; --button-ink:#17362c; }
 html[data-theme="sakura"] { --bg:#f4f1e9; --studio-panel:#fffdf6; --studio-well:#ebe9df; --studio-border:#6f665614; --studio-shadow:0 18px 55px #65595113,0 2px 6px #6559510b; --studio-soft-shadow:0 5px 20px #65595110; }
-html[data-theme="zine"] { --bg:#e8e7df; --studio-panel:#f7f5ec; --studio-well:#dedfd3; --studio-border:#24261b19; --studio-shadow:0 8px 0 #20271905,0 18px 35px #2229190e; --studio-soft-shadow:0 5px 18px #24291912; --studio-radius:16px; }
 html[data-theme] body { background:var(--bg); }
 html[data-theme] body::before,html[data-theme] body::after { display:none; }
 html[data-theme] .app-masthead.app-studio-shell { position:fixed; inset:22px auto 22px 20px; z-index:40; width:72px; min-height:0; margin:0; padding:0; display:block; border:0; background:none; }
@@ -25,9 +23,6 @@ html[data-theme] .nav-item.active { color:var(--text); background:var(--studio-w
 html[data-theme] .primary-nav .nav-item.active>.icon { color:var(--mint); }
 html[data-theme] .primary-nav .nav-item:hover { background:var(--studio-well); color:var(--text); }
 html[data-theme] .masthead-tools { position:fixed; right:30px; top:26px; gap:8px; display:flex; align-items:center; }
-html[data-theme] .theme-launcher { min-height:38px; padding:7px 12px; border:1px solid var(--studio-border); border-radius:30px; background:var(--studio-panel); gap:9px; box-shadow:0 2px 6px #00000004; }
-html[data-theme] .theme-launcher [data-theme-name] { font-size:11px; color:var(--muted); }
-html[data-theme] .theme-launcher__swatch { width:19px; height:19px; border:0; border-radius:50%; transform:rotate(-25deg); }
 html[data-theme] .masthead-tools .demo-help { width:38px; height:38px; min-width:38px; min-height:38px; display:grid; place-items:center; border:0; padding:0; color:var(--muted); }
 html[data-theme] .app-body { margin-left:112px; padding:0; min-height:100dvh; }
 html[data-theme] .main-content { max-width:1660px; min-height:100dvh; padding:94px 32px 32px 16px; margin:0 auto; }
@@ -38,26 +33,13 @@ html[data-theme] .button--primary { background:var(--button-fill); color:var(--b
 html[data-theme] .button:hover:not(:disabled) { transform:translateY(-1px); }
 html[data-theme] .button:active:not(:disabled) { transform:translateY(1px); }
 html[data-theme] .icon-button { border-radius:50%; }
-html[data-theme] :is(.about-dialog,.theme-dialog,.live-dialog,.sp-dialog,.map-dialog) { border-radius:var(--studio-radius); border:1px solid var(--studio-border); box-shadow:0 30px 110px #0005; }
+html[data-theme] :is(.about-dialog,.live-dialog,.sp-dialog,.map-dialog) { border-radius:var(--studio-radius); border:1px solid var(--studio-border); box-shadow:0 30px 110px #0005; }
 html[data-theme] dialog::backdrop { background:#0e151c88; backdrop-filter:blur(8px); }
 html[data-theme] .about-dialog { background:var(--studio-panel); }
 html[data-theme] .about-dialog h2 { font-size:23px; letter-spacing:-.04em; margin:0; }
 html[data-theme] .about-facts { border:0; }
 html[data-theme] .about-facts p { display:grid; grid-template-columns:48px 1fr; gap:16px; }
 html[data-theme] .about-facts span { margin:0; font-size:13px; color:var(--muted); }
-html[data-theme] .theme-dialog { width:min(760px,calc(100vw - 32px)); padding:26px; background:var(--studio-panel); }
-html[data-theme] .theme-dialog__top { margin-bottom:22px; }
-html[data-theme] .theme-dialog__top h2 { font-size:22px; margin:0; }
-html[data-theme] .theme-options { gap:12px; }
-html[data-theme] .theme-option { border:1px solid transparent; padding:7px; border-radius:18px; }
-html[data-theme] .theme-option[aria-pressed=true] { background:var(--studio-well); border-color:var(--line); }
-html[data-theme] .theme-preview { border:0; border-radius:12px; aspect-ratio:1.12; padding:15px; }
-html[data-theme] .theme-preview__edition { font-size:8px; }
-html[data-theme] .theme-preview strong { font-size:32px; }
-html[data-theme] .theme-preview__foot { font-size:7px; }
-html[data-theme] .theme-option__title { padding:0 3px; margin:12px 0 3px; }
-html[data-theme] .theme-option__title b { font-size:13px; font-weight:550; }
-html[data-theme] .theme-dialog__footer { margin-top:20px; }
 html[data-theme] .toast { border:0; border-radius:16px; box-shadow:var(--studio-shadow); }
 
 /* Personal collection: tabs and objects, without a document masthead. */
@@ -216,8 +198,6 @@ html[data-theme] .live-invite-layout { border-radius:17px; }
   html[data-theme] .brand-wordmark { position:static; font-size:20px; }
   html[data-theme] .primary-nav { display:none; }
   html[data-theme] .masthead-tools { position:absolute; right:0; top:3px; gap:2px; }
-  html[data-theme] .theme-launcher { padding:7px 9px; min-height:34px; }
-  html[data-theme] .theme-launcher [data-theme-name] { font-size:10px; }
   html[data-theme] .masthead-tools .demo-help { width:32px; min-width:32px; }
   html[data-theme] .app-body { margin:0; padding:0 0 calc(91px + env(safe-area-inset-bottom)); }
   html[data-theme] .main-content { min-height:calc(100dvh - 91px); padding:80px 18px 16px; }
@@ -228,14 +208,6 @@ html[data-theme] .live-invite-layout { border-radius:17px; }
   html[data-theme] .mobile-nav .nav-item.active::before,html[data-theme] .mobile-nav .nav-item::after { display:none; }
   html[data-theme] .toast { bottom:100px; font-size:12px; }
   html[data-theme] .storage-warning { margin:65px 16px -60px; font-size:12px; }
-  html[data-theme] .theme-dialog { padding:20px; max-height:calc(100dvh - 30px); }
-  html[data-theme] .theme-options { grid-template-columns:1fr; gap:6px; }
-  html[data-theme] .theme-option { display:flex; align-items:center; gap:14px; padding:7px; }
-  html[data-theme] .theme-preview { width:112px; aspect-ratio:1.28; flex-shrink:0; padding:10px; }
-  html[data-theme] .theme-preview strong { font-size:20px; }
-  html[data-theme] .theme-preview__edition,html[data-theme] .theme-preview__foot { display:none; }
-  html[data-theme] .theme-preview__art { transform:scale(.7); transform-origin:right center; }
-  html[data-theme] .theme-option__title { flex:1; padding:0 5px 0 0; margin:0; }
   html[data-theme] .records-page { padding-top:4px; }
   html[data-theme] .records-heading { margin-bottom:23px; gap:12px; }
   html[data-theme] .records-heading h1 { font-size:23px; }
