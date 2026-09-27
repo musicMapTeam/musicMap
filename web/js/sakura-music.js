@@ -4,8 +4,12 @@ import { gsap } from 'gsap';
 const PAPER = { x: 1.86, z: 1.25 };
 const MIN_ZOOM = 1;
 const MAX_ZOOM = 2.8;
+const SLEEVE = .38;
+const INK_WIDTH = { quiet: .010, route: .018, answer: .013, stub: .014 };
 
-/** One complete, persistent graph printed on the record shop's real table. */
+/** One persistent graph printed on the record shop's real table. In a 寻声 round,
+ *  unknown artists lie face down (a shared paper back, no name, no colour) and only
+ *  flipped songs are inked; the page never receives more than the player uncovered. */
 export function createSakuraMusic({ world, cel, host, canvas, camera, reduced, onAction, onChange, isActive, framing }) {
   const furniture = new THREE.Group();
   furniture.name = 'record-connection-table'; furniture.position.set(0, 1.19, -1.3); furniture.visible = false;
@@ -30,22 +34,28 @@ export function createSakuraMusic({ world, cel, host, canvas, camera, reduced, o
   const paper = material({ color: '#ecebe4', bands: 'soft' });
   const brass = material({ color: '#c8a774' });
   const cardStock = material({ color: '#eeeee5', bands: 'soft' }, true);
+  const backStock = material({ color: '#e2d7c0', bands: 'soft' }, true);
   const vinyl = material({ color: '#39484b' }, true);
   const grooveInk = material({ color: '#70877c' }, true);
   const recordCenter = material({ color: '#c8a774' }, true);
-  const selectedInk = material({ color: '#416f62', bands: 'soft' }, true);
-  const pathInk = material({ color: '#bb8d56', bands: 'soft' }, true);
+  const selectedInk = material({ color: '#3f6d5f', bands: 'soft' }, true);
+  const targetInk = material({ color: '#c0606f', bands: 'soft' }, true);
+  const pathInk = material({ color: '#b98642', bands: 'soft' }, true);
   const edgeInks = {
-    quiet: material({ color: '#a3a398', bands: 'soft' }, true),
-    active: material({ color: '#517467', bands: 'soft' }, true),
-    visited: material({ color: '#b09b83', bands: 'soft' }, true),
-    highlighted: material({ color: '#b98262', bands: 'soft' }, true),
-    style: material({ color: '#a894a1', bands: 'soft' }, true),
+    quiet: material({ color: '#8d8f7d', bands: 'soft' }, true),
+    active: material({ color: '#2f5e4e', bands: 'soft' }, true),
+    visited: material({ color: '#a57f5a', bands: 'soft' }, true),
+    highlighted: material({ color: '#b0525f', bands: 'soft' }, true),
+    style: material({ color: '#95768f', bands: 'soft' }, true),
+    route: pathInk,
+    answer: material({ color: '#3a4a63', bands: 'soft' }, true),
+    stub: material({ color: '#3f3b33', bands: 'soft' }, true),
   };
   const cube = geometry(new THREE.BoxGeometry(1, 1, 1));
   const disc = geometry(new THREE.CylinderGeometry(1, 1, 1, 32));
   const face = geometry(new THREE.PlaneGeometry(1, 1));
   const ring = geometry(new THREE.TorusGeometry(1, .021, 4, 40));
+  const haloRing = geometry(new THREE.TorusGeometry(1, .032, 4, 48));
   function object(shape, paint, xyz, scale, parent = furniture) {
     const item = new THREE.Mesh(shape, paint);
     item.position.set(...xyz); item.scale.set(...scale); item.castShadow = true; item.receiveShadow = true;
@@ -65,88 +75,142 @@ export function createSakuraMusic({ world, cel, host, canvas, camera, reduced, o
   const nodes = new Map(); const edges = new Map();
   const view = { zoom: 1, x: 0, z: 0 };
   const pointers = new Map();
-  const projector = new THREE.Vector3(); const location = new THREE.Vector3();
+  const projector = new THREE.Vector3(); const location = new THREE.Vector3(); const rim = new THREE.Vector3();
   const picker = new THREE.Raycaster(); const pointer = new THREE.Vector2();
   const tablePlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -(furniture.position.y + .024));
   const originalTouchAction = canvas.style.touchAction;
   let enabled = false; let key = null; let drag = null; let moved = false; let suppressClickUntil = 0;
+  let lastCeremony = null; let ceremonyTimeline = null; let lastFlash = null;
 
   function coverTexture(artist) {
     const surface = document.createElement('canvas'); surface.width = 256; surface.height = 256;
     const ctx = surface.getContext('2d'); const tone = artist.color || '#ab8c99';
     ctx.fillStyle = '#f7f3eb'; ctx.fillRect(0, 0, 256, 256);
-    ctx.fillStyle = tone; ctx.fillRect(12, 12, 232, 177);
-    ctx.save(); ctx.beginPath(); ctx.rect(12, 12, 232, 177); ctx.clip();
+    ctx.fillStyle = tone; ctx.fillRect(12, 12, 232, 232);
+    ctx.save(); ctx.beginPath(); ctx.rect(12, 12, 232, 232); ctx.clip();
     ctx.strokeStyle = '#fff6e5'; ctx.lineWidth = 8;
     const pattern = [...artist.id].reduce((sum, char) => sum + char.charCodeAt(0), 0) % 3;
     if (pattern === 0) {
-      for (let r = 18; r < 215; r += 18) { ctx.beginPath(); ctx.arc(147, 68, r, 0, Math.PI * 2); ctx.stroke(); }
+      for (let r = 18; r < 300; r += 19) { ctx.beginPath(); ctx.arc(150, 96, r, 0, Math.PI * 2); ctx.stroke(); }
     } else if (pattern === 1) {
-      for (let x = -100; x < 320; x += 23) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.bezierCurveTo(x + 95, 50, x - 25, 125, x + 80, 200); ctx.stroke(); }
+      for (let x = -120; x < 340; x += 24) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.bezierCurveTo(x + 95, 70, x - 25, 170, x + 80, 256); ctx.stroke(); }
     } else {
-      for (let y = -20; y < 200; y += 28) for (let x = -10; x < 280; x += 29) { ctx.beginPath(); ctx.arc(x, y, 8, 0, Math.PI * 2); ctx.stroke(); }
+      for (let y = -12; y < 262; y += 28) for (let x = -10; x < 280; x += 29) { ctx.beginPath(); ctx.arc(x + (y / 28 % 2) * 14, y, 8, 0, Math.PI * 2); ctx.stroke(); }
     }
-    ctx.restore(); ctx.fillStyle = '#35534d'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-    ctx.font = '700 23px "Microsoft YaHei", Arial, sans-serif'; ctx.fillText(artist.name, 14, 216, 228);
-    ctx.font = '600 8px Arial, sans-serif'; ctx.fillText('SIDE B / CONNECTIONS', 15, 244, 215);
+    // Names live only on the HTML labels; the sleeve carries colour and pattern.
+    ctx.restore(); ctx.fillStyle = '#fff6e5cc'; ctx.fillRect(12, 222, 64, 6);
     const texture = new THREE.CanvasTexture(surface); texture.colorSpace = THREE.SRGBColorSpace; texture.anisotropy = 2;
     textures.add(texture); return texture;
   }
+  // One shared paper back for every face-down record: no name, no colour, no count.
+  let backTexture = null;
+  function sleeveBack() {
+    if (backTexture) return backTexture;
+    const surface = document.createElement('canvas'); surface.width = 256; surface.height = 256;
+    const ctx = surface.getContext('2d');
+    ctx.fillStyle = '#efe5cf'; ctx.fillRect(0, 0, 256, 256);
+    ctx.strokeStyle = '#d6c7a6'; ctx.lineWidth = 1.5;
+    for (let y = -256; y < 256; y += 9) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(256, y + 256); ctx.stroke(); }
+    ctx.fillStyle = '#efe5cf'; ctx.beginPath(); ctx.arc(128, 128, 88, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#b7a684'; ctx.lineWidth = 3;
+    for (const r of [88, 74]) { ctx.beginPath(); ctx.arc(128, 128, r, 0, Math.PI * 2); ctx.stroke(); }
+    ctx.setLineDash([4, 7]); ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(128, 128, 60, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
+    ctx.strokeStyle = '#c9b993'; ctx.lineWidth = 5; ctx.strokeRect(10, 10, 236, 236);
+    ctx.fillStyle = '#8d7a58'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = '600 92px "Songti SC", "SimSun", serif'; ctx.fillText('？', 132, 134);
+    backTexture = new THREE.CanvasTexture(surface); backTexture.colorSpace = THREE.SRGBColorSpace; backTexture.anisotropy = 2;
+    return backTexture;
+  }
   function createNode(data) {
-    const group = new THREE.Group(); group.name = `music-artist-${data.id}`; printwork.add(group);
-    const size = .38;
-    object(disc, vinyl, [.07, .026, -.01], [.167, .023, .167], group);
+    const group = new THREE.Group(); group.name = 'music-record'; printwork.add(group);
+    const record = [object(disc, vinyl, [.07, .026, -.01], [.167, .023, .167], group)];
     for (const radius of [.123, .151]) {
       const groove = object(ring, grooveInk, [.07, .04, -.01], [radius, radius, radius], group);
-      groove.rotation.x = -Math.PI / 2; groove.castShadow = false;
+      groove.rotation.x = -Math.PI / 2; groove.castShadow = false; record.push(groove);
     }
-    object(disc, recordCenter, [.07, .041, -.01], [.047, .007, .047], group);
-    object(cube, cardStock, [-.035, .047, 0], [size, .025, size], group);
+    record.push(object(disc, recordCenter, [.07, .041, -.01], [.047, .007, .047], group));
+    const stock = object(cube, cardStock, [-.035, .047, 0], [SLEEVE, .025, SLEEVE], group);
     const cover = material({ color: '#ffffff', bands: 'soft' }, true);
-    const panel = object(face, cover, [-.035, .062, 0], [size * .96, size * .96, 1], group);
+    const panel = object(face, cover, [-.035, .062, 0], [SLEEVE * .96, SLEEVE * .96, 1], group);
     panel.rotation.x = -Math.PI / 2; panel.castShadow = false;
-    const halo = object(ring, selectedInk, [0, .029, 0], [.249, .249, .249], group);
+    const halo = object(haloRing, selectedInk, [0, .029, 0], [.249, .249, .249], group);
     halo.rotation.x = -Math.PI / 2; halo.castShadow = false;
     const button = document.createElement('button'); button.type = 'button';
-    button.className = 'world-music-label world-music-label--node'; button.innerHTML = '<strong></strong>';
+    button.className = 'world-music-label world-music-label--node'; button.innerHTML = '<small></small><strong></strong>';
     button.hidden = true; button.style.touchAction = 'none'; host.append(button);
-    const node = { group, panel, halo, button, data: null, texture: null, identity: '', screen: null, releaseLabel: framing.watchLabel(button) };
-    button.addEventListener('click', event => { if (!consumeClick(event)) activate({ type: 'music', action: 'select', id: data.id }); });
+    const node = { group, record, stock, panel, halo, button, data: null, texture: null, identity: '', screen: null, flip: null, turning: false, releaseLabel: framing.watchLabel(button) };
+    button.addEventListener('click', event => { if (!consumeClick(event) && node.data && !node.data.unknown) activate({ type: 'music', action: 'select', id: node.data.id }); });
     nodes.set(data.id, node); return node;
   }
   function releaseNode(node) {
-    node.releaseLabel();
-    gsap.killTweensOf([node.group.position, node.group.scale]); node.button.remove(); node.group.removeFromParent();
-    if (node.texture) { textures.delete(node.texture); node.texture.dispose(); }
+    node.releaseLabel(); node.flip?.kill();
+    gsap.killTweensOf([node.group.position, node.group.scale, node.group.rotation, node.halo.scale]); node.button.remove(); node.group.removeFromParent();
+    if (node.texture && node.texture !== backTexture) { textures.delete(node.texture); node.texture.dispose(); }
     materials.delete(node.panel.material); node.panel.material.dispose();
   }
+  function showFace(node, unknown) {
+    node.panel.material.map = unknown ? sleeveBack() : node.texture; node.panel.material.needsUpdate = true;
+    node.record.forEach(part => { part.visible = !unknown; });
+    node.stock.material = unknown ? backStock : cardStock;
+  }
+  /** Resting height and size: a selected, face-up record stands lifted off the paper. */
+  const restY = node => node.data?.selected && !node.data?.unknown ? .065 : .012;
+  const restScale = node => node.data?.selected && !node.data?.unknown ? 1.23 : 1;
   function assignNode(node, data, first) {
     const previous = node.data; node.data = data;
-    const identity = JSON.stringify([data.name, data.color]);
+    const unknown = Boolean(data.unknown);
+    const identity = unknown ? 'unknown' : JSON.stringify([data.name, data.color]);
     if (node.identity !== identity) {
-      if (node.texture) { textures.delete(node.texture); node.texture.dispose(); }
-      node.texture = coverTexture(data); node.identity = identity;
-      node.panel.material.map = node.texture; node.panel.material.needsUpdate = true;
+      if (!unknown) {
+        if (node.texture && node.texture !== backTexture) { textures.delete(node.texture); node.texture.dispose(); }
+        node.texture = coverTexture(data);
+      }
+      const turning = !unknown && previous?.unknown && !first && !reduced.matches;
+      node.identity = identity;
+      if (turning) turnOver(node, data.revealDelay || 0);
+      else { node.flip?.kill(); node.flip = null; node.turning = false; node.group.scale.x = data.selected ? 1.23 : 1; showFace(node, unknown); }
     }
-    node.group.userData.action = data.disabled ? null : { type: 'music', action: 'select', id: data.id };
-    const muted = !data.selected && !data.adjacent && !data.highlighted && !data.current;
-    node.panel.material.color.set(muted ? '#c3cac3' : '#ffffff');
-    node.halo.visible = Boolean(data.selected || data.highlighted || data.current);
-    node.halo.material = data.highlighted ? pathInk : selectedInk;
-    node.button.querySelector('strong').textContent = data.name;
-    node.button.disabled = Boolean(data.disabled); node.button.setAttribute('aria-pressed', String(Boolean(data.selected)));
-    node.button.setAttribute('aria-label', `查看 ${data.name}，${data.count || 0} 首收录${data.current ? '，当前路线位置' : ''}`);
-    node.button.style.setProperty('--record-tone', data.color || '#a78896');
-    for (const state of ['selected', 'adjacent', 'visited', 'highlighted', 'current']) node.button.classList.toggle(`is-${state}`, Boolean(data[state]));
+    node.group.userData.action = unknown ? { type: 'music', action: 'sealed', id: data.id } : data.disabled ? null : { type: 'music', action: 'select', id: data.id };
+    const muted = unknown || (!data.selected && !data.adjacent && !data.highlighted && !data.current && !data.target && !data.route);
+    node.panel.material.color.set(unknown ? '#f2ecde' : muted ? '#d8d4c9' : '#ffffff');
+    node.halo.visible = !unknown && Boolean(data.selected || data.highlighted || data.current || data.target);
+    node.halo.material = data.target ? targetInk : data.highlighted ? pathInk : selectedInk;
+    const small = node.button.querySelector('small');
+    small.textContent = unknown ? '' : data.target ? '终点' : data.current ? '你在这里' : '';
+    node.button.querySelector('strong').textContent = unknown ? '' : data.name;
+    node.button.disabled = unknown || Boolean(data.disabled);
+    node.button.tabIndex = unknown ? -1 : 0;
+    if (unknown) { node.button.removeAttribute('aria-label'); node.button.removeAttribute('aria-pressed'); node.button.setAttribute('aria-hidden', 'true'); }
+    else {
+      node.button.removeAttribute('aria-hidden');
+      node.button.setAttribute('aria-pressed', String(Boolean(data.selected)));
+      node.button.setAttribute('aria-label', data.target ? `终点：${data.name}` : `查看 ${data.name}，${data.count || 0} 首收录${data.current ? '，你在这里' : ''}`);
+    }
+    node.button.style.setProperty('--record-tone', unknown ? '#d9d4c7' : data.color || '#a78896');
+    for (const state of ['selected', 'adjacent', 'visited', 'highlighted', 'current', 'target', 'route']) node.button.classList.toggle(`is-${state}`, !unknown && Boolean(data[state]));
     node.button.classList.toggle('is-muted', muted);
     node.group.position.x = data.x; node.group.position.z = data.z;
-    const scale = data.selected ? 1.23 : 1;
-    if (first || previous?.selected !== data.selected) {
-      gsap.killTweensOf([node.group.position, node.group.scale]);
+    const scale = data.selected && !unknown ? 1.23 : 1;
+    // A record that is turning over owns its lift and settle; the flip lands on the resting height.
+    if ((first || previous?.selected !== data.selected || previous?.unknown !== data.unknown) && !node.turning) {
       const duration = first || reduced.matches ? 0 : .24;
-      gsap.to(node.group.position, { y: data.selected ? .065 : .012, duration, ease: 'power2.out', onUpdate: onChange });
+      gsap.killTweensOf(node.group.position);
+      gsap.to(node.group.position, { y: restY(node), duration, ease: 'power2.out', onUpdate: onChange });
+      gsap.killTweensOf(node.group.scale);
       gsap.to(node.group.scale, { x: scale, y: 1, z: scale, duration, ease: 'power2.out', onUpdate: onChange });
     }
+  }
+  /** Turn a face-down sleeve over: squash on its spine, change face at the midpoint, lift and settle. */
+  function turnOver(node, delay = 0) {
+    node.flip?.kill(); gsap.killTweensOf([node.group.position, node.group.scale]);
+    node.turning = true; showFace(node, true);
+    // The settle reads the selection when it starts, so a record selected mid-turn lands lifted.
+    node.flip = gsap.timeline({ delay, onUpdate: onChange, onComplete() { node.turning = false; node.flip = null; onChange?.(); } })
+      .to(node.group.position, { y: .09, duration: .12, ease: 'power2.out' }, 0)
+      .to(node.group.scale, { x: 0.02, duration: .14, ease: 'power2.in' }, 0)
+      .call(() => showFace(node, false), null, .14)
+      .to(node.group.scale, { x: () => restScale(node), z: () => restScale(node), duration: .18, ease: 'back.out(2)' }, .14)
+      .to(node.group.position, { y: () => restY(node), duration: .2, ease: 'power2.inOut' }, .2);
   }
   function curveFor(data) {
     const a = nodes.get(data.a).data; const b = nodes.get(data.b).data;
@@ -155,54 +219,152 @@ export function createSakuraMusic({ world, cel, host, canvas, camera, reduced, o
     return new THREE.QuadraticBezierCurve3(new THREE.Vector3(a.x, .023, a.z), new THREE.Vector3((a.x + b.x) / 2 - dz / length * bend, .023, (a.z + b.z) / 2 + dx / length * bend), new THREE.Vector3(b.x, .023, b.z));
   }
   function createEdge(data) {
-    const group = new THREE.Group(); group.name = `music-connection-${data.id}`; printwork.add(group);
+    const group = new THREE.Group(); group.name = 'music-connection'; printwork.add(group);
     const button = document.createElement('button'); button.type = 'button'; button.className = 'world-music-link';
     button.innerHTML = '<span aria-hidden="true"></span>'; button.hidden = true; button.style.touchAction = 'none'; host.append(button);
-    button.addEventListener('click', event => { if (!consumeClick(event)) activate({ type: 'music', action: 'edge', id: data.id }); });
-    const edge = { group, button, data: null, midpoint: new THREE.Vector3(), identity: '', parts: [], releaseLabel: framing.watchLabel(button) };
+    button.addEventListener('click', event => { if (!consumeClick(event) && edge.data && !edge.data.stub) activate({ type: 'music', action: 'edge', id: edge.data.id }); });
+    const edge = { group, button, data: null, midpoint: new THREE.Vector3(), curve: null, identity: '', parts: [], grow: null, growing: false, releaseLabel: framing.watchLabel(button) };
     edges.set(data.id, edge); return edge;
   }
   function clearEdgeGeometry(edge) {
     for (const part of edge.parts) { geometries.delete(part.geometry); part.geometry.dispose(); part.removeFromParent(); }
     edge.parts = [];
   }
-  function assignEdge(edge, data) {
-    edge.data = data; edge.group.userData.action = { type: 'music', action: 'edge', id: data.id };
+  const tierOf = data => data.stub ? 'stub' : data.route ? 'route' : data.answer ? 'answer' : 'quiet';
+  function paintFor(data) {
+    if (data.stub) return edgeInks.stub;
+    if (data.answer) return edgeInks.answer;
+    if (data.route) return edgeInks.route;
+    if (data.highlighted) return edgeInks.highlighted;
+    if (data.active) return edgeInks.active;
+    if (data.visited) return edgeInks.visited;
+    return data.kind === 'style' ? edgeInks.style : edgeInks.quiet;
+  }
+  /** Reveal ink along its path by index ranges; the tube indices run segment by segment. */
+  function setInk(edge, progress) {
+    const totals = edge.parts.map(part => part.geometry.index.count);
+    let remaining = Math.round(totals.reduce((sum, count) => sum + count, 0) * THREE.MathUtils.clamp(progress, 0, 1));
+    edge.parts.forEach((part, index) => {
+      const count = Math.min(totals[index], remaining); remaining -= count;
+      part.geometry.setDrawRange(0, count - count % 6);
+    });
+  }
+  function growEdge(edge, duration = .4, delay = 0) {
+    edge.grow?.kill(); const state = { value: 0 }; edge.growing = true; setInk(edge, 0);
+    edge.grow = gsap.to(state, { value: 1, duration, delay, ease: 'power1.inOut', onUpdate() { setInk(edge, state.value); onChange?.(); }, onComplete() { edge.growing = false; edge.grow = null; setInk(edge, 1); onChange?.(); } });
+    return edge.grow;
+  }
+  function assignEdge(edge, data, animate) {
+    const wasVisible = Boolean(edge.data);
+    edge.data = data; edge.group.userData.action = data.stub ? null : { type: 'music', action: 'edge', id: data.id };
     const a = nodes.get(data.a).data; const b = nodes.get(data.b).data;
-    const identity = JSON.stringify([a.x, a.z, b.x, b.z, data.kind]);
-    const paint = data.highlighted ? edgeInks.highlighted : data.active ? edgeInks.active : data.visited ? edgeInks.visited : data.kind === 'style' ? edgeInks.style : edgeInks.quiet;
+    const tier = tierOf(data);
+    const identity = JSON.stringify([a.x, a.z, b.x, b.z, data.kind, tier, data.stub ? data.from : '']);
+    const paint = paintFor(data);
     if (edge.identity !== identity) {
       clearEdgeGeometry(edge); edge.identity = identity;
-      const curve = curveFor(data); curve.getPoint(.5, edge.midpoint);
-      const count = data.kind === 'style' ? 7 : 1;
-      for (let index = 0; index < count; index++) {
-        const path = count === 1 ? curve : new THREE.QuadraticBezierCurve3(curve.getPoint(index / count), curve.getPoint((index + .29) / count), curve.getPoint((index + .58) / count));
-        const mesh = object(geometry(new THREE.TubeGeometry(path, count === 1 ? 18 : 3, .0065, 4, false)), paint, [0, 0, 0], [1, .2, 1], edge.group);
-        mesh.castShadow = false; edge.parts.push(mesh);
+      let curve = curveFor(data);
+      // Ink grows away from the player's record, so a stub or a new line starts at their feet.
+      const from = data.stub ? data.from : [...nodes.values()].find(node => node.data?.current)?.data.id;
+      if (from === data.b) curve = new THREE.QuadraticBezierCurve3(curve.v2.clone(), curve.v1.clone(), curve.v0.clone());
+      // The hint stub leaves the sleeve's edge and stops well short of the other record:
+      // a pencilled direction with an arrowhead, never a name.
+      if (data.stub) {
+        const length = Math.max(.3, curve.getLength());
+        const t0 = Math.min(.45, .34 / length); const t1 = Math.min(t0 + .42 / length, Math.max(t0 + .16, 1 - .3 / length));
+        curve = new THREE.QuadraticBezierCurve3(curve.getPoint(t0), curve.getPoint((t0 + t1) / 2), curve.getPoint(t1));
       }
+      edge.curve = curve; curve.getPoint(.5, edge.midpoint);
+      const dashes = data.kind === 'style' ? 7 : data.answer ? 9 : data.stub ? 3 : 1;
+      const fill = data.stub ? .72 : .58;
+      const radius = INK_WIDTH[tier] || INK_WIDTH.quiet;
+      const stroke = path => {
+        const mesh = object(geometry(new THREE.TubeGeometry(path, path === curve ? 24 : 3, radius, 4, false)), paint, [0, 0, 0], [1, .2, 1], edge.group);
+        mesh.castShadow = false; edge.parts.push(mesh);
+      };
+      for (let index = 0; index < dashes; index++) {
+        stroke(dashes === 1 ? curve : new THREE.QuadraticBezierCurve3(curve.getPoint(index / dashes), curve.getPoint((index + fill / 2) / dashes), curve.getPoint((index + fill) / dashes)));
+      }
+      if (data.stub) {
+        const tip = curve.getPoint(1); const back = curve.getTangent(1).setY(0).normalize().multiplyScalar(-.09);
+        for (const angle of [-.62, .62]) stroke(new THREE.LineCurve3(tip, tip.clone().add(back.clone().applyAxisAngle(new THREE.Vector3(0, 1, 0), angle))));
+      }
+      if (animate && (!wasVisible || data.stub)) growEdge(edge, data.stub ? .5 : .4);
+      else { edge.grow?.kill(); edge.grow = null; edge.growing = false; }
     }
     edge.parts.forEach(part => { part.material = paint; });
     // Flat ink lies just above the paper; depth outlines should not turn it into cable.
-    edge.group.position.y = .0194;
+    edge.group.position.y = data.route || data.answer ? .0198 : .0194;
+    if (data.stub) {
+      edge.button.hidden = true; edge.button.setAttribute('aria-hidden', 'true'); edge.button.tabIndex = -1;
+      edge.button.removeAttribute('aria-label'); edge.button.removeAttribute('title'); edge.button.querySelector('span').textContent = '';
+      return;
+    }
+    edge.button.removeAttribute('aria-hidden'); edge.button.tabIndex = 0;
     edge.button.setAttribute('aria-label', `查看${a.name}与${b.name}的${data.kind === 'style' ? '策展标签' : '合作'}：${data.title || '连接'}`);
     edge.button.title = data.title || `${a.name} × ${b.name}`;
-    edge.button.querySelector('span').textContent = data.title || '连接';
-    for (const state of ['active', 'visited', 'highlighted']) edge.button.classList.toggle(`is-${state}`, Boolean(data[state]));
+    edge.button.querySelector('span').textContent = data.kind === 'style' ? data.title || '连接' : `《${data.title || '连接'}》`;
+    for (const state of ['active', 'visited', 'highlighted', 'route', 'answer']) edge.button.classList.toggle(`is-${state}`, Boolean(data[state]));
   }
-  function releaseEdge(edge) { edge.releaseLabel(); clearEdgeGeometry(edge); edge.button.remove(); edge.group.removeFromParent(); }
+  function releaseEdge(edge) { edge.grow?.kill(); edge.releaseLabel(); clearEdgeGeometry(edge); edge.button.remove(); edge.group.removeFromParent(); }
   function activate(action) {
     if (!enabled || !isActive()) return;
-    const item = action.action === 'select' ? nodes.get(action.id) : action.action === 'edge' ? edges.get(action.id) : null;
+    const item = ['select', 'sealed'].includes(action.action) ? nodes.get(action.id) : action.action === 'edge' ? edges.get(action.id) : null;
     if (!item || item.data.disabled) return;
+    if (action.action === 'sealed') {
+      if (!item.data.unknown) return;
+      gsap.killTweensOf(item.group.rotation);
+      if (!reduced.matches) gsap.fromTo(item.group.rotation, { y: 0 }, { keyframes: [{ y: .07 }, { y: -.07 }, { y: .04 }, { y: 0 }], duration: .36, ease: 'power1.inOut', onUpdate: onChange });
+    }
     onAction?.(action);
+  }
+  function finishCeremony() {
+    if (!ceremonyTimeline) return;
+    ceremonyTimeline.kill(); ceremonyTimeline = null;
+    edges.forEach(edge => { edge.grow?.kill(); edge.grow = null; edge.growing = false; if (edge.parts.length) setInk(edge, 1); });
+    nodes.forEach(node => { node.flip?.progress(1); gsap.getTweensOf([node.group.position, node.group.scale]).forEach(tween => tween.progress(1)); });
+    onChange?.();
+  }
+  /** Arrival or reveal: fit the table, let the remaining sleeves turn, then ink the route song by song. */
+  function playCeremony(ceremony) {
+    lastCeremony = ceremony.token; ceremonyTimeline?.kill(); ceremonyTimeline = null;
+    const done = () => setTimeout(() => onAction?.({ type: 'music', action: 'ceremony-done' }), 0);
+    if (reduced.matches) { done(); return; }
+    control('fit');
+    const turns = [...nodes.values()].map(node => node.flip ? (node.data.revealDelay || 0) + .32 : 0);
+    const start = Math.min(.55, Math.max(.2, ...turns) * .6);
+    const timeline = gsap.timeline({ onUpdate: onChange, onComplete() { ceremonyTimeline = null; done(); } });
+    ceremony.order.forEach((id, index) => {
+      const edge = edges.get(id); if (!edge?.parts.length) return;
+      edge.grow?.kill(); edge.growing = true; setInk(edge, 0);
+      const ends = [nodes.get(edge.data.a), nodes.get(edge.data.b)];
+      timeline.call(() => ends.forEach(node => node && !node.turning && bump(node, .038, .14)), null, start + index * .3);
+      const state = { value: 0 };
+      timeline.to(state, { value: 1, duration: .28, ease: 'power1.inOut', onUpdate() { setInk(edge, state.value); }, onComplete() { edge.growing = false; } }, start + index * .3);
+    });
+    timeline.to({}, { duration: .35 });
+    ceremonyTimeline = timeline;
+  }
+  function flashNode(flash) {
+    lastFlash = flash.token;
+    const node = nodes.get(flash.id); if (!node || reduced.matches) return;
+    gsap.killTweensOf(node.halo.scale);
+    gsap.fromTo(node.halo.scale, { x: .249, y: .249, z: .249 }, { x: .33, y: .33, z: .33, duration: .22, yoyo: true, repeat: 3, ease: 'sine.inOut', onUpdate: onChange });
+    if (!node.turning) bump(node, .073, .18);
+  }
+  /** Hop from where the record is and land back on its own resting height (lifted when selected). */
+  function bump(node, height, duration) {
+    const base = restY(node);
+    gsap.killTweensOf(node.group.position);
+    gsap.to(node.group.position, { keyframes: [{ y: base + height, duration, ease: 'power2.out' }, { y: base, duration, ease: 'power2.in' }], onUpdate: onChange });
   }
   function setMusic(payload) {
     const wasEnabled = enabled;
     enabled = Boolean(payload); furniture.visible = enabled; canvas.style.touchAction = enabled ? 'none' : originalTouchAction;
     if (!payload) {
-      stopGesture(); gsap.killTweensOf(view);
-      nodes.forEach(node => { node.button.hidden = true; gsap.killTweensOf([node.group.position, node.group.scale]); });
-      edges.forEach(edge => { edge.button.hidden = true; }); onChange?.(); return;
+      stopGesture(); gsap.killTweensOf(view); finishCeremony(); lastCeremony = null;
+      nodes.forEach(node => { node.button.hidden = true; node.flip?.progress(1); gsap.killTweensOf([node.group.position, node.group.scale]); });
+      edges.forEach(edge => { edge.button.hidden = true; edge.grow?.progress(1); }); onChange?.(); return;
     }
     const newGraph = key !== payload.key; key = payload.key;
     if (newGraph) { stopGesture(); gsap.killTweensOf(view); Object.assign(view, { zoom: 1, x: 0, z: 0 }); }
@@ -210,7 +372,11 @@ export function createSakuraMusic({ world, cel, host, canvas, camera, reduced, o
     for (const [id, edge] of edges) if (!edgeIds.has(id)) { releaseEdge(edge); edges.delete(id); }
     for (const [id, node] of nodes) if (!nodeIds.has(id)) { releaseNode(node); nodes.delete(id); }
     for (const data of payload.nodes) { const exists = nodes.has(data.id); assignNode(nodes.get(data.id) || createNode(data), data, newGraph || !exists || !wasEnabled); }
-    for (const data of payload.edges) if (nodes.has(data.a) && nodes.has(data.b)) assignEdge(edges.get(data.id) || createEdge(data), data);
+    const animateInk = wasEnabled && !newGraph && !reduced.matches;
+    for (const data of payload.edges) if (nodes.has(data.a) && nodes.has(data.b)) assignEdge(edges.get(data.id) || createEdge(data), data, animateInk);
+    if (payload.ceremony && payload.ceremony.token !== lastCeremony) playCeremony(payload.ceremony);
+    else if (!payload.ceremony && ceremonyTimeline) finishCeremony();
+    if (payload.flash && payload.flash.token !== lastFlash) flashNode(payload.flash);
     applyView();
   }
   function withinPaper(point, margin = 0) { return Math.abs(point.x) <= PAPER.x - margin && Math.abs(point.z) <= PAPER.z - margin; }
@@ -309,56 +475,87 @@ export function createSakuraMusic({ world, cel, host, canvas, camera, reduced, o
     for (let parent = hit.object; parent; parent = parent.parent) if (parent === printwork) { isGraph = true; break; }
     return !isGraph || withinPaper(furniture.worldToLocal(hit.point.clone()));
   }
-  function screenPoint(point, camera, width, height, yOffset = 0) {
+  function screenPoint(point, camera, width, height) {
     projector.copy(point).project(camera);
-    return { x: (projector.x + 1) * width / 2, y: (1 - projector.y) * height / 2 + yOffset, depth: projector.z };
+    return { x: (projector.x + 1) * width / 2, y: (1 - projector.y) * height / 2, depth: projector.z };
   }
-  function positionLabel(node, width) {
-    const { x, y } = node.screen; const size = framing.labelSize(node.button);
-    const offset = width <= 760 ? 8 : 10; const sourceY = y - offset;
-    const shift = Math.min(22, size.width * .42); const side = size.width / 2 + 10;
-    const above = sourceY - size.height - offset;
-    // Prefer the sleeve's own top/bottom edge, then a small adjacent paper tab.
-    // Every candidate still respects the measured UI and already placed names.
+  const rectAround = (x, y, half) => ({ left: x - half, top: y - half, right: x + half, bottom: y + half });
+  /** Name tags sit beside their sleeve, never on another record; only a crowded
+   *  table lets a tag overlap sleeves, and still never the UI or another tag. */
+  function positionLabel(node, sleeves, mobile) {
+    const { x, y, r } = node.screen; const size = framing.labelSize(node.button);
+    const w = size.width; const h = size.height; const gap = mobile ? 3 : 5;
     const candidates = [
-      [x, y], [x, above],
-      [x + shift, y], [x - shift, y], [x + shift, above], [x - shift, above],
-      [x + side, sourceY - size.height / 2], [x - side, sourceY - size.height / 2],
-      [x, y + 16], [x + shift, y + 16], [x - shift, y + 16],
+      [x, y + r * .72 + gap, 'below'], [x, y - r * .72 - gap - h, 'above'],
+      [x + r * .8 + w / 2 + gap, y - h / 2, 'side'], [x - r * .8 - w / 2 - gap, y - h / 2, 'side'],
+      [x + r * .55 + w / 2, y + r * .55, 'corner'], [x - r * .55 - w / 2, y + r * .55, 'corner'],
+      [x + r * .55 + w / 2, y - r * .55 - h, 'corner'], [x - r * .55 - w / 2, y - r * .55 - h, 'corner'],
+      [x, y + r * .15, 'over'],
     ];
-    const placed = candidates.find(([left, top]) => framing.placeLabel(node.button, left, top));
-    if (!placed) return;
-    const [labelX, labelY] = placed;
-    node.button.hidden = false;
+    const others = sleeves.filter(item => item.node !== node).map(item => item.rect);
+    let placed = candidates.find(([left, top, kind]) => kind !== 'over' && framing.placeLabel(node.button, left, top, 'top', others));
+    if (!placed) placed = candidates.find(([left, top]) => framing.placeLabel(node.button, left, top, 'top'));
+    if (!placed) return false;
+    const [labelX, labelY, kind] = placed;
     node.button.style.transform = `translate3d(${labelX}px,${labelY}px,0) translate(-50%,0)`;
-    // The short printed leader ends at the record, so sideways labels never
-    // look like another artist's caption. It is decorative, not a hit target.
-    const sourceX = x - (labelX - size.width / 2); const sourceTop = sourceY - labelY;
-    const startX = THREE.MathUtils.clamp(sourceX, 0, size.width);
-    const startY = THREE.MathUtils.clamp(sourceTop, 0, size.height);
-    const dx = sourceX - startX; const dy = sourceTop - startY;
-    node.button.classList.toggle('has-leader', labelX !== x || labelY !== y);
+    // A short printed leader from a sideways tag to its own sleeve; decorative only.
+    const leader = kind === 'side' || kind === 'corner';
+    node.button.classList.toggle('has-leader', leader);
+    if (!leader) return true;
+    const left = labelX - w / 2;
+    const startX = THREE.MathUtils.clamp(x - left, 0, w); const startY = THREE.MathUtils.clamp(y - labelY, 0, h);
+    const toX = x - left - startX; const toY = y - labelY - startY; const length = Math.hypot(toX, toY);
+    const reach = Math.max(0, length - r * .62);
     node.button.style.setProperty('--leader-x', `${startX}px`);
     node.button.style.setProperty('--leader-y', `${startY}px`);
-    node.button.style.setProperty('--leader-length', `${Math.hypot(dx, dy)}px`);
-    node.button.style.setProperty('--leader-angle', `${Math.atan2(dy, dx)}rad`);
+    node.button.style.setProperty('--leader-length', `${reach}px`);
+    node.button.style.setProperty('--leader-angle', `${Math.atan2(toY, toX)}rad`);
+    return true;
   }
   function project(camera, width, height, active) {
-    const priority = node => node.data?.selected ? 5 : node.data?.highlighted ? 4 : node.data?.current ? 3 : node.data?.adjacent ? 2 : node.data?.visited ? 1 : 0;
+    const mobile = width <= 760;
+    const priority = node => node.data?.current ? 6 : node.data?.target ? 5 : node.data?.selected ? 4 : node.data?.highlighted || node.data?.route ? 3 : node.data?.adjacent ? 2 : node.data?.visited ? 1 : 0;
     const orderedNodes = [...nodes.values()].sort((a, b) => priority(b) - priority(a));
+    const sleeves = [];
+    const focused = document.activeElement;
     for (const node of orderedNodes) {
       node.group.getWorldPosition(location); const local = furniture.worldToLocal(location.clone());
-      node.screen = screenPoint(location, camera, width, height, width <= 760 ? 8 : 10);
-      node.button.hidden = true;
-      if (!enabled || !active || !withinPaper(local, .055) || node.screen.depth < -1 || node.screen.depth > 1) continue;
-      positionLabel(node, width);
+      const center = screenPoint(location, camera, width, height);
+      rim.set(SLEEVE / 2 * (node.data?.selected ? 1.23 : 1), 0, 0); node.group.localToWorld(rim);
+      const edgePoint = screenPoint(rim, camera, width, height);
+      const r = Math.max(8, Math.hypot(edgePoint.x - center.x, edgePoint.y - center.y));
+      node.screen = { ...center, r };
+      if (!enabled || !active || !withinPaper(local, .055) || center.depth < -1 || center.depth > 1) { node.screen.off = true; continue; }
+      sleeves.push({ node, rect: rectAround(center.x, center.y, r * .9) });
     }
-    for (const edge of edges.values()) {
-      location.copy(edge.midpoint); printwork.localToWorld(location);
-      const local = furniture.worldToLocal(location.clone()); const screen = screenPoint(location, camera, width, height);
-      const closeToNode = orderedNodes.some(node => node.screen && Math.hypot(node.screen.x - screen.x, node.screen.y - screen.y) < (width <= 760 ? 28 : 34));
-      edge.button.hidden = !enabled || !active || !(edge.data.active || edge.data.highlighted) || !withinPaper(local, .04) || screen.depth < -1 || screen.depth > 1 || closeToNode || !framing.placeLabel(edge.button, screen.x, screen.y, 'center');
-      if (!edge.button.hidden) edge.button.style.transform = `translate3d(${screen.x}px,${screen.y}px,0) translate(-50%,-50%)`;
+    // Visibility is assigned once per label per frame (never hidden-then-shown), and a tag
+    // that holds keyboard focus stays where it was rather than dropping focus to the page.
+    for (const node of orderedNodes) {
+      const eligible = enabled && active && !node.data?.unknown;
+      const placed = eligible && !node.screen.off && !node.turning && positionLabel(node, sleeves, mobile);
+      const hidden = !placed && !(eligible && node.button === focused);
+      if (node.button.hidden !== hidden) node.button.hidden = hidden;
+    }
+    const sleeveRects = sleeves.map(item => item.rect);
+    // The song you just turned over (touching where you stand) is named before older route ink.
+    const edgeRank = data => data.stub ? 0 : data.active ? 3 : data.highlighted || data.answer ? 2 : data.route ? 1 : 0;
+    for (const edge of [...edges.values()].sort((a, b) => edgeRank(b.data) - edgeRank(a.data))) {
+      const eligible = enabled && active && !edge.data.stub && (edge.data.active || edge.data.highlighted || edge.data.route || edge.data.answer);
+      let placed = false;
+      if (eligible && !edge.growing) for (const t of [.5, .4, .6, .32, .68]) {
+        edge.curve.getPoint(t, location); printwork.localToWorld(location);
+        const local = furniture.worldToLocal(location.clone()); const screen = screenPoint(location, camera, width, height);
+        if (!withinPaper(local, .04) || screen.depth < -1 || screen.depth > 1) continue;
+        const size = framing.labelSize(edge.button);
+        const box = { left: screen.x - size.width / 2, right: screen.x + size.width / 2, top: screen.y - size.height / 2, bottom: screen.y + size.height / 2 };
+        if (sleeveRects.some(rect => box.left < rect.right + 4 && box.right > rect.left - 4 && box.top < rect.bottom + 4 && box.bottom > rect.top - 4)) continue;
+        if (!framing.placeLabel(edge.button, screen.x, screen.y, 'center')) continue;
+        edge.button.style.transform = `translate3d(${screen.x}px,${screen.y}px,0) translate(-50%,-50%)`;
+        placed = true;
+        break;
+      }
+      const hidden = !placed && !(eligible && edge.button === focused);
+      if (edge.button.hidden !== hidden) edge.button.hidden = hidden;
     }
   }
   canvas.addEventListener('pointerdown', onPointerDown); host.addEventListener('pointerdown', onPointerDown);
@@ -366,15 +563,20 @@ export function createSakuraMusic({ world, cel, host, canvas, camera, reduced, o
   host.addEventListener('pointermove', onPointerMove); host.addEventListener('pointerup', onPointerUp); host.addEventListener('pointercancel', onPointerUp);
   canvas.addEventListener('wheel', onWheel, { passive: false }); host.addEventListener('wheel', onWheel, { passive: false });
   return { setMusic, project, activate, control, acceptHit, consumeClick, get dragging() { return pointers.size > 0 && moved; },
-    finish() { gsap.getTweensOf(view).forEach(tween => tween.totalProgress(1)); nodes.forEach(node => gsap.getTweensOf([node.group.position, node.group.scale]).forEach(tween => tween.totalProgress(1))); },
+    finish() {
+      gsap.getTweensOf(view).forEach(tween => tween.totalProgress(1));
+      finishCeremony();
+      nodes.forEach(node => { node.flip?.progress(1); gsap.getTweensOf([node.group.position, node.group.scale, node.group.rotation, node.halo.scale]).forEach(tween => tween.totalProgress(1)); });
+      edges.forEach(edge => edge.grow?.progress(1));
+    },
     dispose() {
-      stopGesture(); gsap.killTweensOf(view); canvas.style.touchAction = originalTouchAction; delete host.dataset.musicZoom;
+      stopGesture(); gsap.killTweensOf(view); ceremonyTimeline?.kill(); canvas.style.touchAction = originalTouchAction; delete host.dataset.musicZoom;
       canvas.removeEventListener('pointerdown', onPointerDown); host.removeEventListener('pointerdown', onPointerDown);
       canvas.removeEventListener('pointermove', onPointerMove); canvas.removeEventListener('pointerup', onPointerUp); canvas.removeEventListener('pointercancel', onPointerUp);
       host.removeEventListener('pointermove', onPointerMove); host.removeEventListener('pointerup', onPointerUp); host.removeEventListener('pointercancel', onPointerUp);
       canvas.removeEventListener('wheel', onWheel); host.removeEventListener('wheel', onWheel);
       edges.forEach(releaseEdge); nodes.forEach(releaseNode);
-      geometries.forEach(item => item.dispose()); materials.forEach(item => item.dispose()); textures.forEach(item => item.dispose());
+      geometries.forEach(item => item.dispose()); materials.forEach(item => item.dispose()); textures.forEach(item => item.dispose()); backTexture?.dispose();
       furniture.removeFromParent();
     },
   };

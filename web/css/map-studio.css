@@ -166,16 +166,11 @@
     & .map-studio-title { flex-direction: column; align-items: flex-start; gap: 10px; }
     & .map-studio-title h1 { font-size: 18px; }
     & .map-catalogue__switch { padding: 3px; }
-    & .map-catalogue__switch button { min-height: 27px; padding: 5px 10px; font-size: 10px; }
-    & .map-studio-tools { align-self: flex-start; padding-top: 1px; }
-    & .map-studio-tools .button { padding-inline: 8px; min-height: 30px; font-size: 10px; }
-    & .map-studio-tools .icon-button { width: 30px; height: 30px; min-width: 30px; }
     & .map-stage-tools { padding: 2px; box-shadow: none; background: none; }
     & .map-stage-tools .button { font-size: 10px; padding-inline: 5px; }
     & .map-stage-top { top: 13px; }
     & .map-mode-caption { font-size: 10px; }
     & .map-mode-switch { padding: 0; }
-    & .map-mode-switch button { font-size: 10px; padding: 6px 9px; }
     & .map-stage { min-height: 370px; }
     & .map-node--center { width: 145px; height: 172px; }
     & .map-node--center .map-node__disc { width: 112px; height: 112px; }
@@ -194,20 +189,7 @@
     & .map-discovery__artists { font-size: 9px; }
     & .map-discovery__actions .button { font-size: 10px; min-height: 30px; padding: 5px 6px; }
     & .map-discovery__actions .map-track__listen { padding-inline: 5px; min-height: 32px; }
-    & .map-route-bar { padding: 5px 0 0; margin-top: 4px; min-height: 33px; border-left: 0; border-top: 1px solid color-mix(in srgb, var(--line) 45%, transparent); gap: 5px; }
-    & .map-route-trail { font-size: 9px; padding: 6px 0; }
-    & .map-route-controls .icon-button { width: 26px; min-width: 26px; height: 26px; }
     & .map-route-controls .icon-button:last-child { display: grid; }
-    & .map-route-bar > .button { font-size: 10px; min-height: 28px; padding: 5px 3px; }
-    & .map-foot { padding-top: 3px; }
-    & .map-foot .button { min-height: 26px; font-size: 9px; }
-    & .map-challenge-banner { flex-wrap: wrap; column-gap: 8px; row-gap: 0; min-height: 38px; padding: 5px 10px; border-radius: 12px; }
-    & .map-challenge-banner > div { gap: 7px; }
-    & .map-challenge-banner__label { font-size: 9px; }
-    & .map-challenge-banner strong { gap: 5px; font-size: 11px; }
-    & .map-challenge-banner .button { min-height: 25px; padding: 3px 5px; font-size: 10px; }
-    & .map-undo { bottom: 139px; font-size: 11px; }
-    & .map-dialog h2 { font-size: 23px; }
   }
 }
 
