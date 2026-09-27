@@ -19,6 +19,8 @@ import '../css/memory-export.css';
 import '../css/courtyard-ui.css';
 import '../css/spatial-objects.css';
 import '../css/map-spatial.css';
+import '../css/scene-panels.css';
+import '../css/scene-layout.css';
 import { OverlayScrollbars } from 'overlayscrollbars';
 import { mountThemes } from './themes.js';
 import { icon } from './icons.js';

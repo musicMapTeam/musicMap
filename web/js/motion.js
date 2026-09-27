@@ -53,8 +53,8 @@ export function mountMotion() {
       if (reduced.matches) return;
       const panel = container.firstElementChild;
       if (!panel) return;
-      entrance = gsap.fromTo(panel, { opacity: 0, y: 14 }, {
-        opacity: 1, y: 0, duration: .62, delay: .12, ease: 'power3.out', clearProps: 'opacity,transform',
+      entrance = gsap.fromTo(panel, { opacity: 0 }, {
+        opacity: 1, duration: .4, delay: .08, ease: 'power2.out', clearProps: 'opacity',
       });
     },
   };

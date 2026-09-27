@@ -4,6 +4,7 @@ import { buildSakuraWorld } from './sakura-world.js';
 import { batchStaticMeshes } from './sakura-batch.js';
 import { createCameraDirector } from './sakura-camera.js';
 import { createSakuraMusic } from './sakura-music.js';
+import { createSakuraFraming } from './sakura-framing.js';
 import { createCelMaterials } from './vendor/sakura/toon.js';
 import { Pipeline } from './vendor/sakura/post.js';
 import { PAL } from './vendor/sakura/palette.js';
@@ -135,6 +136,27 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
   bounce.position.set(1, -3, 4); scene.add(bounce);
 
   const model = buildSakuraWorld({ THREE, world, mesh, box, cylinder, ball, rod, label, geometry, toon, cel: celMaterials.cel, materials, textures });
+  // Capture original object bounds before static meshes are moved into batches.
+  world.updateMatrixWorld(true);
+  const subjectBounds = {
+    explore: new THREE.Box3(new THREE.Vector3(-1.97, 1.0, -2.65), new THREE.Vector3(1.97, 1.6, .05)),
+    live: new THREE.Box3().setFromObject(world.getObjectByName('two-view-photo-wall')).expandByScalar(.05),
+    editor: new THREE.Box3().setFromObject(model.desk),
+    records: new THREE.Box3().setFromObject(model.shelf),
+    home: new THREE.Box3(),
+  };
+  const photoBounds = model.photoCards.map(card => new THREE.Box3().setFromObject(card.object));
+  const courtyardParts = new Set(['open-record-shop', 'removable-shop-roof', 'tree-side-stage', 'two-view-photo-wall', 'card-making-desk', 'desk-stool', 'listening-bench', 'courtyard-fence']);
+  world.children.filter(object => courtyardParts.has(object.name)).forEach(object => subjectBounds.home.union(new THREE.Box3().setFromObject(object)));
+  const instanceMatrix = new THREE.Matrix4(); const canopyBox = new THREE.Box3(); const canopyCenter = new THREE.Vector3();
+  world.children.filter(object => object.isInstancedMesh && object.name.startsWith('cherry-canopy-')).forEach(object => {
+    object.geometry.computeBoundingBox();
+    for (let index = 0; index < object.count; index++) {
+      object.getMatrixAt(index, instanceMatrix); instanceMatrix.premultiply(object.matrixWorld);
+      canopyBox.copy(object.geometry.boundingBox).applyMatrix4(instanceMatrix); canopyBox.getCenter(canopyCenter);
+      if (Math.abs(canopyCenter.x) < 7 && canopyCenter.z > -5.8) subjectBounds.home.union(canopyBox);
+    }
+  });
   batchStaticMeshes(THREE, world, { exclude: [model.roof, model.record, model.shelf, model.draftImageMesh, ...model.exploreShadowBlockers, ...model.photoCards.map(card => card.object)] });
   batchStaticMeshes(THREE, model.shelf);
   const pipeline = new Pipeline(renderer, scene, camera, { pixelBudget: 2e6, maxPixelRatio: 1.5 });
@@ -145,10 +167,6 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
   pipeline.grade.mat.uniforms.uSaturation.value = 1.06;
 
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  const music = createSakuraMusic({ world, cel: celMaterials.cel, host: hotspots, canvas, camera, reduced, onAction,
-    isActive: () => director.active.key === 'explore' && !director.moving,
-    onChange() { renderer.shadowMap.needsUpdate = true; if (reduced.matches) { projectPins(); draw(); } },
-  });
   const loader = new THREE.TextureLoader();
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
@@ -179,20 +197,43 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
     hotspots.append(button); card.object.visible = false;
     return slot;
   });
-  function draw() { if (!disposed && visible && width && height) pipeline.render(); }
+  let director;
+  const framing = createSakuraFraming(host, {
+    getShot: () => director?.active.key || (view === 'space' ? 'home' : view),
+    onChange() { if (!disposed) { director?.reframe(); projectPins(); draw(); } },
+    onLabelsChange() { if (!disposed) { projectPins(); if (reduced.matches) draw(); } },
+  });
+  pins.forEach(pin => framing.watchLabel(pin.button)); photoSlots.forEach(slot => framing.watchLabel(slot.button));
+  const music = createSakuraMusic({ world, cel: celMaterials.cel, host: hotspots, canvas, camera, reduced, onAction, framing,
+    isActive: () => director.active.key === 'explore' && !director.travelling && !framing.layout.blocked,
+    onChange() { renderer.shadowMap.needsUpdate = true; if (reduced.matches) { projectPins(); draw(); } },
+  });
+  function boundsForShot(key, id) {
+    if (key !== 'photo') return subjectBounds[key] || subjectBounds.live;
+    const slot = photoSlots.find(item => item.data?.id === id);
+    if (!slot) return subjectBounds.live;
+    const bounds = photoBounds[slot.index]; const center = bounds.getCenter(new THREE.Vector3()).add(new THREE.Vector3(0, .26, .82));
+    const extent = bounds.getSize(new THREE.Vector3()).multiplyScalar(1.28).addScalar(.06);
+    return new THREE.Box3().setFromCenterAndSize(center, extent);
+  }
+  const courtyardCenter = subjectBounds.home.getCenter(new THREE.Vector3());
+  function draw() {
+    if (disposed || !visible || !width || !height) return;
+    // Reframing can move the camera back on small screens; keep haze beyond the venue.
+    scene.fog.near = Math.max(24, camera.position.distanceTo(courtyardCenter) + 7);
+    scene.fog.far = scene.fog.near + 22;
+    pipeline.render();
+  }
   const projected = new THREE.Vector3();
   function positionPin(button, point, offsetY = 0) {
     projected.copy(point).project(camera);
     const x = (projected.x + 1) * width / 2; const y = (1 - projected.y) * height / 2 + offsetY;
-    const clearArea = width <= 760
-      ? director.active.key === 'home' ? height - 240 : director.active.key === 'live' ? height * .6 - 104 : height * .43
-      : width - (director.active.key === 'home' ? 20 : 520);
-    const inArea = width <= 760 ? y < clearArea : x < clearArea;
-    button.hidden = projected.z > 1 || projected.z < -1 || x < 35 || x > width - 35 || y < 95 || y > height - 100 || !inArea;
+    button.hidden = projected.z > 1 || projected.z < -1 || !framing.placeLabel(button, x, y, 'bottom');
     if (!button.hidden) button.style.transform = `translate3d(${x}px,${y}px,0) translate(-50%,-100%)`;
   }
   function projectPins() {
     camera.updateMatrixWorld(); world.updateMatrixWorld(true);
+    framing.beginLabels();
     music.project(camera, width, height, director.active.key === 'explore');
     pins.forEach(pin => { pin.button.hidden = true; if (director.active.key === 'home') positionPin(pin.button, pin.position); });
     photoSlots.forEach(slot => {
@@ -202,8 +243,9 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
       positionPin(slot.button, position, director.active.key === 'home' ? (slot.index % 3) * 27 : 0);
     });
   }
-  const director = createCameraDirector(camera, {
+  director = createCameraDirector(camera, {
     size: () => ({ width, height }), reduced,
+    getLayout: key => framing.get(key), getBounds: boundsForShot,
     onFrame() { projectPins(); if (reduced.matches) draw(); },
     onShot(key, id, travelling) {
       model.roof.visible = key !== 'explore';
@@ -343,7 +385,7 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
   function resize() {
     const bounds = host.getBoundingClientRect();
     width = Math.max(1, Math.round(bounds.width)); height = Math.max(1, Math.round(bounds.height));
-    director.resize(); pipeline.setSize(width, height); renderer.shadowMap.needsUpdate = true; projectPins(); draw();
+    framing.measure(director.active.key); director.resize(); pipeline.setSize(width, height); renderer.shadowMap.needsUpdate = true; projectPins(); draw();
   }
   const resizeObserver = new ResizeObserver(resize); resizeObserver.observe(host);
   const intersectionObserver = new IntersectionObserver(entries => { visible = entries[0]?.isIntersecting ?? false; updateMotion(); }, { threshold: .01 });
@@ -353,6 +395,7 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
   return { setView, setContent, setMusic: music.setMusic, musicControl: music.control, focus, restore, dispose() {
     disposed = true; cancelAnimationFrame(frame); director.dispose();
     music.dispose();
+    framing.dispose();
     photoSlots.forEach(slot => { gsap.killTweensOf([slot.object.position, slot.object.rotation, slot.object.scale]); });
     resizeObserver.disconnect(); intersectionObserver.disconnect();
     document.removeEventListener('visibilitychange', updateMotion); reduced.removeEventListener('change', updateMotion);
