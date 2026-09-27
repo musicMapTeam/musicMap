@@ -1,0 +1,84 @@
+<!doctype html>
+<!-- 0.15 参赛封面源（1920×1080）。渲染时同目录需要两张输入图：ticket.png = 0.15 最终构建在「体验示例」中接受交换后，「保存双联图片」实际导出的 1600×1800 票根（AI 示例照片）；round.png = 唱片店寻声入口 1440×900 截图，页面只裁出左上题签。浏览器以 1920×1080 打开后截图即得 delivery/cover.png；截图前移除浏览器扩展注入的节点。 -->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>同一刻，另一面 · 参赛封面 0.15</title>
+<style>
+  :root {
+    --ink: #fff3dc; --ink-soft: #eadff2; --muted: #cbbfd9; --amber: #ffc27a; --pink: #f4a7c3;
+    --font: -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --serif: "Songti SC", "Noto Serif SC", "Source Han Serif SC", "STSong", "SimSun", serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; }
+  body {
+    position: relative; font-family: var(--font); color: var(--ink);
+    background:
+      radial-gradient(1200px 520px at 18% 112%, #e0907e66, transparent 70%),
+      radial-gradient(900px 600px at 78% 58%, #ffc27a1f, transparent 70%),
+      linear-gradient(180deg, #11143a 0%, #1b1d48 46%, #2a2556 72%, #43305e 100%);
+  }
+  body::before {
+    content: ""; position: absolute; inset: 0; opacity: .22; pointer-events: none;
+    background: repeating-radial-gradient(circle at 78% 52%, transparent 0 46px, #ffffff14 47px, transparent 48px);
+  }
+  .lights { position: absolute; left: 0; top: 0; width: 1920px; height: 150px; }
+  .brand { position: absolute; left: 120px; top: 150px; display: flex; align-items: center; gap: 16px; }
+  .brand svg { width: 46px; height: 46px; }
+  .brand b { font-size: 26px; font-weight: 700; letter-spacing: .06em; }
+  .brand small { display: block; font-size: 17px; color: var(--muted); letter-spacing: .04em; }
+  .copy { position: absolute; left: 120px; top: 262px; width: 860px; }
+  .kicker { display: flex; align-items: center; gap: 14px; font-size: 26px; font-weight: 700; color: var(--amber); letter-spacing: .08em; }
+  .kicker i { width: 14px; height: 14px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 0 7px #ffc27a2e, 0 0 20px var(--amber); }
+  h1 { margin: 26px 0 30px; font-size: 156px; line-height: 1.06; font-weight: 800; letter-spacing: -.01em; text-shadow: 0 6px 40px #0a0d2699; }
+  h1 span { display: block; }
+  h1 span + span { margin-left: 1.1em; color: var(--pink); }
+  .lede { font-size: 36px; line-height: 1.6; color: var(--ink-soft); }
+  .steps { display: flex; margin-top: 24px; font-size: 25px; color: var(--muted); }
+  .steps li { list-style: none; padding: 0 22px; border-left: 1px solid #ffffff2e; }
+  .steps li:first-child { padding-left: 0; border: 0; }
+  .steps em { font-style: normal; font-family: Consolas, monospace; color: var(--amber); margin-right: 10px; }
+  .round { position: absolute; left: 120px; top: 812px; display: flex; align-items: center; gap: 26px; }
+  .round__crop { width: 452px; height: 186px; border-radius: 6px; overflow: hidden; box-shadow: 0 18px 50px #05071a80; background: url(round.png) -32px -88px / 1440px 900px no-repeat; flex: none; transform: scale(.86); transform-origin: left center; margin-right: -64px; }
+  .round__note strong { display: block; font-size: 24px; color: var(--ink); }
+  .round__note span { display: block; margin-top: 6px; font-size: 20px; line-height: 1.55; color: var(--muted); max-width: 22em; }
+  .ticket { position: absolute; left: 1030px; top: 118px; width: 776px; transform: rotate(2.4deg); }
+  .ticket::before { content: ""; position: absolute; inset: 8% -6% -4%; background: radial-gradient(closest-side, #ffc27a40, transparent); filter: blur(30px); z-index: -1; }
+  .ticket img { display: block; width: 100%; border-radius: 22px; box-shadow: 0 40px 90px #04061acc, 0 0 0 1px #ffffff1f; }
+  .foot { position: absolute; left: 120px; right: 120px; bottom: 34px; display: flex; justify-content: space-between; font-size: 20px; color: var(--muted); }
+  .foot b { color: var(--pink); font-weight: 600; }
+</style>
+</head>
+<body>
+  <svg class="lights" viewBox="0 0 1920 150" aria-hidden="true">
+    <defs><radialGradient id="g"><stop offset="0" stop-color="#ffe2aa"/><stop offset=".3" stop-color="#ffbe6e" stop-opacity=".55"/><stop offset="1" stop-color="#ff9650" stop-opacity="0"/></radialGradient></defs>
+    <path d="M-20 40 Q 480 118 960 52 T 1940 44" fill="none" stroke="#c9b8d8" stroke-opacity=".45" stroke-width="2"/>
+    <g id="bulbs"></g>
+  </svg>
+  <div class="brand">
+    <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 6c6 7 6 15 0 22-6-7-6-15 0-22z" fill="#f4a7c3"/><path d="M8 30c8-3 15 0 18 6-8 3-15 0-18-6z" fill="#8fc2a5"/><path d="M40 30c-8-3-15 0-18 6 8 3 15 0 18-6z" fill="#f7d0dd"/></svg>
+    <div><b>樱下放映</b><small>Music Map × Music Space</small></div>
+  </div>
+  <section class="copy">
+    <p class="kicker"><i></i>音乐现场 · 散场以后</p>
+    <h1><span>同一刻，</span><span>另一面。</span></h1>
+    <p class="lede">用另一位观众的视角，补完整你记住的那一晚。</p>
+    <ol class="steps"><li><em>01</em>交换现场照片</li><li><em>02</em>双方同意</li><li><em>03</em>两人署名的双联票根</li></ol>
+  </section>
+  <div class="round">
+    <div class="round__crop" role="img" aria-label="唱片店寻声题签"></div>
+    <p class="round__note"><strong>唱片店 · 寻声一局</strong><span>翻开唱片，自己找出两位歌手之间<br>隔着几首真实合唱</span></p>
+  </div>
+  <figure class="ticket"><img src="ticket.png" alt="应用实际导出的双联票根"></figure>
+  <footer class="foot"><span>MVP 0.15 · 2026 腾讯音乐高校 AI Hackathon</span><span>右图为应用实际导出票根 · <b>演示照片由 AI 生成</b></span></footer>
+  <script>
+    const path = document.querySelector('.lights path'); const g = document.getElementById('bulbs');
+    const len = path.getTotalLength();
+    for (let i = 1; i < 22; i++) {
+      const p = path.getPointAtLength(len * i / 22);
+      g.insertAdjacentHTML('beforeend', `<circle cx="${p.x}" cy="${p.y + 14}" r="26" fill="url(#g)"/><line x1="${p.x}" y1="${p.y}" x2="${p.x}" y2="${p.y + 8}" stroke="#c9b8d8" stroke-opacity=".5"/><ellipse cx="${p.x}" cy="${p.y + 15}" rx="6" ry="8" fill="#ffe6b0"/>`);
+    }
+  </script>
+</body>
+</html>
