@@ -2,10 +2,9 @@
 .world-music-label { position:absolute; z-index:3; top:0; left:0; display:flex; flex-direction:column; align-items:center; gap:2px; min-width:53px; max-width:125px; min-height:28px; padding:4px 8px; border:1px solid #8c917b50; border-radius:2px; background:#fff9e9f5; color:#3c554c; box-shadow:1px 2px 0 #ccc3ab70; cursor:pointer; pointer-events:auto; }
 .world-music-label[hidden] { display:none; }
 .world-music-label strong { font:550 12px/1.45 var(--font-display); letter-spacing:.015em; white-space:nowrap; }
-.world-music-label small { display:none; font:9px/1.4 var(--font-display); color:#747a69; }
+.world-music-label.has-leader::after { content:''; position:absolute; left:var(--leader-x); top:var(--leader-y); width:var(--leader-length); height:1px; background:#667d6eaa; transform:rotate(var(--leader-angle)); transform-origin:0 50%; pointer-events:none; }
 .world-music-label.is-selected { z-index:5; border-color:#a77984; border-top:3px solid #a77984; background:#fff5e4; box-shadow:1px 3px 0 #d6bcbc80,0 4px 12px #48584316; }
 .world-music-label.is-selected strong { font-size:14px; }
-.world-music-label.is-selected small { display:block; }
 .world-music-label.is-highlighted { border-color:#a77984; background:#f9ebe0; }
 .world-music-label.is-muted { color:#69756b; background:#fff9e9df; }
 .world-music-label:hover { border-color:#42694f; background:#fffdf5; }
@@ -124,7 +123,6 @@ html[data-theme='sakura'] body.spatial-fallback[data-view='explore'] {
   .world-music-label { min-width:40px; max-width:82px; min-height:25px; padding:3px 5px; }
   .world-music-label strong { font-size:11px; }
   .world-music-label.is-selected strong { font-size:12px; }
-  .world-music-label small { font-size:8px; }
   .world-music-link { font-size:8px; max-width:82px; padding:2px 4px; }
   .map-network-selection h2 { font-size:19px; }
   .map-network-stamp { width:35px; height:35px; border-width:3px; }

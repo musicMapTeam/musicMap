@@ -45,14 +45,14 @@ export function mountHome(container, api) {
   }
   function render() {
     if (signal.aborted) return;
+    const recentOpen = Boolean(container.querySelector('[data-home-recent]')?.open);
     const cards = entries();
     const recentRoom = catalogue?.rooms.find(room => room.id === session?.roomId) || catalogue?.rooms[0];
     const personal = cards.filter(card => !card.local);
     container.innerHTML = `<div class="space-page space-page--home space-studio space-studio--home home-studio" aria-labelledby="home-title">
       <h1 id="home-title" class="sr-only">樱下放映</h1>
-      <div class="home-paper">
-        <div class="home-paper__edge"><span>MEMORY NO. ${String(catalogue?.cards.length || 0).padStart(2, '0')}</span><span aria-hidden="true">✳</span></div>
-        ${personal.length ? `<div class="home-memory-list">${personal.map(card => `<button class="home-memory" data-home="photo" data-id="${escape(card.id)}" aria-label="查看${escape(card.title)}"><span class="home-memory__image">${card.src ? `<img src="${escape(card.src)}" alt="${escape(card.alt)}">` : api.icon('image')}</span><span class="home-memory__copy"><small>${card.exampleImage ? 'AI 示例图 · ' : ''}我的现场</small><strong>${escape(card.title)}</strong></span>${api.icon('arrow-up-right')}</button>`).join('')}</div>` : `<div class="home-first-card"><span class="home-first-card__art" aria-hidden="true">${api.icon('camera')}</span><div><small>从一张照片开始</small><strong>留住这一晚</strong></div></div>`}
+      <div class="home-paper home-paper--compact">
+        ${personal.length ? `<details class="home-recent" data-home-recent ${recentOpen ? 'open' : ''}><summary><span>最近现场</span><small>${catalogue.cards.length}</small>${api.icon('chevron-right')}</summary><div class="home-memory-list">${personal.map(card => `<button class="home-memory" data-home="photo" data-id="${escape(card.id)}" aria-label="查看${escape(card.title)}"><span class="home-memory__image">${card.src ? `<img src="${escape(card.src)}" alt="${escape(card.alt)}">` : api.icon('image')}</span><span class="home-memory__copy"><small>${card.exampleImage ? 'AI 示例图 · ' : ''}我的现场</small><strong>${escape(card.title)}</strong></span>${api.icon('arrow-up-right')}</button>`).join('')}</div></details>` : `<div class="home-first-card"><span class="home-first-card__art" aria-hidden="true">${api.icon('camera')}</span><strong>留住这一晚</strong></div>`}
         <div class="home-paper__actions"><button class="button button--primary" data-home="make">${api.icon('plus')}记录我的现场</button><button class="button button--secondary" data-home="invite">${api.icon('users')}邀请朋友</button></div>
         <div class="home-paper__foot">${recentRoom ? `<button data-home="resume" data-room="${escape(recentRoom.id)}" title="${escape(recentRoom.title)}">继续本场 ${api.icon('arrow-right')}</button>` : `<button data-home="join">我有邀请码 ${api.icon('arrow-right')}</button>`}<button data-home="demo">体验示例 ${api.icon('arrow-up-right')}</button></div>
         ${loading ? '<span class="home-paper__status" role="status">正在找回你的现场…</span>' : ''}${error ? `<div class="home-paper__status" role="status">${escape(error)} <button data-home="retry">重试</button></div>` : ''}

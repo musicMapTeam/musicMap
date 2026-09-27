@@ -6,7 +6,7 @@ const MIN_ZOOM = 1;
 const MAX_ZOOM = 2.8;
 
 /** One complete, persistent graph printed on the record shop's real table. */
-export function createSakuraMusic({ world, cel, host, canvas, camera, reduced, onAction, onChange, isActive }) {
+export function createSakuraMusic({ world, cel, host, canvas, camera, reduced, onAction, onChange, isActive, framing }) {
   const furniture = new THREE.Group();
   furniture.name = 'record-connection-table'; furniture.position.set(0, 1.19, -1.3); furniture.visible = false;
   world.add(furniture);
@@ -108,13 +108,14 @@ export function createSakuraMusic({ world, cel, host, canvas, camera, reduced, o
     const halo = object(ring, selectedInk, [0, .029, 0], [.249, .249, .249], group);
     halo.rotation.x = -Math.PI / 2; halo.castShadow = false;
     const button = document.createElement('button'); button.type = 'button';
-    button.className = 'world-music-label world-music-label--node'; button.innerHTML = '<strong></strong><small></small>';
+    button.className = 'world-music-label world-music-label--node'; button.innerHTML = '<strong></strong>';
     button.hidden = true; button.style.touchAction = 'none'; host.append(button);
-    const node = { group, panel, halo, button, data: null, texture: null, identity: '', screen: null };
+    const node = { group, panel, halo, button, data: null, texture: null, identity: '', screen: null, releaseLabel: framing.watchLabel(button) };
     button.addEventListener('click', event => { if (!consumeClick(event)) activate({ type: 'music', action: 'select', id: data.id }); });
     nodes.set(data.id, node); return node;
   }
   function releaseNode(node) {
+    node.releaseLabel();
     gsap.killTweensOf([node.group.position, node.group.scale]); node.button.remove(); node.group.removeFromParent();
     if (node.texture) { textures.delete(node.texture); node.texture.dispose(); }
     materials.delete(node.panel.material); node.panel.material.dispose();
@@ -133,7 +134,6 @@ export function createSakuraMusic({ world, cel, host, canvas, camera, reduced, o
     node.halo.visible = Boolean(data.selected || data.highlighted || data.current);
     node.halo.material = data.highlighted ? pathInk : selectedInk;
     node.button.querySelector('strong').textContent = data.name;
-    const subtitle = node.button.querySelector('small'); subtitle.textContent = data.selected ? `${data.count || 0} 首收录` : ''; subtitle.hidden = !data.selected;
     node.button.disabled = Boolean(data.disabled); node.button.setAttribute('aria-pressed', String(Boolean(data.selected)));
     node.button.setAttribute('aria-label', `查看 ${data.name}，${data.count || 0} 首收录${data.current ? '，当前路线位置' : ''}`);
     node.button.style.setProperty('--record-tone', data.color || '#a78896');
@@ -159,7 +159,7 @@ export function createSakuraMusic({ world, cel, host, canvas, camera, reduced, o
     const button = document.createElement('button'); button.type = 'button'; button.className = 'world-music-link';
     button.innerHTML = '<span aria-hidden="true"></span>'; button.hidden = true; button.style.touchAction = 'none'; host.append(button);
     button.addEventListener('click', event => { if (!consumeClick(event)) activate({ type: 'music', action: 'edge', id: data.id }); });
-    const edge = { group, button, data: null, midpoint: new THREE.Vector3(), identity: '', parts: [] };
+    const edge = { group, button, data: null, midpoint: new THREE.Vector3(), identity: '', parts: [], releaseLabel: framing.watchLabel(button) };
     edges.set(data.id, edge); return edge;
   }
   function clearEdgeGeometry(edge) {
@@ -189,7 +189,7 @@ export function createSakuraMusic({ world, cel, host, canvas, camera, reduced, o
     edge.button.querySelector('span').textContent = data.title || '连接';
     for (const state of ['active', 'visited', 'highlighted']) edge.button.classList.toggle(`is-${state}`, Boolean(data[state]));
   }
-  function releaseEdge(edge) { clearEdgeGeometry(edge); edge.button.remove(); edge.group.removeFromParent(); }
+  function releaseEdge(edge) { edge.releaseLabel(); clearEdgeGeometry(edge); edge.button.remove(); edge.group.removeFromParent(); }
   function activate(action) {
     if (!enabled || !isActive()) return;
     const item = action.action === 'select' ? nodes.get(action.id) : action.action === 'edge' ? edges.get(action.id) : null;
@@ -313,19 +313,51 @@ export function createSakuraMusic({ world, cel, host, canvas, camera, reduced, o
     projector.copy(point).project(camera);
     return { x: (projector.x + 1) * width / 2, y: (1 - projector.y) * height / 2 + yOffset, depth: projector.z };
   }
-  function visibleScreen(point, width, height) { return point.depth >= -1 && point.depth <= 1 && point.x > 16 && point.x < width - 16 && point.y > 98 && point.y < height - 130; }
+  function positionLabel(node, width) {
+    const { x, y } = node.screen; const size = framing.labelSize(node.button);
+    const offset = width <= 760 ? 8 : 10; const sourceY = y - offset;
+    const shift = Math.min(22, size.width * .42); const side = size.width / 2 + 10;
+    const above = sourceY - size.height - offset;
+    // Prefer the sleeve's own top/bottom edge, then a small adjacent paper tab.
+    // Every candidate still respects the measured UI and already placed names.
+    const candidates = [
+      [x, y], [x, above],
+      [x + shift, y], [x - shift, y], [x + shift, above], [x - shift, above],
+      [x + side, sourceY - size.height / 2], [x - side, sourceY - size.height / 2],
+      [x, y + 16], [x + shift, y + 16], [x - shift, y + 16],
+    ];
+    const placed = candidates.find(([left, top]) => framing.placeLabel(node.button, left, top));
+    if (!placed) return;
+    const [labelX, labelY] = placed;
+    node.button.hidden = false;
+    node.button.style.transform = `translate3d(${labelX}px,${labelY}px,0) translate(-50%,0)`;
+    // The short printed leader ends at the record, so sideways labels never
+    // look like another artist's caption. It is decorative, not a hit target.
+    const sourceX = x - (labelX - size.width / 2); const sourceTop = sourceY - labelY;
+    const startX = THREE.MathUtils.clamp(sourceX, 0, size.width);
+    const startY = THREE.MathUtils.clamp(sourceTop, 0, size.height);
+    const dx = sourceX - startX; const dy = sourceTop - startY;
+    node.button.classList.toggle('has-leader', labelX !== x || labelY !== y);
+    node.button.style.setProperty('--leader-x', `${startX}px`);
+    node.button.style.setProperty('--leader-y', `${startY}px`);
+    node.button.style.setProperty('--leader-length', `${Math.hypot(dx, dy)}px`);
+    node.button.style.setProperty('--leader-angle', `${Math.atan2(dy, dx)}rad`);
+  }
   function project(camera, width, height, active) {
-    for (const node of nodes.values()) {
+    const priority = node => node.data?.selected ? 5 : node.data?.highlighted ? 4 : node.data?.current ? 3 : node.data?.adjacent ? 2 : node.data?.visited ? 1 : 0;
+    const orderedNodes = [...nodes.values()].sort((a, b) => priority(b) - priority(a));
+    for (const node of orderedNodes) {
       node.group.getWorldPosition(location); const local = furniture.worldToLocal(location.clone());
       node.screen = screenPoint(location, camera, width, height, width <= 760 ? 8 : 10);
-      node.button.hidden = !enabled || !active || !withinPaper(local, .055) || !visibleScreen(node.screen, width, height);
-      if (!node.button.hidden) node.button.style.transform = `translate3d(${node.screen.x}px,${node.screen.y}px,0) translate(-50%,0)`;
+      node.button.hidden = true;
+      if (!enabled || !active || !withinPaper(local, .055) || node.screen.depth < -1 || node.screen.depth > 1) continue;
+      positionLabel(node, width);
     }
     for (const edge of edges.values()) {
       location.copy(edge.midpoint); printwork.localToWorld(location);
       const local = furniture.worldToLocal(location.clone()); const screen = screenPoint(location, camera, width, height);
-      const closeToNode = [...nodes.values()].some(node => !node.button.hidden && Math.hypot(node.screen.x - screen.x, node.screen.y - screen.y) < (width <= 760 ? 28 : 34));
-      edge.button.hidden = !enabled || !active || !(edge.data.active || edge.data.highlighted) || !withinPaper(local, .04) || !visibleScreen(screen, width, height) || closeToNode;
+      const closeToNode = orderedNodes.some(node => node.screen && Math.hypot(node.screen.x - screen.x, node.screen.y - screen.y) < (width <= 760 ? 28 : 34));
+      edge.button.hidden = !enabled || !active || !(edge.data.active || edge.data.highlighted) || !withinPaper(local, .04) || screen.depth < -1 || screen.depth > 1 || closeToNode || !framing.placeLabel(edge.button, screen.x, screen.y, 'center');
       if (!edge.button.hidden) edge.button.style.transform = `translate3d(${screen.x}px,${screen.y}px,0) translate(-50%,-50%)`;
     }
   }

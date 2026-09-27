@@ -175,8 +175,10 @@ function mapHTML(map, api, presentation = 'quiet') {
     </div>
     <div class="map-studio-dock">
       <div class="map-network-selection"><span class="map-network-stamp" style="--node-tone:${selectedArtist.color}" aria-hidden="true"><i></i></span><div><h2>${escapeHTML(selectedArtist.name)}</h2><span>${selectedLinks.length} ${relationUnit} <i>·</i> ${selectedArtist.songIds.length} 首作品</span></div><div class="map-network-selection__actions">${button('artist', `作品 ${api.icon('arrow-up-right')}`, 'button button--quiet', `data-id="${selectedId}"`)}${selectedId !== node.id && !isChallenge ? button('connect', '找关联', 'button button--quiet', `data-id="${selectedId}"`) : ''}</div></div>
+      <details class="map-network-index" data-map-index ${map.view.inspectorOpen ?? Boolean(query) ? 'open' : ''}><summary><span>${query ? '关联路线' : `${selectedLinks.length} 条连接`}</span><small>探索 ${session.path.length - 1} 步</small>${api.icon('chevron-right')}</summary><div class="map-network-index__body">
       ${query ? `<section class="map-network-chain" aria-label="查询到的关联链"><div><span>${chain ? `${chain.edges.length} ${relationUnit}相连` : '已收录关系中尚未连通'}</span>${button('clear-path', api.icon('x'), 'icon-button', 'aria-label="清除关联查询"')}</div>${chain ? `<div class="map-chain-stops">${chain.nodes.map((id, index) => `${index ? button('edge', escapeHTML(chain.edges[index - 1].song ? songs[chain.edges[index - 1].song].title : chain.edges[index - 1].reason), 'map-chain-song', `data-id="${chain.edges[index - 1].id}"`) : ''}${button('select', escapeHTML(artistName(id)), 'map-chain-person', `data-id="${id}"`)}`).join('')}</div><small>已收录${modeName(session.mode)}中的最短链</small>` : `<p>${escapeHTML(artistName(query.start))} ↔ ${escapeHTML(artistName(query.target))}</p>`}</section>` : `<div class="map-network-neighbors" aria-label="${escapeHTML(selectedArtist.name)}的连接">${selectedLinks.map(edge => button('edge', `<span>${escapeHTML(artistName(otherArtist(edge, selectedId)))}</span><small>${escapeHTML(edge.song ? songs[edge.song].title : edge.reason)}</small>`, 'map-network-connection', `data-id="${edge.id}"`)).join('') || '<span class="map-inline-empty">暂未收录连接</span>'}</div>`}
       <div class="map-route-bar"><div class="map-route-controls">${button('back', api.icon('arrow-left'), 'icon-button', `aria-label="返回上一位${isChallenge ? '并撤销一步' : ''}" ${session.path.length < 2 || isComplete ? 'disabled' : ''}`)}${button('reset', api.icon('rotate'), 'icon-button', `aria-label="回到起点" ${session.path.length < 2 || isComplete ? 'disabled' : ''}`)}</div><div class="map-route-trail" aria-label="当前路线">${session.path.map((step, index) => `<span ${index === session.path.length - 1 ? 'aria-current="step"' : ''}>${escapeHTML(artistName(step.id))}</span>`).join('<span class="map-route-trail__arrow" aria-hidden="true">·</span>')}</div>${button('recap', `${currentSavedSongs(session).length} 首收藏`, 'button button--quiet', `data-session="${session.id}" data-map-saved-count="${session.id}"`)}</div>
+      </div></details>
     </div>
     ${undoHTML(map, api)}
     <div class="map-foot"><div>${isChallenge ? button('recap', isComplete ? '挑战结果' : '回顾路线', 'button button--quiet', `data-session="${session.id}"`) : button('finish', '结束探索', 'button button--quiet')}</div>${button('space', `${api.icon('users')} ${isReal ? '去同场' : isEventArtist ? '关联示例现场' : '示例现场'} ${api.icon('arrow-up-right')}`, 'button button--quiet map-space-link', `title="${isReal ? '为自己的活动创建房间，可返回这次探索' : '回声现场 · 虚构情景'}"`)}</div>
@@ -392,7 +394,7 @@ function attachInteractions(container, api, recordsOnly) {
     }
     if (action === 'connect') {
       if (session.type === 'challenge' || datasetForArtist(id) !== sessionDataset(session)) return;
-      mutate(state => { state.view.networkQuery = { start: currentNode(session).id, target: id, dataset: sessionDataset(session), mode: session.mode }; state.view.panel = null; });
+      mutate(state => { state.view.networkQuery = { start: currentNode(session).id, target: id, dataset: sessionDataset(session), mode: session.mode }; state.view.inspectorOpen = true; state.view.panel = null; });
       performAction({ mapAction: 'fit' });
       return;
     }
@@ -585,7 +587,7 @@ function attachInteractions(container, api, recordsOnly) {
       const start = data.get('start'); const target = data.get('target');
       const session = activeSession(api.getState().map); const dataset = sessionDataset(session);
       if (session.type === 'challenge' || datasetForArtist(start) !== dataset || datasetForArtist(target) !== dataset) return;
-      mutate(map => { map.view.networkQuery = { start, target, dataset, mode: session.mode }; map.view.selectedArtistId = target; map.view.selectedEdgeId = null; map.view.panel = null; });
+      mutate(map => { map.view.networkQuery = { start, target, dataset, mode: session.mode }; map.view.inspectorOpen = true; map.view.selectedArtistId = target; map.view.selectedEdgeId = null; map.view.panel = null; });
       performAction({ mapAction: 'fit' });
       return;
     }
@@ -626,6 +628,10 @@ function attachInteractions(container, api, recordsOnly) {
     focusTarget?.focus({ preventScroll: true });
   }
 
+  const index = container.querySelector('[data-map-index]');
+  index?.addEventListener('toggle', () => {
+    if (api.getState().map.view.inspectorOpen !== index.open) api.update(state => { state.map.view.inspectorOpen = index.open; });
+  }, { signal });
   const stage = container.querySelector('[data-map-stage]');
   const trail = container.querySelector('.map-route-trail');
   if (trail) trail.scrollLeft = trail.scrollWidth;
