@@ -1,0 +1,507 @@
+/* map-round — 0.15 寻声一局.
+   The puzzle as physical paper on a lamp-lit table: a question slip (题签) pinned
+   top-left, a dark crate holding the hand of record cards, face-down kraft sleeves
+   with a ？, and a setlist that shares the duet ticket's perforated paper.
+   Night surfaces come from night-shell tokens; every value keeps a light fallback. */
+
+html[data-theme='sakura'] {
+  --round-paper:var(--paper-lit,#fbf3e2);
+  --round-ink:var(--paper-ink,#24382d);
+  --round-muted:var(--paper-muted,#5d6858);
+  --round-rose:#b0525f;
+  --round-rose-soft:#f3dcd8;
+  --round-green:#2f5e4e;
+  --round-gold:#b98642;
+  --round-kraft:#eadcbf;
+  --round-kraft-line:#cdb98f;
+  --round-kraft-ink:#5c4b2c;
+  --round-glass:var(--night-glass,#121829e8);
+  --round-glass-line:var(--night-glass-line,#ffffff26);
+  --round-glass-ink:var(--night-glass-ink,#efe5d4);
+  --round-glass-muted:#c4bba9;
+  --round-serif:var(--font-serif,'Songti SC','STSong','Noto Serif SC','SimSun',serif);
+}
+
+/* ---------- Head: question slip, three controls, hint tape ---------- */
+/* The question and its three controls hang together in the top-left corner, leaving the
+   top of the table (and the lamp above it) clear. */
+html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback) .map-round-head {
+  position:absolute; z-index:7; top:90px; left:32px; right:auto; display:grid; grid-template-columns:min(452px,38vw);
+  grid-template-areas:'slip' 'tools' 'note'; justify-items:stretch; align-items:start; gap:10px; min-height:0; pointer-events:none;
+}
+html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback) .map-round-head>.map-round-tools { justify-self:start; }
+.map-round-slip {
+  grid-area:slip; position:relative; max-width:none; padding:15px 22px 14px 24px; border-radius:2px;
+  background:linear-gradient(#fffaf0,var(--round-paper)); color:var(--round-ink);
+  box-shadow:var(--paper-shadow-night-soft,0 12px 34px #0204127a),inset 0 0 0 1px #e8dcc0; pointer-events:auto;
+}
+.map-round-slip::before { content:''; position:absolute; left:22px; top:-8px; width:52px; height:15px; transform:rotate(-4deg); background:#e2aab5c4; box-shadow:0 1px 2px #6b3a4426; }
+/* A punched string hole: the slip is a tag hung on the table. */
+.map-round-slip::after { content:''; position:absolute; right:14px; top:14px; width:9px; height:9px; border-radius:50%; background:#d9ccad; box-shadow:inset 0 1px 2px #6b5d3d80; }
+.map-round-slip__eyebrow { display:block; margin:0 0 6px; font:600 12px/1.4 var(--font-display); letter-spacing:.16em; color:#8f4452; }
+html[data-theme='sakura'] body .map-round-slip__question {
+  display:block; margin:0; padding:0; border:0; background:none; font:500 24px/1.38 var(--round-serif); letter-spacing:.04em; color:var(--round-ink); text-wrap:balance;
+}
+.map-round-slip__question>span.is-from { color:#1f3a2d; }
+.map-round-slip__question>span.is-to { color:#9d3f50; background:linear-gradient(transparent 72%,#f2c6cc 72% 92%,transparent 92%); }
+.map-round-slip__question>i { display:inline-block; margin:0 .28em; font-style:normal; font-family:var(--font-display); color:#a29a86; transform:translateY(-.06em); }
+.map-round-slip__ask { color:var(--round-ink); }
+.map-round-slip__status { display:flex; flex-wrap:wrap; align-items:center; gap:4px 0; margin:8px 0 0; font:500 14px/1.5 var(--font-display); color:var(--round-muted); font-variant-numeric:tabular-nums; }
+.map-round-slip__status>span+span::before { content:'·'; margin:0 8px; color:#b4aa92; }
+.map-round-remaining { margin-left:12px; padding:2px 10px; border-radius:999px; background:var(--round-green); color:#fffcef; font:600 13px/1.5 var(--font-display); }
+.map-round-stamp { display:inline-flex; align-items:center; gap:6px; margin-left:12px; font:600 13px/1 var(--font-display); color:var(--tone); --tone:#2f6b4f; }
+.map-round-stamp.is-far { --tone:#a4473f; }
+.map-round-stamp.is-even { --tone:#6a6556; }
+.map-round-stamp>b { display:grid; place-items:center; width:30px; height:30px; border:2px solid var(--tone); border-radius:50%; font:700 15px/1 var(--round-serif); transform:rotate(-10deg); box-shadow:inset 0 0 0 2px #fbf3e2,inset 0 0 0 3px color-mix(in srgb,var(--tone) 55%,transparent); animation:map-stamp .38s cubic-bezier(.2,1.6,.4,1) both; }
+@keyframes map-stamp { from { transform:rotate(-24deg) scale(1.7); opacity:0; } }
+html[data-theme='sakura'] body .map-round-skip { margin-top:10px; min-height:40px; padding:8px 14px; border:1px solid #cdbf9f; border-radius:3px; background:#fffaf0; color:var(--round-ink); font:600 14px/1.2 var(--font-display); gap:6px; }
+.map-round-skip .icon { width:14px; height:14px; }
+
+html[data-theme='sakura'] body .map-studio .map-round-tools {
+  grid-area:tools; margin:0; display:flex; align-items:center; gap:4px; padding:5px; border:1px solid var(--round-glass-line); border-radius:28px;
+  background:var(--round-glass); box-shadow:0 10px 26px #02041266; pointer-events:auto;
+}
+html[data-theme='sakura'] body .map-studio .map-round-tools>.button,
+html[data-theme='sakura'] body .map-studio .map-round-tools .map-shop-menu>summary {
+  min-height:44px; padding:10px 16px; gap:7px; border:0; border-radius:22px; background:none; color:var(--round-glass-ink); font:500 14px/1.2 var(--font-display); white-space:nowrap;
+}
+html[data-theme='sakura'] body .map-studio .map-round-tools>.button:hover,
+html[data-theme='sakura'] body .map-studio .map-round-tools .map-shop-menu>summary:hover { background:#ffffff1a; color:#fff; }
+html[data-theme='sakura'] body .map-studio .map-round-tools>.button .icon { width:16px; height:16px; }
+html[data-theme='sakura'] body .map-studio .map-round-tools>.map-round-hint { background:var(--round-paper); color:var(--round-ink); font-weight:600; box-shadow:inset 0 -2px #d9ccad; }
+html[data-theme='sakura'] body .map-studio .map-round-tools>.map-round-hint:hover { background:#fff; color:var(--round-ink); }
+.map-round-hint>i { display:grid; place-items:center; width:20px; height:20px; border-radius:50%; background:#f3c77e; color:#4a3610; font:700 13px/1 var(--font-display); font-style:normal; }
+html[data-theme='sakura'] body .map-studio .map-round-tools>.map-round-hint.is-final { background:var(--round-rose); color:#fff8f0; box-shadow:none; }
+/* Amber reads on the dark glass only; the 目录 paper under it keeps an ink ring. */
+html[data-theme='sakura'] body .map-studio .map-round-tools>.button:focus-visible,
+html[data-theme='sakura'] body .map-studio .map-round-tools .map-shop-menu>summary:focus-visible { outline:2px solid var(--night-amber,#ffc27a); outline-offset:2px; }
+html[data-theme='sakura'] body .map-studio .map-shop-menu__paper :focus-visible { outline:2px solid var(--round-ink,#24382d); outline-offset:2px; }
+
+html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback) .map-round-tools .map-shop-menu>div { max-height:calc(100dvh - 290px); }
+.map-round-note {
+  grid-area:note; position:relative; display:flex; gap:10px; max-width:none; margin:0; padding:10px 16px 11px 14px; border-radius:2px;
+  background:#f7e9bf; color:#3e3214; font:500 14px/1.6 var(--font-display); box-shadow:0 8px 20px #0204124d; transform:rotate(-.6deg); pointer-events:auto;
+}
+.map-round-note::before { content:''; position:absolute; right:16px; top:-6px; width:38px; height:12px; transform:rotate(5deg); background:#ffffff8c; }
+.map-round-note>span:first-child { flex:none; font:700 16px/1.45 var(--round-serif); color:#8a5b12; }
+.map-round-note b { color:#7a3b12; font-size:15px; }
+.map-round-note__short { display:none; }
+
+/* ---------- The hand: a dark crate of record cards ---------- */
+html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback) .map-round-hand {
+  position:absolute; z-index:5; left:50%; bottom:98px; transform:translateX(-50%); width:max-content; min-width:min(560px,calc(100vw - 64px)); max-width:min(1060px,calc(100vw - 400px));
+  display:grid; grid-template-columns:212px minmax(0,1fr); grid-template-areas:'who cards' 'route cards'; align-items:start; gap:8px 16px;
+  padding:12px 14px 12px 18px; border:1px solid var(--round-glass-line); border-radius:14px; background:var(--round-glass);
+  color:var(--round-glass-ink); box-shadow:0 18px 44px #0204128c; pointer-events:auto;
+}
+.map-round-hand__who { grid-area:who; display:flex; align-items:center; gap:12px; min-width:0; }
+.map-round-hand__stamp { position:relative; flex:none; display:grid; place-items:center; width:42px; height:42px; background:var(--node-tone); border:3px solid #fff8e8; transform:rotate(-6deg); box-shadow:0 3px 6px #0006; }
+.map-round-hand__stamp::before { content:''; width:26px; height:26px; border-radius:50%; background:repeating-radial-gradient(#2c3634 0 2px,#5f6f68 3px 4px); }
+.map-round-hand__stamp i { position:absolute; width:9px; height:9px; border-radius:50%; background:var(--node-tone); }
+.map-round-hand__who h2 { margin:0; font:500 21px/1.3 var(--round-serif); letter-spacing:.06em; color:#fff4e2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.map-round-hand__who>div>span { display:block; margin-top:2px; font-size:13px; line-height:1.45; color:var(--round-glass-muted); }
+.map-round-route { grid-area:route; display:flex; align-items:center; gap:4px; min-width:0; }
+html[data-theme='sakura'] body .map-round-route .button,
+html[data-theme='sakura'] body .map-round-route .icon-button { min-height:44px; border:1px solid #ffffff24; border-radius:22px; background:#ffffff0f; color:var(--round-glass-ink); font:500 14px/1.2 var(--font-display); }
+html[data-theme='sakura'] body .map-round-route .button { padding:8px 14px 8px 12px; gap:6px; }
+html[data-theme='sakura'] body .map-round-route .icon-button { width:44px; min-width:44px; height:44px; padding:0; }
+html[data-theme='sakura'] body .map-round-route :is(.button,.icon-button):hover:not(:disabled) { background:#ffffff26; color:#fff; }
+html[data-theme='sakura'] body .map-round-route :is(.button,.icon-button):disabled { opacity:.38; }
+html[data-theme='sakura'] body .map-round-route .button--primary { background:#f3c77e; border-color:#f3c77e; color:#3a2a0c; font-weight:600; }
+html[data-theme='sakura'] body .map-round-route .button--primary:hover:not(:disabled) { background:#ffd796; color:#3a2a0c; }
+.map-round-route .icon { width:16px; height:16px; }
+.map-round-route { flex-wrap:wrap; }
+html[data-theme='sakura'] body .map-round .map-round-route__trail { flex:1 0 100%; display:flex; align-items:center; gap:6px; min-width:0; overflow-x:auto; padding:2px 0 0; font-size:13px; line-height:1.5; color:var(--round-glass-muted); white-space:nowrap; scrollbar-width:none; }
+.map-round-route__trail::-webkit-scrollbar { display:none; }
+html[data-theme='sakura'] body .map-round .map-round-route__trail>i { font-style:normal; color:#8d8676; }
+html[data-theme='sakura'] body .map-round .map-round-route__trail>span { color:var(--round-glass-muted); }
+html[data-theme='sakura'] body .map-round .map-round-route__trail>[aria-current] { color:#fff4e2; font-weight:600; }
+/* 怎么玩: a memo beside the first cards until the first song is turned over. */
+.map-round-hand__tip {
+  flex:0 0 212px; align-self:stretch; display:flex; flex-direction:column; justify-content:center; gap:4px; margin:0; padding:10px 14px; border:1px dashed #ffffff40; border-radius:3px;
+  color:var(--round-glass-ink); font:500 14px/1.6 var(--font-display); text-wrap:pretty;
+}
+.map-round-hand__tip strong { font:600 13px/1.3 var(--font-display); letter-spacing:.16em; color:#f3c77e; }
+/* The crate is dark glass (and dark paper without WebGL): its own controls take the amber ring,
+   beating map.css's green; the paper cards keep the dark one. */
+html[data-theme='sakura'] body .map-round-hand :is(.map-round-route,.map-round-hand__done) button:focus-visible { outline:2px solid var(--night-amber,#ffc27a); outline-offset:2px; }
+html[data-theme='sakura'] body .map-round-route .map-round-route__back.is-hinted { outline:2px dashed #f3c77e; outline-offset:3px; }
+/* A memo slipped in after the last card when the only way on is the way back. */
+.map-round-hand__dead {
+  flex:0 0 190px; align-self:stretch; display:flex; flex-direction:column; justify-content:center; gap:4px; margin:0; padding:10px 14px; border-radius:2px;
+  background:#f7e9bf; color:#3e3214; font:500 14px/1.55 var(--font-display); box-shadow:0 3px 0 #d8c58f,0 8px 16px #0204125c; transform:rotate(-1.2deg);
+}
+.map-round-hand__dead strong { font:600 13px/1.3 var(--font-display); letter-spacing:.16em; color:#8a5b12; }
+.map-round-hand__cards {
+  grid-area:cards; display:flex; gap:10px; min-width:0; margin:0; padding:10px 2px 4px; list-style:none; overflow-x:auto; overflow-y:visible;
+  scroll-snap-type:x proximity; scroll-padding:2px; scrollbar-width:thin; scrollbar-color:#ffffff40 transparent; overscroll-behavior-x:contain;
+}
+.map-round-card {
+  position:relative; flex:0 0 auto; width:max-content; min-width:158px; max-width:236px; display:flex; flex-direction:column; min-height:122px; padding:10px 11px 10px 13px; border-radius:3px;
+  scroll-snap-align:start; color:var(--round-ink); transform-origin:50% 50%;
+}
+.map-round-card__no { position:absolute; right:9px; top:8px; font:500 12px/1 var(--font-mono,monospace); color:#8b8069; letter-spacing:.04em; }
+.map-round-card__title { display:block; margin:0 22px 4px 0; font:600 15px/1.4 var(--font-display); color:inherit; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.map-round-card__who { display:flex; flex-wrap:wrap; align-items:center; gap:4px 6px; margin-bottom:auto; padding-bottom:8px; font-size:13px; line-height:1.4; }
+/* Face down: kraft sleeve back, a die-cut ring, and the partner hidden behind a ？. */
+.map-round-card.is-sealed {
+  border:1px solid var(--round-kraft-line); color:#2f2616;
+  background:radial-gradient(circle at 118% 108%,transparent 0 42px,#cdb98f66 43px 44px,transparent 45px 52px,#cdb98f4d 53px 54px,transparent 55px),
+    repeating-linear-gradient(135deg,transparent 0 7px,#d8c69f59 7px 8px),var(--round-kraft);
+  box-shadow:0 3px 0 #b8a06f,0 8px 16px #0204125c;
+}
+.map-round-card.is-sealed .map-round-card__who { color:var(--round-kraft-ink); }
+.map-round-card.is-sealed .map-round-card__who>i { display:inline-grid; place-items:center; width:22px; height:22px; border:1.5px dashed #9c8657; border-radius:50%; font:700 13px/1 var(--round-serif); font-style:normal; color:#7a6438; }
+html[data-theme='sakura'] body .map-round-card__flip {
+  width:100%; min-height:44px; padding:8px 10px; border:0; border-radius:3px; background:#2a3046; color:#fff4e2; font:600 14px/1.2 var(--font-display); letter-spacing:.12em;
+  box-shadow:inset 0 -2px #0000004d;
+}
+html[data-theme='sakura'] body .map-round-card__flip:hover:not(:disabled) { background:#1c2136; color:#fff; }
+/* Face up: lit paper with the partner's colour on the spine. */
+.map-round-card.is-open { border:1px solid #e3d7bb; background:var(--round-paper); box-shadow:inset 5px 0 var(--node-tone,#a78896),0 3px 0 #cbbd9b,0 8px 16px #0204125c; padding-left:16px; }
+.map-round-card__dot { display:none; }
+.map-round-card.is-open .map-round-card__who { font-weight:600; color:#1f3a2d; font-size:14px; }
+.map-round-card__who mark { padding:1px 6px; border-radius:2px; background:#e3e8d9; color:#34523f; font:600 12px/1.4 var(--font-display); }
+.map-round-card__who mark.is-target { background:var(--round-rose); color:#fff8f0; }
+.map-round-card__actions { display:flex; gap:4px; }
+html[data-theme='sakura'] body .map-round-card__go {
+  flex:1; min-width:0; min-height:44px; padding:8px 8px; gap:5px; border:0; border-radius:3px; background:var(--round-green); color:#fffcef; font:600 14px/1.2 var(--font-display);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+html[data-theme='sakura'] body .map-round-card__go:hover:not(:disabled) { background:#244d3f; color:#fff; }
+html[data-theme='sakura'] body .map-round-card__go.is-target { background:var(--round-rose); }
+html[data-theme='sakura'] body .map-round-card__go.is-target:hover:not(:disabled) { background:#963f4c; }
+.map-round-card__go .icon { flex:none; width:14px; height:14px; }
+html[data-theme='sakura'] body .map-round-card__more { flex:none; width:44px; min-width:44px; height:44px; min-height:44px; padding:0; border:1px solid #d6c9aa; border-radius:3px; background:#f3ead4; color:#4d5a4c; }
+html[data-theme='sakura'] body .map-round-card__more:hover { background:#fff; }
+.map-round-card__more .icon { width:18px; height:18px; }
+.map-round-card.is-target { border-color:#d69aa4; }
+.map-round-card.is-hinted { outline:2px dashed #f3c77e; outline-offset:3px; }
+.map-round-card__flip-hint { display:none; font:inherit; letter-spacing:.04em; color:#f3c77e; }
+.map-round-card__hint { position:absolute; z-index:1; left:10px; top:-12px; padding:2px 8px; border:1.5px dashed #6f6a5c; border-radius:2px; background:#fffaf0; color:#3d3a30; font:600 12px/1.4 var(--font-display); transform:rotate(-3deg); box-shadow:0 3px 6px #0204124d; }
+.map-round-card.is-turning { animation:map-card-turn .34s cubic-bezier(.3,.7,.3,1.2) both; }
+@keyframes map-card-turn { 0% { transform:perspective(700px) rotateY(-88deg) translateY(-6px); filter:brightness(.8); } 100% { transform:none; filter:none; } }
+
+/* Closed round: the crate becomes a result strip. */
+html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback) .map-round-hand--closed {
+  grid-template-columns:minmax(0,1fr) auto; grid-template-areas:'who done'; align-items:center; width:min(860px,calc(100vw - 400px)); padding:12px 14px 12px 16px;
+}
+.map-round-hand__done { grid-area:done; display:flex; gap:6px; }
+html[data-theme='sakura'] body .map-round-hand__done .button { min-height:44px; padding:9px 16px; border-radius:22px; font:500 14px/1.2 var(--font-display); gap:6px; }
+html[data-theme='sakura'] body .map-round-hand__done .button--quiet { border:1px solid #ffffff2e; background:#ffffff0f; color:var(--round-glass-ink); }
+html[data-theme='sakura'] body .map-round-hand__done .button--quiet:hover { background:#ffffff26; color:#fff; }
+html[data-theme='sakura'] body .map-round-hand__done .button--primary { background:#f3c77e; border-color:#f3c77e; color:#3a2a0c; font-weight:600; }
+html[data-theme='sakura'] body .map-round-hand__done .button--primary:hover:not(:disabled) { background:#ffd796; border-color:#ffd796; color:#3a2a0c; }
+.map-round-hand__done .icon { width:14px; height:14px; }
+.map-round-seal { flex:none; display:grid; place-items:center; width:50px; height:50px; border:2px solid #f3c77e; border-radius:50%; color:#f3c77e; font:700 15px/1 var(--round-serif); letter-spacing:.1em; transform:rotate(-12deg); box-shadow:inset 0 0 0 3px var(--round-glass),inset 0 0 0 4px #f3c77e80; }
+.map-round-seal.is-revealed { border-color:#aeb8d6; color:#c9d0e6; box-shadow:inset 0 0 0 3px var(--round-glass),inset 0 0 0 4px #aeb8d680; }
+.map-round-hand__trail { display:flex !important; flex-wrap:wrap; gap:2px 6px; color:var(--round-glass-muted); }
+.map-round-hand__trail i { font-style:normal; color:#8d8676; }
+
+/* During the arrival ceremony the crate steps back so the table can speak. */
+html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback) .map-round.is-ceremony .map-round-hand { opacity:.0; transform:translateX(-50%) translateY(16px); transition:opacity .25s,transform .25s; pointer-events:none; }
+
+/* ---------- Toast: in the record shop it sits under the question ---------- */
+html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback) .toast { top:auto; bottom:302px; max-width:min(520px,calc(100vw - 64px)); transform:translate(-50%,10px); text-align:center; line-height:1.55; }
+html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback) .toast.visible { transform:translate(-50%,0); }
+
+/* ---------- 2D table (WebGL off) keeps the same round ---------- */
+html[data-theme='sakura'] body.spatial-fallback[data-view='explore'] {
+  & .map-round-head { display:grid; grid-template-columns:minmax(0,1fr) auto; grid-template-areas:'slip tools' 'note note'; gap:12px; align-items:start; }
+  & .map-round-slip { max-width:none; box-shadow:0 2px 0 #e2d7bb; }
+  & .map-round-note { max-width:none; transform:none; box-shadow:none; }
+  & .map-round-tools { background:#f3ead4; border-color:#d8ccad; box-shadow:none; }
+  & .map-round-tools>.button, & .map-round-tools .map-shop-menu>summary { color:var(--round-ink); }
+  & .map-round-tools>.button:hover, & .map-round-tools .map-shop-menu>summary:hover { background:#e6dcc2; color:var(--round-ink); }
+  /* The bar is light paper here, so the scene's amber ring would vanish. */
+  & .map-studio .map-round-tools :focus-visible { outline-color:var(--round-ink,#24382d); }
+  & .map-round-hand { display:grid; grid-template-columns:212px minmax(0,1fr); grid-template-areas:'who cards' 'route cards'; gap:8px 16px; margin-top:14px; padding:12px 14px; border-radius:6px; background:#2a3046; color:var(--round-glass-ink); }
+  & .map-round-hand--closed { grid-template-columns:minmax(0,1fr) auto; grid-template-areas:'who done'; align-items:center; }
+  & .map-stage.is-ceremony .map-network-line.is-drawn { stroke-dasharray:1; stroke-dashoffset:1; animation:map-ink .3s calc(var(--i) * .3s + .2s) ease-in-out forwards; }
+}
+@keyframes map-ink { to { stroke-dashoffset:0; } }
+/* Without WebGL the record shop scrolls as a page: a moved focus stops clear of the fixed header and
+   bottom nav, and the toast rides at the top (the header's empty middle) instead of over the hand. */
+html[data-theme='sakura']:has(body.spatial-fallback[data-view='explore']) { scroll-padding:88px 0 96px; }
+html[data-theme='sakura'] body.spatial-fallback[data-view='explore'] .toast { top:max(24px,env(safe-area-inset-top)); bottom:auto; transform:translate(-50%,-10px); }
+html[data-theme='sakura'] body.spatial-fallback[data-view='explore'] .toast.visible { transform:translate(-50%,0); }
+
+/* ---------- Dialogs: type floors for the record shop ---------- */
+html[data-theme='sakura'] body .map-dialog {
+  & .eyebrow { font-size:12px; letter-spacing:.14em; color:#8f4452; }
+  & h2 { font-size:26px; line-height:1.4; }
+  & .map-panel-description { font-size:15px; line-height:1.7; color:#4d5a4c; }
+  & .map-track__copy strong, & .map-track__copy .map-track__title { font-size:15px; line-height:1.55; }
+  & .map-track__copy .map-track__title span { font-size:13px; }
+  & .map-track__copy span { font-size:13px; line-height:1.55; color:#5d6858; }
+  & .map-track__copy small, & .map-track__copy .map-track__credit-preview { display:block; margin-top:2px; font-size:12px; line-height:1.55; color:#6b6a5c; }
+  & .map-track__index { font-size:12px; }
+  & .map-track__take, & .map-track__listen { font-size:13px; min-height:38px; }
+  & .map-track__save { width:40px; min-width:40px; height:40px; min-height:40px; }
+  & .map-credits>summary { font-size:13px; }
+  & .map-credits>summary small { font-size:12px; }
+  & .map-credit-table { font-size:13px; }
+  & .map-credit-table thead th { font-size:12px; }
+  & .map-credit-table tbody th { font-size:13px; }
+  & .map-credit-role { font-size:13px; }
+  & .map-credit-role a { font-size:12px; top:-.25em; }
+  & .map-credit-sources summary, & .map-credit-sources ol, & .map-credit-sources p { font-size:12px; }
+  & .map-credit-heading p { font-size:13px; }
+  & .map-credit-bottom>span { font-size:12px; }
+  & .map-evidence-link { display:inline-flex; align-items:center; gap:4px; font-size:13px; color:#2f5e4e; }
+  & .map-evidence-link .icon { width:12px; height:12px; }
+  & .map-storage-note { font-size:12px; line-height:1.6; }
+  & .map-field { font-size:14px; }
+  & .map-field select, & .map-input { font-size:15px; }
+  & .map-form-error { font-size:13px; }
+  & .map-panel-actions .button { min-height:42px; font-size:14px; }
+  & .map-recap-stats>span { font-size:13px; }
+  & .map-recap-section h3 { font-size:14px; }
+  & .map-current-route { font-size:14px; }
+  & .map-route-details>summary { font-size:14px; min-height:44px; align-items:center; }
+  & .map-route-details>summary>span { font-size:12px; }
+  & .map-timeline__stop h4 { font-size:14px; }
+  & .map-timeline__stop>p { font-size:13px; }
+  & .map-timeline__return { font-size:13px; color:#a4473f; }
+  & .map-search-result strong { font-size:15px; }
+  & .map-search-result small { font-size:12px; }
+  & .map-search-label { font-size:13px; }
+  & .map-inline-empty { font-size:14px; }
+}
+.map-timeline__tone { margin-left:6px; padding:0 5px; border:1.5px solid currentColor; border-radius:50%; font:700 12px/1.4 var(--round-serif); font-style:normal; color:#2f6b4f; }
+.map-timeline__tone.is-far { color:#a4473f; }
+.map-timeline__tone.is-even { color:#6a6556; }
+.map-round-sealed-note { margin:14px 0 0; padding:10px 12px; border-left:3px solid #cdb98f; background:#f4ecd8; color:#4d4330; font-size:14px; line-height:1.6; }
+.map-round-flipped { display:grid; gap:6px; margin:0; padding:0; list-style:none; }
+.map-round-flipped li { display:flex; flex-wrap:wrap; justify-content:space-between; gap:4px 10px; padding:8px 10px; border-radius:2px; background:#f4ecd8; font-size:14px; }
+.map-round-flipped li span { color:#5d6858; font-size:13px; }
+/* 探索记录 inside the paper dialog: one column of slim rows, sleeve · copy · actions. */
+html[data-theme] body .map-dialog .map-record-list--panel { display:grid; grid-template-columns:minmax(0,1fr); gap:0; margin-top:8px; }
+html[data-theme] body .map-dialog .map-record--compact {
+  display:grid; grid-template-columns:40px minmax(0,1fr); grid-template-areas:'disc copy' 'disc actions'; align-items:start; gap:4px 14px;
+  padding:12px 0; border:0; border-bottom:1px dashed #d8ccad; border-radius:0; background:none; box-shadow:none; color:var(--round-ink);
+}
+html[data-theme] body .map-dialog .map-record--compact .map-record__disc { grid-area:disc; width:40px; height:40px; margin-top:2px; border-color:color-mix(in srgb,var(--node-tone),transparent 30%); background:repeating-radial-gradient(#2c3634 0 2px,#4d5a55 3px 4px); color:#fff4e2; }
+html[data-theme] body .map-dialog .map-record--compact .map-record__disc span { width:22px; height:22px; background:var(--node-tone); color:#1f2a24; font:600 12px/1 var(--font-mono,monospace); }
+html[data-theme] body .map-dialog .map-record--compact .map-record__copy { grid-area:copy; }
+html[data-theme] body .map-dialog .map-record--compact h3 { margin:2px 0; color:#1f3a2d; font:500 17px/1.4 var(--round-serif); letter-spacing:.04em; }
+html[data-theme] body .map-dialog .map-record--compact .map-record__meta { color:#6b6a5c; }
+html[data-theme] body .map-dialog .map-record--compact p { color:#4d5a4c; }
+html[data-theme] body .map-dialog .map-record--compact .map-record__actions { grid-area:actions; margin:4px 0 0; gap:4px; }
+html[data-theme] body .map-dialog .map-record--compact .map-record__actions .button { min-height:40px; padding:8px 12px; border:1px solid #d8ccad; border-radius:3px; background:#f6efdc; color:#24382d; font-size:13px; }
+html[data-theme] body .map-dialog .map-record--compact .map-record__actions .button:hover:not(:disabled) { background:#fff; }
+html[data-theme] body .map-dialog .map-record--compact .map-record__actions .icon-button { width:40px; min-width:40px; height:40px; min-height:40px; color:#6b5a4c; }
+html[data-theme='sakura'] body :is(.map-records,.map-dialog) {
+  & .map-record__meta { font-size:12px; line-height:1.5; }
+  & .map-record h3 { font-size:16px; }
+  & .map-record p { font-size:13px; }
+  & .map-record__actions .button { min-height:40px; font-size:13px; }
+  & .map-records-heading>span { font-size:13px; }
+}
+
+/* ---------- 连线歌单: a setlist on ticket paper ---------- */
+html[data-theme='sakura'] body dialog.map-dialog[open] { overflow:auto; overscroll-behavior:contain; }
+html[data-theme='sakura'] body dialog.map-dialog--setlist[open] { width:min(560px,calc(100vw - 64px)); max-height:calc(100dvh - 186px); inset:90px 32px auto auto; }
+html[data-theme='sakura'] body dialog.map-dialog--setlist::backdrop { background:linear-gradient(90deg,#0a0d2400 35%,#0a0d2466); }
+html[data-theme='sakura'] body dialog.map-dialog--setlist[open] .map-dialog__top { height:48px; }
+html[data-theme='sakura'] body dialog.map-dialog--setlist[open] .map-dialog__content { padding:0 30px 0 34px; }
+.map-setlist-head { position:relative; padding:0 0 16px; margin-bottom:18px; border-bottom:2px dashed #d8ccad; }
+.map-setlist-head .eyebrow { display:block; }
+html[data-theme='sakura'] body .map-dialog .map-setlist-head h2 { margin:8px 0 8px; font:500 30px/1.35 var(--round-serif); letter-spacing:.04em; color:#1f3a2d; }
+.map-setlist-head h2 small { font-size:20px; color:#5b6480; }
+.map-setlist-head__and { margin:0 .3em; font-size:.7em; color:#8a8474; }
+.map-setlist-head h2 b { display:inline-block; min-width:.8em; font:600 50px/1 var(--round-serif); color:var(--round-rose); vertical-align:-.12em; text-align:center; }
+.map-setlist-head__verdict { margin:0; font:500 15px/1.6 var(--font-display); color:#4d5a4c; }
+.map-setlist__own { margin:-6px 0 14px; font-size:14px; color:#5d6858; }
+.map-setlist { position:relative; display:grid; gap:0; margin:0 0 22px; padding:0; list-style:none; }
+/* The thread that the route hangs on. */
+.map-setlist::before { content:''; position:absolute; left:23px; top:24px; bottom:24px; border-left:3px solid var(--round-gold); }
+.map-setlist.is-answer::before { border-left:3px dashed #3a4a63; }
+.map-setlist__stop { position:relative; display:flex; align-items:center; gap:14px; min-height:56px; padding:4px 0; animation:map-setlist-in .36s calc(var(--i) * 80ms + 60ms) cubic-bezier(.2,.8,.3,1) both; }
+.map-setlist__sleeve { position:relative; z-index:1; flex:none; display:grid; place-items:center; width:48px; height:48px; background:var(--node-tone); border:4px solid #fffdf3; box-shadow:0 2px 0 #cbbd9b,0 5px 10px #3a3a2a2e; transform:rotate(-5deg); }
+.map-setlist__sleeve::before { content:''; width:30px; height:30px; border-radius:50%; background:repeating-radial-gradient(#2c3634 0 2px,#5f6f68 3px 4px); }
+.map-setlist__sleeve i { position:absolute; width:10px; height:10px; border-radius:50%; background:var(--node-tone); }
+.map-setlist__stop strong { font:500 20px/1.3 var(--round-serif); letter-spacing:.05em; color:#1f3a2d; }
+.map-setlist__stop small { padding:2px 8px; border-radius:2px; background:#ebe4d0; color:#4d5a4c; font-size:12px; font-weight:600; }
+.map-setlist__stop.is-target small { background:var(--round-rose); color:#fff8f0; }
+.map-setlist__song { padding:6px 0 6px 58px; animation:map-setlist-in .4s calc(var(--i) * 80ms + 60ms) cubic-bezier(.2,.8,.3,1) both; }
+/* A ticket strip: numbered stub, perforation, notches on both edges. */
+.map-setlist__ticket {
+  --notch:9px; position:relative; display:grid; grid-template-columns:50px minmax(0,1fr); grid-template-areas:'no copy' 'no actions'; gap:4px 0;
+  background:#fffaf0; border:1px solid #e3d7bb; border-radius:4px; box-shadow:0 2px 0 #d9ccad,0 8px 18px #3a3a2a24;
+  -webkit-mask:radial-gradient(circle var(--notch) at 50px 0,#0000 97%,#000) top/100% 51% no-repeat,radial-gradient(circle var(--notch) at 50px 100%,#0000 97%,#000) bottom/100% 51% no-repeat;
+  mask:radial-gradient(circle var(--notch) at 50px 0,#0000 97%,#000) top/100% 51% no-repeat,radial-gradient(circle var(--notch) at 50px 100%,#0000 97%,#000) bottom/100% 51% no-repeat;
+}
+.map-setlist__no { grid-area:no; display:grid; place-items:center; border-right:2px dashed #d8ccad; background:#f3e9d0; color:#8f4452; font:600 17px/1 var(--round-serif); letter-spacing:.02em; border-radius:4px 0 0 4px; }
+.map-setlist__copy { grid-area:copy; display:flex; flex-direction:column; align-items:flex-start; gap:3px; min-width:0; padding:12px 14px 0 16px; }
+html[data-theme='sakura'] body .map-setlist__title { display:inline; padding:0; border:0; background:none; font:600 17px/1.45 var(--font-display); color:#1f3a2d; text-align:left; cursor:pointer; text-decoration:underline; text-decoration-color:#d8ccad; text-underline-offset:4px; }
+html[data-theme='sakura'] body button.map-setlist__title:hover { text-decoration-color:#2f5e4e; }
+.map-setlist__version { font-size:13px; line-height:1.5; color:#5d6858; }
+.map-setlist__copy .map-evidence-link { font-size:13px; }
+.map-setlist__actions { grid-area:actions; display:flex; flex-wrap:wrap; gap:6px; padding:8px 14px 12px 16px; }
+html[data-theme='sakura'] body .map-setlist__actions .button { min-height:38px; padding:7px 12px; gap:5px; border:1px solid #d8ccad; border-radius:3px; background:#f6efdc; color:#24382d; font:500 13px/1.2 var(--font-display); }
+html[data-theme='sakura'] body .map-setlist__actions .button:hover { background:#fff; }
+html[data-theme='sakura'] body .map-setlist__actions .map-setlist__save.is-saved { background:#e3ecde; color:#2f5e4e; border-color:#b7c9b0; }
+.map-setlist__actions .icon { width:14px; height:14px; }
+@keyframes map-setlist-in { from { opacity:0; transform:translateY(-10px) rotate(-.6deg); } }
+.map-setlist__stats { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1px; margin:0 0 18px; padding:0; background:#e3d7bb; border:1px solid #e3d7bb; border-radius:3px; overflow:hidden; }
+.map-setlist__stats>div { padding:10px 12px; background:#fbf5e6; }
+.map-setlist__stats dt { font-size:12px; letter-spacing:.06em; color:#6b6a5c; }
+.map-setlist__stats dd { margin:2px 0 0; font:600 20px/1.3 var(--font-display); color:#1f3a2d; font-variant-numeric:tabular-nums; }
+.map-setlist__alt { margin:0 0 4px; border-top:1px solid #e3d7bb; }
+.map-setlist__alt>summary { display:flex; align-items:center; justify-content:space-between; min-height:44px; cursor:pointer; font-size:14px; font-weight:600; color:#24382d; }
+.map-setlist__alt>summary span { font-size:12px; color:#6b6a5c; font-weight:400; }
+.map-setlist__alt ol { margin:0 0 12px; padding-left:20px; }
+.map-setlist__alt li { padding:4px 0; font-size:14px; line-height:1.8; color:#24382d; }
+.map-setlist__alt li em { margin:0 6px; font-style:normal; color:#8f4452; font-size:13px; }
+html[data-theme='sakura'] body .map-dialog .map-setlist__actions-bar { position:sticky; bottom:0; z-index:2; margin:12px -30px 0 -34px; padding:12px 30px 12px 34px; background:linear-gradient(#fff9e900,var(--object-paper,#fff9e9) 22%); }
+html[data-theme='sakura'] body .map-dialog .map-setlist__actions-bar .button { min-height:44px; }
+/* Once the route is kept the button stays focusable (aria-disabled), reading as a kept slip rather than fading out. */
+html[data-theme='sakura'] body .map-dialog .map-setlist__actions-bar .map-setlist__save-route[aria-disabled='true'],
+html[data-theme='sakura'] body .map-dialog .map-setlist__actions-bar .map-setlist__save-route[aria-disabled='true']:hover { background:#e3ecde; color:#2f5e4e; border-color:#b7c9b0; cursor:default; }
+.map-setlist__note { margin:4px 0 22px; font-size:12px; line-height:1.7; color:#6b6a5c; }
+
+/* ---------- Phone ---------- */
+@media(max-width:760px) {
+  html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback) .map-round-head {
+    top:64px; left:10px; right:10px; grid-template-columns:minmax(0,1fr); grid-template-areas:'slip' 'tools' 'note'; justify-items:stretch; gap:8px;
+  }
+  html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback) .map-round-head>.map-round-tools { justify-self:stretch; }
+  .map-round-slip { max-width:none; padding:10px 14px 9px 16px; }
+  .map-round-slip::before { left:auto; right:22px; width:40px; height:12px; top:-6px; transform:rotate(4deg); }
+  .map-round-slip::after { display:none; }
+  .map-round-slip__eyebrow { margin-bottom:2px; font-size:12px; letter-spacing:.12em; }
+  html[data-theme='sakura'] body .map-round-slip__question { font-size:18px; line-height:1.35; letter-spacing:.02em; }
+  .map-round-slip__status { margin-top:4px; font-size:13px; }
+  .map-round-slip__status>span+span::before { margin:0 6px; }
+  .map-round-remaining, .map-round-stamp { margin-left:8px; }
+  .map-round-stamp>b { width:26px; height:26px; font-size:14px; }
+  /* The glyph alone keeps the status on one line; the words stay for screen readers and the toast. */
+  .map-round-stamp>span { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+  html[data-theme='sakura'] body .map-studio .map-round-tools { gap:2px; padding:4px; }
+  html[data-theme='sakura'] body .map-studio .map-round-tools>.button, html[data-theme='sakura'] body .map-studio .map-round-tools .map-shop-menu { flex:1; min-width:0; }
+  html[data-theme='sakura'] body .map-studio .map-round-tools>.button, html[data-theme='sakura'] body .map-studio .map-round-tools .map-shop-menu>summary { justify-content:center; width:100%; padding:8px 6px; font-size:14px; }
+  html[data-theme='sakura'] body .map-studio .map-round-tools>.map-round-hint { flex:1.5; }
+  .map-round-note { max-width:none; padding:8px 12px; font-size:13px; transform:none; }
+  html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback) .map-round-hand {
+    left:8px; right:8px; bottom:calc(max(12px,env(safe-area-inset-bottom)) + 72px); width:auto; min-width:0; max-width:none; transform:none;
+    grid-template-columns:50px minmax(0,1fr); grid-template-areas:'who cards' 'route cards'; align-content:start; gap:6px 8px; padding:8px 8px 8px 10px; border-radius:12px;
+  }
+  /* A slim spine on the left: who you are and the two ways back; the cards scroll beside it. */
+  .map-round-hand__stamp { display:none; }
+  .map-round-hand__who h2 { font-size:16px; line-height:1.25; white-space:normal; letter-spacing:.02em; overflow-wrap:anywhere; }
+  .map-round-hand__who>div>span:not(.map-round-hand__trail) { display:none; }
+  .map-round-route { flex-direction:column; align-items:flex-start; flex-wrap:nowrap; gap:6px; }
+  html[data-theme='sakura'] body .map-round-route .button { width:44px; min-width:44px; padding:0; justify-content:center; }
+  .map-round-route__back span { display:none; }
+  html[data-theme='sakura'] body .map-round .map-round-route__trail { display:none; }
+  .map-round-hand__tip { flex-basis:168px; padding:8px 10px; font-size:13px; line-height:1.5; }
+  .map-round-hand__cards { align-self:stretch; padding-top:4px; gap:8px; scroll-snap-type:x mandatory; scrollbar-width:none; }
+  .map-round-card { flex:0 0 auto; width:max-content; min-width:136px; max-width:232px; min-height:100px; padding:8px 9px 8px 12px; }
+  .map-round-card__title { margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .map-round-card.is-open { padding-left:14px; }
+  .map-round-card__title { font-size:15px; }
+  .map-round-card__who { font-size:13px; padding-bottom:6px; }
+  .map-round-hand__dead { flex-basis:170px; padding:8px 10px; font-size:13px; }
+  html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback) .map-round-hand--closed { grid-template-columns:minmax(0,1fr); grid-template-areas:'who' 'done'; gap:8px; padding:10px 10px 10px 12px; }
+  .map-round-hand--closed .map-round-hand__who h2 { white-space:nowrap; font-size:17px; }
+  .map-round-hand--closed .map-round-hand__who>div>span.map-round-hand__trail { display:flex !important; font-size:13px; }
+  .map-round-hand__done { width:100%; }
+  html[data-theme='sakura'] body .map-round-hand__done .button { flex:1; justify-content:center; padding:8px 6px; }
+  .map-round-seal { width:42px; height:42px; font-size:13px; }
+  html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback) .toast { top:auto; bottom:calc(max(12px,env(safe-area-inset-bottom)) + 232px); max-width:calc(100vw - 32px); min-width:0; width:max-content; }
+  html[data-theme='sakura'] body dialog.map-dialog--setlist[open] { inset:auto 0 0 0; width:100%; max-width:none; max-height:88dvh; border-radius:14px 14px 0 0; }
+  html[data-theme='sakura'] body dialog.map-dialog--setlist::backdrop { background:#0a0d2459; }
+  html[data-theme='sakura'] body dialog.map-dialog--setlist[open] .map-dialog__content { padding:0 18px 0 22px; }
+  html[data-theme='sakura'] body .map-dialog .map-setlist-head h2 { font-size:24px; }
+  .map-setlist-head h2 b { font-size:40px; }
+  .map-setlist__song { padding-left:30px; }
+  .map-setlist::before { left:23px; }
+  .map-setlist__ticket { grid-template-columns:40px minmax(0,1fr); --notch:8px; -webkit-mask:radial-gradient(circle var(--notch) at 40px 0,#0000 97%,#000) top/100% 51% no-repeat,radial-gradient(circle var(--notch) at 40px 100%,#0000 97%,#000) bottom/100% 51% no-repeat; mask:radial-gradient(circle var(--notch) at 40px 0,#0000 97%,#000) top/100% 51% no-repeat,radial-gradient(circle var(--notch) at 40px 100%,#0000 97%,#000) bottom/100% 51% no-repeat; }
+  .map-setlist__copy { padding:10px 10px 0 12px; }
+  .map-setlist__actions { padding:6px 10px 10px 12px; }
+  html[data-theme='sakura'] body .map-setlist__actions .button { min-height:44px; flex:1; justify-content:center; }
+  .map-setlist__stats { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  .map-setlist__stats>div { padding:8px 9px; }
+  .map-setlist__stats dd { font-size:18px; }
+  html[data-theme='sakura'] body .map-dialog .map-setlist__actions-bar { margin:10px -18px 0 -22px; padding:10px 18px calc(10px + env(safe-area-inset-bottom)) 22px; display:grid; grid-template-columns:1fr 1fr; }
+  html[data-theme='sakura'] body .map-dialog .map-setlist__actions-bar .button { justify-content:center; }
+  html[data-theme='sakura'] body .map-dialog .map-setlist__actions-bar .button:last-child:nth-child(3) { grid-column:1/-1; }
+  html[data-theme='sakura'] body.spatial-fallback[data-view='explore'] {
+    & .map-round-head { grid-template-columns:minmax(0,1fr); grid-template-areas:'slip' 'tools' 'note'; }
+    & .map-round-tools { flex-wrap:wrap; }
+    & .map-round-hand { grid-template-columns:minmax(0,1fr) auto; grid-template-areas:'who route' 'cards cards'; }
+    & .map-round-hand--closed { grid-template-columns:minmax(0,1fr); grid-template-areas:'who' 'done'; }
+  }
+}
+@media(max-width:380px) {
+  html[data-theme='sakura'] body .map-studio .map-round-tools>.map-round-next>.icon { display:none; }
+}
+@media(max-width:760px) {
+  .map-round-note { padding:5px 10px; font-size:13px; white-space:nowrap; }
+  .map-round-note>span:first-child { font-size:14px; }
+  .map-round-note__full { display:none; }
+  .map-round-note__short { display:block; min-width:0; overflow:hidden; text-overflow:ellipsis; }
+  .map-round-note b { font-size:13px; }
+}
+@media(max-width:760px) and (max-height:640px) {
+  .map-round-slip__eyebrow { display:none; }
+  html[data-theme='sakura'] body .map-round-slip__question { font-size:16px; }
+  .map-round-slip { padding:8px 12px 7px 14px; }
+  .map-round-slip__status { font-size:12px; margin-top:2px; }
+  .map-round-card { min-height:96px; padding-top:6px; padding-bottom:6px; }
+  .map-round-card__who { padding-bottom:4px; }
+  html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback) .map-round-head { top:58px; gap:5px; }
+  html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback) .map-round-hand { padding-top:6px; padding-bottom:4px; gap:2px 8px; }
+  .map-round-hand__cards { padding-top:4px; }
+  /* A short phone gives the table the room: no hint tape (the chip and the tagged card carry it),
+     and a one-row hand — ways back on the spine, each card just its song and its action. */
+  .map-round-note { display:none; }
+  html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback) .map-round-hand:not(.map-round-hand--closed) {
+    grid-template-columns:40px minmax(0,1fr); grid-template-areas:'route cards'; align-items:center; gap:0 6px; padding:6px;
+  }
+  .map-round-hand:not(.map-round-hand--closed) .map-round-hand__who { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+  .map-round-route { justify-content:center; gap:4px; }
+  html[data-theme='sakura'] body .map-round-route :is(.button,.icon-button) { width:40px; min-width:40px; height:38px; min-height:38px; }
+  .map-round-hand__cards { padding:2px 0 0; gap:6px; }
+  .map-round-card { min-height:0; padding:6px 8px 7px 10px; }
+  .map-round-card.is-open { padding-left:12px; }
+  .map-round-card__no, .map-round-card__who { display:none; }
+  .map-round-card__title { margin:0 0 5px; }
+  html[data-theme='sakura'] body .map-round-hand :is(.map-round-card__flip,.map-round-card__go) { min-height:38px; padding-block:6px; }
+  html[data-theme='sakura'] body .map-round-hand .map-round-card__more { width:38px; min-width:38px; height:38px; min-height:38px; }
+  .map-round-card__hint { display:none; }
+  .map-round-card__flip-hint { display:inline; }
+  .map-round-hand__dead { flex-basis:150px; padding:6px 10px; font-size:13px; line-height:1.45; }
+  .map-round-hand__tip { display:none; }
+}
+@media(min-width:761px) and (max-width:1180px) {
+  html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback) .map-round-head { grid-template-columns:min(400px,42vw); }
+}
+@media(min-width:761px) and (max-height:760px) {
+  html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback) .map-round-head { top:84px; gap:8px; }
+  html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback) .toast { bottom:292px; }
+  .map-round-slip { padding:12px 20px 11px 22px; }
+  html[data-theme='sakura'] body .map-round-slip__question { font-size:22px; }
+  .map-round-slip__status { margin-top:5px; }
+  html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback) .map-round-hand { bottom:92px; padding-top:8px; padding-bottom:8px; gap:6px 16px; }
+  /* The way back and the trail share one row, so the hand is only as tall as its cards. */
+  .map-round-route { flex-wrap:nowrap; }
+  html[data-theme='sakura'] body .map-round-route .button { flex:none; width:44px; min-width:44px; padding:0; justify-content:center; }
+  .map-round-route__back span { display:none; }
+  html[data-theme='sakura'] body .map-round .map-round-route__trail { flex:1 1 auto; padding:0 0 0 6px; }
+  .map-round-card { min-height:0; padding-top:8px; padding-bottom:8px; }
+  .map-round-card__who { padding-bottom:6px; }
+  html[data-theme='sakura'] body .map-round-hand :is(.map-round-card__flip,.map-round-card__go) { min-height:40px; padding-block:6px; }
+  html[data-theme='sakura'] body .map-round-hand .map-round-card__more { height:40px; min-height:40px; }
+  .map-round-hand__cards { padding-top:8px; }
+}
+
+@media(prefers-reduced-motion:reduce) {
+  .map-round-card.is-turning, .map-round-stamp>b, .map-setlist__stop, .map-setlist__song { animation:none; }
+  html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback) .map-round.is-ceremony .map-round-hand { transition:none; }
+  html[data-theme='sakura'] body.spatial-fallback[data-view='explore'] .map-stage.is-ceremony .map-network-line.is-drawn { animation:none; stroke-dashoffset:0; }
+}
+
+/* Without WebGL the table is ordinary page paper: keep it visible behind the record shop's dialogs. */
+html[data-theme='sakura'] body.spatial-fallback[data-view='explore']:has(.map-dialog[open]) .main-content { visibility:visible; }

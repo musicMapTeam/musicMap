@@ -21,6 +21,9 @@ import '../css/spatial-objects.css';
 import '../css/map-spatial.css';
 import '../css/scene-panels.css';
 import '../css/scene-layout.css';
+import '../css/map-round.css';
+import '../css/duet-ceremony.css';
+import '../css/night-shell.css';
 import { OverlayScrollbars } from 'overlayscrollbars';
 import { mountThemes } from './themes.js';
 import { icon } from './icons.js';
@@ -144,7 +147,7 @@ function updateChrome() {
   });
   const storageNote = document.querySelector('#storage-warning');
   if (storageNote) storageNote.hidden = !saveFailed;
-  const sectionNames = { explore: '发现新的声音', space: '遇见同场的人', records: '留住这次相遇', live: '邀请同场，交换视角' };
+  const sectionNames = { explore: '发现新的声音', space: '同一刻，另一面', records: '留住这次相遇', live: '邀请同场，交换视角' };
   document.title = `${sectionNames[state.view]} · Music Map × Space`;
   document.querySelectorAll('[data-view-label]').forEach(el => { el.textContent = sectionNames[state.view]; });
   const identity = document.querySelector('.identity');
@@ -160,7 +163,7 @@ function navItems() {
     ['space', 'heart', '小院'],
     ['explore', 'compass', '唱片店'],
     ['live', 'users', '照片墙'],
-    ['records', 'bookmark', '我的收藏'],
+    ['records', 'bookmark', '收藏'],
   ].map(([view, name, title]) => `
     <button class="nav-item" data-nav="${view}">
       ${icon(name)}<span>${title}</span>
@@ -170,9 +173,9 @@ function navItems() {
 function shell() {
   root.innerHTML = `
     <header class="app-masthead app-studio-shell">
-      <button class="brand" data-nav="space" aria-label="Music Map 首页">
+      <button class="brand" data-nav="space" aria-label="回到小院 · 樱下放映 Music Map × Space">
         <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
-        <span class="brand-wordmark">樱下放映<small>MUSIC MAP × SPACE</small></span>
+        <span class="brand-wordmark">樱下放映<small>Music Map × Space</small></span>
       </button>
       <nav class="primary-nav" aria-label="主要导航">${navItems()}</nav>
       <div class="masthead-tools"><button class="courtyard-join" data-join-room>${icon('users')}输入邀请码</button><button class="demo-help icon-button" id="demo-help" aria-label="关于 Music Map" aria-haspopup="dialog" aria-controls="about-dialog">${icon('info')}</button></div>

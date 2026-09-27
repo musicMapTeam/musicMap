@@ -19,12 +19,7 @@ html { scrollbar-width:thin; scrollbar-color:var(--line) transparent; }
 .records-filters { margin-top:0; }
 .records-scope { font-size:12px; margin:18px 0 24px; }
 
-/* The home is a cover. The demo lives behind its own entry. */
-.space-page--home .sp-hero { margin:0; min-height:620px; height:calc(100dvh - 128px); }
-.space-page--home .sp-hero__content { max-width:60%; }
-html[data-theme='sakura'] .space-page--home .sp-hero { min-height:580px; }
-html[data-theme='sakura'] .space-page--home .sp-hero__content { max-width:none; }
-html[data-theme='sakura'] .space-page--home .sp-hero>.theme-world { min-height:0; }
+/* The demo lives behind its own entry. */
 @media (min-width:761px) {
   .space-page--demo .sp-demo-header { padding-bottom:12px; }
   .space-page--demo .sp-demo-bar { padding-block:8px; }
@@ -88,11 +83,6 @@ dialog::-webkit-scrollbar-thumb { border-radius:8px; background:transparent; }
 dialog:hover::-webkit-scrollbar-thumb,dialog:focus-within::-webkit-scrollbar-thumb { background:var(--line); }
 @media (forced-colors:active) { .os-theme-music { --os-handle-bg:CanvasText; --os-handle-bg-hover:Highlight; } dialog { scrollbar-color:auto; } }
 
-@media (min-width:761px) and (max-height:780px) {
-  .space-page--home .sp-hero,html[data-theme='sakura'] .space-page--home .sp-hero { min-height:500px; }
-  .space-page--home .sp-hero h1 { font-size:clamp(60px,6vw,86px); }
-  html[data-theme='sakura'] .space-page--home .sp-hero h1 { font-size:clamp(50px,5.1vw,68px); }
-}
 @media (max-width:1150px) and (min-width:761px) {
   .app-masthead { grid-template-columns:1fr auto auto; gap:14px; padding-inline:28px; }
   .primary-nav .nav-item { padding-inline:12px; }
@@ -108,8 +98,6 @@ dialog:hover::-webkit-scrollbar-thumb,dialog:focus-within::-webkit-scrollbar-thu
   .main-content { padding:18px 20px 28px; min-height:calc(100dvh - 130px); }
   .mobile-nav { min-height:60px; padding-block:4px; }
   .mobile-nav .nav-item { min-height:48px; gap:5px; }
-  .space-page--home .sp-hero,html[data-theme='sakura'] .space-page--home .sp-hero { height:auto; min-height:0; margin-bottom:0; }
-  .space-page--home .sp-hero__content { max-width:none; }
   .records-heading h1 { font-size:30px; }
   .records-heading .button { padding-inline:12px; font-size:12px; }
   .live-entry-head { margin-bottom:22px; }

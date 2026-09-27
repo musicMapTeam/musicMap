@@ -12,7 +12,8 @@ export function mountMotion() {
   const dialogs = new Map();
   const observer = new MutationObserver(records => {
     for (const { target } of records) {
-      if (!(target instanceof HTMLDialogElement)) continue;
+      // Full-screen and print dialogs choreograph themselves.
+      if (!(target instanceof HTMLDialogElement) || target.dataset.motion === 'self') continue;
       dialogs.get(target)?.kill();
       dialogs.delete(target);
       gsap.set(target, { clearProps: 'opacity,transform' });

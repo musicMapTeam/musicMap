@@ -9,102 +9,7 @@ html[data-theme="sakura"] {
   --sk-line: #405d4330;
 }
 
-/* A real split composition keeps the scene out of the text and action area. */
-html[data-theme="sakura"] .sp-hero {
-  position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 44fr) minmax(0, 56fr);
-  grid-template-rows: 1fr auto;
-  min-height: 554px;
-  overflow: hidden;
-  isolation: isolate;
-  border: 1px solid var(--sk-line);
-  border-radius: 22px 22px 5px 5px;
-  background: var(--sk-paper);
-  color: var(--sk-ink);
-  box-shadow: 0 12px 35px #4b58410a;
-}
-html[data-theme="sakura"] .sp-hero :is(.sp-hero__image, .sp-hero__scrim, .sp-hero__optic, .sp-hero__second) { display: none; }
-html[data-theme="sakura"] .sp-hero > .theme-world {
-  display: block;
-  position: relative;
-  inset: auto;
-  grid-column: 2;
-  grid-row: 1 / 3;
-  z-index: 0;
-  min-width: 0;
-  width: 100%;
-  height: 100%;
-  min-height: 554px;
-  align-self: stretch;
-  overflow: hidden;
-  pointer-events: none;
-  background: radial-gradient(ellipse at 66% 25%, #f5dbd45e 0, #f5dbd400 61%), #f3efdf;
-  border-left: 1px solid #71866c10;
-}
 html[data-theme="sakura"] .sakura-scene__canvas { display: block; width: 100%; height: 100%; position: relative; z-index: 1; }
-html[data-theme="sakura"] .sp-hero__content {
-  position: relative;
-  inset: auto;
-  grid-column: 1;
-  grid-row: 1;
-  z-index: 2;
-  width: auto;
-  max-width: none;
-  align-self: center;
-  padding: 38px 34px 26px 38px;
-  color: var(--sk-ink);
-  background: var(--sk-paper);
-}
-html[data-theme="sakura"] .sp-hero__eyebrow { color: var(--sk-green); font-size: 10px; letter-spacing: .13em; flex-wrap: wrap; gap: 9px; }
-html[data-theme="sakura"] .sp-hero__eyebrow .sp-scene-tag { color: #626e5e; border-color: #3d66533b; padding-left: 11px; font-size: 10px; }
-html[data-theme="sakura"] .sp-hero h1 {
-  margin: 30px 0 22px;
-  color: var(--sk-ink);
-  font-size: clamp(51px, 5.9vw, 78px);
-  font-weight: 780;
-  letter-spacing: -.058em;
-  line-height: 1.12;
-  text-shadow: none;
-}
-html[data-theme="sakura"] .sp-hero h1 em { color: var(--sk-rose); }
-html[data-theme="sakura"] .sp-hero__content > p { max-width: 30em; color: #5b6859; font-size: 14px; line-height: 1.95; margin: 0 0 26px; }
-html[data-theme="sakura"] .sp-hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 22px; }
-html[data-theme="sakura"] .sp-hero .sp-hero__cta {
-  min-height: 48px;
-  padding: 12px 17px;
-  border: 1px solid var(--sk-green);
-  border-radius: 6px;
-  background: var(--sk-green);
-  color: #fff9eb;
-  box-shadow: 0 3px 0 #254530;
-  font-size: 13px;
-  white-space: nowrap;
-}
-html[data-theme="sakura"] .sp-hero .sp-hero__cta:hover { background: #2f523f; border-color: #2f523f; color: #fff9eb; }
-html[data-theme="sakura"] .sp-hero .sp-hero__cta:active { transform: translateY(2px); box-shadow: 0 1px 0 #254530; }
-html[data-theme="sakura"] .sp-hero__demo { color: var(--sk-ink); font-size: 13px; }
-html[data-theme="sakura"] .sp-hero__demo > span { color: #65705f; font-size: 11px; }
-html[data-theme="sakura"] .sp-hero__content > .sp-hero__room-note { position: static; margin: 18px 0 0; max-width: none; font-size: 12px; line-height: 1.7; color: #6d7364; }
-html[data-theme="sakura"] .sp-hero__event {
-  position: relative;
-  inset: auto;
-  grid-column: 1;
-  grid-row: 2;
-  z-index: 2;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px 16px;
-  margin: 0 34px 27px 38px;
-  padding: 18px 0 0;
-  border-top: 1px solid var(--sk-line);
-  color: var(--sk-ink);
-}
-html[data-theme="sakura"] .sp-hero__event-number { color: var(--sk-rose); font-size: 13px; line-height: 1; }
-html[data-theme="sakura"] .sp-hero__event div > span { color: #67715f; font-size: 10px; }
-html[data-theme="sakura"] .sp-hero__event strong { color: var(--sk-ink); font-size: 14px; line-height: 1.7; }
-html[data-theme="sakura"] .sp-hero__event em { display: block; margin: 0; color: #7b7968; font-size: 11px; }
-html[data-theme="sakura"] .sp-hero__image-note { display: block; flex-basis: 100%; margin: 1px 0 0; text-align: left; color: #77806d; font-size: 10px; }
 
 /* Fallback keeps a designed space if this browser cannot create a WebGL context. */
 html[data-theme="sakura"] .sakura-scene__fallback { display: grid; align-content: center; justify-items: center; gap: 30px; min-height: inherit; height: 100%; padding: 35px; color: var(--sk-green); }
@@ -124,13 +29,32 @@ html[data-theme="sakura"] .sp-ticket__paper { background-image: repeating-linear
 html[data-theme="sakura"] :is(.sp-ticket__caption, .live-card-author, .sp-memory__body h3) { color: var(--sk-ink); }
 html[data-theme="sakura"] :is(.sp-ticket__song, .live-card-track) { color: #486953; border-color: var(--sk-line); }
 html[data-theme="sakura"] :is(.sp-ticket__event, .sp-ticket__author, .live-card-author small) { color: #67725f; }
-html[data-theme="sakura"] :is(.sp-ticket__stub, .sp-duet__stub, .live-ticket-strip) { background: #e7ead8; border-color: #62795551; color: var(--sk-ink); }
-html[data-theme="sakura"] :is(.sp-ticket__stub::before, .sp-ticket__stub::after, .sp-duet__stub::before, .sp-duet__stub::after, .sp-duet::before, .sp-duet::after) { background: var(--bg, #f6f1e4); }
-html[data-theme="sakura"] :is(.sp-duet, .live-ticket) { border: 1px solid #69805c3b; background: #fffaf0; color: var(--sk-ink); box-shadow: 4px 7px 0 #9aab7d21; }
-html[data-theme="sakura"] .sp-duet__top { background: #f2e3df; color: #77505a; border-color: #ad899275; }
-html[data-theme="sakura"] .sp-duet__side { background: #fffaf0; }
-html[data-theme="sakura"] .sp-duet__byline > span:last-child { color: var(--sk-green); }
-html[data-theme="sakura"] .sp-duet__side--coral .sp-duet__byline > span:last-child { color: var(--sk-rose); }
+html[data-theme="sakura"] :is(.sp-ticket__stub, .live-ticket-strip) { background: #e7ead8; border-color: #62795551; color: var(--sk-ink); }
+/* Ticket notches are real cuts in the paper (mask), so paper, lamp-lit night or scene all show through; no painted dots. */
+html[data-theme="sakura"] .sp-ticket { --sp-stub-h: 62px; background: transparent; border-color: transparent; box-shadow: 0 1px 0 #7c8b6b2e, 0 8px 18px #1d22182b; }
+html[data-theme="sakura"] .sp-ticket--small { --sp-stub-h: 50px; }
+html[data-theme="sakura"] .sp-ticket--preview { --sp-stub-h: 48px; }
+html[data-theme="sakura"] .sp-ticket__paper {
+  -webkit-mask: radial-gradient(circle 7px at 0 calc(100% - var(--sp-stub-h)), #0000 95%, #000), radial-gradient(circle 7px at 100% calc(100% - var(--sp-stub-h)), #0000 95%, #000);
+  -webkit-mask-composite: source-in;
+  mask: radial-gradient(circle 7px at 0 calc(100% - var(--sp-stub-h)), #0000 95%, #000), radial-gradient(circle 7px at 100% calc(100% - var(--sp-stub-h)), #0000 95%, #000);
+  mask-composite: intersect;
+}
+html[data-theme="sakura"] .sp-ticket .sp-ticket__stub { height: var(--sp-stub-h); min-height: 0; flex-wrap: nowrap; padding-block: 0; }
+html[data-theme="sakura"] .sp-ticket .sp-ticket__stub::before,
+html[data-theme="sakura"] .sp-ticket .sp-ticket__stub::after { display: none; }
+/* Readable ticket print (≥12px) wherever the ticket sits, including the studio demo overrides. */
+html[data-theme="sakura"] .sp-ticket .sp-ticket__image-top { font-size: 12px; letter-spacing: .04em; }
+html[data-theme="sakura"] .sp-ticket .sp-ticket__image-top > span:last-child { font-size: 12px; }
+html[data-theme="sakura"] .sp-ticket .sp-ticket__event { flex-wrap: wrap; gap: 2px 10px; font-size: 12px; letter-spacing: .02em; }
+html[data-theme="sakura"] .sp-ticket .sp-ticket__song { font-size: 13px; }
+html[data-theme="sakura"] .sp-ticket .sp-ticket__author { min-width: 0; white-space: nowrap; font-size: 13px; }
+html[data-theme="sakura"] .sp-ticket .sp-ticket__author > span:last-child { font-size: 12px; }
+html[data-theme="sakura"] .sp-ticket .sp-ticket__code { font-size: 12px; }
+html[data-theme="sakura"] .sp-ticket--small .sp-ticket__event > span:last-child { display: none; }
+html[data-theme="sakura"] .sp-ticket--small .sp-ticket__code,
+html[data-theme="sakura"] .sp-ticket--small .sp-ticket__author > span:last-child { display: none; }
+html[data-theme="sakura"] .live-ticket { border: 1px solid #69805c3b; background: #fffaf0; color: var(--sk-ink); box-shadow: 4px 7px 0 #9aab7d21; }
 html[data-theme="sakura"] .live-ticket-mast { border-color: var(--sk-green); }
 html[data-theme="sakura"] .live-ticket-mast > b { background: var(--sk-pink); color: var(--sk-rose); }
 html[data-theme="sakura"] .live-ticket-title i { color: var(--sk-rose); }
@@ -176,35 +100,8 @@ html[data-theme="sakura"] :is(.live-match, .live-pair-reason) { border-color: #7
 html[data-theme="sakura"] .live-pair-reason { background: #e9eddd; }
 html[data-theme="sakura"] .live-local-link { background: #f3e3dd; color: #80575a; border-color: #b78485; }
 
-@media (max-width: 1080px) and (min-width: 761px) {
-  html[data-theme="sakura"] .sp-hero { grid-template-columns: minmax(0, 46fr) minmax(0, 54fr); }
-  html[data-theme="sakura"] .sp-hero__content { padding: 30px 25px 24px 28px; }
-  html[data-theme="sakura"] .sp-hero h1 { font-size: 58px; }
-  html[data-theme="sakura"] .sp-hero__content > p { font-size: 13px; }
-  html[data-theme="sakura"] .sp-hero__actions { gap: 15px; }
-  html[data-theme="sakura"] .sp-hero__event { margin-left: 28px; margin-right: 25px; }
-}
 @media (max-width: 760px) {
-  html[data-theme="sakura"] .sp-hero { display: flex; flex-direction: column; min-height: 0; border-radius: 14px 14px 4px 4px; }
-  html[data-theme="sakura"] .sp-hero__content { order: 1; align-self: stretch; padding: 26px 24px 24px; }
-  html[data-theme="sakura"] .sp-hero h1 { font-size: clamp(47px, 13vw, 65px); margin: 26px 0 19px; line-height: 1.1; }
-  html[data-theme="sakura"] .sp-hero__content > p { max-width: none; margin-bottom: 23px; font-size: 13px; line-height: 1.9; }
-  html[data-theme="sakura"] .sp-hero__actions { gap: 17px; }
-  html[data-theme="sakura"] .sp-hero .sp-hero__cta { font-size: 12px; padding-inline: 13px; }
-  html[data-theme="sakura"] .sp-hero__demo { font-size: 12px; }
-  html[data-theme="sakura"] .sp-hero__demo > span { font-size: 10px; }
-  html[data-theme="sakura"] .sp-hero__content > .sp-hero__room-note { font-size: 11px; margin: 16px 0 0; }
-  html[data-theme="sakura"] .sp-hero > .theme-world { order: 2; flex: 0 0 260px; height: 260px; min-height: 260px; width: 100%; border-left: 0; border-top: 1px solid #6d815014; border-bottom: 1px solid #6d815014; }
-  html[data-theme="sakura"] .sp-hero__event { order: 3; margin: 0; padding: 20px 24px; border: 0; gap: 9px 14px; }
-  html[data-theme="sakura"] .sp-hero__event-number { font-size: 12px; }
-  html[data-theme="sakura"] .sp-hero__event strong { font-size: 14px; }
-  html[data-theme="sakura"] .sp-hero__image-note { margin-top: 2px; font-size: 9px; }
   html[data-theme="sakura"] .sakura-scene__fallback { gap: 16px; padding: 20px; }
   html[data-theme="sakura"] .sakura-scene__fallback > span { width: 118px; }
   html[data-theme="sakura"] .sakura-scene__fallback strong { font-size: 22px; }
-}
-@media (prefers-reduced-motion: reduce) {
-  html[data-theme="sakura"] .sp-hero *,
-  html[data-theme="sakura"] .sp-hero *::before,
-  html[data-theme="sakura"] .sp-hero *::after { animation: none !important; transition: none !important; }
 }

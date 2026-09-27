@@ -16,6 +16,8 @@ const portrait = {
   records: { eye: [-.55, 2.4, 2.8], at: [1.2, 1.25, -2.3], fov: 46 },
 };
 
+const tallExplore = { eye: [-2.62, 12, -1.22], at: [0, 1.22, -1.3], fov: 45 };
+
 /** One interruptible camera move; a cancelled trip cannot open a stale modal. */
 export function createCameraDirector(camera, { size, reduced, onFrame, onShot, getLayout, getBounds }) {
   const target = new THREE.Vector3();
@@ -36,12 +38,15 @@ export function createCameraDirector(camera, { size, reduced, onFrame, onShot, g
     const { key, id, point } = active;
     const { width, height } = size();
     const mobile = width <= 760;
-    const shot = (mobile ? portrait : desktop)[key] || desktop.live;
+    // A tall phone looks at the record table from the west, so its long side runs down the screen.
+    // Decided by the viewport only (same rule as sakura-framing), so opening paper never rotates the table.
+    const tall = key === 'explore' && height > width * 1.9;
+    const shot = tall ? tallExplore : (mobile ? portrait : desktop)[key] || desktop.live;
     const endTarget = point?.clone() || new THREE.Vector3(...shot.at);
     const endEye = point ? point.clone().add(new THREE.Vector3(mobile ? .65 : 1.35, mobile ? .65 : .8, mobile ? 4.6 : 3.7)) : new THREE.Vector3(...shot.eye);
     const endFov = point ? 39 : shot.fov;
     const layout = getLayout(key); const rect = layout.rect;
-    const bottomPadding = key === 'explore' ? (mobile ? 32 : 36) : 14;
+    const bottomPadding = key === 'explore' ? (mobile ? 28 : 24) : 14;
     const fitWidth = Math.max(1, rect.width - 24); const fitHeight = Math.max(1, rect.height - 12 - bottomPadding);
     const centerX = (rect.left + rect.right) / 2; const centerY = (rect.top + 12 + rect.bottom - bottomPadding) / 2;
     const endFrame = { x: .5 - centerX / width, y: .5 - centerY / height };

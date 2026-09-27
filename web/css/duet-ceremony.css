@@ -1,0 +1,501 @@
+/* duet-ceremony — 0.15
+   The accepted duet as a night-screening ticket: indigo sky, festoon lights, warm paper.
+   Photographs are only cropped by object-fit; no filter, blend or tint ever touches them. */
+.duet-ceremony {
+  --dc-night-0: #0e1228;
+  --dc-night-1: #1b2045;
+  --dc-night-2: #2b2143;
+  --dc-lamp: #ffc27a;
+  --dc-lamp-hi: #ffd8a6;
+  --dc-sakura: #f5b0c1;
+  --dc-on: #fff4e2;
+  --dc-on-soft: #d8cfe2;
+  --dc-on-faint: #aaa2be;
+  --dc-paper: #fbf1dd;
+  --dc-paper-top: #fff9ec;
+  --dc-stub: #f5e6c9;
+  --dc-edge: #d6c09a;
+  --dc-ink: #2a2a34;
+  --dc-ink-soft: #5f5a6b;
+  --dc-rose: #9b5664;
+  --dc-green: #3d6653;
+  --dc-serif: var(--font-serif, 'Songti SC', 'Noto Serif SC', 'Source Han Serif SC', 'STSong', 'SimSun', serif);
+  --dc-sans: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', system-ui, sans-serif;
+  --dc-photo-h: clamp(200px, calc(100dvh - 592px), 420px);
+  --dc-ticket-w: min(100%, 960px, calc(var(--dc-photo-h) * 3.3 + 64px));
+  --dc-name-scale: 1;
+}
+html[data-theme] dialog.duet-ceremony {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  color: var(--dc-on);
+  color-scheme: dark;
+  font-family: var(--dc-sans);
+  background:
+    radial-gradient(70% 46% at 50% 112%, #ffc27a33, transparent 72%),
+    radial-gradient(36% 28% at 6% -6%, #ffc27a24, transparent 74%),
+    radial-gradient(36% 28% at 94% -6%, #ffc27a24, transparent 74%),
+    radial-gradient(58% 48% at 50% 52%, #2a3170, transparent 74%),
+    linear-gradient(180deg, var(--dc-night-0) 0%, #161b3b 34%, var(--dc-night-1) 62%, var(--dc-night-2) 100%);
+  overflow: hidden auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  opacity: 1;
+  transform: none;
+}
+html[data-theme] dialog.duet-ceremony[open] { display: grid; grid-template-rows: auto 1fr auto; }
+html[data-theme] dialog.duet-ceremony::backdrop { background: var(--dc-night-0); backdrop-filter: none; }
+.duet-ceremony :focus-visible { outline: 2px solid var(--dc-lamp); outline-offset: 3px; }
+
+/* Sky: interference rings behind the ticket, and a festoon of lamps across the top. */
+.duet-ceremony__sky { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.duet-ceremony__sky::before {
+  position: absolute;
+  inset: 0;
+  content: '';
+  background:
+    radial-gradient(circle 70px at 7% 78%, #f5b0c11c, transparent 70%),
+    radial-gradient(circle 46px at 12% 62%, #ffc27a14, transparent 70%),
+    radial-gradient(circle 90px at 93% 72%, #ffc27a17, transparent 70%),
+    radial-gradient(circle 40px at 88% 88%, #f5b0c11f, transparent 70%),
+    radial-gradient(circle 28px at 18% 90%, #ffc27a1c, transparent 70%);
+}
+.duet-ceremony__waves {
+  position: absolute;
+  left: 50%;
+  top: 58%;
+  width: 1500px;
+  height: 1100px;
+  margin: -550px 0 0 -750px;
+  background:
+    repeating-radial-gradient(circle at 38% 50%, #fff4e212 0 1px, transparent 1.6px 26px),
+    repeating-radial-gradient(circle at 62% 50%, #f5b0c112 0 1px, transparent 1.6px 26px);
+  -webkit-mask: radial-gradient(closest-side, #000 20%, transparent 100%);
+  mask: radial-gradient(closest-side, #000 20%, transparent 100%);
+}
+.duet-ceremony__wire { position: absolute; left: 0; top: 0; width: 100%; height: 140px; overflow: visible; }
+.duet-ceremony__wire path { fill: none; stroke: #fff4e23d; stroke-width: 1.3; vector-effect: non-scaling-stroke; }
+.duet-ceremony__bulbs i {
+  position: absolute;
+  left: var(--x);
+  top: calc(var(--y) + 3px);
+  width: 8px;
+  height: 11px;
+  margin-left: -4px;
+  border-radius: 45% 45% 50% 50%;
+  background: radial-gradient(circle at 50% 38%, #fffaf0 0 18%, var(--dc-lamp) 62%, #f0a255);
+  box-shadow: 0 0 8px 2px #ffc27a99, 0 0 30px 10px #ffc27a2b;
+}
+.duet-ceremony__bulbs i::before { position: absolute; left: 2px; top: -4px; width: 4px; height: 4px; border-radius: 1px; background: #5d5870; content: ''; }
+
+/* Top bar */
+.duet-ceremony__bar {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  padding: max(16px, env(safe-area-inset-top)) max(26px, env(safe-area-inset-right)) 0 max(28px, env(safe-area-inset-left));
+}
+.duet-ceremony__brand { display: flex; align-items: baseline; gap: 10px; min-width: 0; padding: 7px 16px 8px; border: 1px solid #fff4e21f; border-radius: 999px; background: #0e1228cc; white-space: nowrap; }
+.duet-ceremony__brand b { color: var(--dc-on); font-family: var(--dc-serif); font-size: 17px; font-weight: 600; letter-spacing: .1em; }
+.duet-ceremony__brand span { color: var(--dc-on-soft); font-size: 13px; letter-spacing: .2em; }
+.duet-ceremony__tag {
+  flex: none;
+  padding: 4px 12px;
+  border: 1px solid #f5b0c166;
+  border-radius: 999px;
+  background: #1b2045cc;
+  color: var(--dc-sakura);
+  font-size: 13px;
+  line-height: 1.5;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.duet-ceremony__close {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-left: auto;
+  padding: 0;
+  border: 1px solid #fff4e238;
+  border-radius: 50%;
+  background: #0e1228b3;
+  color: var(--dc-on);
+  font-size: 20px;
+  cursor: pointer;
+  transition: border-color .18s, background .18s;
+}
+.duet-ceremony__close:hover { border-color: #fff4e299; background: #1b2045; }
+
+/* Stage: names, event and the ticket stay centred as one composition. */
+.duet-ceremony__stage {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: safe center;
+  min-width: 0;
+  padding: 4px 32px 16px;
+  text-align: center;
+  overflow-x: clip;
+}
+.duet-ceremony__status {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 4px 8px;
+  margin: 0 0 10px;
+  color: var(--dc-sakura);
+  font-size: 14px;
+  line-height: 1.5;
+  letter-spacing: .12em;
+}
+.duet-ceremony__status .icon { width: 16px; height: 16px; flex: none; }
+.duet-ceremony__status time { color: var(--dc-on-soft); letter-spacing: .04em; font-variant-numeric: tabular-nums; }
+.duet-ceremony__status time::before { margin-right: 8px; color: var(--dc-on-faint); content: '·'; }
+.duet-ceremony__names {
+  max-width: 100%;
+  margin: 0;
+  color: var(--dc-on);
+  font-family: var(--dc-serif);
+  font-size: calc(clamp(40px, 4.8vw, 70px) * var(--dc-name-scale));
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: .03em;
+  text-shadow: 0 2px 24px #0e1228, 0 0 44px #ffc27a2e;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.duet-ceremony__name { display: inline-block; max-width: 100%; }
+.duet-ceremony__times {
+  display: inline-block;
+  margin: 0 .34em;
+  color: var(--dc-lamp);
+  font-family: var(--dc-sans);
+  font-size: .62em;
+  font-weight: 300;
+  vertical-align: .14em;
+  text-shadow: 0 0 18px #ffc27a99;
+}
+.duet-ceremony__event { display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: 4px 14px; margin: 12px 0 24px; }
+.duet-ceremony__event strong { color: var(--dc-on); font-family: var(--dc-serif); font-size: 20px; font-weight: 600; letter-spacing: .06em; overflow-wrap: anywhere; }
+.duet-ceremony__event span { color: var(--dc-on-soft); font-size: 15px; letter-spacing: .08em; font-variant-numeric: tabular-nums; }
+
+/* Ticket */
+.duet-ticket { position: relative; isolation: isolate; width: var(--dc-ticket-w); margin: 0; color: var(--dc-ink); text-align: left; }
+.duet-ticket__shadow {
+  position: absolute;
+  inset: 16px 10px 4px;
+  z-index: -1;
+  border-radius: 20px;
+  box-shadow: 0 36px 70px -12px #03051299, 0 14px 30px #0305124d, 0 0 110px 10px #ffc27a26;
+  pointer-events: none;
+}
+.duet-ticket__halves { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.duet-ticket__half {
+  --hole: 9px;
+  --notch: 13px;
+  position: relative;
+  min-width: 0;
+  margin: 0;
+  padding: 14px 16px 16px 14px;
+  background:
+    repeating-linear-gradient(0deg, #8a7a5a05 0 1px, transparent 1px 4px),
+    linear-gradient(180deg, var(--dc-paper-top), var(--dc-paper));
+}
+.duet-ticket__half--a {
+  border-radius: 16px 0 0 0;
+  -webkit-mask: radial-gradient(circle var(--hole) at 100% 0, #0000 96%, #000), radial-gradient(circle var(--notch) at 0 100%, #0000 96%, #000);
+  -webkit-mask-composite: source-in;
+  mask: radial-gradient(circle var(--hole) at 100% 0, #0000 96%, #000), radial-gradient(circle var(--notch) at 0 100%, #0000 96%, #000);
+  mask-composite: intersect;
+}
+.duet-ticket__half--b {
+  padding: 14px 14px 16px 16px;
+  border-radius: 0 16px 0 0;
+  -webkit-mask: radial-gradient(circle var(--hole) at 0 0, #0000 96%, #000), radial-gradient(circle var(--notch) at 100% 100%, #0000 96%, #000);
+  -webkit-mask-composite: source-in;
+  mask: radial-gradient(circle var(--hole) at 0 0, #0000 96%, #000), radial-gradient(circle var(--notch) at 100% 100%, #0000 96%, #000);
+  mask-composite: intersect;
+}
+.duet-ticket__photo { position: relative; height: var(--dc-photo-h); overflow: hidden; border-radius: 10px; background: #1c2140; }
+.duet-ticket__photo::after { position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px #0000001f; content: ''; pointer-events: none; }
+.duet-ticket__photo img { display: block; width: 100%; height: 100%; object-fit: cover; user-select: none; -webkit-user-drag: none; }
+.duet-ticket__ai,
+.duet-ticket__loading {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  z-index: 1;
+  padding: 3px 9px;
+  border-radius: 6px;
+  background: #121327d9;
+  color: var(--dc-on);
+  font-size: 12px;
+  line-height: 1.5;
+  letter-spacing: .04em;
+}
+.duet-ticket__loading { top: auto; bottom: 10px; }
+.duet-ticket__half figcaption { padding: 12px 2px 0; }
+.duet-ticket__byline { display: flex; align-items: baseline; justify-content: space-between; gap: 4px 12px; flex-wrap: wrap; }
+.duet-ticket__byline b { min-width: 0; color: var(--dc-ink); font-size: 18px; font-weight: 700; line-height: 1.35; overflow-wrap: anywhere; }
+.duet-ticket__byline > span { color: var(--dc-rose); font-size: 13px; line-height: 1.5; letter-spacing: .06em; }
+.duet-ticket__half p { margin: 6px 0 0; color: #3b3945; font-size: 15px; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; }
+.duet-ticket__seam {
+  position: absolute;
+  top: 16px;
+  bottom: 6px;
+  left: 50%;
+  width: 2px;
+  margin-left: -1px;
+  background: repeating-linear-gradient(180deg, var(--dc-edge) 0 5px, transparent 5px 11px);
+  transform-origin: 50% 0;
+}
+.duet-ticket__flash {
+  position: absolute;
+  top: -8%;
+  bottom: -8%;
+  left: 50%;
+  width: 44px;
+  margin-left: -22px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, #fff6e2, #ffc27a88 46%, transparent);
+  opacity: 0;
+  pointer-events: none;
+}
+.duet-ticket__burst { position: absolute; left: 50%; top: 42%; width: 0; height: 0; pointer-events: none; }
+.duet-ticket__burst i {
+  position: absolute;
+  left: -6px;
+  top: -5px;
+  width: 13px;
+  height: 10px;
+  border-radius: 85% 12% 85% 12%;
+  background: linear-gradient(135deg, #ffe1e8, #f3a2b7);
+  opacity: 0;
+}
+.duet-ticket__burst i:nth-child(3n) { width: 10px; height: 8px; background: linear-gradient(135deg, #fff3d9, var(--dc-lamp)); }
+.duet-ticket__stub {
+  --notch: 13px;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px 22px;
+  padding: 14px 28px 16px;
+  border-radius: 0 0 16px 16px;
+  background:
+    repeating-linear-gradient(0deg, #8a7a5a06 0 1px, transparent 1px 4px),
+    linear-gradient(180deg, var(--dc-stub), #f1dfbf);
+  -webkit-mask: radial-gradient(circle var(--notch) at 0 0, #0000 96%, #000) left / 51% 100% no-repeat, radial-gradient(circle var(--notch) at 100% 0, #0000 96%, #000) right / 51% 100% no-repeat;
+  mask: radial-gradient(circle var(--notch) at 0 0, #0000 96%, #000) left / 51% 100% no-repeat, radial-gradient(circle var(--notch) at 100% 0, #0000 96%, #000) right / 51% 100% no-repeat;
+}
+.duet-ticket__stub::before { position: absolute; top: 0; left: calc(var(--notch) + 8px); right: calc(var(--notch) + 8px); border-top: 2px dashed var(--dc-edge); content: ''; }
+.duet-ticket__shared { min-width: 0; }
+.duet-ticket__label { display: block; color: var(--dc-rose); font-size: 13px; line-height: 1.5; letter-spacing: .12em; }
+.duet-ticket__value { display: block; margin-top: 2px; color: var(--dc-ink); font-family: var(--dc-serif); font-size: clamp(22px, 2.3vw, 30px); font-weight: 700; line-height: 1.3; letter-spacing: .03em; overflow-wrap: anywhere; }
+.duet-ticket__seal {
+  display: grid;
+  place-content: center;
+  gap: 1px;
+  width: 80px;
+  height: 80px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  outline: 1px solid currentColor;
+  outline-offset: -8px;
+  color: var(--dc-green);
+  text-align: center;
+  line-height: 1.3;
+  transform: rotate(-8deg);
+  opacity: .92;
+}
+.duet-ticket__seal b { font-size: 13px; font-weight: 700; letter-spacing: .02em; }
+.duet-ticket__seal small { font-size: 12px; letter-spacing: .06em; font-variant-numeric: tabular-nums; }
+.duet-ceremony__note { margin: 16px 0 0; color: var(--dc-on-soft); font-size: 13px; line-height: 1.6; letter-spacing: .04em; }
+
+/* Actions: one warm primary, one outline secondary; the rest stay quiet. */
+.duet-ceremony__actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px 26px;
+  padding: 16px max(24px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
+  background: linear-gradient(180deg, #26203e00, #231e3ee6 44%);
+}
+.duet-ceremony[data-phase='playing'] .duet-ceremony__actions { pointer-events: none; }
+.duet-ceremony__main { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 12px; }
+.duet-ceremony__quiet { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0 18px; }
+.duet-ceremony__quiet:empty { display: none; }
+.duet-ceremony .duet-ceremony__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-width: 0;
+  min-height: 48px;
+  padding: 12px 26px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: none;
+  color: var(--dc-on);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: .04em;
+  cursor: pointer;
+  transition: background .18s, border-color .18s, color .18s, box-shadow .18s;
+}
+.duet-ceremony .duet-ceremony__button .icon { flex: none; width: 1.15em; height: 1.15em; }
+.duet-ceremony .duet-ceremony__button--primary { border-color: var(--dc-lamp); background: var(--dc-lamp); color: #2d1d0b; box-shadow: 0 10px 30px #ffc27a3d, inset 0 1px 0 #ffffff59; }
+.duet-ceremony .duet-ceremony__button--primary:hover:not([aria-disabled='true']) { border-color: var(--dc-lamp-hi); background: var(--dc-lamp-hi); box-shadow: 0 12px 36px #ffc27a59, inset 0 1px 0 #ffffff59; }
+.duet-ceremony .duet-ceremony__button--secondary { border-color: #fff4e259; background: #fff4e20a; }
+.duet-ceremony .duet-ceremony__button--secondary:hover:not([aria-disabled='true']) { border-color: #fff4e2a6; background: #fff4e21a; }
+.duet-ceremony .duet-ceremony__button:is(.duet-ceremony__button--link, .duet-ceremony__button--remove) { min-height: 44px; padding: 8px 4px; border-radius: 6px; color: var(--dc-on-soft); font-size: 14px; font-weight: 500; }
+.duet-ceremony .duet-ceremony__button--link span { text-decoration: underline; text-decoration-color: #fff4e24d; text-underline-offset: 5px; }
+.duet-ceremony .duet-ceremony__button--link:hover { color: var(--dc-on); }
+.duet-ceremony .duet-ceremony__button--remove { color: var(--dc-on-faint); font-size: 13px; }
+.duet-ceremony .duet-ceremony__button--remove:hover { color: #ffb8aa; }
+.duet-ceremony .duet-ceremony__button[aria-disabled='true'] { cursor: progress; opacity: .78; }
+.duet-ceremony__error { flex-basis: 100%; margin: 0; color: #ffc0ad; font-size: 14px; line-height: 1.5; text-align: center; }
+
+/* A confirmation or print preview opened from the ceremony sits in the middle of the night, not docked to the side. */
+html[data-theme] body:has(dialog.duet-ceremony[open]) dialog[open]:is(.live-dialog, .sp-dialog, .library-dialog--confirm) {
+  inset: 0;
+  width: min(440px, calc(100vw - 32px));
+  height: fit-content;
+  max-height: calc(100dvh - 48px);
+  margin: auto;
+}
+
+html[data-theme] body:has(dialog.duet-ceremony[open]) dialog:is(.live-dialog, .sp-dialog, .library-dialog--confirm)::backdrop { background: #0a0d24b3; backdrop-filter: none; }
+
+/* Two or three caption lines borrow their height from the photographs (desktop). */
+@media (min-width: 761px) {
+  .duet-ceremony[data-captions='medium'] { --dc-photo-h: clamp(190px, calc(100dvh - 616px), 400px); }
+  .duet-ceremony[data-captions='long'] { --dc-photo-h: clamp(170px, calc(100dvh - 660px), 380px); }
+}
+
+/* Shorter laptop screens keep the whole ticket and its actions in one view. */
+@media (min-width: 761px) and (max-height: 840px) {
+  .duet-ceremony { --dc-photo-h: clamp(170px, calc(100dvh - 500px), 400px); }
+  .duet-ceremony[data-captions='medium'] { --dc-photo-h: clamp(160px, calc(100dvh - 524px), 380px); }
+  .duet-ceremony[data-captions='long'] { --dc-photo-h: clamp(150px, calc(100dvh - 566px), 360px); }
+  .duet-ceremony__bar { padding-top: max(12px, env(safe-area-inset-top)); }
+  .duet-ceremony__stage { padding-top: 0; padding-bottom: 8px; }
+  .duet-ceremony__status { margin-bottom: 4px; }
+  .duet-ceremony__names { font-size: calc(clamp(36px, 6.4vh, 60px) * var(--dc-name-scale)); }
+  .duet-ceremony__event { margin: 6px 0 16px; }
+  .duet-ceremony__event strong { font-size: 18px; }
+  .duet-ticket__half p { font-size: 14px; line-height: 1.6; }
+  .duet-ticket__half figcaption { padding-top: 10px; }
+  .duet-ticket__stub { padding: 12px 26px 14px; }
+  .duet-ticket__value { font-size: 24px; }
+  .duet-ticket__seal { width: 70px; height: 70px; outline-offset: -7px; }
+  .duet-ticket__seal b { font-size: 13px; }
+  .duet-ceremony__note { margin-top: 10px; }
+  .duet-ceremony__actions { padding-top: 10px; padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+}
+
+@media (max-width: 760px) {
+  .duet-ceremony { --dc-photo-h: clamp(150px, calc(100dvh - 590px), 250px); --dc-ticket-w: 100%; }
+  /* Longer captions take their lines from the photographs, so a tall phone still shows the whole ticket. */
+  .duet-ceremony[data-captions='medium'] { --dc-photo-h: clamp(140px, calc(100dvh - 624px), 236px); }
+  .duet-ceremony[data-captions='long'] { --dc-photo-h: clamp(130px, calc(100dvh - 680px), 210px); }
+  .duet-ceremony__bar { gap: 8px; padding: max(10px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left)); }
+  .duet-ceremony__brand span { display: none; }
+  .duet-ceremony__brand b { font-size: 15px; letter-spacing: .06em; }
+  .duet-ceremony__tag { padding: 3px 10px; font-size: 12px; }
+  .duet-ceremony__stage { justify-content: flex-start; padding: 22px 12px 10px; }
+  .duet-ceremony__status { margin-bottom: 4px; font-size: 13px; letter-spacing: .06em; }
+  .duet-ceremony__status .icon { width: 14px; height: 14px; }
+  .duet-ceremony__names { font-size: calc(clamp(30px, 9.6vw, 42px) * var(--dc-name-scale)); line-height: 1.16; }
+  .duet-ceremony__event { gap: 2px 10px; margin: 6px 0 16px; }
+  .duet-ceremony__event strong { font-size: 16px; }
+  .duet-ceremony__event span { font-size: 13px; letter-spacing: .04em; }
+  .duet-ticket__shadow { inset: 12px 6px 2px; }
+  .duet-ticket__half { --hole: 7px; --notch: 10px; padding: 8px 9px 12px 8px; }
+  .duet-ticket__half--a { border-radius: 12px 0 0 0; }
+  .duet-ticket__half--b { padding: 8px 8px 12px 9px; border-radius: 0 12px 0 0; }
+  .duet-ticket__photo { border-radius: 7px; }
+  .duet-ticket__ai, .duet-ticket__loading { left: 6px; top: 6px; padding: 2px 6px; font-size: 12px; }
+  .duet-ticket__loading { top: auto; bottom: 6px; }
+  .duet-ticket__half figcaption { padding: 9px 2px 0; }
+  .duet-ticket__byline { display: block; }
+  .duet-ticket__byline b { display: block; font-size: 16px; }
+  .duet-ticket__byline > span { display: block; margin-top: 1px; font-size: 12px; letter-spacing: .02em; }
+  .duet-ticket__half p { margin-top: 5px; font-size: 14px; line-height: 1.65; }
+  .duet-ticket__seam { top: 10px; }
+  .duet-ticket__stub { --notch: 10px; gap: 4px 12px; padding: 14px 14px 15px 18px; border-radius: 0 0 12px 12px; }
+  .duet-ticket__label { font-size: 12px; letter-spacing: .06em; }
+  .duet-ticket__value { font-size: 21px; }
+  .duet-ticket__seal { width: 62px; height: 62px; outline-offset: -6px; }
+  .duet-ticket__seal b { font-size: 12px; letter-spacing: .02em; }
+  .duet-ticket__seal small { font-size: 12px; letter-spacing: 0; }
+  .duet-ceremony__note { margin-top: 12px; padding: 0 8px; }
+  .duet-ceremony__actions { flex-direction: column; flex-wrap: nowrap; gap: 2px; padding: 14px max(12px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); background: linear-gradient(180deg, #26203e00, #231e3ef0 30%); }
+  .duet-ceremony__main { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; width: 100%; }
+  .duet-ceremony__main > :only-child { grid-column: 1 / -1; }
+  .duet-ceremony .duet-ceremony__button { padding: 10px 12px; }
+  .duet-ceremony__quiet { gap: 0 16px; }
+}
+/* Short phones (320 × 568): the whole ticket, stub included, fits above one sticky row of buttons;
+   the quiet links follow the note in the page flow. */
+@media (max-width: 760px) and (max-height: 700px) {
+  .duet-ceremony[data-captions] { --dc-photo-h: clamp(108px, calc(100dvh - 452px), 200px); }
+  .duet-ceremony__stage { padding-top: 8px; }
+  .duet-ceremony__status { margin-bottom: 2px; }
+  .duet-ceremony__names { font-size: calc(clamp(26px, 8.6vw, 36px) * var(--dc-name-scale)); }
+  .duet-ceremony__event { margin: 4px 0 12px; }
+  .duet-ticket__half figcaption { padding-top: 7px; }
+  .duet-ticket__half p { margin-top: 3px; line-height: 1.6; }
+  .duet-ticket__stub { padding-block: 11px 12px; }
+  .duet-ticket__value { font-size: 20px; }
+  .duet-ticket__seal { width: 56px; height: 56px; }
+  .duet-ceremony__note { margin-top: 10px; }
+  .duet-ceremony__actions { display: contents; }
+  .duet-ceremony__quiet { order: 1; padding: 4px 12px 2px; }
+  /* Scrolled into view on failure; the margin keeps it clear of the sticky row below. */
+  .duet-ceremony__error { order: 1; padding: 0 16px; scroll-margin-bottom: calc(88px + env(safe-area-inset-bottom, 0px)); }
+  .duet-ceremony__main {
+    order: 2;
+    position: sticky;
+    bottom: 0;
+    z-index: 3;
+    width: auto;
+    padding: 12px max(12px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+    background: linear-gradient(180deg, #26203e00, #231e3ef2 34%);
+  }
+}
+@media (max-width: 360px) {
+  .duet-ceremony__brand { display: none; }
+  .duet-ceremony__status time { display: none; }
+  .duet-ceremony .duet-ceremony__button { gap: 6px; padding: 10px 8px; font-size: 14px; letter-spacing: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .duet-ceremony *, .duet-ceremony *::before, .duet-ceremony *::after { animation: none !important; transition: none !important; }
+}
+@media (forced-colors: active) {
+  .duet-ticket__half, .duet-ticket__stub { border: 1px solid CanvasText; }
+}
+.duet-ceremony__names:focus { outline: none; }

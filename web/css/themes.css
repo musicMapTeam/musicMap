@@ -6,7 +6,6 @@
   --theme-paper:#fffbf1; --theme-accent:#eab1c1; --theme-soft:#f2dfe4;
   --button-fill:#345b49; --button-ink:#fff9ed;
 }
-.sp-hero { margin-bottom:40px; }
 
 /* Readable light surfaces for shared controls, forms and business content. */
 :root {
@@ -21,6 +20,8 @@
   & .button--primary { background:var(--button-fill); color:var(--button-ink); border-color:var(--button-fill); }
   & .button--primary:hover:not(:disabled) { background:color-mix(in srgb,var(--button-fill),var(--text) 9%); color:var(--button-ink); border-color:var(--button-fill); }
   & .button--quiet { color:var(--text); border-color:transparent; }
+  /* base.css lightens quiet text on hover for dark pages; on paper it stays ink over the raised fill. */
+  & .button--quiet:hover:not(:disabled) { color:var(--text); }
   & .icon-button:hover { background:var(--surface-raised); border-color:var(--muted); }
   & .empty-state { border-color:var(--line); }
   & .mobile-nav { background:var(--bg); border-color:var(--line); }

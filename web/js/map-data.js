@@ -18,8 +18,11 @@ const fictionalArtists = [
 ];
 
 export const catalogues = {
-  real: { id: 'real', label: '真实合作精选', version: REAL_CATALOGUE_VERSION, start: 'real-jay', target: 'real-gem', hasStyle: false },
-  fictional: { id: 'fictional', label: '情景示例', version: 'fictional-2026-09-v1', start: 'a', target: 'f', hasStyle: true },
+  // rounds: fixed, reproducible 寻声 puzzles (start → target), each checked to be ≥ 2 co steps apart.
+  real: { id: 'real', label: '真实合作精选', version: REAL_CATALOGUE_VERSION, start: 'real-jay', target: 'real-gem', hasStyle: false,
+    rounds: [['real-fei', 'real-gem'], ['real-amei', 'real-stefanie'], ['real-cindy', 'real-jam'], ['real-gary', 'real-jinsha'], ['real-charlene', 'real-fei']] },
+  fictional: { id: 'fictional', label: '情景示例', version: 'fictional-2026-09-v1', start: 'a', target: 'f', hasStyle: true,
+    rounds: [['b', 'h'], ['d', 'h'], ['a', 'f']] },
 };
 export const artists = [
   ...realArtists,

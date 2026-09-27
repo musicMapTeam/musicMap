@@ -1,6 +1,8 @@
 import { SPACE_EVENT, SPACE_MOMENTS, SPACE_PHOTOS } from './space-data.js';
 import { downloadTicket, downloadCard } from './ticket-export.js';
 import { createPhotoStore, preparePhoto } from './live-photo.js';
+import { openDuetCeremony } from './duet-ceremony.js';
+import { momentLabel, perspectiveLabel, sharedLine } from './duet-facts.js';
 import qrcode from 'qrcode-generator';
 
 const SESSION_KEY = 'music-map-live:v1';
@@ -31,6 +33,7 @@ export function mountLive(container, api) {
   let interval;
   let currentModal = null;
   let requestTarget = null;
+  let ceremony = null;
   const entryPayload = api.getState().routePayload || {};
   let songDraft = typeof entryPayload.songDraft?.title === 'string' ? entryPayload.songDraft : null;
   const requestedRoomId = typeof entryPayload.roomId === 'string' ? entryPayload.roomId : null;
@@ -190,16 +193,17 @@ export function mountLive(container, api) {
     if (!rooms.some(item => item.id === next.room.id)) rooms.push(next.room);
     render();
     if (dialog.open) hydratePhotos(modal);
-    if (dialog.open && currentModal?.name === 'exchange') {
-      const previous = old?.exchanges.find(ex => ex.id === currentModal.id);
-      const latest = next.exchanges.find(ex => ex.id === currentModal.id);
-      if (latest && previous?.status !== latest.status) openExchange(latest.id);
+    const watching = dialog.open && currentModal?.name === 'exchange' ? currentModal.id : null;
+    if (watching) {
+      const previous = old?.exchanges.find(ex => ex.id === watching);
+      const latest = next.exchanges.find(ex => ex.id === watching);
+      if (latest && previous?.status !== latest.status && latest.status !== 'accepted') openExchange(latest.id);
     }
-    const newlyAccepted = next.exchanges.find(ex => ex.status === 'accepted' && old?.exchanges.some(previous => previous.id === ex.id && previous.status === 'pending'));
-    if (newlyAccepted && !dialog.open) {
-      api.toast(newlyAccepted.from === next.me.id ? '对方接受了交换，你们的共同记忆已保存' : '交换完成，你们的共同记忆已保存');
-      openTicket(newlyAccepted);
-    }
+    // Only a real pending → accepted change premieres the duet, once; the exchange being watched goes first.
+    const accepted = next.exchanges.filter(ex => ex.status === 'accepted' && old?.exchanges.some(previous => previous.id === ex.id && previous.status === 'pending'));
+    const newlyAccepted = accepted.find(ex => ex.id === watching) || accepted[0];
+    if (newlyAccepted && !ceremony && (!dialog.open || watching === newlyAccepted.id)) openTicket(newlyAccepted, { reveal: true });
+    else if (newlyAccepted && !ceremony) api.toast(newlyAccepted.from === next.me.id ? '对方接受了交换，双联已保存到你的记录' : '交换完成，双联已保存到你的记录');
   }
 
   async function refresh(force = false) {
@@ -292,7 +296,7 @@ export function mountLive(container, api) {
     const hasCards = room.cards.some(card => card.ownerId !== room.me.id && card.isPublic);
     const action = hasCards ? 'wall' : room.room.memberCount < 2 ? 'invite' : own.isPublic ? 'wall' : 'visibility';
     const label = { wall: '看看同场卡片', invite: '邀请朋友一起', visibility: '展示到本场' }[action];
-    openModal('card-saved', '现场卡已保存', `<div class="live-saved-note">${icon('check')}<div><strong>${own.isPublic ? '已展示到本场' : '这张卡先为你私藏'}</strong><p>${own.isPublic ? '交换仍需双方同意。' : '只有你可见，也能主动申请交换。'}</p></div></div><div class="live-saved-actions"><button class="button button--primary" data-live-action="${action}">${label} ${icon('arrow-right')}</button><button class="button button--secondary" data-live-action="download-card">下载我的卡片 ${icon('arrow-up-right')}</button>${!own.isPublic && action !== 'visibility' ? '<button class="text-button" data-live-action="visibility">展示到本场</button>' : ''}<button class="text-button" data-live-action="collection">去我的记录</button></div><button class="text-button" data-live-action="close">先收好</button>`, 'live-dialog--saved', own.id);
+    openModal('card-saved', '现场卡已保存', `<div class="live-saved-note">${icon('check')}<div><strong>${own.isPublic ? '已展示到本场' : '这张卡先为你私藏'}</strong><p>${own.isPublic ? '交换仍需双方同意。' : '只有你可见，也能主动申请交换。'}</p></div></div><div class="live-saved-actions"><button class="button button--primary" data-live-action="${action}">${label} ${icon('arrow-right')}</button><button class="button button--secondary" data-live-action="download-card">下载我的卡片 ${icon('arrow-up-right')}</button></div><div class="live-saved-links">${!own.isPublic && action !== 'visibility' ? '<button class="text-button" data-live-action="visibility">展示到本场</button>' : ''}<button class="text-button" data-live-action="collection">去我的记录 ${icon('arrow-right')}</button><button class="text-button live-saved-later" data-live-action="close">先收好</button></div>`, 'live-dialog--saved', own.id);
   }
 
   function roomView() {
@@ -324,7 +328,7 @@ export function mountLive(container, api) {
   }
 
   function restoreScene() {
-    queueMicrotask(() => { if (!signal.aborted && !dialog.open) api.spatial?.restore(); });
+    queueMicrotask(() => { if (!signal.aborted && !dialog.open && !ceremony) api.spatial?.restore(); });
   }
 
   function closeModal() {
@@ -459,13 +463,50 @@ export function mountLive(container, api) {
     currentModal.id = id;
   }
 
-  function openTicket(item) {
+  /** Accepted exchanges and saved records open the full-screen duet; nothing else can. */
+  function openTicket(item, { reveal = false } = {}) {
+    if (!item || (item.status && item.status !== 'accepted') || signal.aborted) return;
     const [a, b] = [item.fromCard, item.toCard];
     const event = eventOf(a);
-    const saved = room.records.find(record => record.exchangeId === (item.exchangeId || item.id));
-    const sharedTrack = a.trackId && a.trackId === b.trackId && event.song;
-    const reason = matchReason(a, b);
-    openModal('ticket', '共同记忆', `<div class="live-ticket"><div class="live-ticket-title"><span>${escape(event.title)}${event.isDemo ? ' · 示例场次' : ''}<small>${escape([event.date, event.city].filter(Boolean).join(' · '))}</small></span><strong>${escape(a.ownerName)} <i>×</i> ${escape(b.ownerName)}</strong></div><div class="live-ticket-pair">${miniCard(a)}${miniCard(b)}</div><div class="live-ticket-strip"><span>${sharedTrack ? `♪ ${escape(event.song)}` : escape(reason.title)}</span></div><div class="live-ticket-foot"><span>${escape(dateLabel(completedAt(item)))}<br>双方已同意 · ${saved ? '已保存到我的记录' : '交换记录'}</span><span class="live-ticket-bars" aria-hidden="true"></span></div></div><div class="live-ticket-actions"><button class="button button--primary" data-live-action="download" data-id="${escape(item.exchangeId || item.id)}">保存票根图片 ${icon('arrow-up-right')}</button><button class="button button--secondary" data-live-action="collection">去我的记录 ${icon("bookmark")}</button><button class="text-button" data-live-action="map">${api.getState().space?.mapReturnId ? '继续刚才的探索' : '去音乐地图'} ${icon('compass')}</button></div>${saved ? `<button class="text-button live-delete-record" data-live-action="delete-record" data-id="${escape(saved.id)}">从我的记忆中删除</button>` : ''}`, 'live-dialog--ticket', a.ownerId === room.me.id ? b.id : a.id);
+    const exchangeId = item.exchangeId || item.id;
+    const saved = room.records.find(record => record.exchangeId === exchangeId);
+    if (dialog.open) { dialog.close(); currentModal = null; }
+    ceremony?.close();
+    const handle = openDuetCeremony({
+      id: exchangeId,
+      reveal,
+      scenario: 'live',
+      event: { title: event.title, date: event.date, city: event.city, isDemo: event.isDemo },
+      completedAt: completedAt(item),
+      sides: [a, b].map(card => ({
+        author: card.ownerName || '同场朋友',
+        src: photo(card),
+        load: card.photoId ? () => photos.load(card.photoId) : null,
+        isExample: !card.photoId,
+        perspective: perspectiveLabel(card),
+        moment: momentLabel(card.momentId),
+        caption: card.caption || '这一刻，想和你一起记住。',
+      })),
+      shared: sharedLine([a, b], event),
+      status: saved ? '双方已同意 · 已保存到我的记录' : '双方已同意',
+      note: '再次公开对方照片前，请先征得对方同意。',
+      closeLabel: '关闭双联，回到本场',
+      actions: [
+        { id: 'save', kind: 'primary', icon: 'image', label: '保存双联图片', busyLabel: '正在生成图片…',
+          run: async () => { await downloadTicket(await Promise.all([exportCard(a), exportCard(b)]), exportInfo(a, item)); } },
+        { id: 'back', kind: 'secondary', icon: 'arrow-left', label: '返回现场', run: ({ close }) => close() },
+        { id: 'collection', kind: 'link', icon: 'bookmark', label: '去我的收藏', run: ({ close }) => { close(); api.navigate('records'); } },
+        { id: 'map', kind: 'link', icon: 'compass', label: api.getState().space?.mapReturnId ? '继续刚才的探索' : '去音乐地图',
+          run: ({ close }) => { close(); const resumeSessionId = api.getState().space?.mapReturnId; api.navigate('explore', resumeSessionId ? { resumeSessionId } : { from: 'live' }); } },
+        saved ? { id: 'remove', kind: 'remove', icon: 'trash', label: '从我的记忆中删除', run: () => openDeleteRecord(saved.id) } : null,
+      ],
+      onClose: () => { if (ceremony !== handle) return; ceremony = null; restoreScene(); },
+    });
+    ceremony = handle;
+  }
+
+  function openDeleteRecord(id) {
+    openModal('delete', '从我的记忆中删除这张票？', `<p class="live-modal-intro">只删除你保存的记录，不会改动对方的记录。已经完成的交换动态仍会保留。</p><button class="button button--primary live-wide" data-live-action="confirm-delete" data-id="${escape(id)}">确认删除我的记录</button>`);
   }
 
   function openInvite() {
@@ -734,10 +775,11 @@ export function mountLive(container, api) {
     });
     if (action === 'decide') act(async () => {
       version += 1;
-      setState(await request(`/rooms/${room.room.id}/exchanges/${id}/decision`, { method: 'POST', body: { decision: button.dataset.decision } }));
-      closeModal();
-      if (button.dataset.decision === 'accepted') openTicket(room.exchanges.find(item => item.id === id));
-      else api.toast(button.dataset.decision === 'declined' ? '已回应，这次先不交换' : '交换申请已取消');
+      const decision = button.dataset.decision;
+      setState(await request(`/rooms/${room.room.id}/exchanges/${id}/decision`, { method: 'POST', body: { decision } }));
+      // setState already premieres an accepted exchange; this only covers a missed transition.
+      if (decision === 'accepted') { if (!ceremony) openTicket(room.exchanges.find(item => item.id === id), { reveal: true }); }
+      else { closeModal(); api.toast(decision === 'declined' ? '已回应，这次先不交换' : '交换申请已取消'); }
     });
     if (action === 'copy' || action === 'copy-code') act(async () => {
       const isCode = action === 'copy-code';
@@ -745,19 +787,13 @@ export function mountLive(container, api) {
       try { await navigator.clipboard.writeText(input.value); api.toast(isCode ? '邀请码已复制，回来时可以使用' : '邀请链接已复制'); }
       catch { input.focus(); input.select(); api.toast(isCode ? '已选中邀请码，可以手动复制' : '已选中邀请链接，可以手动复制'); }
     });
-    if (action === 'download') act(async () => {
-      const item = room.exchanges.find(ex => ex.id === id) || room.records.find(record => record.exchangeId === id);
-      if (!item) throw new Error('这份共同记忆暂时未找到，请刷新后重试。');
-      await downloadTicket(await Promise.all([exportCard(item.fromCard), exportCard(item.toCard)]), exportInfo(item.fromCard, item));
-      api.toast('票根已生成');
-    });
     if (action === 'download-card') act(async () => {
       if (!room.ownCard) throw new Error('请先保存自己的现场卡。');
       await downloadCard(await exportCard(room.ownCard), exportInfo(room.ownCard));
       api.toast('现场卡已生成');
     });
-    if (action === 'delete-record') openModal('delete', '从我的记忆中删除这张票？', `<p class="live-modal-intro">只删除你保存的记录，不会改动对方的记录。已经完成的交换动态仍会保留。</p><button class="button button--primary live-wide" data-live-action="confirm-delete" data-id="${escape(id)}">确认删除我的记录</button>`);
-    if (action === 'confirm-delete') act(async () => { version += 1; setState(await request(`/rooms/${room.room.id}/records/${id}`, { method: 'DELETE' })); closeModal(); api.toast('已从我的记忆中删除'); });
+    if (action === 'delete-record') openDeleteRecord(id);
+    if (action === 'confirm-delete') act(async () => { version += 1; setState(await request(`/rooms/${room.room.id}/records/${id}`, { method: 'DELETE' })); closeModal(); ceremony?.close(); api.toast('已从我的记忆中删除'); });
     if (action === 'leave') openModal('leave', '离开房间？', `<p class="live-modal-intro">你的现场卡会撤下，待回应申请会取消。自己的卡片和已收藏双联仍在「我的记录」中。</p><div class="live-return-slip"><label class="live-field">重新入场的邀请码<input readonly value="${escape(room.room.code)}" data-room-code aria-label="重新入场的邀请码"></label><button class="button button--secondary" data-live-action="copy-code">复制邀请码 ${icon('arrow-up-right')}</button></div><button class="button button--primary live-wide" data-live-action="confirm-leave">确认离开</button>`);
     if (action === 'confirm-leave') act(async () => {
       version += 1;
@@ -785,5 +821,6 @@ export function mountLive(container, api) {
   document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); }, { signal });
   connect();
   interval = setInterval(refresh, 4000);
-  return () => { clearPhotos(); life.abort(); clearInterval(interval); dialog.close(); };
+  // Close the duet before revoking the photo URLs it may still show.
+  return () => { ceremony?.close(); clearPhotos(); life.abort(); clearInterval(interval); dialog.close(); };
 }
