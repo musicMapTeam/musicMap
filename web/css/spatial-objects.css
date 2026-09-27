@@ -67,21 +67,21 @@ html[data-theme='sakura'] body[data-spatial-section='live']:not(.spatial-fallbac
   border:0; border-radius:0; box-shadow:none; background:none; pointer-events:none;
 }
 html[data-theme='sakura'] body[data-spatial-section='live'] .live-page { padding:0; height:100%; max-width:none; }
-html[data-theme='sakura'] body[data-spatial-section='live'] #live-surface { height:100%; }
+html[data-theme='sakura'] body[data-spatial-section='live'] #live-surface:not([data-live-state='entry']) { height:100%; }
 html[data-theme='sakura'] body[data-spatial-section='live'] .world-caption { display:none; }
 html[data-theme='sakura'] .live-room-scene { position:relative; height:100%; min-height:0; }
 html[data-theme='sakura'] .live-room-ticket { position:absolute; left:0; top:0; width:330px; padding:17px 20px 10px; pointer-events:auto; }
 html[data-theme='sakura'] .live-room-ticket::before { content:''; position:absolute; width:40px; height:11px; left:24px; top:-5px; transform:rotate(-5deg); background:#b5bfa18c; }
-html[data-theme='sakura'] .live-paper-label { display:block; margin-bottom:9px; color:#a2757b; font:9px/1.4 var(--font-mono); letter-spacing:.17em; }
+html[data-theme='sakura'] .live-paper-label { display:block; margin-bottom:9px; color:#a2757b; font:12px/1.4 var(--font-mono); letter-spacing:.17em; }
 html[data-theme='sakura'] .live-room-ticket .live-room-head { padding:0; margin:0; }
 html[data-theme='sakura'] .live-room-ticket .live-room-head h1 { margin:0 0 8px; font:500 22px/1.5 'Songti SC','SimSun',serif; letter-spacing:.03em; }
-html[data-theme='sakura'] .live-room-ticket .live-event-meta { font-size:10px; line-height:1.7; }
-html[data-theme='sakura'] .live-room-ticket .live-event-meta>span { display:block; font-size:10px; }
+html[data-theme='sakura'] .live-room-ticket .live-event-meta { font-size:12px; line-height:1.7; }
+html[data-theme='sakura'] .live-room-ticket .live-event-meta>span { display:block; font-size:12px; }
 html[data-theme='sakura'] .live-room-ticket .live-room-tools { gap:12px; margin:12px 0 0; flex-wrap:nowrap; }
-html[data-theme='sakura'] .live-room-ticket .live-room-tools .button { min-height:36px; padding:8px 10px; font-size:11px; }
-html[data-theme='sakura'] .live-room-ticket .text-button { font-size:10px; min-height:36px; }
-html[data-theme='sakura'] .live-room-ticket .live-room-ribbon { gap:10px; margin:12px 0 0; padding:6px 0 0; border:0; border-top:1px dashed var(--object-line); border-radius:0; background:none; font-size:10px; }
-html[data-theme='sakura'] .live-room-ticket .live-room-ribbon b { font-size:9px; padding:2px 4px; margin-left:0; border-color:var(--object-line); }
+html[data-theme='sakura'] .live-room-ticket .live-room-tools .button { min-height:36px; padding:8px 10px; font-size:12px; }
+html[data-theme='sakura'] .live-room-ticket .text-button { font-size:12px; min-height:36px; }
+html[data-theme='sakura'] .live-room-ticket .live-room-ribbon { gap:10px; margin:12px 0 0; padding:6px 0 0; border:0; border-top:1px dashed var(--object-line); border-radius:0; background:none; font-size:12px; }
+html[data-theme='sakura'] .live-room-ticket .live-room-ribbon b { font-size:12px; padding:2px 4px; margin-left:0; border-color:var(--object-line); }
 html[data-theme='sakura'] .live-room-ticket .live-room-ribbon [data-sync].is-offline { max-width:none; color:#955b65; }
 html[data-theme='sakura'] .live-room-ticket:has([data-sync]:not([hidden])) .live-room-ribbon { flex-wrap:wrap; }
 html[data-theme='sakura'] .live-room-ticket [data-sync]:not([hidden]) { flex-basis:100%; order:2; }
@@ -92,21 +92,21 @@ html[data-theme='sakura'] .live-room-tray .live-room-columns { display:block; }
 html[data-theme='sakura'] .live-room-tray .live-own-section { padding:0; border:0; }
 html[data-theme='sakura'] .live-room-tray .live-section-title { margin:0 0 10px; gap:7px; }
 html[data-theme='sakura'] .live-room-tray .live-section-title h2 { font-size:12px; font-weight:550; letter-spacing:.04em; }
-html[data-theme='sakura'] .live-room-tray .live-section-title small { font-size:10px; }
+html[data-theme='sakura'] .live-room-tray .live-section-title small { font-size:12px; }
 html[data-theme='sakura'] .live-room-tray .live-own-section>.live-card { display:grid; grid-template-columns:72px minmax(0,1fr); padding:5px; border:1px solid #e4ddcb; border-radius:1px; background:#fffdf5; box-shadow:1px 3px 5px #43523714; }
 html[data-theme='sakura'] .live-room-tray .live-own-section>.live-card .live-card-photo { height:85px; min-height:0; border-radius:0; aspect-ratio:auto; }
-html[data-theme='sakura'] .live-room-tray .live-own-section>.live-card .live-card-photo>span { bottom:4px; left:4px; max-width:calc(100% - 8px); padding:2px 4px; font-size:8px; }
-html[data-theme='sakura'] .live-room-tray .live-own-section>.live-card .live-example-photo { font-size:7px; padding:2px 3px; }
+html[data-theme='sakura'] .live-room-tray .live-own-section>.live-card .live-card-photo>span { bottom:4px; left:4px; max-width:calc(100% - 8px); padding:2px 4px; font-size:12px; }
+html[data-theme='sakura'] .live-room-tray .live-own-section>.live-card .live-example-photo { font-size:12px; padding:2px 3px; }
 html[data-theme='sakura'] .live-room-tray .live-own-section>.live-card .live-card-content { padding:7px 9px 4px; }
-html[data-theme='sakura'] .live-room-tray .live-own-section>.live-card .live-card-author { display:flex; flex-wrap:wrap; gap:3px 8px; font-size:11px; }
-html[data-theme='sakura'] .live-room-tray .live-own-section>.live-card .live-card-author small { margin:0; font-size:9px; }
+html[data-theme='sakura'] .live-room-tray .live-own-section>.live-card .live-card-author { display:flex; flex-wrap:wrap; gap:3px 8px; font-size:12px; }
+html[data-theme='sakura'] .live-room-tray .live-own-section>.live-card .live-card-author small { margin:0; font-size:12px; }
 html[data-theme='sakura'] .live-room-tray .live-own-section>.live-card .live-card-content p { min-height:0; margin:6px 0; font:500 12px/1.65 'Songti SC','SimSun',serif; }
-html[data-theme='sakura'] .live-room-tray .live-own-section>.live-card .live-card-track { font-size:9px; }
+html[data-theme='sakura'] .live-room-tray .live-own-section>.live-card .live-card-track { font-size:12px; }
 html[data-theme='sakura'] .live-room-tray .live-own-meta { margin:9px 0 3px; }
-html[data-theme='sakura'] .live-room-tray .live-visibility { padding:0; background:none; font-size:9px; }
+html[data-theme='sakura'] .live-room-tray .live-visibility { padding:0; background:none; font-size:12px; }
 html[data-theme='sakura'] .live-room-tray .live-own-actions { flex-wrap:wrap; gap:0 12px; margin:4px 0 12px; }
-html[data-theme='sakura'] .live-room-tray .live-own-actions>.button { min-height:35px; padding:7px 10px; font-size:10px; }
-html[data-theme='sakura'] .main-content .live-room-tray .live-own-actions>.text-button { font-size:9px; margin:0; min-height:35px; }
+html[data-theme='sakura'] .live-room-tray .live-own-actions>.button { min-height:35px; padding:7px 10px; font-size:12px; }
+html[data-theme='sakura'] .main-content .live-room-tray .live-own-actions>.text-button { font-size:12px; margin:0; min-height:35px; }
 html[data-theme='sakura'] .live-room-tray .live-empty-card { padding:2px 0 13px; min-height:0; border:0; background:none; text-align:left; }
 html[data-theme='sakura'] .live-room-tray .live-empty-card .live-optical { display:none; }
 html[data-theme='sakura'] .live-room-tray .live-empty-card h3 { font:500 22px/1.5 'Songti SC','SimSun',serif; margin:0 0 12px; }
@@ -114,7 +114,7 @@ html[data-theme='sakura'] .live-room-tray .live-empty-card .button { min-height:
 html[data-theme='sakura'] .live-room-tray :is(.live-wall-directory,.live-memory-directory,.live-history) { margin:0; padding:0; border:0; border-top:1px dashed var(--object-line); }
 html[data-theme='sakura'] .live-room-tray :is(.live-wall-directory,.live-memory-directory)>summary { display:flex; align-items:center; gap:10px; min-height:44px; padding:10px 0; list-style:none; cursor:pointer; font-size:12px; }
 html[data-theme='sakura'] .live-room-tray :is(.live-wall-directory,.live-memory-directory)>summary::-webkit-details-marker { display:none; }
-html[data-theme='sakura'] .live-room-tray :is(.live-wall-directory,.live-memory-directory)>summary small { margin-left:auto; font-size:9px; color:var(--muted); }
+html[data-theme='sakura'] .live-room-tray :is(.live-wall-directory,.live-memory-directory)>summary small { margin-left:auto; font-size:12px; color:var(--muted); }
 html[data-theme='sakura'] .live-room-tray :is(.live-wall-directory,.live-memory-directory)>summary>.icon { width:13px; height:13px; color:#8f7479; }
 html[data-theme='sakura'] .live-room-tray :is(.live-wall-directory,.live-memory-directory)[open]>summary>.icon { transform:rotate(90deg); }
 html[data-theme='sakura'] .live-room-tray .live-wall { gap:16px; padding:0 0 15px; }
@@ -123,48 +123,48 @@ html[data-theme='sakura'] .live-room-tray .live-wall-item .live-card-photo { asp
 html[data-theme='sakura'] .live-room-tray .live-wall-item .live-card-content { padding:12px 5px 2px; }
 html[data-theme='sakura'] .live-room-tray .live-wall-item .live-card-content p { min-height:0; font-size:12px; }
 html[data-theme='sakura'] .live-room-tray .live-wall-item .live-card-author { font-size:13px; }
-html[data-theme='sakura'] .live-room-tray .live-wall-item .button { min-height:40px; font-size:11px; }
-html[data-theme='sakura'] .live-room-tray .live-match { padding:4px 5px 10px; font-size:10px; }
+html[data-theme='sakura'] .live-room-tray .live-wall-item .button { min-height:40px; font-size:12px; }
+html[data-theme='sakura'] .live-room-tray .live-match { padding:4px 5px 10px; font-size:12px; }
 html[data-theme='sakura'] .live-room-tray .live-empty-wall { padding:5px 0 15px; border:0; border-radius:0; background:none; }
 html[data-theme='sakura'] .live-room-tray .live-empty-wall h3 { font-size:14px; }
-html[data-theme='sakura'] .live-room-tray .live-empty-wall p { font-size:11px; }
-html[data-theme='sakura'] .live-room-tray .live-empty-wall .button { min-height:39px; font-size:11px; }
+html[data-theme='sakura'] .live-room-tray .live-empty-wall p { font-size:13px; line-height:1.7; }
+html[data-theme='sakura'] .live-room-tray .live-empty-wall .button { min-height:40px; font-size:13px; }
 html[data-theme='sakura'] .live-room-tray .live-incoming { margin:0 0 14px; padding:12px; border:1px solid #d9b9b9; border-radius:2px; background:#f4e5dd; }
 html[data-theme='sakura'] .live-room-tray .live-request-row { gap:8px; flex-wrap:wrap; }
 html[data-theme='sakura'] .live-room-tray .live-request-row .live-initial { width:30px; height:30px; font-size:12px; }
-html[data-theme='sakura'] .live-room-tray .live-request-row p { font-size:11px; flex:1; min-width:70px; }
-html[data-theme='sakura'] .live-room-tray .live-request-row .button { min-height:36px; font-size:10px; padding:8px 10px; }
+html[data-theme='sakura'] .live-room-tray .live-request-row p { font-size:12px; flex:1; min-width:70px; }
+html[data-theme='sakura'] .live-room-tray .live-request-row .button { min-height:36px; font-size:12px; padding:8px 10px; }
 html[data-theme='sakura'] .live-room-tray .live-pending { margin:10px 0; padding:12px 0; }
-html[data-theme='sakura'] .live-room-tray .live-pending-row { padding:7px 0; font-size:11px; }
-html[data-theme='sakura'] .live-room-tray .live-pending-row .text-button { font-size:10px; }
+html[data-theme='sakura'] .live-room-tray .live-pending-row { padding:7px 0; font-size:12px; }
+html[data-theme='sakura'] .live-room-tray .live-pending-row .text-button { font-size:12px; }
 html[data-theme='sakura'] .live-room-tray .live-memory { padding:8px 0; border:0; border-radius:0; background:none; gap:12px; }
 html[data-theme='sakura'] .live-room-tray .live-memory h3 { font-size:13px; }
-html[data-theme='sakura'] .live-room-tray .live-memory p { font-size:9px; }
-html[data-theme='sakura'] .live-room-tray .live-history>summary { min-height:37px; padding:10px 0; font-size:10px; }
-html[data-theme='sakura'] .live-room-tray .live-history>div { gap:8px; font-size:10px; }
-html[data-theme='sakura'] .live-room-tray .live-history>div small { font-size:9px; }
+html[data-theme='sakura'] .live-room-tray .live-memory p { font-size:12px; }
+html[data-theme='sakura'] .live-room-tray .live-history>summary { min-height:37px; padding:10px 0; font-size:12px; }
+html[data-theme='sakura'] .live-room-tray .live-history>div { gap:8px; font-size:12px; }
+html[data-theme='sakura'] .live-room-tray .live-history>div small { font-size:12px; }
 html[data-theme='sakura'] .live-room-tray .live-room-bottom { margin:0; padding:3px 0 0; border:0; }
 html[data-theme='sakura'] .live-room-tray .live-footer-actions { margin:0; padding:0; }
-html[data-theme='sakura'] .live-room-tray .live-room-bottom .text-button { font-size:10px; min-height:32px; color:var(--muted); }
+html[data-theme='sakura'] .live-room-tray .live-room-bottom .text-button { font-size:12px; min-height:32px; color:var(--muted); }
 
 /* Joining is the small slip beside the wall; it remains a native form. */
 html[data-theme='sakura'] #live-surface[data-live-state='entry'] { position:absolute; right:0; bottom:0; width:360px; height:auto; max-height:100%; overflow:auto; padding:23px 25px 20px; pointer-events:auto; background:var(--object-paper); border:1px solid #ddd7c5; border-radius:2px; box-shadow:var(--object-shadow); scrollbar-width:thin; scrollbar-color:transparent transparent; }
 html[data-theme='sakura'] #live-surface[data-live-state='entry'] .live-entry-head { margin:0 0 14px; padding:0 0 9px; border-bottom:1px dashed var(--object-line); }
-html[data-theme='sakura'] #live-surface[data-live-state='entry'] .live-entry-head .text-button { font-size:10px; }
+html[data-theme='sakura'] #live-surface[data-live-state='entry'] .live-entry-head .text-button { font-size:12px; }
 html[data-theme='sakura'] #live-surface[data-live-state='entry'] .live-entry-copy { padding:0; }
 html[data-theme='sakura'] #live-surface[data-live-state='entry'] .live-entry-copy h1 { margin:0 0 19px; font-size:24px; }
 html[data-theme='sakura'] #live-surface[data-live-state='entry'] .live-gate { padding:0; border:0; }
 html[data-theme='sakura'] #live-surface[data-live-state='entry'] .live-gate-heading { margin-bottom:13px; }
 html[data-theme='sakura'] #live-surface[data-live-state='entry'] .live-gate-heading b { font-size:12px; font-weight:500; }
-html[data-theme='sakura'] #live-surface[data-live-state='entry'] .live-gate-heading>span { font-size:9px; }
-html[data-theme='sakura'] #live-surface[data-live-state='entry'] .live-field { margin:14px 0; font-size:11px; }
+html[data-theme='sakura'] #live-surface[data-live-state='entry'] .live-gate-heading>span { font-size:12px; }
+html[data-theme='sakura'] #live-surface[data-live-state='entry'] .live-field { margin:14px 0; font-size:12px; }
 html[data-theme='sakura'] #live-surface[data-live-state='entry'] .live-field input { padding:11px 12px; border-radius:2px; border-color:#acaa9070; background:#f8f0dd; }
 html[data-theme='sakura'] #live-surface[data-live-state='entry'] .live-gate-actions { gap:7px; margin:17px 0 0; }
-html[data-theme='sakura'] #live-surface[data-live-state='entry'] .button { border-radius:2px; padding:10px 9px; font-size:11px; }
-html[data-theme='sakura'] #live-surface[data-live-state='entry'] .live-gate-note { margin-top:13px; font-size:10px; }
+html[data-theme='sakura'] #live-surface[data-live-state='entry'] .button { border-radius:2px; padding:10px 9px; font-size:12px; }
+html[data-theme='sakura'] #live-surface[data-live-state='entry'] .live-gate-note { margin-top:13px; font-size:12px; }
 html[data-theme='sakura'] #live-surface[data-live-state='entry'] .live-recent { margin-top:21px; }
-html[data-theme='sakura'] #live-surface[data-live-state='entry'] .live-recent>button { padding:11px 0; font-size:11px; }
-html[data-theme='sakura'] #live-surface[data-live-state='entry'] .live-recent>button small { font-size:10px; }
+html[data-theme='sakura'] #live-surface[data-live-state='entry'] .live-recent>button { padding:11px 0; font-size:12px; }
+html[data-theme='sakura'] #live-surface[data-live-state='entry'] .live-recent>button small { font-size:12px; }
 
 /* A personal album: cloth binding, index tabs and mounted photographs. */
 html[data-theme='sakura'] body[data-spatial-section='records'] .main-content {
@@ -174,12 +174,21 @@ html[data-theme='sakura'] body[data-spatial-section='records'] .main-content {
 }
 html[data-theme='sakura'] body[data-spatial-section='records'] .records-heading { margin-bottom:20px; }
 html[data-theme='sakura'] body[data-spatial-section='records'] .records-heading h1 { font:500 27px/1.5 'Songti SC','SimSun',serif; letter-spacing:.09em; }
-html[data-theme='sakura'] .collection-page .records-filters { gap:5px; margin:0 0 18px; padding:0 0 0 3px; border-bottom:1px solid #b1b193; border-radius:0; background:none; }
-html[data-theme='sakura'] .collection-page .records-filters button { position:relative; bottom:-1px; flex:1; min-height:37px; padding:9px 7px; border:1px solid transparent; border-bottom:1px solid #b1b193; border-radius:3px 3px 0 0; background:#e4e5cf; color:#6c7660; font-size:11px; box-shadow:none; }
-html[data-theme='sakura'] .collection-page .records-filters button[aria-pressed='true'] { border-color:#b1b193; border-bottom-color:var(--object-paper); background:var(--object-paper); color:#39563e; box-shadow:none; }
+/* Album index: quiet ink words on one hairline; the open section gets a short rose ribbon, not a folder tab. */
+html[data-theme='sakura'] .collection-page .records-filters { display:flex; flex-wrap:nowrap; gap:0 26px; width:100%; margin:0 0 20px; padding:0; border:0; border-bottom:1px solid #e4dcc6; border-radius:0; background:none; box-shadow:none; }
+html[data-theme='sakura'] .collection-page .records-filters button { position:relative; flex:none; min-height:40px; padding:6px 0 10px; border:0; border-radius:0; background:none; color:#77786a; font-size:14px; font-weight:500; letter-spacing:.06em; white-space:nowrap; box-shadow:none; transition:color .18s ease; }
+html[data-theme='sakura'] .collection-page .records-filters button:hover { color:#34503f; background:none; }
+html[data-theme='sakura'] .collection-page .records-filters button[aria-pressed='true'] { color:#23392c; font-weight:600; background:none; box-shadow:none; }
+html[data-theme='sakura'] .collection-page .records-filters button::after { content:''; display:block; position:absolute; left:50%; right:auto; bottom:-1px; width:0; height:2px; border-radius:2px; background:#b36677; transform:translateX(-50%); transition:width .22s ease; }
+html[data-theme='sakura'] .collection-page .records-filters button[aria-pressed='true']::after { width:100%; }
+html[data-theme='sakura'] .collection-page .records-filters button:focus-visible { outline-offset:4px; border-radius:4px; }
 html[data-theme='sakura'] .library-toolbar { margin:0 0 17px; }
-html[data-theme='sakura'] .library-filters button { min-height:35px; padding:7px 10px; border-radius:2px; font-size:10px; }
-html[data-theme='sakura'] .library-filters button[aria-pressed='true'] { background:#efe6d1; box-shadow:none; }
+html[data-theme='sakura'] .library-filters { gap:6px; }
+html[data-theme='sakura'] .library-filters button { min-height:34px; padding:5px 13px; border:1px solid #e2dac3; border-radius:999px; background:transparent; color:#6c6f60; font-size:13px; transition:background .18s, border-color .18s, color .18s; }
+html[data-theme='sakura'] .library-filters button:hover { border-color:#c9bf9f; color:#34503f; }
+html[data-theme='sakura'] .library-filters button span { font-size:12px; opacity:.72; }
+html[data-theme='sakura'] .library-filters button[aria-pressed='true'] { border-color:#34503f; background:#34503f; color:#fffaf0; box-shadow:none; }
+html[data-theme='sakura'] .library-filters button[aria-pressed='true'] span { opacity:.8; }
 html[data-theme='sakura'] .library-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:22px 19px; }
 html[data-theme='sakura'] .library-card { position:relative; display:block; padding:7px; overflow:visible; border:1px solid #e0d6bd; border-radius:1px; background:#fffdf3; box-shadow:0 3px 7px #534a3020; }
 html[data-theme='sakura'] .library-card::before { content:''; position:absolute; z-index:1; right:-3px; top:-3px; width:18px; height:18px; border-top:3px solid #8c9c7980; border-right:3px solid #8c9c7980; pointer-events:none; }
@@ -187,10 +196,10 @@ html[data-theme='sakura'] .library-card__cover { border-radius:0; }
 html[data-theme='sakura'] .library-card__photos { height:152px; min-height:0; }
 html[data-theme='sakura'] .library-card__body { padding:11px 4px 0; }
 html[data-theme='sakura'] .library-card__body h3 { font:500 14px/1.6 'Songti SC','SimSun',serif; }
-html[data-theme='sakura'] .library-card__authors { font-size:10px; }
-html[data-theme='sakura'] .library-card__meta { font-size:9px; gap:4px; }
+html[data-theme='sakura'] .library-card__authors { font-size:12px; }
+html[data-theme='sakura'] .library-card__meta { font-size:12px; gap:4px; }
 html[data-theme='sakura'] .library-card__actions { padding:3px 4px 0; gap:5px; border-top:1px dotted #c1bda133; margin-top:9px; }
-html[data-theme='sakura'] .library-card__actions .text-button { min-height:33px; font-size:9px; }
+html[data-theme='sakura'] .library-card__actions .text-button { min-height:36px; font-size:13px; }
 html[data-theme='sakura'] .library-card__kind { border-radius:1px; }
 html[data-theme='sakura'] .library-empty { min-height:270px; padding:35px 13px; background:repeating-linear-gradient(transparent 0 31px,#abae8c20 31px 32px); }
 html[data-theme='sakura'] .library-empty__mark { background:#fffdf3; border-radius:1px; border-bottom-width:9px; border-color:#d6cfb9; box-shadow:0 3px 6px #534a301b; }
@@ -226,23 +235,23 @@ html[data-theme='sakura'] body.spatial-fallback #live-surface[data-live-state='e
 @media(max-width:760px) {
   html[data-theme='sakura'] body[data-spatial-section='live']:not(.spatial-fallback) .main-content { inset:84px 16px 94px; }
   html[data-theme='sakura'] .live-room-ticket { left:0; top:0; width:250px; padding:9px 13px 4px; }
-  html[data-theme='sakura'] .live-paper-label { margin-bottom:2px; font-size:7px; line-height:1.3; }
+  html[data-theme='sakura'] .live-paper-label { margin-bottom:2px; font-size:12px; line-height:1.3; }
   html[data-theme='sakura'] .live-room-ticket .live-room-head h1 { font-size:16px; line-height:1.4; margin-bottom:3px; }
-  html[data-theme='sakura'] .live-room-ticket .live-event-meta { font-size:9px; line-height:1.5; }
-  html[data-theme='sakura'] .live-room-ticket .live-event-meta>span { display:inline; margin-left:5px; font-size:9px; }
+  html[data-theme='sakura'] .live-room-ticket .live-event-meta { font-size:12px; line-height:1.5; }
+  html[data-theme='sakura'] .live-room-ticket .live-event-meta>span { display:inline; margin-left:5px; font-size:12px; }
   html[data-theme='sakura'] .live-room-ticket .live-room-tools { margin-top:6px; gap:11px; }
-  html[data-theme='sakura'] .live-room-ticket .live-room-tools .button { min-height:32px; font-size:9px; padding:6px 9px; }
-  html[data-theme='sakura'] .live-room-ticket .live-room-tools .text-button { min-height:32px; font-size:9px; }
-  html[data-theme='sakura'] .live-room-ticket .live-room-menu { font-size:10px; }
+  html[data-theme='sakura'] .live-room-ticket .live-room-tools .button { min-height:32px; font-size:12px; padding:6px 9px; }
+  html[data-theme='sakura'] .live-room-ticket .live-room-tools .text-button { min-height:32px; font-size:12px; }
+  html[data-theme='sakura'] .live-room-ticket .live-room-menu { font-size:12px; }
   html[data-theme='sakura'] .live-room-ticket .live-room-menu>summary { min-height:32px; padding:5px; }
-  html[data-theme='sakura'] .live-room-ticket .live-room-ribbon { margin-top:3px; padding-top:1px; font-size:8px; }
-  html[data-theme='sakura'] .live-room-ticket .live-room-ribbon .text-button { min-height:24px; padding:5px 0; font-size:9px; }
+  html[data-theme='sakura'] .live-room-ticket .live-room-ribbon { margin-top:3px; padding-top:1px; font-size:12px; }
+  html[data-theme='sakura'] .live-room-ticket .live-room-ribbon .text-button { min-height:24px; padding:5px 0; font-size:12px; }
   html[data-theme='sakura'] .live-room-tray { right:0; left:0; bottom:0; width:auto; max-height:40dvh; padding:11px 15px 5px; }
   html[data-theme='sakura'] .live-room-tray .live-section-title { margin-bottom:8px; }
   html[data-theme='sakura'] .live-room-tray .live-own-section>.live-card { grid-template-columns:57px minmax(0,1fr); }
   html[data-theme='sakura'] .live-room-tray .live-own-section>.live-card .live-card-photo { height:68px; }
   html[data-theme='sakura'] .live-room-tray .live-own-section>.live-card .live-card-content { padding:5px 8px; }
-  html[data-theme='sakura'] .live-room-tray .live-own-section>.live-card .live-card-content p { font-size:11px; margin:4px 0; }
+  html[data-theme='sakura'] .live-room-tray .live-own-section>.live-card .live-card-content p { font-size:12px; margin:4px 0; }
   html[data-theme='sakura'] .live-room-tray .live-own-section>.live-card .live-card-track { padding-top:5px; }
   html[data-theme='sakura'] .live-room-tray .live-own-meta { margin-top:5px; }
   html[data-theme='sakura'] .live-room-tray .live-own-actions { margin:2px 0 5px; }
@@ -265,9 +274,9 @@ html[data-theme='sakura'] body.spatial-fallback #live-surface[data-live-state='e
   html[data-theme='sakura'] .library-detail-actions { bottom:-20px; padding-bottom:20px; }
   html[data-theme='sakura'] body[data-spatial-section='records'] .main-content { top:27dvh; right:16px; left:16px; bottom:94px; width:auto; max-width:none; padding:21px 17px 20px 33px; background:linear-gradient(90deg,#d5d7bd 0 8px,#bbbfa3 8px 9px,#e5ddc5 9px 16px,#f6eedc 16px 18px,var(--object-paper) 18px); }
   html[data-theme='sakura'] body[data-spatial-section='records'] .records-heading h1 { font-size:23px; }
-  html[data-theme='sakura'] body[data-spatial-section='records'] .records-heading>.button { min-height:35px; padding:8px; font-size:10px; }
-  html[data-theme='sakura'] .collection-page .records-filters { gap:3px; }
-  html[data-theme='sakura'] .collection-page .records-filters button { font-size:10px; padding:8px 5px; min-height:35px; }
+  html[data-theme='sakura'] body[data-spatial-section='records'] .records-heading>.button { min-height:35px; padding:8px; font-size:12px; }
+  html[data-theme='sakura'] .collection-page .records-filters { justify-content:space-between; gap:0 8px; margin-bottom:16px; }
+  html[data-theme='sakura'] .collection-page .records-filters button { min-height:40px; padding:6px 0 9px; font-size:13px; letter-spacing:.02em; }
   html[data-theme='sakura'] .library-grid { grid-template-columns:1fr; gap:17px; }
   html[data-theme='sakura'] .library-card { display:grid; grid-template-columns:100px minmax(0,1fr); padding:5px; }
   html[data-theme='sakura'] .library-card__cover { grid-row:1/3; }

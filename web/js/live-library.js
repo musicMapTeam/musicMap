@@ -1,6 +1,8 @@
 import { SPACE_PHOTOS, SPACE_MOMENTS } from './space-data.js';
 import { createPhotoStore } from './live-photo.js';
 import { downloadCard, downloadTicket } from './ticket-export.js';
+import { openDuetCeremony } from './duet-ceremony.js';
+import { momentLabel, perspectiveLabel, sharedLine } from './duet-facts.js';
 
 const SESSION_KEY = 'music-map-live:v1';
 const escape = value => String(value ?? '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
@@ -28,6 +30,7 @@ export function mountLiveLibrary(container, api) {
   let retry = null;
   let selectedKey = null;
   let deleteKey = null;
+  let ceremony = null;
   let requestedKey = api.getState().routePayload?.libraryItemId || null;
   if (requestedKey) api.update(state => { delete state.routePayload.libraryItemId; });
 
@@ -55,7 +58,7 @@ export function mountLiveLibrary(container, api) {
 
   function photoMarkup(card, eager = false) {
     const src = card.photoId ? photos.peek(card.photoId) || placeholder : SPACE_PHOTOS[card.photoKey]?.url || SPACE_PHOTOS.stage.url;
-    return `<span class="library-photo"><img src="${escape(src)}" ${card.photoId ? `data-library-photo="${escape(card.photoId)}"` : ''} alt="${escape(card.photoId ? `${card.ownerName || '我'}的现场照片` : 'AI 生成的示例照片')}" loading="${eager ? 'eager' : 'lazy'}">${!card.photoId ? '<small class="library-photo__label">AI 示例图</small>' : !photos.peek(card.photoId) ? '<small class="library-photo__status">读取照片</small>' : ''}</span>`;
+    return `<span class="library-photo"><img src="${escape(src)}" ${card.photoId ? `data-library-photo="${escape(card.photoId)}"` : ''} alt="${escape(card.photoId ? `${card.ownerName || '我'}的现场照片` : 'AI 生成的示例照片')}" loading="${eager ? 'eager' : 'lazy'}">${!card.photoId ? '<small class="library-photo__label">AI<span class="library-photo__label-rest"> 示例图</span></small>' : !photos.peek(card.photoId) ? '<small class="library-photo__status">读取照片</small>' : ''}</span>`;
   }
 
   function hydrate(root = container) {
@@ -81,7 +84,7 @@ export function mountLiveLibrary(container, api) {
   }
 
   function cardMarkup(item) {
-    return `<article class="library-card library-card--${item.type}"><button class="library-card__cover" data-library-action="open" data-key="${escape(item.key)}" aria-label="查看${escape(titleOf(item))}${item.type === 'record' ? '双联记忆' : '现场卡'}"><span class="library-card__photos">${item.cards.map(card => photoMarkup(card)).join('')}</span><span class="library-card__kind">${icon(item.type === 'record' ? 'swap' : 'camera')}${item.type === 'record' ? '双联' : '现场卡'}</span></button><div class="library-card__body"><h3>${escape(titleOf(item))}</h3><p class="library-card__authors">${escape(authorsOf(item))}</p><div class="library-card__meta"><time>${escape(dateOf(item))}</time>${item.joined === false ? '<span>已离场</span>' : item.type === 'card' ? `<span>${item.isPublic ? '本场展示中' : '私藏'}</span>` : ''}</div></div><footer class="library-card__actions"><button class="text-button" data-library-action="open" data-key="${escape(item.key)}">翻开 ${icon('arrow-up-right')}</button><button class="text-button" data-library-action="download" data-key="${escape(item.key)}" data-library-mutation>保存图片</button></footer></article>`;
+    return `<article class="library-card library-card--${item.type}"><button class="library-card__cover" data-library-action="open" data-key="${escape(item.key)}" aria-label="查看${escape(titleOf(item))}${item.type === 'record' ? '双联记忆' : '现场卡'}"><span class="library-card__photos">${item.cards.map(card => photoMarkup(card)).join('')}</span><span class="library-card__kind">${icon(item.type === 'record' ? 'swap' : 'camera')}${item.type === 'record' ? '双联' : '现场卡'}</span></button><div class="library-card__body"><h3>${escape(titleOf(item))}</h3><p class="library-card__authors">${escape(authorsOf(item))}</p><div class="library-card__meta"><time>${escape(dateOf(item))}</time>${item.joined === false ? '<span>已离场</span>' : item.type === 'card' ? `<span>${item.isPublic ? '本场展示中' : '私藏'}</span>` : ''}${item.type === 'record' && item.cards.some(card => !card.photoId) ? '<span class="library-card__ai">含 AI 示例图</span>' : ''}</div></div><footer class="library-card__actions"><button class="text-button" data-library-action="open" data-key="${escape(item.key)}">翻开 ${icon('arrow-up-right')}</button><button class="text-button" data-library-action="download" data-key="${escape(item.key)}" data-library-mutation>保存图片</button></footer></article>`;
   }
 
   function render() {
@@ -122,7 +125,7 @@ export function mountLiveLibrary(container, api) {
     if (loading || busy || signal.aborted) return;
     const next = readSession();
     if (next?.token !== session?.token) {
-      dialog.close(); confirmation.close(); photos.clear(); library = null;
+      ceremony?.close(); dialog.close(); confirmation.close(); photos.clear(); library = null;
     }
     session = next;
     if (!session) { render(); return; }
@@ -132,7 +135,10 @@ export function mountLiveLibrary(container, api) {
       if (signal.aborted) return;
       loading = false;
       render();
-      if (dialog.open && selectedKey) {
+      // A refresh never replays the duet; it only closes one that was removed elsewhere.
+      if (ceremony && selectedKey) {
+        if (!find(selectedKey)) ceremony.close();
+      } else if (dialog.open && selectedKey) {
         if (find(selectedKey)) openItem(selectedKey);
         else { dialog.close(); selectedKey = null; }
       }
@@ -146,7 +152,7 @@ export function mountLiveLibrary(container, api) {
       if (signal.aborted) return;
       loading = false;
       if (error.status === 401 || error.status === 403) {
-        library = null; dialog.close(); confirmation.close(); photos.clear();
+        library = null; ceremony?.close(); dialog.close(); confirmation.close(); photos.clear();
         needsEntry = true;
         notice = error.status === 401 ? '当前身份已失效。重新入场会使用新身份，旧记录无法带回。' : '当前身份无法读取收藏，请重新入场。';
       } else notice = `${error instanceof TypeError ? '暂时连接不上现场服务。' : error.message}${library ? '上次收到的收藏仍在。' : '恢复连接后可刷新。'}`;
@@ -166,9 +172,72 @@ export function mountLiveLibrary(container, api) {
   function openItem(key) {
     const item = find(key);
     if (!item) return;
+    if (item.type === 'record') { openRecord(item); return; }
     selectedKey = key;
     const event = eventOf(item);
-    openDetail(item.type === 'record' ? '一起留下的双联' : '我的现场卡', `<div class="library-detail-heading"><span>${item.type === 'record' ? '双方已同意' : item.isPublic && item.joined !== false ? '本场展示中' : '私藏'}</span><h3>${escape(titleOf(item))}</h3><p>${escape([dateOf(item), event.city].filter(Boolean).join(' · '))}${event.isDemo ? ' · 示例场次' : ''}</p></div><div class="library-detail-photos ${item.type === 'record' ? 'library-detail-photos--pair' : ''}">${item.cards.map(card => `<figure>${photoMarkup(card, true)}<figcaption><b>${escape(card.ownerName || '我')}</b><small>${escape([SPACE_MOMENTS.find(moment => moment.id === card.momentId)?.name, perspectives[card.perspective]].filter(Boolean).join(' · '))}</small>${card.caption ? `<p>${escape(card.caption)}</p>` : ''}</figcaption></figure>`).join('')}</div>${event.song ? `<p class="library-detail-song">♪ ${escape(event.song)}</p>` : ''}<div class="library-detail-actions"><button class="button button--primary" data-library-action="download" data-key="${escape(key)}" data-library-mutation>保存${item.type === 'record' ? '双联' : '卡片'}图片 ${icon('arrow-up-right')}</button><button class="button button--secondary" data-library-action="return" data-key="${escape(key)}">${item.joined === false ? '查看邀请码' : '返回现场'} ${icon('arrow-right')}</button></div>${item.type === 'record' ? `<button class="library-delete text-button" data-library-action="delete" data-key="${escape(key)}" data-library-mutation>${icon('trash')} 从我的记忆中删除</button>` : ''}`);
+    openDetail(item.type === 'record' ? '一起留下的双联' : '我的现场卡', `<div class="library-detail-heading"><span>${item.type === 'record' ? '双方已同意' : item.isPublic && item.joined !== false ? '本场展示中' : '私藏'}</span><h3>${escape(titleOf(item))}</h3><p>${escape([dateOf(item), event.city].filter(Boolean).join(' · '))}${event.isDemo ? ' · 示例场次' : ''}</p></div><div class="library-detail-photos ${item.type === 'record' ? 'library-detail-photos--pair' : ''}">${item.cards.map(card => `<figure>${photoMarkup(card, true)}<figcaption><b>${escape(card.ownerName || '我')}</b><small>${escape([SPACE_MOMENTS.find(moment => moment.id === card.momentId)?.name, perspectives[card.perspective]].filter(Boolean).join(' · '))}</small>${card.caption ? `<p>${escape(card.caption)}</p>` : ''}</figcaption></figure>`).join('')}</div>${item.cards[0].trackId && event.song ? `<p class="library-detail-song">♪ ${escape(event.song)}</p>` : ''}<div class="library-detail-actions"><button class="button button--primary" data-library-action="download" data-key="${escape(key)}" data-library-mutation>保存${item.type === 'record' ? '双联' : '卡片'}图片 ${icon('arrow-up-right')}</button><button class="button button--secondary" data-library-action="return" data-key="${escape(key)}">${item.joined === false ? '查看邀请码' : '返回现场'} ${icon('arrow-right')}</button></div>${item.type === 'record' ? `<button class="library-delete text-button" data-library-action="delete" data-key="${escape(key)}" data-library-mutation>${icon('trash')} 从我的记忆中删除</button>` : ''}`);
+  }
+
+  /** A saved duet opens the shared full-screen ticket; its first view in this browser premieres. */
+  function openRecord(item) {
+    ceremony?.close();
+    if (dialog.open) dialog.close();
+    selectedKey = item.key;
+    const event = eventOf(item);
+    const handle = openDuetCeremony({
+      id: item.exchangeId || item.id,
+      scenario: 'live',
+      event: { title: titleOf(item), date: event.date, city: event.city, isDemo: event.isDemo },
+      completedAt: item.createdAt,
+      sides: item.cards.map(card => ({
+        author: card.ownerName || '我',
+        src: card.photoId ? photos.peek(card.photoId) || placeholder : SPACE_PHOTOS[card.photoKey]?.url || SPACE_PHOTOS.stage.url,
+        load: card.photoId ? () => photos.load(card.photoId) : null,
+        isExample: !card.photoId,
+        perspective: perspectiveLabel(card),
+        moment: momentLabel(card.momentId),
+        caption: card.caption || '这一刻，想和你一起记住。',
+      })),
+      shared: sharedLine(item.cards, event),
+      status: '双方已同意 · 在我的收藏里',
+      note: '再次公开对方照片前，请先征得对方同意。',
+      closeLabel: '关闭双联，回到收藏',
+      actions: [
+        { id: 'save', kind: 'primary', icon: 'image', label: '保存双联图片', busyLabel: '正在生成图片…', run: () => exportRecord(item.key) },
+        item.joined === false
+          ? { id: 'rejoin', kind: 'secondary', icon: 'arrow-right', label: '查看邀请码', run: ({ close }) => { close(); openRejoin(item); } }
+          : { id: 'return', kind: 'secondary', icon: 'arrow-right', label: '返回现场', run: ({ close }) => { close(); api.navigate('live', { roomId: item.roomId }); } },
+        { id: 'remove', kind: 'remove', icon: 'trash', label: '从我的记忆中删除', run: () => {
+          if (busy) return;
+          deleteKey = item.key;
+          confirmation.querySelector('[data-library-delete-error]').hidden = true;
+          confirmation.showModal();
+        } },
+      ],
+      onClose: () => { if (ceremony !== handle) return; ceremony = null; selectedKey = null; restoreScene(); },
+    });
+    ceremony = handle;
+  }
+
+  /** Save from inside the duet; a failure is thrown so the page can show it in place. */
+  async function exportRecord(key) {
+    const item = find(key);
+    if (!item) throw new Error('这张双联已不在你的收藏里。');
+    if (busy) return;
+    busy = true; updateBusy();
+    try {
+      const event = eventOf(item);
+      const info = { id: item.exchangeId || item.id, title: event.title || titleOf(item), song: event.song, eventDate: event.date, city: event.city, isDemo: Boolean(event.isDemo), createdAt: item.createdAt };
+      const cards = await Promise.all(item.cards.map(async card => ({ ...card, photoDataUrl: card.photoId ? await photos.load(card.photoId) : undefined })));
+      if (signal.aborted) return;
+      await downloadTicket(cards, info);
+    } catch (error) {
+      if (error instanceof TypeError) throw new Error('照片暂时没有读到，恢复连接后可重试保存。');
+      throw error;
+    } finally {
+      busy = false;
+      if (!signal.aborted) updateBusy();
+    }
   }
 
   function openRejoin(item) {
@@ -221,7 +290,7 @@ export function mountLiveLibrary(container, api) {
       if (signal.aborted) return;
       library.records = library.records.filter(record => record.id !== item.id);
       confirmation.close();
-      if (selectedKey === item.key) { dialog.close(); selectedKey = null; }
+      if (selectedKey === item.key) { dialog.close(); ceremony?.close(); selectedKey = null; }
       photos.clear();
       deleteKey = null; notice = ''; retry = null;
       api.toast('已从你的记忆中删除');
@@ -237,7 +306,7 @@ export function mountLiveLibrary(container, api) {
   }
 
   function restoreScene() {
-    queueMicrotask(() => { if (!signal.aborted && !dialog.open && !confirmation.open) api.spatial?.restore(); });
+    queueMicrotask(() => { if (!signal.aborted && !dialog.open && !confirmation.open && !ceremony) api.spatial?.restore(); });
   }
   dialog.addEventListener('close', restoreScene, { signal });
   confirmation.addEventListener('close', restoreScene, { signal });
@@ -282,6 +351,7 @@ export function mountLiveLibrary(container, api) {
   render();
   refresh();
   return () => {
+    ceremony?.close();
     life.abort();
     confirmation.close(); dialog.close();
     photos.clear();
