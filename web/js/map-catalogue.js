@@ -1,7 +1,7 @@
 // A small, manually checked catalogue of credited vocal collaborations.
 // Metadata and outbound official links only: no audio, lyrics or cover images.
-// Evidence and metadata-check details: references/research/2026-09-27/real-catalogue-sources.md
-export const REAL_CATALOGUE_VERSION = 'real-vocal-2026-09-v2';
+// Evidence: references/research/2026-09-27/real-catalogue-sources.md and vocal-network-expansion.md
+export const REAL_CATALOGUE_VERSION = 'real-vocal-2026-09-v3';
 const checkedAt = '2026-09-27';
 const warnerJam = 'https://www.warnermusic.com.tw/blog/posts/與蕭敬騰與合唱的必聽歌曲-蕭敬騰合唱-禁愛條款-張惠妹一眼瞬間-林俊傑hello';
 const warnerGenesis = 'https://www.warnermusic.com.tw/products/《新地球-genesis-發行版-─-天sky》';
@@ -10,14 +10,15 @@ const artistEntries = [
   ['real-jay', '周杰伦', ['周杰倫', 'Jay Chou'], '#FF7E59', '从《不该》出发，沿一次合唱走到下一位艺人'],
   ['real-amei', '张惠妹', ['張惠妹', 'aMEI', 'A-Mei'], '#DF8F99', '《不该》与《一眼瞬间》，两次不同的声音相遇'],
   ['real-jam', '萧敬腾', ['蕭敬騰', 'Jam Hsiao'], '#D8B474', '从张惠妹的《一眼瞬间》，走向与林俊杰合唱的《Hello》'],
-  ['real-jj', '林俊杰', ['林俊傑', 'JJ Lin'], '#70DDCF', '在《Hello》之后，继续寻找另一首双人对唱'],
+  ['real-jj', '林俊杰', ['林俊傑', 'JJ Lin'], '#70DDCF', '从《黑暗骑士》走向阿信，或沿联唱现场遇见周杰伦'],
   ['real-fei', '费玉清', ['費玉清', 'Fei Yu-ching'], '#C9C0A2', '沿《千里之外》，回到与周杰伦的这次合唱'],
-  ['real-ashin', '阿信', ['五月天阿信', '五月天 阿信', 'Mayday Ashin'], '#B2BDDF', '《说好不哭》的合唱署名是阿信，并非五月天全团'],
+  ['real-ashin', '阿信', ['五月天阿信', '五月天 阿信', 'Mayday Ashin'], '#B2BDDF', '《说好不哭》与《黑暗骑士》连接两次合唱；这里的演唱者是阿信本人'],
   ['real-gary', '杨瑞代', ['楊瑞代', 'Gary Yang', 'Gary'], '#A6C5AC', '在《等你下课》中，听见两位合唱者的名字'],
   ['real-cindy', '袁咏琳', ['袁詠琳', 'Cindy Yen'], '#D9AAC9', '从《画沙》的双人署名，开始这一小段探索'],
   ['real-charlene', '蔡卓妍', ['A-Sa', '阿Sa', 'Charlene Choi'], '#E0BC85', '沿《小酒窝》，认识这首歌里的另一位合唱者'],
   ['real-jinsha', '金莎', ['Jin Sha', 'Kym'], '#BACE98', '从《被风吹过的夏天》出发，接着探索林俊杰的合作'],
   ['real-gem', '邓紫棋', ['鄧紫棋', 'G.E.M.', 'GEM'], '#D49D9B', '在《手心的蔷薇》中，与林俊杰的声音相连'],
+  ['real-stefanie', '孙燕姿', ['孫燕姿', 'Stefanie Sun', 'Sun Yanzi'], '#D1B676', '《Stay With You》英文版，和林俊杰一起留下陪伴的声音'],
 ];
 
 const recordings = [
@@ -88,6 +89,27 @@ const recordings = [
     sourceUrl: warnerGenesis, sourceLabel: '华纳音乐 ·《新地球》专辑页',
     evidence: '华纳《新地球》专辑页列出 feat. G.E.M. 邓紫棋，并明确说明为男女对唱作品。',
   },
+  {
+    id: 'real-dark-knight', title: '黑暗骑士', artists: ['real-jj', 'real-ashin'],
+    versionLabel: '林俊杰 × 阿信 ·《因你而在》官方 MV', videoId: 'gvce2ywrSsI',
+    sourceUrl: 'https://www.youtube.com/watch?v=gvce2ywrSsI',
+    sourceLabel: '林俊杰官方频道 · 华纳官方 MV 说明',
+    evidence: '官方发布说明明确阿信与林俊杰合唱；五月天的编曲、演奏另列制作署名，不把整团替代阿信本人。',
+  },
+  {
+    id: 'real-jay-jj-medley', title: '稻香 / Stay With You', artists: ['real-jay', 'real-jj'],
+    versionLabel: '周杰伦 × 林俊杰 · 2020 官方联唱现场', videoId: 'rCT0zSWaEZI',
+    sourceUrl: 'https://www.bilibili.com/video/BV13C4y1p7jQ/',
+    sourceLabel: '人民网官方账号 · 公益云演唱会合唱',
+    evidence: '人民网官方发布直接将该节目署名为周杰伦、林俊杰合唱《稻香 / Stay With You》；这里连接 2020 联唱现场，不把两首原版录音室歌曲改作合唱。',
+  },
+  {
+    id: 'real-stay-with-you-english', title: 'Stay With You（英文版）', artists: ['real-jj', 'real-stefanie'],
+    versionLabel: '林俊杰 × 孙燕姿 · 英文版官方歌词 MV', videoId: 'AGl7EJ8ZOFk',
+    sourceUrl: 'https://www.youtube.com/watch?v=AGl7EJ8ZOFk',
+    sourceLabel: '林俊杰官方频道 · 英文版录音室署名',
+    evidence: '官方歌词 MV 标题共同署名林俊杰与孙燕姿，发布说明介绍两人演唱英文版，并列出该版录音制作名单。',
+  },
 ];
 
 // A credit belongs to a specific recording, not to an artist in general.
@@ -98,6 +120,37 @@ const credited = (name, roles, sourceId) => roles.map(role => ({
   ...(artistEntries.find(entry => entry[1] === name) ? { artistId: artistEntries.find(entry => entry[1] === name)[0] } : {}),
 }));
 const contributions = {
+  'real-dark-knight': {
+    recordingLabel: '《因你而在》· 录音室版', creditSummary: '词 阿信 · 曲 林俊杰 · 编曲 五月天',
+    sources: [],
+    credits: [
+      ...credited('阿信', ['作词'], 'vocal'),
+      ...credited('林俊杰', ['作曲'], 'vocal'),
+      ...credited('五月天', ['编曲', '演奏'], 'vocal'),
+    ],
+  },
+  'real-jay-jj-medley': {
+    recordingLabel: '2020 官方发布 · 双人联唱现场版', creditSummary: '两曲联唱 · 词曲按作品分别署名',
+    sources: [source('official', '林俊杰官方频道 · 联唱中的分曲词曲署名', 'https://www.youtube.com/watch?v=rCT0zSWaEZI')],
+    credits: [
+      ...credited('周杰伦', ['《稻香》作词', '《稻香》作曲'], 'official'),
+      ...credited('黄雨勋', ['《稻香》编曲'], 'official'),
+      ...credited('孙燕姿', ['《Stay With You》作词'], 'official'),
+      ...credited('林俊杰', ['《Stay With You》作曲', '《Stay With You》编曲'], 'official'),
+    ],
+  },
+  'real-stay-with-you-english': {
+    recordingLabel: '2020 单曲 · 英文录音室版', creditSummary: '词 孙燕姿 · 曲 / 制作 林俊杰',
+    sources: [],
+    credits: [
+      ...credited('孙燕姿', ['作词'], 'vocal'),
+      ...credited('林俊杰', ['作曲', '制作人', '配唱制作', '编曲', '键盘', '弦乐编写', '录音', '混音', '母带制作人'], 'vocal'),
+      ...credited('陈蔚甄 MISO TAN', ['配唱制作', '录音'], 'vocal'),
+      ...credited('黄冠龙 ALEX.D', ['制作协力', '吉他'], 'vocal'),
+      ...credited('周信廷 SHiN CHOU', ['制作协力'], 'vocal'),
+      ...credited('Mike Bozzi', ['母带工程'], 'vocal'),
+    ],
+  },
   'real-bu-gai': {
     recordingLabel: '《周杰伦的床边故事》· 录音室版', creditSummary: '词 方文山 · 曲 周杰伦',
     sources: [source('release', 'Shazam · 发行制作署名', 'https://www.shazam.com/zh-tw/song/1721456390/不該-feat-張惠妹')],

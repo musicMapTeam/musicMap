@@ -1,6 +1,6 @@
 # 项目状态
 
-更新日期：**2026-09-27** · MVP **0.12.0** · 产品文档 **2.3**。
+更新日期：**2026-09-27** · MVP **0.13.0** · 产品文档 **2.4**。
 
 依据：[产品方案](../product/docs/01-product-plan.md) · [交付计划](../product/docs/02-delivery-plan.md) · [实施规格](../product/docs/03-build-guide.md)。
 
@@ -16,7 +16,23 @@
 
 ## Doing
 
-本轮开发已完成；GitHub 自动检查与合并记录见 [PR #2](https://github.com/musicMapTeam/musicMap/pull/2)。用户要求所有页面融入同一小院的设计语言，音乐探索成为场景内可操作唱片关系。
+无开发任务进行中。0.13 本地实现与验收已提交 [PR #3](https://github.com/musicMapTeam/musicMap/pull/3)，CI 与合并状态以 PR 记录为准。
+
+## Done · 0.13.0
+
+| 任务 | 负责人 / 文件 | 本轮证据 |
+| --- | --- | --- |
+| 完整关系网 | root、spatial_music：`map-network.js`、`map.js`、`sakura-music.js` | 展示数据集全部节点与边；按数据集 / 关系类型缓存固定布局，选择不重排。12 人 / 13 条作品边，不再只显示当前艺人的一圈邻居 |
+| 真实回路 | spatial_docs：`map-catalogue.js`、[来源记录](../references/research/2026-09-27/vocal-network-expansion.md) | 增加《黑暗骑士》、2020 周杰伦与林俊杰联唱、英文《Stay With You》，新节点孙燕姿，形成 2 个独立回路；旧 ID 保留。官方署名按录音版本核实；HF 共同署名没有冒充共同演唱 |
+| 查询与行走 | root：生产页面；paper_language：只读约束审阅 | 实际查询费玉清→周杰伦→林俊杰→孙燕姿，显示 3 次合作、4 个高亮节点及 3 条高亮边，原探索路线不变。点联唱打开版本、署名和人民网来源；袁咏琳沿《画沙》前往周杰伦只追加 1 步，返回恢复原路线。切 session 清理旧选中和查询 |
+| 视野与交互 | 场景控件与 Map 共用动作 | 实操按钮缩放到 1.28，拖动节点标签移动约 85px / -20px，未误开面板、路线未变；全图恢复 12 个可见艺人。搜索选中与缩放不记步，默认倍率拖离后搜索回全图；双指与无 WebGL 全图仅静态核对，未声称真机 / 降级实测 |
+| 纸面 UI | root、spatial_music：`map-spatial.css`、机位与模型 | 桌面镜头留出整网边界，连线缩细贴纸；印刷封套、短标签、合作索引、查询链与路线同属纸桌。已目视 1440×900 整网和 390×844 查询，12 个艺人可见；修复动作换行、手机标题堆叠、底部挡节点与字体覆盖。图见[视觉规范](VISUAL_THEMES.md) |
+| 数据集切换 | root：生产页面 | 切至情景示例的策展标签，显示「标签图谱」「9 人 · 8 条标签连接」，旧查询清空；返回真实合作可选择林俊杰。最终 canvas 为 1，桌面 scrollWidth / clientWidth 为 1440 / 1440 |
+| 构建与运行包 | root：Vite、`delivery/music-map-space-runtime.zip` | 最终构建成功，61 模块；HTML 1,824,072 B / gzip 619.80 kB。ZIP 640,234 B，6 文件：页面、两个后端文件、package、运行说明与来源许可；无数据库、用户照片或 HF 原始 CSV。无新依赖或后端迁移 |
+| 版本与文档 | spatial_docs、root | MVP 0.13.0 / 文档 2.4；README、三份产品文档、视觉、比赛当前介绍、交付和变更记录同步。旧图、0.4 视频和历史验收保持原版本边界 |
+| GitHub | [PR #3](https://github.com/musicMapTeam/musicMap/pull/3) | 实现从 `feat/music-network` 提交；沿用既有 Build demo 工作流，按用户授权在检查通过后合并。检查结果及合并时间以 PR 为准 |
+
+本轮只做生产构建、上述 UI 路径与静态审阅，没有新增或运行测试套件。390×844 是模拟视口；实体手机双指 / 帧率、公网部署、正式比赛视频与目标用户试用仍未完成。完整图指当前已收录数据集，不是完整华语音乐百科。
 
 ## Done · 0.12.0
 

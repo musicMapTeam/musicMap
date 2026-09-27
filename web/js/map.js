@@ -1,6 +1,7 @@
 import { MAP_DATA_VERSION, catalogues, artistById, songs, edges, artistName, datasetForArtist, artistsInDataset, otherArtist, getNeighbors, isReachable } from './map-data.js';
 import { getSavedMusic, toggleSavedMusic, saveMusic, importSavedMusic, subscribeSavedMusic } from './music-library.js';
 import '../css/map.css';
+import { networkEdges, networkLayout, shortestChain } from './map-network.js';
 
 const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
 const currentNode = session => session.path[session.path.length - 1];
@@ -11,6 +12,7 @@ const sessionDataset = session => session?.dataset || datasetForArtist(session?.
 const catalogueFor = session => catalogues[sessionDataset(session)];
 const dateLabel = timestamp => new Date(timestamp).toLocaleDateString('zh-CN', { month: 'long', day: 'numeric' });
 let lastPresentedArtist = null;
+const fallbackViews = new Map();
 
 function songDraft(song) {
   return { id: song.id, title: song.title, artists: song.artists.map(artistName), source: song.sourceUrl || '', dataset: 'real' };
@@ -56,6 +58,11 @@ export function createMapState() {
 }
 
 function activateSession(map, session) {
+  if (map.activeId !== session.id) {
+    map.view.selectedArtistId = currentNode(session).id;
+    map.view.selectedEdgeId = null;
+    map.view.networkQuery = null;
+  }
   map.activeId = session.id;
   map.lastSessionByDataset ||= {};
   map.lastSessionByDataset[sessionDataset(session)] = session.id;
@@ -130,70 +137,45 @@ function undoHTML(map, api) {
   return map.undo ? `<div class="map-undo" role="status"><span>已移除《${escapeHTML(songs[map.undo.item.id]?.title)}》</span>${button('undo', '撤销', 'button button--quiet')}</div>` : '';
 }
 
-function discoveryHTML(session, api, undo) {
-  const node = currentNode(session);
-  const previous = session.path[session.path.length - 2];
-  const edge = previous && edges.find(item => item.id === node.edgeId);
-  if (edge) {
-    const origin = escapeHTML(artistName(previous.id));
-    const destination = escapeHTML(artistName(node.id));
-    const saved = edge.song && songIsSaved(session, edge.song);
-    const source = `通过${artistName(previous.id)}与${artistName(node.id)}的合作作品留下`;
-    const canUndo = undo?.sessionId === session.id && undo.item.id === edge.song;
-    return `<section class="map-discovery" aria-label="当前连接的作品">
-      <div class="map-discovery__copy"><p><strong>${edge.song ? `《${escapeHTML(songs[edge.song].title)}》` : `策展标签 · ${escapeHTML(edge.reason)}`}</strong><span class="map-discovery__artists">${origin} × ${destination}</span></p></div>
-      ${edge.song ? `<div class="map-discovery__actions">${songs[edge.song].credits?.length ? button('credits', '谁做了什么', 'button button--quiet', `data-id="${edge.song}" data-session="${session.id}"`) : ''}${listenHTML(songs[edge.song], api)}${button('save', `${api.icon(saved ? 'check' : 'plus')} ${saved ? '已留下' : '留下'}`, `button button--quiet ${saved ? 'is-saved' : ''}`, `data-id="${edge.song}" data-session="${session.id}" data-source="${escapeHTML(source)}" aria-label="${saved ? '移除' : '留下'}《${escapeHTML(songs[edge.song].title)}》" aria-pressed="${saved}"`)}${canUndo ? button('undo', '撤销', 'button button--quiet') : ''}</div>` : ''}
-    </section>`;
-  }
-
-  const nextEdge = getNeighbors(node.id, session.mode)[0];
-  if (!nextEdge) {
-    const hasStyleLinks = session.mode === 'co' && getNeighbors(node.id, 'style').length > 0;
-    return `<section class="map-discovery map-discovery--first" aria-label="探索提示"><div class="map-discovery__copy"><p>本${sessionDataset(session) === 'real' ? '专题' : '示例'}暂未收录${modeName(session.mode)}。</p></div><div class="map-discovery__actions">${hasStyleLinks ? button('mode', '看策展标签', 'button button--quiet', 'data-mode="style"') : button('search', '换个起点', 'button button--quiet')}</div></section>`;
-  }
-  const nextId = otherArtist(nextEdge, node.id);
-  return `<section class="map-discovery map-discovery--first" aria-label="探索建议">
-    <div class="map-discovery__copy"><p>${nextEdge.song ? `从《${escapeHTML(songs[nextEdge.song].title)}》开始` : `沿「${escapeHTML(nextEdge.reason)}」探索`}</p></div><div class="map-discovery__actions">${button('move', `${escapeHTML(artistName(nextId))} ${api.icon('arrow-right')}`, 'button button--quiet', `data-id="${nextId}"`)}</div>
-  </section>`;
-}
-
 function mapHTML(map, api, presentation = 'quiet') {
   const session = activeSession(map);
   if (!session) return `<section class="map-empty empty-state"><h2>开始一次探索</h2>${button('new', '去音乐地图', 'button button--primary', `data-id="${catalogues.real.start}"`)}</section>`;
   const node = currentNode(session);
-  const artist = artistById[node.id];
-  const dataset = sessionDataset(session);
+    const dataset = sessionDataset(session);
   const catalogue = catalogueFor(session);
   const isReal = dataset === 'real';
-  const neighbors = getNeighbors(node.id, session.mode, dataset);
+  const relationUnit = session.mode === 'co' ? '次合作' : '条标签连接';
   const isChallenge = session.type === 'challenge';
   const isComplete = session.status === 'complete';
   const isEventArtist = ['a', 'b'].includes(node.id);
+  const selectedId = datasetForArtist(map.view.selectedArtistId) === dataset ? map.view.selectedArtistId : node.id;
+  const selectedArtist = artistById[selectedId];
+  const selectedLinks = getNeighbors(selectedId, session.mode, dataset);
+  const layout = networkLayout(dataset, session.mode);
+  const links = networkEdges(dataset, session.mode);
+  const query = map.view.networkQuery?.dataset === dataset && map.view.networkQuery.mode === session.mode ? map.view.networkQuery : null;
+  const chain = query ? shortestChain(query.start, query.target, dataset, session.mode) : null;
   return `<section class="map-experience map-studio map-experience--${presentation}" aria-label="音乐关系探索">
     <header class="map-studio-head">
-      <div class="map-studio-title"><h1>${isChallenge ? '合作挑战' : '合作唱片'}</h1>${catalogueSwitchHTML(dataset)}</div>
-      <div class="map-studio-tools">${button('search', `${api.icon('compass')} 找音乐人`, 'button button--quiet', 'aria-label="换个起点"')}<details class="map-shop-menu"><summary>唱片目录 ${api.icon('chevron-right')}</summary><div><button type="button" class="button button--quiet" data-open-catalogue>开放曲库</button>${button('challenge', '合作挑战', 'button button--quiet')}${button('relations', '连接与来源', 'button button--quiet')}</div></details></div>
+      <div class="map-studio-title"><h1>${isChallenge ? '合作挑战' : session.mode === 'co' ? '合作图谱' : '标签图谱'}</h1>${catalogueSwitchHTML(dataset)}</div>
+      <div class="map-studio-tools">${button('search', `${api.icon('compass')} 找音乐人`, 'button button--quiet')}${button('find-path', '找关联', 'button button--quiet', isChallenge ? 'disabled title="挑战中请逐步探索"' : '')}<details class="map-shop-menu"><summary>目录 ${api.icon('chevron-right')}</summary><div><button type="button" class="button button--quiet" data-open-catalogue>开放曲库</button>${button('challenge', '合作挑战', 'button button--quiet')}${button('relations', '连接与来源', 'button button--quiet')}</div></details></div>
     </header>
     ${isChallenge ? `<div class="map-challenge-banner"><div><span class="map-challenge-banner__label">${isComplete ? '已抵达' : '挑战中'}</span><strong>${escapeHTML(artistName(session.start))} ${api.icon('arrow-right')} ${escapeHTML(artistName(session.target))}</strong></div><span><b>${session.path.length - 1}</b> 步</span>${button('return-roam', '返回漫游', 'button button--quiet', `data-session="${session.id}"`)}</div>` : ''}
     <div class="map-workspace">
       <div class="map-stage-column">
-        <div class="map-stage-top"><div class="map-mode-switch" aria-label="关系类型">${catalogue.hasStyle ? `${button('mode', '合作', session.mode === 'co' ? 'is-active' : '', `data-mode="co" aria-pressed="${session.mode === 'co'}"`)}${button('mode', '策展标签', session.mode === 'style' ? 'is-active' : '', `data-mode="style" aria-pressed="${session.mode === 'style'}" ${isChallenge ? 'disabled title="挑战只沿合作关系前进"' : ''}`)}` : `<span class="map-mode-caption">${neighbors.length} 条连接</span>`}</div><div class="map-stage-tools">${button('relations', '连接与来源', 'button button--quiet')}${button('rotate', api.icon('rotate'), 'icon-button', 'aria-label="旋转关系图" title="旋转关系图"')}</div></div>
-        <div class="map-stage" data-map-stage tabindex="0" role="group" aria-label="${escapeHTML(artist.name)}的关系图。可拖动或使用方向键旋转，也可打开「连接与来源」选择艺人。">
+        <div class="map-stage-top"><div class="map-mode-switch" aria-label="关系类型">${catalogue.hasStyle ? `${button('mode', '合作', session.mode === 'co' ? 'is-active' : '', `data-mode="co" aria-pressed="${session.mode === 'co'}"`)}${button('mode', '策展标签', session.mode === 'style' ? 'is-active' : '', `data-mode="style" aria-pressed="${session.mode === 'style'}" ${isChallenge ? 'disabled' : ''}`)}` : ''}</div><div class="map-network-tools" aria-label="关系网视野">${button('zoom-out', '−', 'icon-button', 'aria-label="缩小关系网"')}${button('fit', '全图', 'button button--quiet', 'aria-label="显示整张关系网"')}${button('zoom-in', '+', 'icon-button', 'aria-label="放大关系网"')}</div><span class="map-network-count">${layout.length} 人 <i>·</i> ${links.length} ${relationUnit}</span></div>
+        <div class="map-stage map-network-fallback" data-map-stage tabindex="0" role="group" aria-label="完整音乐关系网，可用方向键平移和加减号缩放">
           <svg class="map-graph-lines" data-map-lines aria-hidden="true"></svg>
-          <button type="button" class="map-node map-node--center ${artist.name.length > 3 ? 'map-node--long' : ''}" data-map-action="artist" style="--node-tone:${artist.color}" aria-label="查看${escapeHTML(artist.name)}的${isReal ? '入选合作作品' : '示例作品'}">
-            <span class="map-node__disc" aria-hidden="true"><i>${escapeHTML(artist.name.slice(0, 1))}</i></span><span class="map-node__name">${escapeHTML(artist.name)}</span><span class="map-node__hint">${artist.songIds.length} 首作品 ${api.icon('arrow-up-right')}</span>
-          </button>
-          ${neighbors.map(edge => { const next = artistById[otherArtist(edge, node.id)]; return `<button type="button" class="map-node map-node--orbit" data-map-action="move" data-id="${next.id}" style="--node-tone:${next.color}" aria-label="沿${escapeHTML(edge.reason)}探索${escapeHTML(next.name)}" ${isComplete ? 'disabled' : ''}><span class="map-node__disc" aria-hidden="true"><i>${escapeHTML(next.name.slice(0, 1))}</i></span><span class="map-node__name">${escapeHTML(next.name)}</span><span class="map-node__tag">${escapeHTML(edge.song ? songs[edge.song].title : edge.reason)}</span></button>`; }).join('')}
-          ${!neighbors.length ? '<span class="map-stage__no-links">暂无收录连接</span>' : ''}
+          ${layout.map(item => button('select', `<i style="--node-tone:${item.color}"></i><strong>${escapeHTML(item.name)}</strong>`, `map-network-node ${item.id === selectedId ? 'is-selected' : ''}`, `data-id="${item.id}" aria-label="选择${escapeHTML(item.name)}" aria-pressed="${item.id === selectedId}"`)).join('')}
         </div>
       </div>
-      <aside class="map-artist-panel" aria-label="${escapeHTML(artist.name)}的作品">
-        <details class="map-record-shelf"><summary><i class="map-record-sleeve" style="--node-tone:${artist.color}" aria-hidden="true"></i><span><strong>${escapeHTML(artist.name)}</strong><small>${artist.songIds.length} 张${isReal ? '合作唱片' : '示例作品'}</small></span>${api.icon('chevron-right')}</summary>${tracksHTML(session, artist.songIds, api, `在${artist.name}的${isReal ? '入选合作作品' : '示例作品'}中留下`)}</details>
+      <aside class="map-artist-panel" aria-label="${escapeHTML(selectedArtist.name)}的作品">
+        <details class="map-record-shelf"><summary><i class="map-record-sleeve" style="--node-tone:${selectedArtist.color}" aria-hidden="true"></i><span><strong>${escapeHTML(selectedArtist.name)}</strong><small>${selectedArtist.songIds.length} 张${isReal ? '合作唱片' : '示例作品'}</small></span>${api.icon('chevron-right')}</summary>${tracksHTML(session, selectedArtist.songIds, api, `在${selectedArtist.name}的${isReal ? '入选合作作品' : '示例作品'}中留下`)}</details>
       </aside>
     </div>
     <div class="map-studio-dock">
-      <div class="map-sleeve-tab">${button('artist', `<span class="map-sleeve-tab__number">SIDE ${isReal ? 'A' : 'B'}</span><span><b>${escapeHTML(artist.name)}</b><small>封套内页 · ${artist.songIds.length} 首</small></span>${api.icon('arrow-up-right')}`, '', `aria-label="翻开${escapeHTML(artist.name)}的唱片封套"`)}</div>
-      ${discoveryHTML(session, api, map.undo)}
+      <div class="map-network-selection"><span class="map-network-stamp" style="--node-tone:${selectedArtist.color}" aria-hidden="true"><i></i></span><div><h2>${escapeHTML(selectedArtist.name)}</h2><span>${selectedLinks.length} ${relationUnit} <i>·</i> ${selectedArtist.songIds.length} 首作品</span></div><div class="map-network-selection__actions">${button('artist', `作品 ${api.icon('arrow-up-right')}`, 'button button--quiet', `data-id="${selectedId}"`)}${selectedId !== node.id && !isChallenge ? button('connect', '找关联', 'button button--quiet', `data-id="${selectedId}"`) : ''}</div></div>
+      ${query ? `<section class="map-network-chain" aria-label="查询到的关联链"><div><span>${chain ? `${chain.edges.length} ${relationUnit}相连` : '已收录关系中尚未连通'}</span>${button('clear-path', api.icon('x'), 'icon-button', 'aria-label="清除关联查询"')}</div>${chain ? `<div class="map-chain-stops">${chain.nodes.map((id, index) => `${index ? button('edge', escapeHTML(chain.edges[index - 1].song ? songs[chain.edges[index - 1].song].title : chain.edges[index - 1].reason), 'map-chain-song', `data-id="${chain.edges[index - 1].id}"`) : ''}${button('select', escapeHTML(artistName(id)), 'map-chain-person', `data-id="${id}"`)}`).join('')}</div><small>已收录${modeName(session.mode)}中的最短链</small>` : `<p>${escapeHTML(artistName(query.start))} ↔ ${escapeHTML(artistName(query.target))}</p>`}</section>` : `<div class="map-network-neighbors" aria-label="${escapeHTML(selectedArtist.name)}的连接">${selectedLinks.map(edge => button('edge', `<span>${escapeHTML(artistName(otherArtist(edge, selectedId)))}</span><small>${escapeHTML(edge.song ? songs[edge.song].title : edge.reason)}</small>`, 'map-network-connection', `data-id="${edge.id}"`)).join('') || '<span class="map-inline-empty">暂未收录连接</span>'}</div>`}
       <div class="map-route-bar"><div class="map-route-controls">${button('back', api.icon('arrow-left'), 'icon-button', `aria-label="返回上一位${isChallenge ? '并撤销一步' : ''}" ${session.path.length < 2 || isComplete ? 'disabled' : ''}`)}${button('reset', api.icon('rotate'), 'icon-button', `aria-label="回到起点" ${session.path.length < 2 || isComplete ? 'disabled' : ''}`)}</div><div class="map-route-trail" aria-label="当前路线">${session.path.map((step, index) => `<span ${index === session.path.length - 1 ? 'aria-current="step"' : ''}>${escapeHTML(artistName(step.id))}</span>`).join('<span class="map-route-trail__arrow" aria-hidden="true">·</span>')}</div>${button('recap', `${currentSavedSongs(session).length} 首收藏`, 'button button--quiet', `data-session="${session.id}" data-map-saved-count="${session.id}"`)}</div>
     </div>
     ${undoHTML(map, api)}
@@ -204,7 +186,7 @@ function mapHTML(map, api, presentation = 'quiet') {
 
 function searchResultsHTML(query, dataset) {
   const matches = artistsInDataset(dataset).filter(artist => `${artist.name} ${artist.tag} ${(artist.aliases || []).join(' ')}`.toLowerCase().includes(query.trim().toLowerCase()));
-  return matches.length ? matches.map(artist => `<button type="button" class="map-search-result" data-map-action="new" data-id="${artist.id}"><span class="map-search-result__tone" style="--node-tone:${artist.color}" aria-hidden="true"></span><span><strong>${escapeHTML(artist.name)}</strong><small>${escapeHTML(artist.tag)}</small></span><span aria-hidden="true">↗</span></button>`).join('') : `<p class="empty-state">本${dataset === 'real' ? '专题暂未收录。可以试试「周杰伦」或「林俊杰」' : '示例暂未收录。可以试试「林间」或「乔屿」'}。</p>`;
+  return matches.length ? matches.map(artist => `<button type="button" class="map-search-result" data-map-action="select" data-id="${artist.id}"><span class="map-search-result__tone" style="--node-tone:${artist.color}" aria-hidden="true"></span><span><strong>${escapeHTML(artist.name)}</strong><small>${escapeHTML(artist.tag)}</small></span><span aria-hidden="true">↗</span></button>`).join('') : `<p class="empty-state">本${dataset === 'real' ? '专题暂未收录。可以试试「周杰伦」或「林俊杰」' : '示例暂未收录。可以试试「林间」或「乔屿」'}。</p>`;
 }
 
 function visitedArtists(session) {
@@ -226,7 +208,7 @@ function recapHTML(session, api) {
       const edge = edges.find(item => item.id === event.edgeId);
       return `<div class="map-timeline__stop"><h4>${escapeHTML(artistName(event.from))} <span>→</span> ${escapeHTML(artistName(event.to))}</h4><p>${edge ? `${modeName(edge.mode)} · ${escapeHTML(edge.reason)}` : '已记录的连接'}</p>${edge ? evidenceHTML(edge, api) : ''}${edge?.song ? tracksHTML(session, [edge.song], api, `通过${artistName(event.from)}与${artistName(event.to)}的合作作品留下`, true) : ''}</div>`;
     }).join('') || '<p class="map-inline-empty">还没有连接记录。</p>'}</div></details>
-    <div class="map-panel-actions">${session.status !== 'complete' ? button('resume', isChallenge ? '继续挑战' : '继续探索', 'button button--primary', `data-session="${session.id}"`) : button('challenge', '再开一局', 'button button--primary')}${isChallenge ? button('return-roam', '返回漫游', 'button button--quiet', `data-session="${session.id}"`) : button('search', '换个起点', 'button button--quiet')}</div>
+    <div class="map-panel-actions">${session.status !== 'complete' ? button('resume', isChallenge ? '继续挑战' : '继续探索', 'button button--primary', `data-session="${session.id}"`) : button('challenge', '再开一局', 'button button--primary')}${isChallenge ? button('return-roam', '返回漫游', 'button button--quiet', `data-session="${session.id}"`) : button('search', '找音乐人', 'button button--quiet')}</div>
     <p class="map-storage-note">仅保存在当前浏览器，清除浏览器数据会丢失。</p>`;
 }
 
@@ -239,16 +221,29 @@ function panelHTML(map, api, recordsOnly = false) {
   const availableArtists = artistsInDataset(dataset);
   const isReal = dataset === 'real';
   let content = '';
-  if (panel === 'search') content = `<span class="eyebrow">${catalogue.label}</span><h2>换个起点</h2><p class="map-panel-description">开启新探索，当前记录保留。</p><label class="map-search-label" for="map-artist-search">${availableArtists.length} 位艺人</label><input id="map-artist-search" class="map-input" type="search" placeholder="${isReal ? '搜索名字，如 周杰伦、JJ Lin' : '搜索名字或标签，如 林间、民谣'}" value="${escapeHTML(map.view.query)}" autocomplete="off"><div class="map-search-results" data-map-search-results>${searchResultsHTML(map.view.query, dataset)}</div>`;
+  if (panel === 'search') content = `<span class="eyebrow">${catalogue.label}</span><h2>找音乐人</h2><label class="map-search-label" for="map-artist-search">${availableArtists.length} 位已收录</label><input id="map-artist-search" class="map-input" type="search" placeholder="${isReal ? '名字，如 周杰伦、JJ Lin' : '名字或标签，如 林间、民谣'}" value="${escapeHTML(map.view.query)}" autocomplete="off"><div class="map-search-results" data-map-search-results>${searchResultsHTML(map.view.query, dataset)}</div>`;
+  if (panel === 'find-path') {
+    const options = selected => availableArtists.map(artist => `<option value="${artist.id}" ${selected === artist.id ? 'selected' : ''}>${escapeHTML(artist.name)}</option>`).join('');
+    content = `<span class="eyebrow">${catalogue.label} · ${modeName(session.mode)}</span><h2>${session.mode === 'co' ? '他们之间，隔着哪首歌？' : '他们之间，怎样相连？'}</h2><form data-map-path-form><div class="map-path-fields"><label class="map-field">从<select name="start">${options(currentNode(session).id)}</select></label><span aria-hidden="true">↔</span><label class="map-field">到<select name="target">${options(map.view.selectedArtistId || catalogue.target)}</select></label></div><button class="button button--primary" type="submit">在图上找关联 ${api.icon('arrow-right')}</button></form>`;
+  }
   if (panel === 'challenge') content = `<span class="eyebrow">${catalogue.label}</span><h2>合作挑战</h2><p class="map-panel-description">沿合作找到终点，进度自动保留。</p><form data-map-challenge-form><label class="map-field">起点<select name="start">${availableArtists.map(artist => `<option value="${artist.id}" ${map.view.challengeStart === artist.id ? 'selected' : ''}>${escapeHTML(artist.name)}</option>`).join('')}</select></label><label class="map-field">终点<select name="target">${availableArtists.map(artist => `<option value="${artist.id}" ${map.view.challengeEnd === artist.id ? 'selected' : ''}>${escapeHTML(artist.name)}</option>`).join('')}</select></label><p class="map-form-error" data-map-challenge-error role="alert">${escapeHTML(map.view.challengeError)}</p><button class="button button--primary" type="submit">开始挑战 ${api.icon('arrow-right')}</button></form><p class="map-storage-note">每次连接计 1 步，返回撤销 1 步。仅使用本图谱已收录的关系。</p>`;
-  if (panel === 'artist' && session) { const artist = artistById[currentNode(session).id]; content = `<span class="eyebrow">${catalogue.label} · ${isReal ? '入选合作' : '示例作品'}</span><h2>${escapeHTML(artist.name)}</h2><p class="map-panel-description">${isReal ? '作品与制作署名 · 无内置音频' : '虚构作品，无音源。'}</p>${tracksHTML(session, artist.songIds, api, `在${artist.name}的${isReal ? '入选合作作品' : '示例作品'}中留下`, true, true)}`; }
+  if (panel === 'artist' && session) { const id = datasetForArtist(map.view.selectedArtistId) === dataset ? map.view.selectedArtistId : currentNode(session).id; const artist = artistById[id]; content = `<span class="eyebrow">${catalogue.label} · ${isReal ? '入选合作' : '示例作品'}</span><h2>${escapeHTML(artist.name)}</h2>${id !== currentNode(session).id && session.type !== 'challenge' ? `<div class="map-panel-actions">${button('new', '从这里开始探索', 'button button--quiet', `data-id="${id}"`)}</div>` : ''}${tracksHTML(session, artist.songIds, api, `在${artist.name}的${isReal ? '入选合作作品' : '示例作品'}中留下`, true, true)}`; }
+  if (panel === 'edge' && session) {
+    const edge = edges.find(item => item.id === map.view.selectedEdgeId && item.dataset === dataset && item.mode === session.mode);
+    if (edge) {
+      const from = currentNode(session).id;
+      const touchesCurrent = edge.a === from || edge.b === from;
+      const next = touchesCurrent ? otherArtist(edge, from) : null;
+      content = `<span class="eyebrow">${isReal ? '共同演唱' : modeName(edge.mode)}</span><h2 class="map-edge-title">${button('select', escapeHTML(artistName(edge.a)), 'map-edge-person', `data-id="${edge.a}"`)}<span>×</span>${button('select', escapeHTML(artistName(edge.b)), 'map-edge-person', `data-id="${edge.b}"`)}</h2>${edge.song ? tracksHTML(session, [edge.song], api, '从关系网中留下', false, true) : `<p class="map-panel-description">${escapeHTML(edge.evidence)}</p>`}${evidenceHTML(edge, api)}<div class="map-panel-actions">${next && session.status !== 'complete' ? button('move', `前往${escapeHTML(artistName(next))} ${api.icon('arrow-right')}`, 'button button--primary', `data-id="${next}" data-edge-id="${edge.id}"`) : session.type !== 'challenge' ? button('new', `从${escapeHTML(artistName(edge.a))}出发`, 'button button--quiet', `data-id="${edge.a}"`) : ''}</div>`;
+    }
+  }
   if (panel === 'credits' && session) {
     const song = songs[map.view.creditSongId];
     if (song?.credits?.length) content = `<div class="map-credit-heading"><span class="map-credit-disc" style="--credit-tone:${artistById[song.artists[0]].color}" aria-hidden="true"></span><div><span class="eyebrow">作品署名</span><h2>${escapeHTML(song.title)}</h2><p>${escapeHTML(song.recordingLabel)}</p></div></div>${creditsHTML(song, api, true)}<div class="map-credit-bottom"><span>无内置音频</span>${button('take-song', '带到现场', 'button button--quiet', `data-id="${song.id}" data-session="${session.id}"`)}${button('save', `${api.icon(songIsSaved(session, song.id) ? 'check' : 'plus')} ${songIsSaved(session, song.id) ? '已留下' : '留下作品'}`, 'button button--quiet', `data-id="${song.id}" data-session="${session.id}" data-source="查看作品制作署名后留下" aria-pressed="${songIsSaved(session, song.id)}"`)}</div>`;
   }
   if (panel === 'relations' && session) {
-    const id = currentNode(session).id;
-    content = `<span class="eyebrow">${catalogue.label} · ${modeName(session.mode)}</span><h2>连接来源</h2><p class="map-panel-description">${isReal ? '图中连线表示共同演唱；每首作品可展开制作署名。' : '虚构示例，无音源。标签由人工整理。'}</p>${getNeighbors(id, session.mode, dataset).map(edge => `<section class="map-relation-proof"><div class="map-relation-title"><h3>${escapeHTML(artistName(id))} <span>↔</span> ${escapeHTML(artistName(otherArtist(edge, id)))}</h3>${button('move', api.icon('arrow-up-right'), 'icon-button', `data-id="${otherArtist(edge, id)}" aria-label="前往${escapeHTML(artistName(otherArtist(edge, id)))}" ${session.status === 'complete' ? 'disabled' : ''}`)}</div>${edge.song ? tracksHTML(session, [edge.song], api, `通过${artistName(edge.a)}与${artistName(edge.b)}的合作作品留下`, true, true) : `<p>${escapeHTML(edge.evidence)}</p>`}${edge.dataset !== 'real' ? evidenceHTML(edge, api) : ''}</section>`).join('') || '<p class="map-inline-empty">本图谱暂无收录。</p>'}`;
+    const id = datasetForArtist(map.view.selectedArtistId) === dataset ? map.view.selectedArtistId : currentNode(session).id;
+    content = `<span class="eyebrow">${catalogue.label} · ${modeName(session.mode)}</span><h2>连接来源</h2><p class="map-panel-description">${isReal ? '图中连线表示共同演唱；每首作品可展开制作署名。' : '虚构示例，无音源。标签由人工整理。'}</p>${getNeighbors(id, session.mode, dataset).map(edge => `<section class="map-relation-proof"><div class="map-relation-title"><h3>${escapeHTML(artistName(id))} <span>↔</span> ${escapeHTML(artistName(otherArtist(edge, id)))}</h3>${button('edge', api.icon('arrow-up-right'), 'icon-button', `data-id="${edge.id}" aria-label="查看与${escapeHTML(artistName(otherArtist(edge, id)))}的连接"`)}</div>${edge.song ? tracksHTML(session, [edge.song], api, `通过${artistName(edge.a)}与${artistName(edge.b)}的合作作品留下`, true, true) : `<p>${escapeHTML(edge.evidence)}</p>`}${edge.dataset !== 'real' ? evidenceHTML(edge, api) : ''}</section>`).join('') || '<p class="map-inline-empty">本图谱暂无收录。</p>'}`;
   }
   if (panel === 'recap' && session) content = recapHTML(session, api);
   if (panel === 'delete' && session) content = `<h2>删除这次探索？</h2><p class="map-panel-description">将删除从${escapeHTML(artistName(session.start))}出发的路线、分支和作品清单，无法恢复。</p><div class="map-panel-actions">${button('delete-confirm', '删除记录', 'button button--primary', `data-session="${session.id}"`)}${button('close', '保留')}</div>`;
@@ -274,6 +269,9 @@ function startRoam(map, id) {
   activateSession(map, session);
   map.view.panel = null;
   map.view.reviewId = null;
+  map.view.selectedArtistId = id;
+  map.view.selectedEdgeId = null;
+  map.view.networkQuery = null;
 }
 
 function attachInteractions(container, api, recordsOnly) {
@@ -281,7 +279,6 @@ function attachInteractions(container, api, recordsOnly) {
   const { signal } = abort;
   let drag = null;
   let suppressClickUntil = 0;
-  let rotation = null;
   const mutate = (fn, redraw = true, keepPosition = null) => {
     const previousDialog = container.querySelector('.map-dialog');
     const dialogScroll = previousDialog?.scrollTop || 0;
@@ -353,19 +350,63 @@ function attachInteractions(container, api, recordsOnly) {
       session.events.push({ type: reset ? 'reset' : 'back', from, to: node.id });
       session.updated = Date.now();
       map.view.panel = null;
+      map.view.selectedArtistId = node.id;
+      map.view.selectedEdgeId = null;
+      map.view.networkQuery = null;
     });
   }
 
   function runAction(control) {
     if (!control || !container.contains(control) || control.disabled || Date.now() < suppressClickUntil) return;
-    const { mapAction: action, id, session: sessionId } = control.dataset;
+    performAction(control.dataset, control);
+  }
+  function performAction(data, control = null) {
+    const { mapAction: action, id, session: sessionId } = data;
     const map = api.getState().map;
     const session = activeSession(map);
+    if (['zoom-in', 'zoom-out', 'fit', 'focus'].includes(action)) {
+      if (document.body.classList.contains('spatial-fallback')) {
+        if (action === 'fit') Object.assign(fallbackView(), { zoom: 1, x: 0, z: 0 });
+        else if (action === 'focus') {
+          const view = fallbackView();
+          const selected = networkLayout(sessionDataset(session), session.mode).find(artist => artist.id === map.view.selectedArtistId);
+          if (view.zoom === 1) Object.assign(view, { x: 0, z: 0 });
+          else if (selected) Object.assign(view, { x: -selected.x * view.zoom, z: -selected.z * view.zoom });
+        }
+        else fallbackView().zoom = Math.max(1, Math.min(2.8, fallbackView().zoom * (action === 'zoom-in' ? 1.25 : .8)));
+        positionNodes();
+      } else api.spatial?.musicControl(action);
+      return;
+    }
+    if (action === 'select') {
+      if (datasetForArtist(id) !== sessionDataset(session)) return;
+      const fromSearch = map.view.panel === 'search';
+      mutate(state => { state.view.selectedArtistId = id; state.view.selectedEdgeId = null; state.view.panel = null; state.view.reviewId = null; });
+      if (fromSearch) performAction({ mapAction: 'focus' });
+      return;
+    }
+    if (action === 'edge') {
+      if (!edges.some(edge => edge.id === id && edge.dataset === sessionDataset(session) && edge.mode === session.mode)) return;
+      mutate(state => { state.view.selectedEdgeId = id; state.view.panel = 'edge'; state.view.reviewId = session.id; });
+      return;
+    }
+    if (action === 'connect') {
+      if (session.type === 'challenge' || datasetForArtist(id) !== sessionDataset(session)) return;
+      mutate(state => { state.view.networkQuery = { start: currentNode(session).id, target: id, dataset: sessionDataset(session), mode: session.mode }; state.view.panel = null; });
+      performAction({ mapAction: 'fit' });
+      return;
+    }
+    if (action === 'clear-path') { mutate(state => { state.view.networkQuery = null; }); return; }
+    if (action === 'artist' && id && datasetForArtist(id) === sessionDataset(session)) {
+      mutate(state => { state.view.selectedArtistId = id; state.view.panel = 'artist'; state.view.reviewId = session.id; });
+      return;
+    }
     if (action === 'credits' && songs[id]?.credits?.length) {
       mutate(state => { state.view.creditSongId = id; state.view.reviewId = sessionId || null; state.view.panel = 'credits'; });
       return;
     }
-    if (['search', 'artist', 'relations', 'challenge', 'delete', 'recap'].includes(action)) {
+    if (['search', 'artist', 'relations', 'challenge', 'delete', 'recap', 'find-path'].includes(action)) {
+      if (action === 'find-path' && session.type === 'challenge') return;
       showPanel(action, sessionId || null);
       if (recordsOnly && ['search', 'challenge'].includes(action)) goExplore();
       return;
@@ -373,7 +414,7 @@ function attachInteractions(container, api, recordsOnly) {
     switch (action) {
       case 'close': mutate(state => { state.view.panel = null; }); break;
       case 'dataset': {
-        const dataset = control.dataset.dataset;
+        const dataset = data.dataset;
         if (!catalogues[dataset] || dataset === sessionDataset(session)) break;
         mutate(state => {
           if (session) activateSession(state, session);
@@ -388,6 +429,9 @@ function attachInteractions(container, api, recordsOnly) {
           state.view.reviewId = null;
           state.view.query = '';
           state.view.challengeError = '';
+          state.view.selectedArtistId = currentNode(activeSession(state)).id;
+          state.view.selectedEdgeId = null;
+          state.view.networkQuery = null;
         });
         break;
       }
@@ -398,7 +442,7 @@ function attachInteractions(container, api, recordsOnly) {
         break;
       case 'move': {
         if (!session || session.status === 'complete') break;
-        const edge = getNeighbors(currentNode(session).id, session.mode, sessionDataset(session)).find(item => otherArtist(item, currentNode(session).id) === id);
+        const edge = getNeighbors(currentNode(session).id, session.mode, sessionDataset(session)).find(item => otherArtist(item, currentNode(session).id) === id && (!data.edgeId || item.id === data.edgeId));
         if (!edge) break;
         mutate(state => {
           const selected = activeSession(state);
@@ -412,21 +456,20 @@ function attachInteractions(container, api, recordsOnly) {
           selected.status = selected.type === 'challenge' && id === selected.target ? 'complete' : 'active';
           state.view.panel = selected.status === 'complete' ? 'recap' : null;
           state.view.reviewId = selected.status === 'complete' ? selected.id : null;
+          state.view.selectedArtistId = id;
+          state.view.selectedEdgeId = edge.id;
+          state.view.networkQuery = null;
         });
         break;
       }
       case 'mode':
         if (!session || session.type === 'challenge') break;
-        if (control.dataset.mode === 'style' && !catalogueFor(session).hasStyle) break;
-        mutate(state => { const selected = activeSession(state); selected.mode = control.dataset.mode; selected.updated = Date.now(); });
+        if (data.mode === 'style' && !catalogueFor(session).hasStyle) break;
+        mutate(state => { const selected = activeSession(state); selected.mode = data.mode; selected.updated = Date.now(); state.view.networkQuery = null; state.view.selectedEdgeId = null; });
         break;
       case 'back': back(); break;
       case 'reset': if (session?.type === 'challenge') showPanel('reset'); else back(true); break;
       case 'reset-confirm': back(true); break;
-      case 'rotate':
-        mutate(state => { const selected = activeSession(state); if (selected) selected.yaw += 0.45; }, false);
-        positionNodes();
-        break;
       case 'save': {
         const selectedSession = sessionById(map, sessionId);
         if (!selectedSession || !songs[id]) break;
@@ -444,7 +487,7 @@ function attachInteractions(container, api, recordsOnly) {
             if (!real && index >= 0) selected.saved.splice(index, 1);
             state.undo = { sessionId: selected.id, item, index: index >= 0 ? index : selected.saved.length, libraryTrack: previousLibraryEntry };
           } else {
-            if (index < 0) selected.saved.push({ id, source: control.dataset.source || '在探索回顾中留下', savedAt: Date.now() });
+            if (index < 0) selected.saved.push({ id, source: data.source || '在探索回顾中留下', savedAt: Date.now() });
             state.undo = null;
           }
           selected.updated = Date.now();
@@ -536,6 +579,16 @@ function attachInteractions(container, api, recordsOnly) {
   }, { signal });
 
   container.addEventListener('submit', event => {
+    if (event.target.matches('[data-map-path-form]')) {
+      event.preventDefault();
+      const data = new FormData(event.target);
+      const start = data.get('start'); const target = data.get('target');
+      const session = activeSession(api.getState().map); const dataset = sessionDataset(session);
+      if (session.type === 'challenge' || datasetForArtist(start) !== dataset || datasetForArtist(target) !== dataset) return;
+      mutate(map => { map.view.networkQuery = { start, target, dataset, mode: session.mode }; map.view.selectedArtistId = target; map.view.selectedEdgeId = null; map.view.panel = null; });
+      performAction({ mapAction: 'fit' });
+      return;
+    }
     if (!event.target.matches('[data-map-challenge-form]')) return;
     event.preventDefault();
     const data = new FormData(event.target);
@@ -553,6 +606,9 @@ function attachInteractions(container, api, recordsOnly) {
       activateSession(map, challenge);
       map.view.panel = null;
       map.view.reviewId = null;
+      map.view.selectedArtistId = start;
+      map.view.selectedEdgeId = null;
+      map.view.networkQuery = null;
     }, false);
     goExplore();
   }, { signal });
@@ -571,106 +627,85 @@ function attachInteractions(container, api, recordsOnly) {
   }
 
   const stage = container.querySelector('[data-map-stage]');
+  const trail = container.querySelector('.map-route-trail');
+  if (trail) trail.scrollLeft = trail.scrollWidth;
   const resize = stage ? new ResizeObserver(() => positionNodes()) : null;
+  function fallbackView() {
+    const session = activeSession(api.getState().map);
+    const key = `${sessionDataset(session)}:${session.mode}`;
+    if (!fallbackViews.has(key)) fallbackViews.set(key, { x: 0, z: 0, zoom: 1 });
+    return fallbackViews.get(key);
+  }
   if (stage) {
     resize.observe(stage);
     stage.addEventListener('pointerdown', event => {
       if (event.button !== 0) return;
-      const session = activeSession(api.getState().map);
-      drag = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, yaw: session.yaw, pitch: session.pitch, moved: false };
+      drag = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, view: { ...fallbackView() }, moved: false };
     }, { signal });
     stage.addEventListener('pointermove', event => {
       if (!drag || drag.pointerId !== event.pointerId) return;
-      const dx = event.clientX - drag.x;
-      const dy = event.clientY - drag.y;
+      const dx = event.clientX - drag.x; const dy = event.clientY - drag.y;
       if (Math.hypot(dx, dy) < 8 && !drag.moved) return;
-      drag.moved = true;
-      stage.setPointerCapture(event.pointerId);
-      rotation = { yaw: drag.yaw + dx * 0.009, pitch: Math.max(-0.85, Math.min(0.85, drag.pitch + dy * 0.005)) };
-      stage.classList.add('is-dragging');
-      positionNodes();
+      drag.moved = true; stage.setPointerCapture(event.pointerId);
+      Object.assign(fallbackView(), { x: drag.view.x + dx / stage.clientWidth * 3.8, z: drag.view.z + dy / stage.clientHeight * 2.7 });
+      stage.classList.add('is-dragging'); positionNodes();
     }, { signal });
-    const finishDrag = () => {
-      if (drag?.moved && rotation) {
-        const finalRotation = { ...rotation };
-        mutate(map => { Object.assign(activeSession(map), finalRotation); }, false);
-        suppressClickUntil = Date.now() + 280;
-      }
-      stage.classList.remove('is-dragging');
-      drag = null;
-      rotation = null;
-    };
+    const finishDrag = () => { if (drag?.moved) suppressClickUntil = Date.now() + 220; stage.classList.remove('is-dragging'); drag = null; };
     stage.addEventListener('pointerup', finishDrag, { signal });
     stage.addEventListener('pointercancel', finishDrag, { signal });
-    stage.addEventListener('pointerleave', event => { if (!stage.hasPointerCapture(event.pointerId)) finishDrag(); }, { signal });
     stage.addEventListener('keydown', event => {
-      if (event.target !== stage || !['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) return;
-      event.preventDefault();
-      mutate(map => {
-        const session = activeSession(map);
-        if (event.key === 'ArrowLeft') session.yaw -= 0.2;
-        if (event.key === 'ArrowRight') session.yaw += 0.2;
-        if (event.key === 'ArrowUp') session.pitch = Math.max(-0.85, session.pitch - 0.15);
-        if (event.key === 'ArrowDown') session.pitch = Math.min(0.85, session.pitch + 0.15);
-      }, false);
+      if (event.target !== stage) return;
+      if (['+', '=', '-'].includes(event.key)) { event.preventDefault(); performAction({ mapAction: event.key === '-' ? 'zoom-out' : 'zoom-in' }); return; }
+      if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) return;
+      event.preventDefault(); const view = fallbackView();
+      view.x += event.key === 'ArrowLeft' ? .2 : event.key === 'ArrowRight' ? -.2 : 0;
+      view.z += event.key === 'ArrowUp' ? .2 : event.key === 'ArrowDown' ? -.2 : 0;
       positionNodes();
     }, { signal });
     positionNodes();
   }
 
+  function musicPayload(session) {
+    const map = api.getState().map; const dataset = sessionDataset(session);
+    const id = datasetForArtist(map.view.selectedArtistId) === dataset ? map.view.selectedArtistId : currentNode(session).id;
+    const layout = networkLayout(dataset, session.mode); const links = networkEdges(dataset, session.mode);
+    const neighbors = new Set(getNeighbors(id, session.mode, dataset).map(edge => otherArtist(edge, id)));
+    const query = map.view.networkQuery;
+    const chain = query?.dataset === dataset && query.mode === session.mode ? shortestChain(query.start, query.target, dataset, session.mode) : null;
+    const highlightedNodes = new Set(chain?.nodes || []); const highlightedEdges = new Set(chain?.edges.map(edge => edge.id) || []);
+    const visited = new Set(session.path.map(step => step.id)); const visitedEdges = new Set(session.path.map(step => step.edgeId).filter(Boolean));
+    return {
+      key: `${dataset}:${session.mode}`, selectedId: id, pathIds: [...visited],
+      nodes: layout.map(artist => ({ id: artist.id, name: artist.name, color: artist.color, count: artist.songIds.length, x: artist.x, z: artist.z,
+        selected: artist.id === id, adjacent: neighbors.has(artist.id), visited: visited.has(artist.id), current: artist.id === currentNode(session).id, highlighted: highlightedNodes.has(artist.id), disabled: false })),
+      edges: links.map(edge => ({ id: edge.id, a: edge.a, b: edge.b, title: edge.song ? songs[edge.song].title : edge.reason, kind: edge.mode,
+        active: edge.a === id || edge.b === id || edge.id === map.view.selectedEdgeId, visited: visitedEdges.has(edge.id), highlighted: highlightedEdges.has(edge.id) })),
+    };
+  }
   function positionNodes() {
     if (!stage) return;
-    const session = activeSession(api.getState().map);
-    if (!session) return;
-    const { yaw, pitch } = rotation || session;
-    publishMusic(session, yaw, pitch);
-    const width = stage.clientWidth;
-    const height = stage.clientHeight;
+    const session = activeSession(api.getState().map); if (!session) return;
+    const payload = musicPayload(session);
+    if (!recordsOnly) api.spatial?.publish({ mode: 'explore', cards: [], music: payload,
+      onMusic(action) { if (['select', 'edge'].includes(action.action)) performAction({ mapAction: action.action, id: action.id }); },
+    });
+    const width = stage.clientWidth; const height = stage.clientHeight;
     if (!width || !height) return;
-    const nodes = [...stage.querySelectorAll('.map-node--orbit')];
-    const coordinates = nodes.map((node, index) => {
-      const angle = index * Math.PI * 2 / Math.max(nodes.length, 1) - 1.13;
-      const x = Math.cos(angle);
-      const y = Math.sin(angle) * 0.9;
-      const z = Math.sin(angle * 2) * 0.4;
-      const rotatedX = x * Math.cos(yaw) + z * Math.sin(yaw);
-      const rotatedZ = -x * Math.sin(yaw) + z * Math.cos(yaw);
-      const rotatedY = y * Math.cos(pitch) - rotatedZ * Math.sin(pitch);
-      const depth = y * Math.sin(pitch) + rotatedZ * Math.cos(pitch);
-      let px = rotatedX * Math.min(width * 0.34, 270);
-      let py = rotatedY * height * 0.34;
-      const distance = Math.hypot(px, py);
-      const minimum = width < 480 ? 123 : 174;
-      if (distance < minimum) { const factor = minimum / Math.max(distance, 0.01); px *= factor; py *= factor; }
-      px = Math.max(-width / 2 + 55, Math.min(width / 2 - 55, px));
-      py = Math.max(-height / 2 + 65, Math.min(height / 2 - 65, py));
-      const scale = 0.87 + (depth + 1) * 0.065;
-      node.style.transform = `translate(calc(-50% + ${px}px), calc(-50% + ${py}px)) scale(${scale})`;
-      node.style.opacity = String(0.78 + (depth + 1) * 0.1);
-      node.style.zIndex = depth > 0 ? '4' : '2';
-      return [width / 2 + px, height / 2 + py];
-    });
-    const svg = stage.querySelector('[data-map-lines]');
-    svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
-    svg.innerHTML = `<g class="map-orbit-ring" fill="none" stroke-width="1"><ellipse cx="${width / 2}" cy="${height / 2}" rx="${Math.min(width * 0.34, 270)}" ry="${height * 0.31}"/></g><g class="map-relation-lines" fill="none" stroke-width="1" ${session.mode === 'style' ? 'stroke-dasharray="3 7"' : ''}>${coordinates.map(([x, y], index) => `<path d="M${width / 2},${height / 2} Q${(width / 2 + x) / 2 + (index % 2 ? 14 : -14)},${(height / 2 + y) / 2 + 12} ${x},${y}"/>`).join('')}</g>`;
-  }
-
-  function publishMusic(session, yaw = session.yaw, pitch = session.pitch) {
-    if (recordsOnly) return;
-    const id = currentNode(session).id;
-    const artist = artistById[id];
-    const neighbors = getNeighbors(id, session.mode, sessionDataset(session));
-    api.spatial?.publish({
-      mode: 'explore', cards: [],
-      music: { key: `${sessionDataset(session)}:${id}:${session.mode}`, artist: { id, name: artist.name, color: artist.color, count: artist.songIds.length }, yaw, pitch,
-        neighbors: neighbors.map(edge => { const next = artistById[otherArtist(edge, id)]; return { id: next.id, name: next.name, color: next.color, reason: edge.reason, songTitle: edge.song ? songs[edge.song].title : '', disabled: session.status === 'complete' }; }),
-      },
-      onMusic(action) {
-        const controls = [...container.querySelectorAll('[data-map-stage] [data-map-action]')];
-        const control = controls.find(item => item.dataset.mapAction === action.action && (action.action === 'artist' || item.dataset.id === action.id));
-        if (control) runAction(control);
-      },
-    });
+    const view = fallbackView(); const positions = new Map();
+    for (const point of payload.nodes) {
+      const x = width * (.5 + (point.x * view.zoom + view.x) / 3.8);
+      const y = height * (.5 + (point.z * view.zoom + view.z) / 2.7);
+      positions.set(point.id, [x, y]);
+      const node = stage.querySelector(`[data-id="${point.id}"]`);
+      node.style.transform = `translate(${x}px,${y}px) translate(-50%,-50%)`;
+      node.classList.toggle('is-highlighted', point.highlighted);
+      node.hidden = x < 25 || x > width - 25 || y < 25 || y > height - 25;
+    }
+    const svg = stage.querySelector('[data-map-lines]'); svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+    svg.innerHTML = payload.edges.map(edge => {
+      const [x, y] = positions.get(edge.a); const [tx, ty] = positions.get(edge.b);
+      return `<path class="map-network-line ${edge.active ? 'is-active' : ''} ${edge.highlighted ? 'is-highlighted' : ''}" d="M${x},${y} L${tx},${ty}" data-map-action="edge" data-id="${edge.id}"/>`;
+    }).join('');
   }
 
   const unsubscribeSavedMusic = subscribeSavedMusic(tracks => {

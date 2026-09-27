@@ -20,7 +20,7 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
     fallback.innerHTML = '<span aria-hidden="true"></span><strong>SAME SHOW.<br>ANOTHER VIEW.</strong>';
     host.append(fallback);
     document.body.classList.add('spatial-fallback');
-    return { setView() {}, setContent() {}, setMusic() {}, focus: () => Promise.resolve(true), restore() {}, dispose() { fallback.remove(); host.classList.remove('sakura-scene--fallback'); document.body.classList.remove('spatial-fallback'); } };
+    return { setView() {}, setContent() {}, setMusic() {}, musicControl() {}, focus: () => Promise.resolve(true), restore() {}, dispose() { fallback.remove(); host.classList.remove('sakura-scene--fallback'); document.body.classList.remove('spatial-fallback'); } };
   }
 
   host.classList.add('sakura-scene');
@@ -50,6 +50,7 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFShadowMap;
   renderer.shadowMap.autoUpdate = false;
+  renderer.localClippingEnabled = true;
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(PAL.skyMid);
@@ -144,7 +145,8 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
   pipeline.grade.mat.uniforms.uSaturation.value = 1.06;
 
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  const music = createSakuraMusic({ world, cel: celMaterials.cel, host: hotspots, reduced, onAction,
+  const music = createSakuraMusic({ world, cel: celMaterials.cel, host: hotspots, canvas, camera, reduced, onAction,
+    isActive: () => director.active.key === 'explore' && !director.moving,
     onChange() { renderer.shadowMap.needsUpdate = true; if (reduced.matches) { projectPins(); draw(); } },
   });
   const loader = new THREE.TextureLoader();
@@ -308,14 +310,15 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
     const rect = canvas.getBoundingClientRect();
     pointer.set((event.clientX - rect.left) / rect.width * 2 - 1, -(event.clientY - rect.top) / rect.height * 2 + 1);
     raycaster.setFromCamera(pointer, camera);
-    const hit = raycaster.intersectObjects(world.children, true).find(item => { for (let node = item.object; node; node = node.parent) if (!node.visible) return false; return true; });
+    const hit = raycaster.intersectObjects(world.children, true).find(item => { for (let node = item.object; node; node = node.parent) if (!node.visible) return false; return music.acceptHit(item); });
     let object = hit?.object;
     while (object && !object.userData.action) object = object.parent;
     return object?.userData.action;
   }
-  function onPointerMove(event) { if (event.pointerType !== 'touch') canvas.style.cursor = picked(event) ? 'pointer' : ''; }
+  function onPointerMove(event) { if (!music.dragging && event.pointerType !== 'touch') canvas.style.cursor = picked(event) ? 'pointer' : ''; }
   function onPointerLeave() { canvas.style.cursor = ''; }
   function onCanvasClick(event) {
+    if (music.consumeClick(event)) return;
     const action = picked(event);
     if (action?.type === 'music') music.activate(action);
     else if (action) onAction?.(action);
@@ -347,7 +350,7 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
   intersectionObserver.observe(host);
   document.addEventListener('visibilitychange', updateMotion); reduced.addEventListener('change', updateMotion);
   resize(); director.go(baseShot(), { immediate: true, force: true }); model.update?.(0); updateMotion();
-  return { setView, setContent, setMusic: music.setMusic, focus, restore, dispose() {
+  return { setView, setContent, setMusic: music.setMusic, musicControl: music.control, focus, restore, dispose() {
     disposed = true; cancelAnimationFrame(frame); director.dispose();
     music.dispose();
     photoSlots.forEach(slot => { gsap.killTweensOf([slot.object.position, slot.object.rotation, slot.object.scale]); });
