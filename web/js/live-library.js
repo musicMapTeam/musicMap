@@ -24,6 +24,7 @@ export function mountLiveLibrary(container, api) {
   let loading = false;
   let busy = false;
   let notice = '';
+  let needsEntry = false;
   let retry = null;
   let selectedKey = null;
   let deleteKey = null;
@@ -76,7 +77,7 @@ export function mountLiveLibrary(container, api) {
   }
 
   function noticeMarkup() {
-    return notice ? `<div class="library-notice" role="status"><p>${escape(notice)}</p><button class="text-button" data-library-action="${retry ? 'retry' : 'refresh'}" ${busy || loading ? 'disabled' : ''}>${retry ? '重试' : '刷新'}</button></div>` : '';
+    return notice ? `<div class="library-notice" role="status"><p>${escape(notice)}</p><button class="text-button" data-library-action="${needsEntry ? 'enter' : retry ? 'retry' : 'refresh'}" ${busy || loading ? 'disabled' : ''}>${needsEntry ? '重新入场' : retry ? '重试' : '刷新'}</button></div>` : '';
   }
 
   function cardMarkup(item) {
@@ -96,9 +97,10 @@ export function mountLiveLibrary(container, api) {
     const all = items();
     const visible = all.filter(item => filter === 'all' || item.type === filter);
     const rooms = library.rooms.filter(room => room.joined !== false);
+    const exchangeRoom = filter === 'record' && (rooms.find(room => room.id === session.roomId) || rooms[0]);
     const tabs = [['all', '全部', all.length], ['card', '现场卡', library.cards.length], ['record', '双联', library.records.length]];
     surface.innerHTML = `<div class="library-toolbar"><div class="library-filters" role="group" aria-label="筛选现场收藏">${tabs.map(([value, label, count]) => `<button data-library-action="filter" data-filter="${value}" aria-pressed="${filter === value}">${label}<span>${count}</span></button>`).join('')}</div><button class="library-refresh icon-button" data-library-action="refresh" aria-label="刷新收藏" ${loading || busy ? 'disabled' : ''}>${icon('rotate')}</button></div>${noticeMarkup()}
-      ${visible.length ? `<div class="library-grid">${visible.map(cardMarkup).join('')}</div>` : `<div class="library-empty"><span class="library-empty__mark" aria-hidden="true">${icon(filter === 'record' ? 'swap' : 'camera')}</span><h2>${filter === 'record' ? '下一张，和同场的人一起留' : '你的第一张现场卡'}</h2><p>${filter === 'record' ? '双方同意交换后，双联会留在这里。' : '先留一张自己的照片。'}</p><button class="button button--primary" data-library-action="make-card">记录我的现场 ${icon('arrow-right')}</button></div>`}
+      ${visible.length ? `<div class="library-grid">${visible.map(cardMarkup).join('')}</div>` : `<div class="library-empty"><span class="library-empty__mark" aria-hidden="true">${icon(filter === 'record' ? 'swap' : 'camera')}</span><h2>${filter === 'record' ? '下一张，和朋友一起' : '你的第一张现场卡'}</h2><p>${filter === 'record' ? '双方同意后，双联会留在这里。' : '先留一张自己的照片。'}</p><button class="button button--primary" data-library-action="${exchangeRoom ? 'room' : 'make-card'}" ${exchangeRoom ? `data-room-id="${escape(exchangeRoom.id)}"` : ''}>${exchangeRoom ? '回到现场换卡' : '记录我的现场'} ${icon('arrow-right')}</button></div>`}
       ${rooms.length ? `<details class="library-rooms"><summary>还在这些现场 <span>${rooms.length}</span>${icon('chevron-right')}</summary><div>${rooms.map(room => `<button data-library-action="room" data-room-id="${escape(room.id)}"><span><b>${escape(room.title)}</b><small>${escape([room.event?.date, room.event?.city].filter(Boolean).join(' · '))}</small></span>${icon('arrow-up-right')}</button>`).join('')}</div></details>` : ''}`;
     hydrate(surface);
     updateBusy();
@@ -124,7 +126,7 @@ export function mountLiveLibrary(container, api) {
     }
     session = next;
     if (!session) { render(); return; }
-    loading = true; notice = ''; retry = null; render();
+    loading = true; notice = ''; needsEntry = false; retry = null; render();
     try {
       library = await request('/library');
       if (signal.aborted) return;
@@ -145,7 +147,8 @@ export function mountLiveLibrary(container, api) {
       loading = false;
       if (error.status === 401 || error.status === 403) {
         library = null; dialog.close(); confirmation.close(); photos.clear();
-        notice = '当前身份暂时无法读取收藏，请刷新后重试。';
+        needsEntry = true;
+        notice = error.status === 401 ? '当前身份已失效。重新入场会使用新身份，旧记录无法带回。' : '当前身份无法读取收藏，请重新入场。';
       } else notice = `${error instanceof TypeError ? '暂时连接不上现场服务。' : error.message}${library ? '上次收到的收藏仍在。' : '恢复连接后可刷新。'}`;
       render();
     }
@@ -251,6 +254,7 @@ export function mountLiveLibrary(container, api) {
       surface.querySelector(`[data-filter="${filter}"]`)?.focus({ preventScroll: true });
     }
     if (action === 'refresh') refresh();
+    if (action === 'enter') api.navigate('live');
     if (action === 'make-card') api.navigate('live', { intent: 'make-card' });
     if (action === 'open') openItem(key);
     if (action === 'download') exportItem(key);

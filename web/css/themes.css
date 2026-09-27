@@ -1,68 +1,15 @@
-/* Shared visual contracts; each art direction follows in its own stylesheet. */
+/* Paper, ink and shared controls for the music courtyard. */
 :root {
-  --theme-ink:#0c1016; --theme-paper:#f2efe7; --theme-accent:#70ddcf;
-  --theme-soft:#192b30; --button-fill:#70ddcf; --button-ink:#0b2425;
-}
-:root[data-theme="sakura"] {
   color-scheme:light; --bg:#f5f2e8; --surface:#fcf8ef; --surface-raised:#ece9dc;
   --text:#433a46; --paper:#fffbf1; --muted:#756c75; --line:#66576338;
   --mint:#34614b; --coral:#a5556a; --theme-ink:#433a46;
   --theme-paper:#fffbf1; --theme-accent:#eab1c1; --theme-soft:#f2dfe4;
   --button-fill:#345b49; --button-ink:#fff9ed;
 }
-:root[data-theme="zine"] {
-  color-scheme:light; --bg:#e9e8dd; --surface:#f5f3e7; --surface-raised:#dfdfd0;
-  --text:#171914; --paper:#f7f4e7; --muted:#616254; --line:#22261c42;
-  --mint:#455c1c; --coral:#a43322; --theme-ink:#171914;
-  --theme-paper:#f7f4e7; --theme-accent:#d7f44c; --theme-soft:#dedfc9;
-  --button-fill:#d7f44c; --button-ink:#171914; --radius:0px;
-}
-.theme-launcher { justify-self:end; display:flex; align-items:center; gap:12px; border:1px solid var(--line); background:transparent; padding:10px 14px; min-height:48px; text-align:left; }
-.theme-launcher:hover { border-color:var(--mint); background:var(--surface); }
-.theme-launcher__swatch { position:relative; width:26px; height:26px; border:1px solid var(--muted); overflow:hidden; background:var(--theme-paper); transform:rotate(-8deg); }
-.theme-launcher__swatch::before { content:''; position:absolute; inset:0 50% 0 0; background:var(--theme-ink); }
-.theme-launcher__swatch::after { content:''; position:absolute; width:17px; height:17px; border-radius:50%; background:var(--theme-accent); right:-4px; bottom:-3px; }
-.theme-launcher b { display:block; font-size:12px; font-weight:550; line-height:1.5; }
-.theme-launcher small { display:block; color:var(--muted); font-size:10px; margin-top:2px; line-height:1.4; }
-.theme-launcher>.icon { width:15px; height:15px; color:var(--muted); }
-.theme-dialog { width:min(1010px,calc(100vw - 40px)); max-height:calc(100dvh - 40px); padding:30px 34px 25px; background:var(--bg); color:var(--text); border:1px solid var(--line); border-radius:3px; box-shadow:0 30px 130px #0005; }
-.theme-dialog__top { display:flex; justify-content:space-between; align-items:center; gap:20px; }
-.theme-dialog__heading { display:flex; justify-content:space-between; align-items:end; gap:24px; margin:10px 0 30px; }
-.theme-dialog__heading h2 { font-size:clamp(30px,4vw,47px); letter-spacing:-.06em; font-weight:750; margin:0; line-height:1.22; }
-.theme-dialog__heading p { margin:0; font-size:13px; color:var(--muted); line-height:1.9; }
-.theme-options { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; }
-.theme-option { position:relative; padding:0 0 14px; border:0; border-bottom:2px solid var(--line); background:none; text-align:left; color:var(--text); }
-.theme-option:hover { border-color:var(--muted); }
-.theme-option[aria-pressed=true] { border-color:var(--mint); }
-.theme-preview { position:relative; display:flex; flex-direction:column; aspect-ratio:1.12; padding:17px; overflow:hidden; isolation:isolate; background:#101920; color:#f2efe7; border:1px solid #f2efe740; }
-.theme-preview__edition,.theme-preview__foot { position:relative; z-index:2; font:9px/1.6 var(--font-mono); letter-spacing:.025em; }
-.theme-preview strong { position:relative; z-index:2; display:block; margin:auto 0; font-size:clamp(28px,3.8vw,46px); font-weight:850; line-height:1.03; letter-spacing:-.07em; }
-.theme-preview__art { position:absolute; right:-22px; top:31px; width:160px; height:160px; border-radius:50%; background:repeating-radial-gradient(circle,#70ddcf 0 3px,transparent 4px 9px); transform:rotate(-20deg) scaleX(.72); opacity:.8; }
-.theme-option--festival .theme-preview strong { color:#f2efe7; text-shadow:3px 3px #101920; }
-.theme-option--festival .theme-preview__foot { color:#ff9979; }
-.theme-option--sakura .theme-preview { background:#ecebdc; color:#345b49; border-color:#345b493b; }
-.theme-option--sakura .theme-preview strong { font-family:Georgia,'Songti SC','SimSun',serif; font-weight:600; letter-spacing:.03em; line-height:1.17; }
-.theme-option--sakura .theme-preview__art { border-radius:52% 42% 58% 40%; transform:rotate(-18deg); right:-35px; top:36px; background:#e8b2c1; box-shadow:-24px -17px 0 -8px #f4d4d8,-8px 70px 0 -47px #53735c,-55px 65px 0 -55px #53735c; opacity:1; }
-.theme-option--sakura .theme-preview__foot { border-top:1px solid #345b4940; padding-top:6px; }
-.theme-option--zine .theme-preview { background:#d7f44c; color:#171914; border:1px solid #171914; }
-.theme-option--zine .theme-preview strong { font-family:Arial,sans-serif; font-size:clamp(34px,4.7vw,60px); line-height:.87; transform:rotate(-5deg); text-shadow:2px 2px #d7f44c,-2px -2px #e5a288; }
-.theme-option--zine .theme-preview__art { border-radius:0; width:85px; height:120px; right:-30px; top:20px; background:repeating-linear-gradient(45deg,#171914 0 6px,transparent 6px 12px); transform:rotate(5deg); }
-.theme-option--zine .theme-preview__foot { border-top:2px solid #171914; padding-top:4px; }
-.theme-option__title { display:flex; justify-content:space-between; align-items:center; margin:14px 0 8px; gap:10px; }
-.theme-option__title b { font-size:18px; letter-spacing:-.035em; }
-.theme-option__check { display:grid; place-items:center; width:23px; height:23px; border:1px solid var(--line); border-radius:50%; }
-.theme-option__check .icon { width:14px; height:14px; visibility:hidden; }
-[aria-pressed=true]>.theme-option__title .theme-option__check { color:var(--button-ink); border-color:var(--button-fill); background:var(--button-fill); }
-[aria-pressed=true]>.theme-option__title .theme-option__check .icon { visibility:visible; }
-.theme-option__line,.theme-option__detail { display:block; font-size:12px; line-height:1.7; }
-.theme-option__detail { color:var(--muted); margin-top:5px; font-size:10px; }
-.theme-dialog__footer { display:flex; justify-content:space-between; align-items:center; gap:20px; margin-top:23px; }
-.theme-dialog__footer p { margin:0; font-size:12px; color:var(--muted); }
-.theme-world { display:none; }
 .sp-hero { margin-bottom:40px; }
 
 /* Readable light surfaces for shared controls, forms and business content. */
-:root:where([data-theme="sakura"],[data-theme="zine"]) {
+:root {
   scrollbar-color:var(--muted) var(--bg);
   & ::selection { background:var(--theme-accent); color:var(--theme-ink); }
   & .app-masthead { border-color:var(--line); }
@@ -171,29 +118,4 @@
 }
 @media(max-width:760px) {
   .app-masthead { grid-template-columns:1fr auto; gap:12px; }
-  .theme-launcher { padding:7px 9px; gap:8px; }
-  .theme-launcher>.icon { display:none; }
-  .theme-launcher__swatch { width:22px; height:22px; }
-  .theme-launcher b { font-size:11px; }
-  .theme-launcher small { font-size:9px; }
-  .theme-dialog { padding:18px 20px; width:calc(100vw - 24px); max-height:calc(100dvh - 24px); }
-  .theme-dialog__top .eyebrow { font-size:9px; }
-  .theme-dialog__heading { display:block; margin:10px 0 22px; }
-  .theme-dialog__heading h2 { font-size:32px; }
-  .theme-dialog__heading p { margin-top:13px; font-size:12px; }
-  .theme-options { grid-template-columns:1fr; gap:18px; }
-  .theme-option { display:grid; grid-template-columns:108px 1fr; gap:0 15px; padding-bottom:18px; }
-  .theme-preview { grid-row:1 / 4; aspect-ratio:.98; padding:9px; }
-  .theme-preview strong { font-size:27px; }
-  .theme-option--zine .theme-preview strong { font-size:32px; }
-  .theme-preview__edition,.theme-preview__foot { font-size:5px; }
-  .theme-preview__art { width:95px; height:95px; right:-30px; top:16px; }
-  .theme-option--sakura .theme-preview__art { right:-42px; top:23px; }
-  .theme-option__title { margin:2px 0 6px; align-self:start; }
-  .theme-option__title b { font-size:17px; }
-  .theme-option__line { font-size:12px; align-self:start; }
-  .theme-option__detail { font-size:10px; margin-top:5px; }
-  .theme-dialog__footer { flex-direction:column; align-items:stretch; gap:12px; margin-top:18px; }
-  .theme-dialog__footer p { font-size:11px; }
 }
-@media(prefers-reduced-motion:reduce) { .theme-launcher,.theme-option { transition:none; } }

@@ -19,14 +19,6 @@ html[data-theme='sakura'] .space-page.space-studio {
   --studio-radius: 17px;
 }
 
-html[data-theme='zine'] .space-page.space-studio {
-  --studio-paper: #f8f4e9;
-  --studio-ink: #252722;
-  --studio-soft: #6f715410;
-  --studio-shadow: #3335202b;
-  --studio-radius: 5px;
-}
-
 .space-studio--home {
   position: relative;
   isolation: isolate;
@@ -116,8 +108,6 @@ html[data-theme='zine'] .space-page.space-studio {
   transform: rotate(-12deg);
 }
 
-html[data-theme='zine'] .space-studio .space-scene-slot::before { border-color: #1719143a; box-shadow: 12px 14px 0 #383e2521; }
-html[data-theme='zine'] .space-studio .space-scene-slot::after { border-radius: 1px; background: radial-gradient(circle at 58% 50%, #252d25 0 17%, transparent 17.3%), repeating-linear-gradient(40deg, #53662a16 0 1px, transparent 1px 6px), #d7e894; box-shadow: 5px 7px 0 #383e2521; }
 html[data-theme='sakura'] .space-studio .space-scene-slot { top: 76px; bottom: 35px; border-radius: 30px; overflow: hidden; background: #f2eee1; }
 html[data-theme='sakura'] .space-studio .space-scene-slot::before,
 html[data-theme='sakura'] .space-studio .space-scene-slot::after { display: none; }
@@ -198,10 +188,6 @@ html[data-theme='sakura'] .space-studio .space-scene-slot > .theme-world { displ
 .space-studio .space-studio__actions .button--primary { border-color: transparent; }
 .space-studio .space-studio__actions .button:not(.button--primary) { background: var(--surface); }
 
-html[data-theme='zine'] .space-photo { padding: 10px 10px 0; box-shadow: 4px 5px 0 #31362a26, 0 23px 30px -22px #222; }
-html[data-theme='zine'] .space-photo__image { border-radius: 0; }
-html[data-theme='zine'] .space-photo__caption strong { font-weight: 750; }
-html[data-theme='zine'] .space-photo__stamp { border-top: 1px dashed #333b343b; }
 html[data-theme='sakura'] .space-photo__caption strong { font-family: 'Songti SC', 'Noto Serif SC', serif; letter-spacing: .04em; }
 html[data-theme='sakura'] .space-photo__image { filter: saturate(.87); }
 
@@ -265,8 +251,6 @@ html[data-theme='sakura'] .space-photo__image { filter: saturate(.87); }
 .space-studio.space-studio--demo .sp-demo-footer .sp-text-link { font-size: 10px; }
 .space-studio.space-studio--demo .sp-reaction-receipt { margin-top: 12px; font-size: 11px; }
 
-html[data-theme='zine'] .space-studio.space-studio--demo .sp-ticket { box-shadow: 3px 4px 0 #34372a26; }
-html[data-theme='zine'] .space-studio.space-studio--demo .sp-ticket__photo { border-radius: 0; }
 html[data-theme='sakura'] .space-studio.space-studio--demo .sp-ticket { box-shadow: 0 16px 28px -18px #64765555; }
 
 /* Editing is a sheet of controls; keep the photograph as its focal point. */
@@ -289,7 +273,6 @@ html[data-theme='sakura'] .space-studio.space-studio--demo .sp-ticket { box-shad
 .sp-dialog .sp-display-consent { padding: 13px 0; border: 0; }
 .sp-dialog .sp-display-consent input { top: 13px; }
 .sp-dialog .sp-editor__submit { border: 0; padding-top: 8px; }
-html[data-theme='zine'] .sp-dialog.sp-dialog { border-radius: 13px; }
 
 @media (min-width: 761px) and (max-height: 760px) {
   .space-studio--home { min-height: 560px; }

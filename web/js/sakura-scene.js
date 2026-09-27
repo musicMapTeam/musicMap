@@ -31,7 +31,7 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
   const compass = document.createElement('nav');
   compass.className = 'world-compass';
   compass.setAttribute('aria-label', '音乐小院');
-  compass.innerHTML = '<span class="world-compass__label">SIDE B / 樱下唱片店</span><div><button data-world-view="space">小院</button><button data-world-view="explore">唱片店</button><button data-world-view="live">照片墙</button><button data-world-editor>工作桌</button><button data-world-view="records">收藏</button></div>';
+  compass.innerHTML = '<span class="world-compass__label">SIDE B / 樱下放映</span><div><button data-world-view="space">小院</button><button data-world-view="explore">唱片店</button><button data-world-view="live">照片墙</button><button data-world-editor>工作桌</button><button data-world-view="records">收藏</button></div>';
   host.append(compass);
   compass.addEventListener('click', event => {
     const button = event.target.closest('button');
@@ -40,7 +40,7 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
   });
   const hotspots = document.createElement('div'); hotspots.className = 'world-hotspots'; host.append(hotspots);
   const caption = document.createElement('div'); caption.className = 'world-caption';
-  caption.innerHTML = '<span>SIDE B RECORDS</span><strong>樱下唱片店</strong><small data-world-caption>音乐 · 照片 · 此刻</small>';
+  caption.innerHTML = '<span>SIDE B / MUSIC &amp; MEMORIES</span><strong>樱下放映</strong><small data-world-caption>音乐 · 照片 · 此刻</small>';
   host.append(caption);
   renderer.setClearColor(PAL.skyHaze, 1);
   renderer.setPixelRatio(1);
@@ -132,7 +132,7 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
   const bounce = new THREE.DirectionalLight(0xd8cbe8, .34);
   bounce.position.set(1, -3, 4); scene.add(bounce);
 
-  const model = buildSakuraWorld({ THREE, world, mesh, box, cylinder, ball, rod, label, geometry, toon, materials, textures });
+  const model = buildSakuraWorld({ THREE, world, mesh, box, cylinder, ball, rod, label, geometry, toon, cel: celMaterials.cel, materials, textures });
   batchStaticMeshes(THREE, world, { exclude: [model.roof, model.record, model.draftImageMesh, ...model.photoCards.map(card => card.object)] });
   const pipeline = new Pipeline(renderer, scene, camera, { pixelBudget: 2e6, maxPixelRatio: 1.5 });
   const ink = pipeline.ink.mat.uniforms;
@@ -205,7 +205,7 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
         const selected = button.hasAttribute('data-world-editor') ? key === 'editor' : button.dataset.worldView === (key === 'home' ? 'space' : key === 'photo' ? 'live' : key);
         button.setAttribute('aria-pressed', String(selected));
       });
-      caption.querySelector('strong').textContent = ({ home: '樱下唱片店', explore: '唱片里的相遇', live: '同一晚，另一面', editor: '留下一张现场卡', records: '留住的声音', photo: '这张照片的另一面' })[key];
+      caption.querySelector('strong').textContent = ({ home: '樱下放映', explore: '唱片店', live: '照片墙', editor: '工作桌', records: '收藏架', photo: '现场卡' })[key];
       onShot?.(key, id, travelling);
     },
   });

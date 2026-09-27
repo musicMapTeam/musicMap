@@ -1,9 +1,11 @@
+import { createSakuraPrintwork } from './sakura-printwork.js';
+
 /**
  * Original procedural set for the music courtyard.
  * World units are metres; the shop faces +Z. The owner controls the camera,
  * lights, animation clock, photo maps and disposal of the supplied resources.
  */
-export function buildSakuraWorld({ THREE, world, mesh, box, cylinder, ball, rod, label, geometry, toon, materials, textures }) {
+export function buildSakuraWorld({ THREE, world, mesh, box, cylinder, ball, rod, label, geometry, toon, cel, materials, textures }) {
   const group = (name, position = [0, 0, 0], parent = world) => {
     const object = new THREE.Group(); object.name = name;
     object.position.set(...position); parent.add(object); return object;
@@ -15,7 +17,8 @@ export function buildSakuraWorld({ THREE, world, mesh, box, cylinder, ball, rod,
   const darkInk = basic('#3e514c');
   const warmLamp = basic('#fff1c8');
   const paper = basic('#fff9ec');
-  const warmWood = toon.wood;
+  const prints = createSakuraPrintwork({ THREE, textures, materials });
+  const warmWood = registerMaterial(cel({ color: '#b49179', map: prints.woodGrain, bands: 3, flat: false }));
 
   let seed = 267;
   const random = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
@@ -40,6 +43,10 @@ export function buildSakuraWorld({ THREE, world, mesh, box, cylinder, ball, rod,
     parent.add(plane); plane.position.set(...position); plane.castShadow = false; return plane;
   }
   function noShadow(object) { object.castShadow = false; return object; }
+  const printGeometry = geometry(new THREE.PlaneGeometry(1, 1));
+  function printPanel(material, position, width, height, parent = world) {
+    return noShadow(mesh(printGeometry, material, position, [width, height, 1], parent));
+  }
 
   // Ground continues beyond the composition. A winding, slightly imperfect
   // sequence of stone pavers leads from the foreground into the open shop.
@@ -107,7 +114,24 @@ export function buildSakuraWorld({ THREE, world, mesh, box, cylinder, ball, rod,
   noShadow(ball([.96, 2.39, -1.645], [.15, .15, .011], toon.coral, shop));
   noShadow(box([.89, 2.16, -1.64], [.51, .09, .011], toon.leaf, shop));
   print.userData.decorative = true;
-  sign('LISTEN SLOWLY', [0, 2.64, 1.971], 1.65, .19, '#f7eddb', '#42696a', shop);
+  // Recessed mouldings and small plaster joints give the side walls depth.
+  for (const x of [-2.437, 2.437]) {
+    for (const z of [-1.31, -.72, -.13, .46, 1.05]) {
+      box([x, .45, z], [.025, .018, .42], toon.sand, shop);
+    }
+    box([x, 1.91, -.44], [.075, 1.25, 1.52], toon.green, shop);
+    box([x * 1.021, 1.91, -.44], [.028, 1.08, 1.34], toon.glass, shop);
+    box([x * 1.031, 1.91, -.44], [.021, 1.12, .046], toon.cream, shop);
+    box([x * 1.031, 1.91, -.44], [.021, .046, 1.37], toon.cream, shop);
+    box([x * 1.031, 1.244, -.44], [.22, .07, 1.67], warmWood, shop);
+  }
+  const wallPoster = group('acoustic-session-poster', [2.469, 1.55, 1.03], shop);
+  wallPoster.rotation.y = Math.PI / 2; wallPoster.rotation.z = -.034;
+  printPanel(prints.poster, [0, 0, .019], .48, .64, wallPoster);
+  for (const x of [-.16, .16]) {
+    const tape = noShadow(box([x, .316, .027], [.095, .027, .008], toon.sand, wallPoster));
+    tape.rotation.z = x < 0 ? -.19 : .13;
+  }
   // Pendant fittings belong to the roof group so a close overhead camera can
   // remove the whole ceiling without leaving a cable across the composition.
   const roof = group('removable-shop-roof', [0, 0, -1.5]);
@@ -127,7 +151,49 @@ export function buildSakuraWorld({ THREE, world, mesh, box, cylinder, ball, rod,
   gableShape.moveTo(-2.45, 0); gableShape.lineTo(2.45, 0); gableShape.lineTo(0, .72); gableShape.closePath();
   const gableGeometry = geometry(new THREE.ExtrudeGeometry(gableShape, { depth: .08, bevelEnabled: false }));
   for (const z of [-2, 1.91]) mesh(gableGeometry, toon.cream, [0, 3.02, z], [1, 1, 1], roof);
-  sign('SIDE B', [0, 3.281, 2.007], 1.12, .3, '#42696a', '#f2e7d3', roof);
+  roundBox([0, 3.293, 2.043], [2.14, .53, .086], warmWood, roof);
+  printPanel(prints.marquee, [0, 3.293, 2.1], 2.025, .506, roof);
+  for (const x of [-.952, .952]) {
+    const nail = cylinder([x, 3.293, 2.116], [.015, .009, .015], toon.gold, roof); nail.rotation.x = Math.PI / 2;
+  }
+  // A curved canvas awning has an actual underside and scalloped hem. Each
+  // colour is one geometry, so the stripes do not cost one draw per panel.
+  const awningBins = [[], []];
+  const pushTriangle = (vertices, a, b, c) => vertices.push(...a, ...b, ...c);
+  const stripeWidth = 3.84 / 12;
+  const awningPoint = (x, t) => [x, 2.93 - Math.sin(t * Math.PI / 2) * .39, 1.93 + t * .79];
+  for (let i = 0; i < 12; i++) {
+    const vertices = awningBins[i % 2];
+    const left = -1.92 + i * stripeWidth;
+    const right = left + stripeWidth;
+    for (let step = 0; step < 8; step++) {
+      const a = awningPoint(left, step / 8); const b = awningPoint(right, step / 8);
+      const c = awningPoint(right, (step + 1) / 8); const d = awningPoint(left, (step + 1) / 8);
+      pushTriangle(vertices, a, c, b); pushTriangle(vertices, a, d, c);
+      // Back-facing triangles shade the visible underside in close views.
+      pushTriangle(vertices, b, c, a); pushTriangle(vertices, c, d, a);
+    }
+    for (let step = 0; step < 6; step++) {
+      const u = step / 6; const v = (step + 1) / 6;
+      const a = [left + stripeWidth * u, 2.54, 2.72]; const b = [left + stripeWidth * v, 2.54, 2.72];
+      const c = [b[0], 2.48 - Math.sin(v * Math.PI) * .078, 2.72];
+      const d = [a[0], 2.48 - Math.sin(u * Math.PI) * .078, 2.72];
+      pushTriangle(vertices, a, d, c); pushTriangle(vertices, a, c, b);
+    }
+  }
+  awningBins.forEach((vertices, index) => {
+    const shape = geometry(new THREE.BufferGeometry());
+    shape.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3)); shape.computeVertexNormals();
+    mesh(shape, index ? toon.coral : toon.cream, [0, 0, 0], [1, 1, 1], roof);
+  });
+  for (const x of [-1.92, 1.92]) {
+    rod([x, 2.4, 1.9], [x, 2.54, 2.72], .017, toon.green, roof);
+  }
+  // A hanging record reads from the oblique courtyard shot as well as the door.
+  rod([2.57, 3.06, 1.69], [3.1, 3.06, 1.69], .031, toon.green, roof);
+  rod([3.02, 3.05, 1.69], [3.02, 2.73, 1.69], .012, toon.gold, roof);
+  const badge = cylinder([3.02, 2.421, 1.69], [.32, .064, .32], toon.gold, roof); badge.rotation.x = Math.PI / 2;
+  noShadow(mesh(geometry(new THREE.CircleGeometry(.299, 40)), prints.badge, [3.02, 2.421, 1.728], [1, 1, 1], roof));
   for (const x of [-1.15, 1.15]) {
     rod([x, 3.13, .48], [x, 2.63, .48], .019, toon.ink, roof);
     const shadeGeometry = geometry(new THREE.CylinderGeometry(.12, .27, .2, 24, 1, true));
@@ -141,7 +207,7 @@ export function buildSakuraWorld({ THREE, world, mesh, box, cylinder, ball, rod,
   roundBox([0, .61, 0], [2.08, 1.05, .78], toon.green, counter);
   roundBox([0, 1.17, 0], [2.26, .14, .94], warmWood, counter);
   for (let i = 0; i < 14; i++) box([-.96 + i * .147, .67, .399], [.058, .69, .021], toon.leaf, counter);
-  sign('PLAY SOMETHING GOOD', [0, .899, .424], 1.59, .18, '#efe4c7', '#42696a', counter);
+  sign('SIDE B', [0, .899, .424], .57, .13, '#efe4c7', '#42696a', counter);
   const turntable = roundBox([-.28, 1.296, -.015], [1.12, .12, .69], toon.cream, counter);
   turntable.userData.action = { type: 'navigate', view: 'explore' };
   const record = action(group('spinning-vinyl', [-.45, 1.37, .8]), { type: 'navigate', view: 'explore' });
@@ -165,9 +231,20 @@ export function buildSakuraWorld({ THREE, world, mesh, box, cylinder, ball, rod,
   const sleeveStand = group('now-playing-sleeve', [.57, 1.58, -.286], counter);
   sleeveStand.rotation.x = -.14;
   roundBox([0, 0, 0], [.49, .49, .032], toon.coral, sleeveStand);
-  const sleeveDisc = cylinder([0, .015, .03], [.146, .012, .146], toon.ink, sleeveStand); sleeveDisc.rotation.x = Math.PI / 2;
-  const sleeveCentre = cylinder([0, .015, .041], [.049, .012, .049], toon.gold, sleeveStand); sleeveCentre.rotation.x = Math.PI / 2;
-  sign('SIDE A', [0, -.187, .023], .28, .068, '#f7eddb', '#d28091', sleeveStand);
+  printPanel(prints.sleeves[0], [0, 0, .025], .454, .454, sleeveStand);
+  // The listening corner has a resting pair of headphones and a ceramic cup.
+  const headphones = group('counter-headphones', [.29, 1.255, .25], counter);
+  headphones.rotation.y = -.31;
+  tube([[-.105, .043, 0], [-.14, .065, -.145], [0, .081, -.23], [.14, .065, -.145], [.105, .043, 0]], .019, toon.ink, headphones);
+  for (const x of [-.1, .1]) {
+    roundBox([x, .036, .006], [.078, .047, .111], toon.coral, headphones);
+    roundBox([x, .059, .006], [.055, .009, .079], toon.cream, headphones);
+  }
+  cylinder([-.92, 1.339, -.21], [.068, .154, .068], toon.coral, counter);
+  cylinder([-.92, 1.419, -.21], [.059, .01, .059], toon.cream, counter);
+  cylinder([-.92, 1.425, -.21], [.047, .007, .047], toon.wood, counter);
+  const cupHandle = noShadow(mesh(geometry(new THREE.TorusGeometry(.04, .014, 7, 16)), toon.coral, [-.845, 1.354, -.21], [1, 1, 1], counter));
+  cupHandle.rotation.y = Math.PI / 2;
 
   // Interior record cabinet, open at the front. Gaps and slanted sleeves keep
   // it from reading as a solid bookshelf cube in the records camera.
@@ -187,11 +264,9 @@ export function buildSakuraWorld({ THREE, world, mesh, box, cylinder, ball, rod,
   for (let i = 0; i < 3; i++) {
     const album = group(`face-out-album-${i}`, [-.455 + i * .457, 1.871, .053], shelf);
     roundBox([0, 0, 0], [.39, .5, .03], sleeveColors[i * 2], album);
-    const disc = cylinder([0, .025, .027], [.12, .009, .12], toon.black, album); disc.rotation.x = Math.PI / 2;
-    const dot = cylinder([0, .025, .033], [.041, .01, .041], toon.cream, album); dot.rotation.x = Math.PI / 2;
-    sign(['01', '02', '03'][i], [0, -.19, .023], .115, .065, '#42696a', ['#fbc6d8', '#b0c5ab', '#d28091'][i], album);
+    printPanel(prints.sleeves[i], [0, .018, .025], .362, .362, album);
   }
-  sign('KEEP THE NIGHT', [0, 2.255, .373], 1.01, .12, '#f2e7d3', '#42696a', shelf);
+  sign('33 / 45', [0, 2.255, .373], .41, .12, '#f2e7d3', '#42696a', shelf);
 
   // Working desk: paper is a physical surface with a pen, tape, scissors and
   // instant camera, instead of UI controls painted across a flat backdrop.
@@ -288,7 +363,7 @@ export function buildSakuraWorld({ THREE, world, mesh, box, cylinder, ball, rod,
   }
   box([0, 2.575, 0], [3.26, .087, .096], toon.green, photoWall);
   for (const y of [2.414, 1.274]) tube([[-1.57, y, .013], [0, y - .054, .013], [1.57, y, .013]], .008, toon.wood, photoWall);
-  sign('ONE NIGHT / TWO SIDES', [0, 2.566, .062], 1.65, .125, '#f6edda', '#42696a', photoWall);
+  sign('OUR NIGHT', [0, 2.566, .062], .91, .125, '#f6edda', '#42696a', photoWall);
   const photoCards = ['stage', 'crowd', 'slot-2', 'slot-3', 'slot-4', 'slot-5'].map((id, index) => {
     const x = (index % 3 - 1) * 1.04;
     const y = index < 3 ? 1.903 : .763;
@@ -333,9 +408,95 @@ export function buildSakuraWorld({ THREE, world, mesh, box, cylinder, ball, rod,
   pot([-.76, .238, -2.84], .75, false);
   pot([-5.21, .085, 2.56], .85, true);
 
+  // A quiet waiting corner fills the side of the yard, leaving the central
+  // route, photo wall and desk clear. Slats, a tote and records tell one story.
+  const bench = group('listening-bench', [4.31, .065, -1.12]);
+  bench.rotation.y = -.18;
+  for (const x of [-.77, .77]) {
+    rod([x, .015, -.25], [x, .6, -.25], .042, toon.green, bench);
+    rod([x, .015, .26], [x, .48, .26], .042, toon.green, bench);
+    rod([x, .06, -.27], [x, 1.05, -.38], .041, toon.green, bench);
+    rod([x, .41, -.29], [x, .41, .3], .034, toon.green, bench);
+  }
+  for (let i = 0; i < 4; i++) {
+    roundBox([0, .493, -.23 + i * .158], [1.91, .077, .136], i % 2 ? toon.cream : warmWood, bench);
+  }
+  for (const y of [.748, .949]) {
+    const slat = roundBox([0, y, -.351 - (y - .7) * .13], [1.91, .146, .071], warmWood, bench);
+    slat.rotation.x = -.1;
+  }
+  const tote = group('record-shop-tote', [.39, .57, -.005], bench);
+  tote.rotation.z = -.065;
+  roundBox([0, .19, 0], [.36, .38, .115], toon.cream, tote);
+  tube([[-.11, .335, .066], [-.105, .57, .045], [.108, .57, .045], [.11, .335, .066]], .013, warmWood, tote);
+  const totePrint = printPanel(prints.sleeves[1], [0, .185, .07], .19, .19, tote);
+  totePrint.rotation.z = .04;
+  const crate = group('record-crate', [3.15, .081, -.89]);
+  crate.rotation.y = -.16;
+  box([0, .041, 0], [.48, .075, .53], warmWood, crate);
+  for (const x of [-.218, .218]) for (const z of [-.24, .24]) box([x, .183, z], [.041, .35, .04], toon.green, crate);
+  for (const y of [.14, .28]) {
+    for (const x of [-.23, .23]) box([x, y, 0], [.036, .1, .54], warmWood, crate);
+    for (const z of [-.251, .251]) box([0, y, z], [.49, .1, .035], warmWood, crate);
+  }
+  for (let i = 0; i < 6; i++) {
+    const album = group(`crate-record-${i}`, [0, .33, -.16 + i * .056], crate);
+    album.rotation.x = -.08 - i * .023;
+    roundBox([0, 0, 0], [.4, .4, .018], sleeveColors[i % sleeveColors.length], album);
+    if (i === 5) printPanel(prints.sleeves[2], [0, 0, .015], .38, .38, album);
+  }
+  pot([5.43, .085, -.76], 1.48, false);
+
+  // Broad, low leaves read as a planted border from the elevated camera.
+  // Solid curved leaves avoid the ink-like edge of upright single-sided grass.
+  const meadowMaterials = [
+    registerMaterial(cel({ color: '#aabd9d', bands: 'soft', flat: false })),
+    registerMaterial(cel({ color: '#c1cdb0', bands: 'soft', flat: false })),
+  ];
+  const bladeTransform = new THREE.Object3D();
+  const meadow = [[], []];
+  const flowerCenters = [];
+  [[-5.52, 3.22, .58, .79], [5.6, 2.63, .65, 1.12], [-5.9, -2.94, .37, .73]].forEach(([x, z, spreadX, spreadZ]) => {
+    for (let i = 0; i < 14; i++) {
+      const angle = i * 2.39996; const radius = Math.sqrt((i + 1) / 14);
+      const px = x + Math.cos(angle) * radius * spreadX;
+      const pz = z + Math.sin(angle) * radius * spreadZ;
+      const scale = .72 + random() * .46;
+      for (let blade = 0; blade < 5; blade++) meadow[(i + blade) % 2].push({ x: px, z: pz, scale, angle: blade * 1.257 + i });
+      if (i % 3 === 0) flowerCenters.push([px, .09 + .17 * scale, pz]);
+    }
+  });
+  meadow.forEach((blades, index) => {
+    const instances = new THREE.InstancedMesh(leafGeometry, meadowMaterials[index], blades.length);
+    instances.name = `garden-leaf-clusters-${index}`;
+    blades.forEach((blade, i) => {
+      bladeTransform.position.set(blade.x + Math.sin(blade.angle) * .09, .12, blade.z + Math.cos(blade.angle) * .09);
+      bladeTransform.scale.set(.088 * blade.scale, .031 * blade.scale, .182 * blade.scale);
+      bladeTransform.rotation.set(.16, blade.angle, 0); bladeTransform.updateMatrix(); instances.setMatrixAt(i, bladeTransform.matrix);
+    });
+    world.add(instances);
+  });
+  flowerCenters.forEach(([x, y, z], index) => {
+    rod([x, .09, z], [x, y, z], .008, toon.mint);
+    for (let petal = 0; petal < 5; petal++) {
+      const angle = petal * Math.PI * 2 / 5;
+      const blossom = noShadow(ball([x + Math.cos(angle) * .055, y, z + Math.sin(angle) * .055], [.048, .015, .041], index % 3 ? toon.petal : toon.blush));
+      blossom.receiveShadow = false;
+    }
+    const center = noShadow(ball([x, y + .014, z], [.021, .014, .021], toon.gold)); center.receiveShadow = false;
+  });
+
   // Branch geometry supports the crown. Clusters are instanced by colour so
   // the canopy is rich without one draw call per blossom-shaped volume.
   const crownGeometry = geometry(new THREE.IcosahedronGeometry(1, 2));
+  const crownVertices = crownGeometry.attributes.position;
+  for (let i = 0; i < crownVertices.count; i++) {
+    const x = crownVertices.getX(i); const y = crownVertices.getY(i); const z = crownVertices.getZ(i);
+    const scallop = 1 + .065 * Math.sin(x * 6.1 + z * 2.4) * Math.cos(y * 5.3 - z * 3.8);
+    crownVertices.setXYZ(i, x * scallop, y * scallop, z * scallop);
+  }
+  // Keep the source's smooth radial normals; recomputing this non-indexed
+  // geometry would turn each blossom volume into a visibly faceted gemstone.
   const crownBins = [[], [], []];
   function cherryTree(position, scale, canopyCount = 48) {
     const tree = group('cherry-tree', position);
@@ -346,23 +507,40 @@ export function buildSakuraWorld({ THREE, world, mesh, box, cylinder, ball, rod,
       const start = [.02, 1.76 + index * .135, .04];
       tube([start, [end[0] * .4, end[1] - .67, end[2] * .4], end], .049 + (index % 2) * .008, warmWood, tree);
       rod(end, [end[0] * 1.22, end[1] + .22, end[2] * 1.22], .023, warmWood, tree);
+      if (index < 4) tube([end, [end[0] * 1.25, end[1] + .13, end[2] * 1.2], [end[0] * 1.42, end[1] - .22, end[2] * 1.33]], .015, warmWood, tree);
     });
     for (let i = 0; i < 5; i++) {
       const angle = i * 1.256;
       rod([0, .11, 0], [Math.cos(angle) * .45, .02, Math.sin(angle) * .45], .035, warmWood, tree);
     }
     for (let i = 0; i < canopyCount; i++) {
-      const angle = i * 2.399963;
-      const radius = Math.sqrt((i + .4) / canopyCount) * 1.55;
-      const local = new THREE.Vector3(Math.cos(angle) * radius, 3.82 + Math.cos(radius * 1.15) * .38 + (random() - .5) * .35, Math.sin(angle) * radius * .78);
+      // Five branch-led lobes leave sky between the crowns. Smaller volumes
+      // along their rims avoid the former flat cap of equally sized spheres.
+      const branch = endpoints[i % endpoints.length];
+      const ring = Math.floor(i / endpoints.length);
+      const angle = ring * 2.399963 + (i % endpoints.length) * .61;
+      const radius = Math.sqrt((ring + .6) / Math.ceil(canopyCount / endpoints.length)) * .68;
+      const local = new THREE.Vector3(
+        branch[0] * .87 + Math.cos(angle) * radius,
+        branch[1] + .24 + Math.cos(radius * 2.3) * .19 + (random() - .5) * .22,
+        branch[2] * .93 + Math.sin(angle) * radius * .87,
+      );
       local.multiplyScalar(scale).add(new THREE.Vector3(...position));
-      const size = (.38 + random() * .16) * scale;
-      crownBins[i % 3].push({ position: local, scale: [size * (1.05 + random() * .24), size * (.73 + random() * .19), size], rotation: random() * Math.PI });
+      const size = (.27 + random() * .13) * scale;
+      const color = radius > .5 ? 0 : i % 3 === 0 ? 2 : 1;
+      crownBins[color].push({ position: local, scale: [size * (1.05 + random() * .24), size * (.73 + random() * .19), size], rotation: random() * Math.PI });
+      if (i % 7 === 0 && canopyCount > 60) {
+        for (let petal = 0; petal < 5; petal++) {
+          const theta = petal * Math.PI * 2 / 5;
+          const flower = local.clone().add(new THREE.Vector3(Math.cos(theta) * .105 * scale, size * .68, Math.sin(theta) * .105 * scale));
+          crownBins[2].push({ position: flower, scale: [.095 * scale, .042 * scale, .07 * scale], rotation: -theta });
+        }
+      }
     }
     return tree;
   }
-  cherryTree([-4.5, .045, -1.5], 1.06, 64);
-  cherryTree([5.3, .02, -3.5], .88, 48);
+  cherryTree([-4.5, .045, -1.5], 1.06, 90);
+  cherryTree([5.3, .02, -3.5], .88, 70);
   cherryTree([-9.2, -.02, -6.7], .95, 39);
   cherryTree([9.4, -.02, -7.4], 1.08, 39);
   const transform = new THREE.Object3D();
@@ -389,24 +567,71 @@ export function buildSakuraWorld({ THREE, world, mesh, box, cylinder, ball, rod,
     for (let i = 1; i < 8; i++) roundBox([x, .4, -4.5 + i * .89], [.11, .81, .11], toon.mint, fence);
     for (const y of [.3, .67]) box([x, y, -.94], [.055, .065, 7.1], toon.leaf, fence);
   }
-  const quietPlaster = basic('#d6dcd7');
-  const quietRoof = basic('#b7c8c6');
-  const quietGlass = basic('#c2d2d3');
-  const quietTrim = basic('#c9d2c7');
+  const quietPlaster = basic('#d8ddd5');
+  const quietRoof = basic('#bdccca');
+  const quietGlass = basic('#b5c9c8');
+  const quietTrim = basic('#d2d7c9');
+  const quietJoinery = basic('#b7c5ba');
+  const quietRose = basic('#d5c5c2');
+  const distantGable = new THREE.Shape();
+  distantGable.moveTo(-1.7, 0); distantGable.lineTo(1.7, 0); distantGable.lineTo(0, .52); distantGable.closePath();
+  const distantGableGeometry = geometry(new THREE.ExtrudeGeometry(distantGable, { depth: .035, bevelEnabled: false }));
   for (let i = 0; i < 5; i++) {
     const neighbour = group(`quiet-neighbour-${i}`, [-11 + i * 5.2, -.08, -10.8 - (i % 2) * 1.4]);
     const h = 2.1 + (i % 3) * .43;
     noShadow(roundBox([0, h / 2, 0], [3.4, h, 2.6], quietPlaster, neighbour));
+    for (const z of [-1.3, 1.3]) noShadow(mesh(distantGableGeometry, quietPlaster, [0, h, z], [1, 1, 1], neighbour));
     for (const side of [-1, 1]) {
       const pitch = noShadow(box([side * .89, h + .26, 0], [1.95, .1, 3], quietRoof, neighbour)); pitch.rotation.z = side * -.27;
+      noShadow(box([side * 1.83, h + .028, 0], [.067, .11, 3.08], quietJoinery, neighbour));
+      for (const z of [-1.17, -.58, .01, .6, 1.19]) {
+        const seam = noShadow(box([side * .89, h + .323, z], [1.95, .016, .024], quietTrim, neighbour)); seam.rotation.z = side * -.27;
+      }
     }
+    noShadow(box([0, h + .553, 0], [.1, .082, 3.1], quietTrim, neighbour));
+    noShadow(box([0, .136, 1.364], [3.5, .21, .12], quietTrim, neighbour));
+    noShadow(box([0, h - .08, 1.357], [3.46, .082, .08], quietTrim, neighbour));
     for (const x of [-.83, .8]) {
-      noShadow(box([x, h - .72, 1.318], [.71, .9, .019], quietGlass, neighbour));
-      noShadow(box([x, h - .72, 1.337], [.035, .94, .018], quietTrim, neighbour));
-      noShadow(box([x, h - 1.2, 1.36], [.83, .046, .12], quietTrim, neighbour));
+      noShadow(box([x, h - .72, 1.319], [.83, 1.015, .036], quietTrim, neighbour));
+      noShadow(box([x, h - .72, 1.348], [.71, .9, .019], quietGlass, neighbour));
+      noShadow(box([x, h - .72, 1.37], [.036, .94, .022], quietTrim, neighbour));
+      noShadow(box([x, h - .69, 1.37], [.74, .036, .022], quietTrim, neighbour));
+      noShadow(box([x, h - 1.2, 1.388], [.9, .056, .22], quietJoinery, neighbour));
+      if ((i + (x > 0 ? 1 : 0)) % 3 === 0) {
+        for (const side of [-1, 1]) noShadow(box([x + side * .445, h - .72, 1.354], [.12, .98, .049], quietRose, neighbour));
+      }
     }
-    noShadow(box([0, .6, 1.323], [.55, 1.2, .015], quietTrim, neighbour));
+    noShadow(box([0, .682, 1.365], [.67, 1.31, .081], quietTrim, neighbour));
+    noShadow(box([0, .665, 1.415], [.51, 1.19, .027], quietJoinery, neighbour));
+    noShadow(box([0, .975, 1.434], [.33, .37, .015], quietGlass, neighbour));
+    noShadow(ball([.165, .604, 1.455], [.023, .023, .012], quietRoof, neighbour));
+    noShadow(box([0, .072, 1.499], [.77, .094, .39], quietTrim, neighbour));
+    // One shallow balcony and a few flower boxes keep the row varied.
+    if (i === 1 || i === 3) {
+      const balconyY = h - 1.23;
+      noShadow(box([.8, balconyY, 1.54], [1.04, .066, .48], quietTrim, neighbour));
+      noShadow(box([.8, balconyY + .31, 1.756], [1.02, .031, .031], quietJoinery, neighbour));
+      for (let bar = 0; bar < 5; bar++) noShadow(box([.365 + bar * .218, balconyY + .17, 1.755], [.028, .29, .028], quietJoinery, neighbour));
+    } else {
+      noShadow(box([-.83, h - 1.13, 1.479], [.62, .14, .17], quietRose, neighbour));
+      for (const x of [-1.03, -.83, -.63]) noShadow(ball([x, h - 1.035, 1.47], [.113, .071, .081], quietJoinery, neighbour));
+    }
+    // The right side is visible in the main shot, with a complete inset window.
+    noShadow(box([1.726, h - .72, .12], [.048, .86, .76], quietTrim, neighbour));
+    noShadow(box([1.758, h - .72, .12], [.022, .71, .62], quietGlass, neighbour));
+    noShadow(box([1.774, h - .72, .12], [.018, .75, .031], quietTrim, neighbour));
+    noShadow(box([1.781, h - 1.167, .12], [.16, .053, .83], quietJoinery, neighbour));
   }
+  // Atmospheric shapes sit beyond the neighbours, below the main shop's
+  // silhouette. A low rolling horizon replaces the empty end of the ground.
+  const farHill = basic('#c6d6cf');
+  const nearHill = basic('#bacbc3');
+  [[-15, -.8, -23, 12, 3.8, 4], [3, -1, -24, 14, 4.7, 4.2], [21, -.8, -24, 12, 3.7, 4]].forEach(([x, y, z, sx, sy, sz]) => {
+    const hill = noShadow(ball([x, y, z], [sx, sy, sz], farHill)); hill.receiveShadow = false;
+  });
+  [[-15, -.8, -18.9, 9, 2.7, 2.9], [9, -.8, -19.5, 12, 2.9, 2.9]].forEach(([x, y, z, sx, sy, sz]) => {
+    const hill = noShadow(ball([x, y, z], [sx, sy, sz], nearHill)); hill.receiveShadow = false;
+  });
   const shrubGeometry = geometry(new THREE.IcosahedronGeometry(1, 1));
   const shrubMaterials = [toon.mint, toon.leaf];
   for (let i = 0; i < 20; i++) {

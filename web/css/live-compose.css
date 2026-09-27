@@ -78,7 +78,6 @@ html[data-theme] .live-compose__save .button--secondary { flex:0 0 auto; }
 html[data-theme] .live-compose__save .button--primary { flex:1; }
 html[data-theme] .live-entry-switch.text-button { margin-top:12px; font-size:12px; color:var(--muted); }
 html[data-theme="sakura"] .live-dialog.live-dialog--compose { --compose-max-height:calc(100dvh - 122px); }
-html[data-theme="zine"] .live-compose :is(.live-upload-preview,.live-upload-button,.live-compose__thumbnail,.live-perspectives label>span,textarea,.button) { border-radius:5px; }
 /* A name is enough to create a room; optional details never hide the action. */
 html[data-theme] .live-dialog.live-dialog--event { --event-max-height:calc(100dvh - 48px); max-height:var(--event-max-height); padding:0; overflow:hidden; background:var(--studio-panel,var(--surface)); color:var(--text); }
 html[data-theme] .live-dialog--event #live-dialog-content { display:flex; flex-direction:column; max-height:var(--event-max-height); padding:24px; }
@@ -104,7 +103,6 @@ html[data-theme] .live-event-compose__footer { flex-shrink:0; margin:18px 0 0; p
 html[data-theme] .live-event-compose__footer>p { margin:0 0 11px; color:var(--muted); font-size:12px; line-height:1.6; }
 html[data-theme] .live-event-compose__footer>.button { width:100%; min-height:46px; margin:0; border-radius:12px; font-size:14px; }
 html[data-theme="sakura"] .live-dialog.live-dialog--event { --event-max-height:calc(100dvh - 122px); }
-html[data-theme="zine"] .live-event-compose :is(input,.button) { border-radius:5px; }
 @media(max-width:760px) {
   html[data-theme] .live-dialog.live-dialog--compose { --compose-max-height:calc(100dvh - 28px); }
   html[data-theme] .live-dialog--compose #live-dialog-content { padding:18px; }

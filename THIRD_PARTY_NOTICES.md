@@ -152,3 +152,7 @@ Source: [maharshipandya/spotify-tracks-dataset](https://huggingface.co/datasets/
 The full CSV (114,000 rows, 20,118,244 bytes) is downloaded locally under ignored `data/external/spotify-tracks-dataset/`. The distributed [120-record extract](web/assets/data/hf-collaborations.json) contains factual track names, credited artist names, album names and source record identifiers. It contains no audio, lyrics, artwork, listening URL, or detailed production-role claims. See [download record](references/research/2026-09-27/huggingface-download.md) and [reproduction script](scripts/datasets/download_hf_catalogue.py).
 
 The 10 curated vocal collaborations use separate manually checked per-role sources. See [collaboration roles](references/research/2026-09-27/collaboration-roles.md); no HF artist field is used to infer those roles.
+
+## Original courtyard printwork (MVP 0.11.0)
+
+The procedural record sleeves, shop signage and wood-grain textures in web/js/sakura-printwork.js are original project artwork. The striped awning, detailed background houses, foliage and distant hills in sakura-world.js are original geometry. No third-party artwork or additional assets were downloaded for this iteration. Only the Sakura visual direction is exposed in the application and PNG exports; the renderer licenses above remain bundled.
