@@ -156,3 +156,7 @@ The 10 curated vocal collaborations use separate manually checked per-role sourc
 ## Original courtyard printwork (MVP 0.11.0)
 
 The procedural record sleeves, shop signage and wood-grain textures in web/js/sakura-printwork.js are original project artwork. The striped awning, detailed background houses, foliage and distant hills in sakura-world.js are original geometry. No third-party artwork or additional assets were downloaded for this iteration. Only the Sakura visual direction is exposed in the application and PNG exports; the renderer licenses above remain bundled.
+
+## Original interactive record table (MVP 0.12.0)
+
+`web/js/sakura-music.js` adds original procedural furniture, vinyl geometry, connecting threads and printed sleeve textures to the same courtyard scene. Artist names, collaboration titles and links come from the existing catalogues; the abstract sleeves are interface artwork, not official album covers. The projected labels, envelope controls, photo trays and album interface are original project code. No additional third-party assets, fonts or runtime libraries were introduced.

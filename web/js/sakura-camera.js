@@ -3,14 +3,14 @@ import { gsap } from 'gsap';
 
 const desktop = {
   home: { eye: [10.7, 8.6, 16.5], at: [-.35, 1.0, -.1], fov: 40 },
-  explore: { eye: [3.3, 3.3, 5.7], at: [0, 1.15, .8], fov: 39 },
+  explore: { eye: [.25, 6.9, -.15], at: [0, 1.22, -1.3], fov: 41 },
   live: { eye: [-.6, 3.6, 7.1], at: [-3.8, 1.6, 1.4], fov: 40 },
   editor: { eye: [7.2, 5.6, 5.5], at: [4, 1, 1.6], fov: 37 },
   records: { eye: [-.6, 2.4, 1.3], at: [1.3, 1.25, -2.3], fov: 46 },
 };
 const portrait = {
   home: { eye: [12, 18, 29], at: [-.8, .8, .3], fov: 43 },
-  explore: { eye: [2.5, 3.7, 6.9], at: [0, 1.1, .8], fov: 43 },
+  explore: { eye: [.08, 12, 1.4], at: [0, 1.22, -1.3], fov: 45 },
   live: { eye: [-3, 4.4, 10.8], at: [-3.8, 1.5, 1.4], fov: 48 },
   editor: { eye: [6.6, 5.5, 6.6], at: [4, 1, 1.6], fov: 43 },
   records: { eye: [-.55, 2.4, 2.8], at: [1.2, 1.25, -2.3], fov: 46 },
@@ -41,7 +41,9 @@ export function createCameraDirector(camera, { size, reduced, onFrame, onShot })
     const endTarget = point?.clone() || new THREE.Vector3(...shot.at);
     const endEye = point ? point.clone().add(new THREE.Vector3(mobile ? .65 : 1.35, mobile ? .65 : .8, mobile ? 4.6 : 3.7)) : new THREE.Vector3(...shot.eye);
     const endFov = point ? 39 : shot.fov;
-    const endFrame = mobile ? { x: 0, y: key === 'home' ? .045 : .24 } : { x: key === 'home' ? 0 : .18, y: 0 };
+    const endFrame = key === 'explore'
+      ? { x: 0, y: mobile ? .055 : .035 }
+      : mobile ? { x: 0, y: key === 'home' ? .045 : key === 'live' ? .08 : .24 } : { x: key === 'home' ? 0 : .18, y: 0 };
     onShot(key, id, !immediate && !reduced.matches);
     if (immediate || reduced.matches) {
       camera.position.copy(endEye); target.copy(endTarget); camera.fov = endFov;
