@@ -78,7 +78,7 @@ export function buildSakuraWorld({ THREE, world, mesh, box, cylinder, ball, rod,
       nail.castShadow = false;
     }
   }
-  box([-2.34, 1.6, 0], [.15, 2.8, 3.8], toon.plaster, shop);
+  const shopLeftWall = box([-2.34, 1.6, 0], [.15, 2.8, 3.8], toon.plaster, shop);
   box([2.34, 1.6, 0], [.15, 2.8, 3.8], toon.plaster, shop);
   box([0, 1.6, -1.84], [4.8, 2.8, .15], toon.plaster, shop);
   for (const x of [-2.24, 2.24]) box([x, .41, 0], [.08, .38, 3.7], toon.green, shop);
@@ -87,7 +87,7 @@ export function buildSakuraWorld({ THREE, world, mesh, box, cylinder, ball, rod,
     box([x, 1.62, 1.85], [.18, 2.86, .18], toon.green, shop);
     box([x, 2.87, 0], [.16, .16, 3.88], warmWood, shop);
   }
-  box([0, 2.88, 1.85], [4.72, .22, .2], toon.green, shop);
+  const shopFrontBeam = box([0, 2.88, 1.85], [4.72, .22, .2], toon.green, shop);
   box([0, .14, 2.18], [4.96, .2, .63], warmWood, shop);
   box([0, .25, 2.18], [4.95, .035, .61], toon.cream, shop);
   for (const x of [-1.84, 1.84]) {
@@ -767,6 +767,7 @@ export function buildSakuraWorld({ THREE, world, mesh, box, cylinder, ball, rod,
   void textures;
   return {
     roof, record, photoCards, desk, draftImageMesh, shelf, anchors,
+    exploreShadowBlockers: [shopLeftWall, shopFrontBeam],
     update(time) {
       record.rotation.y = time * .27;
       catBody.scale.y = .16 * (1 + Math.sin(time * 1.35) * .035);

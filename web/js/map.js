@@ -171,8 +171,8 @@ function mapHTML(map, api, presentation = 'quiet') {
   const isEventArtist = ['a', 'b'].includes(node.id);
   return `<section class="map-experience map-studio map-experience--${presentation}" aria-label="音乐关系探索">
     <header class="map-studio-head">
-      <div class="map-studio-title"><h1>${isChallenge ? '合作挑战' : '音乐地图'}</h1>${catalogueSwitchHTML(dataset)}</div>
-      <div class="map-studio-tools"><button type="button" class="button button--quiet" data-open-catalogue>开放曲库</button>${button('search', api.icon('compass'), 'icon-button', 'aria-label="换个起点" title="换个起点"')}${button('challenge', '合作挑战', 'button button--quiet')}</div>
+      <div class="map-studio-title"><h1>${isChallenge ? '合作挑战' : '合作唱片'}</h1>${catalogueSwitchHTML(dataset)}</div>
+      <div class="map-studio-tools">${button('search', `${api.icon('compass')} 找音乐人`, 'button button--quiet', 'aria-label="换个起点"')}<details class="map-shop-menu"><summary>唱片目录 ${api.icon('chevron-right')}</summary><div><button type="button" class="button button--quiet" data-open-catalogue>开放曲库</button>${button('challenge', '合作挑战', 'button button--quiet')}${button('relations', '连接与来源', 'button button--quiet')}</div></details></div>
     </header>
     ${isChallenge ? `<div class="map-challenge-banner"><div><span class="map-challenge-banner__label">${isComplete ? '已抵达' : '挑战中'}</span><strong>${escapeHTML(artistName(session.start))} ${api.icon('arrow-right')} ${escapeHTML(artistName(session.target))}</strong></div><span><b>${session.path.length - 1}</b> 步</span>${button('return-roam', '返回漫游', 'button button--quiet', `data-session="${session.id}"`)}</div>` : ''}
     <div class="map-workspace">
@@ -192,6 +192,7 @@ function mapHTML(map, api, presentation = 'quiet') {
       </aside>
     </div>
     <div class="map-studio-dock">
+      <div class="map-sleeve-tab">${button('artist', `<span class="map-sleeve-tab__number">SIDE ${isReal ? 'A' : 'B'}</span><span><b>${escapeHTML(artist.name)}</b><small>封套内页 · ${artist.songIds.length} 首</small></span>${api.icon('arrow-up-right')}`, '', `aria-label="翻开${escapeHTML(artist.name)}的唱片封套"`)}</div>
       ${discoveryHTML(session, api, map.undo)}
       <div class="map-route-bar"><div class="map-route-controls">${button('back', api.icon('arrow-left'), 'icon-button', `aria-label="返回上一位${isChallenge ? '并撤销一步' : ''}" ${session.path.length < 2 || isComplete ? 'disabled' : ''}`)}${button('reset', api.icon('rotate'), 'icon-button', `aria-label="回到起点" ${session.path.length < 2 || isComplete ? 'disabled' : ''}`)}</div><div class="map-route-trail" aria-label="当前路线">${session.path.map((step, index) => `<span ${index === session.path.length - 1 ? 'aria-current="step"' : ''}>${escapeHTML(artistName(step.id))}</span>`).join('<span class="map-route-trail__arrow" aria-hidden="true">·</span>')}</div>${button('recap', `${currentSavedSongs(session).length} 首收藏`, 'button button--quiet', `data-session="${session.id}" data-map-saved-count="${session.id}"`)}</div>
     </div>
@@ -355,8 +356,7 @@ function attachInteractions(container, api, recordsOnly) {
     });
   }
 
-  container.addEventListener('click', event => {
-    const control = event.target.closest('[data-map-action]');
+  function runAction(control) {
     if (!control || !container.contains(control) || control.disabled || Date.now() < suppressClickUntil) return;
     const { mapAction: action, id, session: sessionId } = control.dataset;
     const map = api.getState().map;
@@ -525,7 +525,8 @@ function attachInteractions(container, api, recordsOnly) {
         break;
       }
     }
-  }, { signal });
+  }
+  container.addEventListener('click', event => runAction(event.target.closest('[data-map-action]')), { signal });
 
   container.addEventListener('input', event => {
     if (event.target.id !== 'map-artist-search') return;
@@ -622,8 +623,10 @@ function attachInteractions(container, api, recordsOnly) {
     const session = activeSession(api.getState().map);
     if (!session) return;
     const { yaw, pitch } = rotation || session;
+    publishMusic(session, yaw, pitch);
     const width = stage.clientWidth;
     const height = stage.clientHeight;
+    if (!width || !height) return;
     const nodes = [...stage.querySelectorAll('.map-node--orbit')];
     const coordinates = nodes.map((node, index) => {
       const angle = index * Math.PI * 2 / Math.max(nodes.length, 1) - 1.13;
@@ -650,6 +653,24 @@ function attachInteractions(container, api, recordsOnly) {
     const svg = stage.querySelector('[data-map-lines]');
     svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
     svg.innerHTML = `<g class="map-orbit-ring" fill="none" stroke-width="1"><ellipse cx="${width / 2}" cy="${height / 2}" rx="${Math.min(width * 0.34, 270)}" ry="${height * 0.31}"/></g><g class="map-relation-lines" fill="none" stroke-width="1" ${session.mode === 'style' ? 'stroke-dasharray="3 7"' : ''}>${coordinates.map(([x, y], index) => `<path d="M${width / 2},${height / 2} Q${(width / 2 + x) / 2 + (index % 2 ? 14 : -14)},${(height / 2 + y) / 2 + 12} ${x},${y}"/>`).join('')}</g>`;
+  }
+
+  function publishMusic(session, yaw = session.yaw, pitch = session.pitch) {
+    if (recordsOnly) return;
+    const id = currentNode(session).id;
+    const artist = artistById[id];
+    const neighbors = getNeighbors(id, session.mode, sessionDataset(session));
+    api.spatial?.publish({
+      mode: 'explore', cards: [],
+      music: { key: `${sessionDataset(session)}:${id}:${session.mode}`, artist: { id, name: artist.name, color: artist.color, count: artist.songIds.length }, yaw, pitch,
+        neighbors: neighbors.map(edge => { const next = artistById[otherArtist(edge, id)]; return { id: next.id, name: next.name, color: next.color, reason: edge.reason, songTitle: edge.song ? songs[edge.song].title : '', disabled: session.status === 'complete' }; }),
+      },
+      onMusic(action) {
+        const controls = [...container.querySelectorAll('[data-map-stage] [data-map-action]')];
+        const control = controls.find(item => item.dataset.mapAction === action.action && (action.action === 'artist' || item.dataset.id === action.id));
+        if (control) runAction(control);
+      },
+    });
   }
 
   const unsubscribeSavedMusic = subscribeSavedMusic(tracks => {

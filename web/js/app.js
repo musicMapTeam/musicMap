@@ -17,6 +17,8 @@ import '../css/product-finish.css';
 import '../css/live-compose.css';
 import '../css/memory-export.css';
 import '../css/courtyard-ui.css';
+import '../css/spatial-objects.css';
+import '../css/map-spatial.css';
 import { OverlayScrollbars } from 'overlayscrollbars';
 import { mountThemes } from './themes.js';
 import { icon } from './icons.js';
@@ -107,6 +109,7 @@ const api = { getState: () => state, update, render, navigate, toast, icon,
       spatialContext = content;
       document.body.dataset.spatialSection = content.mode || state.view;
       themeController?.setContent(content.cards || [], content.mode);
+      themeController?.setMusic(content.music || null);
     },
     focus(kind, id) { return themeController?.focus(kind, id) || Promise.resolve(true); },
     restore() { themeController?.restore(); },
@@ -115,6 +118,7 @@ const api = { getState: () => state, update, render, navigate, toast, icon,
 
 async function onSpatialAction(action) {
   const version = ++spatialActionVersion;
+  if (action.type === 'music') { spatialContext.onMusic?.(action); return; }
   if (action.type === 'navigate') { navigate(action.view, action.view === 'space' ? { home: true } : null); return; }
   if (action.type === 'editor') {
     if (!spatialContext.onEdit) { navigate('live', { intent: 'make-card' }); return; }
@@ -213,6 +217,7 @@ function render() {
   cleanup = null;
   spatialContext = {};
   themeController?.setContent([]);
+  if (state.view !== 'explore') themeController?.setMusic(null);
   const container = document.querySelector('#main-content');
   container.replaceChildren();
   document.body.dataset.view = state.view;
