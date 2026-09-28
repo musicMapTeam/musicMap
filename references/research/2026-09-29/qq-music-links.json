@@ -1,0 +1,281 @@
+{
+  "checkedAt": "2026-09-29",
+  "method": "只用 2026-09-29 本次实际取回的 QQ 音乐元数据，没有播放、试听或下载任何音频，也没有请求 playUrl。接口都发往网页播放器统一网关 POST https://u.y.qq.com/cgi-bin/musicu.fcg：music.search.SearchCgiService / DoSearchForQQMusicDesktop 做歌曲搜索（search_type 0，grp 1，用来显示 QQ 折叠在同一录音下的其他发行；少数条目加做专辑搜索 search_type 2），每首用简体、繁体、英文名、专辑名等多组查询；music.pf_song_detail_svr / get_song_detail_yqq 取歌曲详情（标题、歌手 mid、专辑 mid、发行日、曲序、时长、版本代码、语言、厂牌）；music.musichallAlbum.AlbumInfoServer / GetAlbumDetail 与 music.musichallAlbum.AlbumSongList / GetAlbumSongList 取专辑类型和完整曲目表；个别条目另查歌词头署名（GetPlayLyricInfo）和歌手详情（GetSingerDetail）。页面核对：请求 https://y.qq.com/n/ryqq/songDetail/{songmid}，桌面 UA 跳到 /n/ryqq_v2/songDetail/{songmid}（浏览器渲染的空壳，静态标题为空），手机 UA 跳到 https://i2.y.qq.com/n3/other/pages/playsong/index.html?songmid={songmid}，以该服务端页面的 <title> 和内嵌数据核对曲名、歌手、专辑。外部互证用 iTunes lookup API、Qobuz、Deezer、Spotify、YouTube oEmbed 和新闻报道。每条先由检索者匹配，再由复核者独立重取并尝试反驳，两步都通过才收录。",
+  "urlFormat": "https://y.qq.com/n/ryqq/songDetail/{songmid}",
+  "links": {
+    "real-bu-gai": {
+      "songmid": "000sxzol11raSd",
+      "url": "https://y.qq.com/n/ryqq/songDetail/000sxzol11raSd",
+      "qqTitle": "不该 (with aMEI)",
+      "qqSingers": ["周杰伦", "张惠妹"],
+      "qqAlbum": "周杰伦的床边故事",
+      "qqReleaseDate": "2016-06-24"
+    },
+    "real-far-away": {
+      "songmid": "003FRy0r0wyGHl",
+      "url": "https://y.qq.com/n/ryqq/songDetail/003FRy0r0wyGHl",
+      "qqTitle": "千里之外",
+      "qqSingers": ["周杰伦", "费玉清"],
+      "qqAlbum": "依然范特西",
+      "qqReleaseDate": "2006-09-05"
+    },
+    "real-wont-cry": {
+      "songmid": "001qvvgF38HVc4",
+      "url": "https://y.qq.com/n/ryqq/songDetail/001qvvgF38HVc4",
+      "qqTitle": "说好不哭 (with 五月天阿信)",
+      "qqSingers": ["周杰伦"],
+      "qqAlbum": "说好不哭（with 五月天阿信）",
+      "qqReleaseDate": "2019-09-16"
+    },
+    "real-waiting-for-you": {
+      "songmid": "00176bPZ2wu39R",
+      "url": "https://y.qq.com/n/ryqq/songDetail/00176bPZ2wu39R",
+      "qqTitle": "等你下课 (with 杨瑞代)",
+      "qqSingers": ["周杰伦"],
+      "qqAlbum": "最伟大的作品",
+      "qqReleaseDate": "2022-07-15"
+    },
+    "real-sand-painting": {
+      "songmid": "001tCE0T2vR5p5",
+      "url": "https://y.qq.com/n/ryqq/songDetail/001tCE0T2vR5p5",
+      "qqTitle": "画沙",
+      "qqSingers": ["袁咏琳", "周杰伦"],
+      "qqAlbum": "袁咏琳 Cindy",
+      "qqReleaseDate": "2009-10-30"
+    },
+    "real-a-moment": {
+      "songmid": "004QYBHS1kwnCM",
+      "url": "https://y.qq.com/n/ryqq/songDetail/004QYBHS1kwnCM",
+      "qqTitle": "一眼瞬间",
+      "qqSingers": ["张惠妹", "萧敬腾"],
+      "qqAlbum": "Star",
+      "qqReleaseDate": "2007-08-03"
+    },
+    "real-hello": {
+      "songmid": "003BtUeT4PTqns",
+      "url": "https://y.qq.com/n/ryqq/songDetail/003BtUeT4PTqns",
+      "qqTitle": "Hello",
+      "qqSingers": ["萧敬腾", "林俊杰"],
+      "qqAlbum": "Hello (录音室版)",
+      "qqReleaseDate": "2020-05-26"
+    },
+    "real-dimples": {
+      "songmid": "003h3CYS3UxDB4",
+      "url": "https://y.qq.com/n/ryqq/songDetail/003h3CYS3UxDB4",
+      "qqTitle": "小酒窝",
+      "qqSingers": ["林俊杰", "蔡卓妍"],
+      "qqAlbum": "JJ陆",
+      "qqReleaseDate": "2008-10-18"
+    },
+    "real-summer-breeze": {
+      "songmid": "0018qunY0L4Bkx",
+      "url": "https://y.qq.com/n/ryqq/songDetail/0018qunY0L4Bkx",
+      "qqTitle": "被风吹过的夏天",
+      "qqSingers": ["金莎", "林俊杰"],
+      "qqAlbum": "空气",
+      "qqReleaseDate": "2005-04-01"
+    },
+    "real-beautiful": {
+      "songmid": "0038BQfx4MB0MR",
+      "url": "https://y.qq.com/n/ryqq/songDetail/0038BQfx4MB0MR",
+      "qqTitle": "手心的蔷薇",
+      "qqSingers": ["林俊杰", "G.E.M.邓紫棋"],
+      "qqAlbum": "新地球",
+      "qqReleaseDate": "2014-12-27"
+    },
+    "real-stay-with-you-english": {
+      "songmid": "002xmBmi1c2eMG",
+      "url": "https://y.qq.com/n/ryqq/songDetail/002xmBmi1c2eMG",
+      "qqTitle": "Stay With You (英文版)",
+      "qqSingers": ["林俊杰", "孙燕姿"],
+      "qqAlbum": "Stay With You (英文版)",
+      "qqReleaseDate": "2020-08-09"
+    },
+    "real-coral-sea": {
+      "songmid": "001K0AjL2huSxx",
+      "url": "https://y.qq.com/n/ryqq/songDetail/001K0AjL2huSxx",
+      "qqTitle": "珊瑚海",
+      "qqSingers": ["周杰伦", "Lara梁心颐"],
+      "qqAlbum": "十一月的萧邦",
+      "qqReleaseDate": "2005-11-01"
+    },
+    "real-try": {
+      "songmid": "001faq2u0gVP6j",
+      "url": "https://y.qq.com/n/ryqq/songDetail/001faq2u0gVP6j",
+      "qqTitle": "Try",
+      "qqSingers": ["派伟俊", "周杰伦"],
+      "qqAlbum": "Try",
+      "qqReleaseDate": "2016-01-06"
+    },
+    "real-equal-terms": {
+      "songmid": "001wG84E4bOj3V",
+      "url": "https://y.qq.com/n/ryqq/songDetail/001wG84E4bOj3V",
+      "qqTitle": "对等关系",
+      "qqSingers": ["李荣浩", "张惠妹"],
+      "qqAlbum": "纵横四海",
+      "qqReleaseDate": "2022-12-21"
+    },
+    "real-how-much-i-love-you": {
+      "songmid": "003LqdzX0edhb9",
+      "url": "https://y.qq.com/n/ryqq/songDetail/003LqdzX0edhb9",
+      "qqTitle": "我有多么喜欢你 (feat. 林宥嘉)",
+      "qqSingers": ["萧敬腾", "林宥嘉"],
+      "qqAlbum": "欲望反光",
+      "qqReleaseDate": "2018-06-22"
+    },
+    "real-sincerely-yours": {
+      "songmid": "003Iq94Q0SnePV",
+      "url": "https://y.qq.com/n/ryqq/songDetail/003Iq94Q0SnePV",
+      "qqTitle": "致姗姗来迟的你",
+      "qqSingers": ["阿肆", "林宥嘉"],
+      "qqAlbum": "我愚蠢的理想主义",
+      "qqReleaseDate": "2016-10-01"
+    },
+    "real-dont-force-it": {
+      "songmid": "00207tA52BLqom",
+      "url": "https://y.qq.com/n/ryqq/songDetail/00207tA52BLqom",
+      "qqTitle": "别勉强",
+      "qqSingers": ["G.E.M.邓紫棋", "Eric周兴哲"],
+      "qqAlbum": "摩天动物园",
+      "qqReleaseDate": "2019-12-27"
+    },
+    "real-when-you-loved-me": {
+      "songmid": "0036P9kz3IG3qu",
+      "url": "https://y.qq.com/n/ryqq/songDetail/0036P9kz3IG3qu",
+      "qqTitle": "爱我的时候",
+      "qqSingers": ["单依纯", "Eric周兴哲"],
+      "qqAlbum": "爱我的时候",
+      "qqReleaseDate": "2021-02-09"
+    },
+    "real-tenderness-20th": {
+      "songmid": "000qzndv3RJUjM",
+      "url": "https://y.qq.com/n/ryqq/songDetail/000qzndv3RJUjM",
+      "qqTitle": "温柔 #MaydayBlue20th",
+      "qqSingers": ["五月天", "孙燕姿"],
+      "qqAlbum": "温柔 #MaydayBlue20th",
+      "qqReleaseDate": "2020-01-01"
+    },
+    "real-elope-to-the-moon": {
+      "songmid": "000EZEV00EZCHo",
+      "url": "https://y.qq.com/n/ryqq/songDetail/000EZEV00EZCHo",
+      "qqTitle": "私奔到月球",
+      "qqSingers": ["五月天", "陈绮贞"],
+      "qqAlbum": "离开地球表面 Jump!",
+      "qqReleaseDate": "2007-07-20"
+    },
+    "real-drunk-ah-q": {
+      "songmid": "001LID6n1Szd9Z",
+      "url": "https://y.qq.com/n/ryqq/songDetail/001LID6n1Szd9Z",
+      "qqTitle": "（……醉鬼阿Q）（feat. 孙燕姿）",
+      "qqSingers": ["吴青峰", "孙燕姿"],
+      "qqAlbum": "马拉美的星期二",
+      "qqReleaseDate": "2022-09-30"
+    },
+    "real-marry-me-today": {
+      "songmid": "0008aOkA3v4X0Q",
+      "url": "https://y.qq.com/n/ryqq/songDetail/0008aOkA3v4X0Q",
+      "qqTitle": "今天你要嫁给我",
+      "qqSingers": ["陶喆", "蔡依林"],
+      "qqAlbum": "太美丽",
+      "qqReleaseDate": "2006-08-04"
+    },
+    "real-who-am-i": {
+      "songmid": "003PzotY0CRLex",
+      "url": "https://y.qq.com/n/ryqq/songDetail/003PzotY0CRLex",
+      "qqTitle": "我是谁",
+      "qqSingers": ["蔡依林", "Jony J"],
+      "qqAlbum": "狼殿下 影视原声碟",
+      "qqReleaseDate": "2020-11-22"
+    },
+    "real-no-more-u": {
+      "songmid": "002XUx9q3uv72w",
+      "url": "https://y.qq.com/n/ryqq/songDetail/002XUx9q3uv72w",
+      "qqTitle": "再也没有你 (Feat.陈势安)",
+      "qqSingers": ["Lara梁心颐", "陈势安"],
+      "qqAlbum": "来者何人{}",
+      "qqReleaseDate": "2021-09-14"
+    },
+    "real-ordinary-people": {
+      "songmid": "000X6Og627LKMd",
+      "url": "https://y.qq.com/n/ryqq/songDetail/000X6Og627LKMd",
+      "qqTitle": "凡人歌",
+      "qqSingers": ["五月天", "萧敬腾"],
+      "qqAlbum": "凡人歌",
+      "qqReleaseDate": "2017-03-21"
+    },
+    "real-dont-say-never-loved-live": {
+      "songmid": "002idxL60z9ORp",
+      "url": "https://y.qq.com/n/ryqq/songDetail/002idxL60z9ORp",
+      "qqTitle": "别说没爱过 (Live)",
+      "qqSingers": ["林宥嘉", "Eric周兴哲"],
+      "qqAlbum": "声生不息·华流季 第7期",
+      "qqReleaseDate": "2026-01-02"
+    },
+    "real-not-truly-happy-sky-live": {
+      "songmid": "001tKUw30RmbDH",
+      "url": "https://y.qq.com/n/ryqq/songDetail/001tKUw30RmbDH",
+      "qqTitle": "你不是真正的快乐 + 天空 (Life Live)",
+      "qqSingers": ["五月天", "蔡依林"],
+      "qqAlbum": "五月天 人生无限公司 Life Live 好友加班篇",
+      "qqReleaseDate": "2019-05-15"
+    },
+    "real-leave-the-earth-live": {
+      "songmid": "003kIzSf0LkDco",
+      "url": "https://y.qq.com/n/ryqq/songDetail/003kIzSf0LkDco",
+      "qqTitle": "离开地球表面 (Life Live)",
+      "qqSingers": ["五月天", "李荣浩"],
+      "qqAlbum": "五月天 人生无限公司 Life Live 好友加班篇",
+      "qqReleaseDate": "2019-05-15"
+    },
+    "real-who-do-you-love-live": {
+      "songmid": "003Pfh2Z4UdNF4",
+      "url": "https://y.qq.com/n/ryqq/songDetail/003Pfh2Z4UdNF4",
+      "qqTitle": "爱我还是他 (2024JJ20世界巡回演唱会重庆站现场)",
+      "qqSingers": ["林俊杰", "陶喆"],
+      "qqAlbum": "",
+      "qqReleaseDate": ""
+    },
+    "real-double-shadow": {
+      "songmid": "000P5BUK4HpaLo",
+      "url": "https://y.qq.com/n/ryqq/songDetail/000P5BUK4HpaLo",
+      "qqTitle": "双影",
+      "qqSingers": ["张惠妹", "林忆莲"],
+      "qqAlbum": "双影",
+      "qqReleaseDate": "2018-08-20"
+    },
+    "real-shouldve-let-go": {
+      "songmid": "003vjg9A0VCFfh",
+      "url": "https://y.qq.com/n/ryqq/songDetail/003vjg9A0VCFfh",
+      "qqTitle": "过",
+      "qqSingers": ["王嘉尔", "林俊杰"],
+      "qqAlbum": "过",
+      "qqReleaseDate": "2020-12-18"
+    }
+  },
+  "unavailable": {
+    "real-dark-knight": {
+      "status": "unconfirmed",
+      "reason": "录音本身一致：《因你 而在》第 3 首录音室版 001tzPHJ436zJl（版本 0，304 秒，专辑中唯一一版）。但 QQ 演唱署名是林俊杰 / 五月天（乐团），曲名写 feat. 五月天，没有单列阿信；阿信只作为作词人出现。唯一署名阿信的是无专辑的 30 秒抢听版。五月天与阿信的节点规则仍待产品负责人确认，确认前不放入口。"
+    },
+    "real-jay-jj-medley": {
+      "status": "no-same-version",
+      "reason": "QQ 没有 2020 致敬白衣天使公益云演唱会《稻香 / Stay With You》二人完整联唱。最接近的 001V1IIS2SDlpJ 只有《稻香》段（175 秒），且无专辑、发行日期和厂牌；001nVKDC3zOExH《Stay With You (Live)》无专辑，也不写场次。"
+    },
+    "real-give-me-a-song-live": {
+      "status": "no-same-version",
+      "reason": "QQ 官方现场专辑《The Era 2010 超时代演唱会》（002o2a5G46ETLr）24 首中没有此曲。唯一署名周杰伦 / 蔡依林的 0019C6vR2iM3N3「(Live)」无专辑、日期和厂牌，无法对应超时代 DVD / Blu-ray 录音；《魔杰座》录音室版是周杰伦独唱，标签已排除。"
+    },
+    "real-rooftop": {
+      "status": "no-same-version",
+      "reason": "QQ 的《有点野》（003koQ8f2ugWIh）只有第 1–10 首，缺第 11 首《屋顶》。署名温岚 / 周杰伦的 003oF0Pc0ahSx4 在 2005 年精选《爱回温》，319 秒与 Apple《有點野》第 11 首（319.44 秒）一致，很可能是同一母带，但发行不是《有点野》。是否接受精选重发待产品决定。"
+    },
+    "real-us-afterwards-live": {
+      "status": "no-same-version",
+      "reason": "我们的录音是 2018 年鸟巢 Life Tour 北京 no.105 官方现场影片，未见音频发行。QQ 唯一署名五月天 / 张惠妹的 002CEGy10mjQuV 标题写 2017 北京站，且无专辑、日期和厂牌；《Life Live 好友加班篇》没有这首。"
+    },
+    "real-if-i-were-young-live": {
+      "status": "no-same-version",
+      "reason": "我们的录音是 2023 JJ20 南宁站官方现场视频。QQ 唯一署名林俊杰 / 李荣浩的 000ehIIj3LuMIw「年少有为 (Live)」无专辑、日期和厂牌，标题不写场次，无法确认是南宁站；其余是李荣浩独唱原版、其他现场或第三方上传。"
+    }
+  }
+}
