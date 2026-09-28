@@ -13,9 +13,5 @@ test-results/
 work/
 data/
 !web/assets/data/
-*.sqlite
-*.sqlite-shm
-*.sqlite-wal
 delivery/*.zip
-delivery/runtime/
 delivery/video-source/.hyperframes/
