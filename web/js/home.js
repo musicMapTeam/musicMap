@@ -1,108 +1,129 @@
-import { SPACE_PHOTOS, SPACE_ACTORS, seedSpaceCard } from './space-data.js';
-import { createPhotoStore } from './live-photo.js';
+import { artistById, artistName, artistsInDataset, datasetForArtist } from './map-data.js';
+import { getSavedMusic, subscribeSavedMusic } from './music-library.js';
 
 const escape = value => String(value ?? '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
+// Width, case and punctuation never decide a match: "jj lin", "ＧＥＭ" and "g.e.m." all find their singer.
+const normalize = value => String(value ?? '').normalize('NFKC').toLocaleLowerCase().replace(/[\s.·・_-]/g, '');
+// Familiar first doors into the real network; an id the catalogue no longer has is skipped.
+const EXAMPLE_STARTS = ['real-jay', 'real-jj', 'real-gem', 'real-stefanie'];
+const MAX_PICKS = 4;
 
-/** The front door belongs to the visitor; the two-character demo is optional. */
+/** Singers from the verified catalogue, best match first: whole name, then prefix, then anywhere. */
+function findArtists(query, candidates) {
+  const needle = normalize(query);
+  if (!needle) return [];
+  return candidates
+    .map(artist => {
+      const names = [artist.name, ...(artist.aliases || [])].map(normalize);
+      const rank = names.includes(needle) ? 0 : names.some(name => name.startsWith(needle)) ? 1 : names.some(name => name.includes(needle)) ? 2 : 3;
+      return { artist, rank };
+    })
+    .filter(item => item.rank < 3)
+    .sort((a, b) => a.rank - b.rank)
+    .slice(0, MAX_PICKS)
+    .map(item => item.artist);
+}
+
+/** The latest 寻声 round that has not arrived or been revealed. */
+function openRound(map) {
+  return map.sessions
+    .filter(session => session.type === 'challenge' && session.fog && session.status !== 'complete' && session.status !== 'revealed' && artistById[session.start] && artistById[session.target])
+    .sort((a, b) => (b.updated || 0) - (a.updated || 0))[0] || null;
+}
+
+const touched = session => session.path.length > 1 || Boolean(session.flipped?.length) || Boolean(session.hints?.length);
+
+/** The front door: pick a singer to roam from, or pick up a 寻声 round. Everything here is local. */
 export function mountHome(container, api) {
-  // The title is written once; data and photo loads only repaint the paper, so its entrance never replays.
-  container.innerHTML = `<section class="space-page space-page--home space-studio space-studio--home home-studio" aria-labelledby="home-title">
+  const map = api.getState().map;
+  const candidates = artistsInDataset('real');
+  const starts = EXAMPLE_STARTS.map(id => artistById[id]).filter(artist => artist?.dataset === 'real');
+  const round = openRound(map);
+  const steps = round ? round.path.length - 1 : 0;
+  const resume = round && touched(round);
+  const pair = round ? `${datasetForArtist(round.start) === 'fictional' ? '情景示例 · ' : ''}${artistName(round.start)} → ${artistName(round.target)}` : '';
+  const roundTitle = resume ? '继续寻声' : '两位歌手之间，隔着几首歌？';
+  const roundMeta = resume ? `${pair} · 已走 ${steps} 步` : round ? `寻声 · ${pair}` : '寻声 · 在唱片店开一局';
+  const returning = map.sessions.some(touched) || getSavedMusic().length > 0;
+
+  // Written once: typing only repaints the picks, so focus and the title's entrance are never disturbed.
+  container.innerHTML = `<section class="home-studio${returning ? ' home-studio--returning' : ''}" aria-labelledby="home-title">
     <div class="home-cover">
       <header class="home-hero">
-        <p class="home-hero__kicker"><i aria-hidden="true"></i>音乐现场 · 散场以后</p>
-        <h1 id="home-title" class="home-hero__title"><span>同一刻，</span><span>另一面。</span></h1>
-        <p class="home-hero__lede">用另一位观众的视角，补完整你记住的那一晚。</p>
-        <ol class="home-hero__steps" aria-label="怎么交换"><li>交换现场照片</li><li>双方同意</li><li>两人署名的双联票根</li></ol>
+        <p class="home-hero__kicker"><i aria-hidden="true"></i>音乐探索 · 夜场唱片店</p>
+        <h1 id="home-title" class="home-hero__title"><span>从喜欢，</span><span>走向未知。</span></h1>
+        <p class="home-hero__lede">从一位喜欢的歌手出发，沿着真实的合唱，翻开下一位、找到下一首。</p>
+        <ol class="home-hero__steps" aria-label="怎么探索"><li>选一位歌手</li><li>沿合唱走到下一位</li><li>把路上的歌留下</li></ol>
       </header>
-      <div class="home-paper home-paper--compact" data-home-paper></div>
+      <div class="home-paper home-paper--compact" data-home-paper>
+        <form class="home-search" role="search" data-home-search>
+          <label class="home-search__label" for="home-artist-search">今天，从谁开始？</label>
+          <div class="home-search__field">${api.icon('magnifying-glass')}<input id="home-artist-search" type="search" enterkeyhint="go" autocomplete="off" spellcheck="false" placeholder="如 周杰伦、JJ Lin" aria-describedby="home-search-note"></div>
+          <div class="home-search__picks" data-home-picks role="group"></div>
+          <p class="home-search__note" id="home-search-note" data-home-note role="status"></p>
+        </form>
+        <div class="home-paper__actions">
+          <button type="button" class="button button--secondary home-round" data-home="round">
+            <span class="home-round__copy"><strong>${escape(roundTitle)}</strong><small>${escape(roundMeta)}</small></span>${api.icon('arrow-right')}
+          </button>
+        </div>
+        <div class="home-paper__foot">
+          <button type="button" data-home="records">我的发现 <span class="home-count">${map.sessions.length}</span></button>
+          <button type="button" data-home="music">留下的歌 <span class="home-count" data-home-music>${getSavedMusic().length}</span></button>
+          <button type="button" data-open-catalogue aria-haspopup="dialog">开放曲库 ${api.icon('arrow-up-right')}</button>
+        </div>
+      </div>
     </div>
-    <div class="home-fallback-cards" data-home-fallback></div>
   </section>`;
   const page = container.firstElementChild;
-  const paper = page.querySelector('[data-home-paper]');
-  const fallback = page.querySelector('[data-home-fallback]');
+  const form = page.querySelector('[data-home-search]');
+  const input = form.querySelector('input');
+  const picks = form.querySelector('[data-home-picks]');
+  const note = form.querySelector('[data-home-note]');
   const life = new AbortController();
   const { signal } = life;
-  let session = null;
-  try { session = JSON.parse(localStorage.getItem('music-map-live:v1')); } catch { /* No saved identity. */ }
-  const photos = createPhotoStore(() => session?.token, signal);
-  let catalogue = null;
-  let error = '';
-  let loading = Boolean(session?.token);
-  const actor = api.getState().actor;
-  const demoCards = [actor, actor === 'a' ? 'b' : 'a'].map(owner => {
-    const card = api.getState().space.cards[owner] || seedSpaceCard(owner);
-    if (owner !== actor && !card.isPublic) return null;
-    return { id: card.id, src: card.photoDataUrl || SPACE_PHOTOS[card.photoKey]?.url,
-      title: `${SPACE_ACTORS[owner].name}的卡`, subtitle: `${SPACE_ACTORS[owner].name} · 本地示例`,
-      caption: card.caption, eventTitle: '回声现场', date: '2026.09.26', alt: `${SPACE_ACTORS[owner].name}的本地示例照片`,
-      isDemo: true, isOwn: owner === actor, local: true, exampleImage: card.photoKey !== 'custom' };
-  }).filter(Boolean);
+  let found = [];
 
-  function entries() {
-    if (!catalogue?.cards.length) return demoCards;
-    return catalogue.cards.slice(0, 2).map(card => ({ ...card,
-      src: card.photoId ? photos.peek(card.photoId) : SPACE_PHOTOS[card.photoKey]?.url,
-      title: card.event?.title || card.roomTitle, subtitle: `${card.ownerName} · 我的现场`,
-      eventTitle: card.event?.title || card.roomTitle, date: card.event?.date || '',
-      alt: card.photoId ? `${card.ownerName}的现场照片` : 'AI 示例照片',
-      isDemo: Boolean(card.event?.isDemo || !card.photoId), isOwn: true, local: false, exampleImage: !card.photoId,
-    }));
+  function renderPicks() {
+    const query = input.value.trim();
+    found = findArtists(query, candidates);
+    const list = found.length ? found : starts;
+    picks.dataset.kind = found.length ? 'found' : 'starts';
+    picks.setAttribute('aria-label', found.length ? '匹配的歌手' : '可以从这几位出发');
+    picks.innerHTML = list.map(artist => `<button type="button" class="home-pick" data-home-start="${escape(artist.id)}" style="--pick-tone:${escape(artist.color)}" aria-label="从${escape(artist.name)}出发">${escape(artist.name)}</button>`).join('');
+    note.textContent = query && !found.length ? `本专题还没收录「${query}」，先从这几位出发试试。` : '';
   }
-  function openCard(id) {
-    const item = entries().find(card => card.id === id);
-    if (!item) return;
-    if (item.local) api.navigate('space', { showDemo: true, previewCardId: item.id });
-    else api.navigate('records', { section: 'live', libraryItemId: `card:${item.id}` });
+  function start(artistId) {
+    if (artistById[artistId]?.dataset === 'real') api.navigate('explore', { artistId, newSession: true });
   }
-  function publish() {
-    api.spatial?.publish({ mode: 'home', cards: entries().filter(card => card.src), onPhoto: openCard,
-      onEdit: () => api.navigate('live', { intent: 'make-card' }) });
-  }
-  function render() {
-    if (signal.aborted) return;
-    const recentOpen = Boolean(paper.querySelector('[data-home-recent]')?.open);
-    const cards = entries();
-    const recentRoom = catalogue?.rooms.find(room => room.id === session?.roomId) || catalogue?.rooms[0];
-    const personal = cards.filter(card => !card.local);
-    page.classList.toggle('home-studio--returning', personal.length > 0);
-    paper.innerHTML = `${personal.length ? `<details class="home-recent" data-home-recent ${recentOpen ? 'open' : ''}><summary><span>最近现场</span><small>${catalogue.cards.length}</small>${api.icon('chevron-right')}</summary><div class="home-memory-list">${personal.map(card => `<button class="home-memory" data-home="photo" data-id="${escape(card.id)}" aria-label="查看${escape(card.title)}"><span class="home-memory__image">${card.src ? `<img src="${escape(card.src)}" alt="${escape(card.alt)}">` : api.icon('image')}</span><span class="home-memory__copy"><small>${card.exampleImage ? 'AI 示例图 · ' : ''}我的现场</small><strong>${escape(card.title)}</strong></span>${api.icon('arrow-up-right')}</button>`).join('')}</div></details>` : `<div class="home-first-card"><span class="home-first-card__art" aria-hidden="true">${api.icon('camera')}</span><span class="home-first-card__copy"><strong>留住这一晚</strong><small>照片默认私藏，双方同意才交换</small></span></div>`}
-      <div class="home-paper__actions"><button class="button button--primary" data-home="make">${api.icon('plus')}记录我的现场</button><button class="button button--secondary" data-home="invite">${api.icon('users')}邀请朋友</button></div>
-      <div class="home-paper__foot">${recentRoom ? `<button data-home="resume" data-room="${escape(recentRoom.id)}" title="${escape(recentRoom.title)}">继续本场 ${api.icon('arrow-right')}</button>` : ''}<button data-home="join">我有邀请码 ${api.icon('arrow-right')}</button><button data-home="demo">体验示例 ${api.icon('arrow-up-right')}</button></div>
-      ${loading ? '<span class="home-paper__status" role="status">正在找回你的现场…</span>' : ''}${error ? `<div class="home-paper__status" role="status">${escape(error)} <button data-home="retry">重试</button></div>` : ''}`;
-    fallback.innerHTML = cards.map(card => `<button data-home="photo" data-id="${escape(card.id)}">${card.src ? `<img src="${escape(card.src)}" alt="${escape(card.alt)}">` : ''}<span>${escape(card.title)}${card.local ? ' · 示例' : ''}</span></button>`).join('');
-    publish();
-  }
-  async function load() {
-    if (!session?.token || loading && catalogue) return;
-    loading = true; error = '';
-    try {
-      const response = await fetch('/api/live/library', { headers: { Authorization: `Bearer ${session.token}` }, cache: 'no-store', signal });
-      if (!response.ok || !response.headers.get('content-type')?.includes('application/json')) throw new Error('暂时读不到你的现场记录');
-      catalogue = await response.json();
-      catalogue.cards.sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
-      if (signal.aborted) return;
-      loading = false; render();
-      await Promise.all(catalogue.cards.slice(0, 2).filter(card => card.photoId).map(async card => {
-        try { await photos.load(card.photoId); if (!signal.aborted) render(); }
-        catch (reason) { if (reason.name !== 'AbortError') { error = '有张照片没能读到'; render(); } }
-      }));
-    } catch (reason) {
-      if (reason.name !== 'AbortError') { error = reason.message; loading = false; render(); }
-    }
-  }
-  container.addEventListener('click', event => {
+
+  input.addEventListener('input', renderPicks, { signal });
+  input.addEventListener('keydown', event => {
+    if (event.key !== 'ArrowDown') return;
+    const first = picks.querySelector('button');
+    if (first) { event.preventDefault(); first.focus(); }
+  }, { signal });
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    if (found.length) start(found[0].id);
+    else input.focus();
+  }, { signal });
+  page.addEventListener('click', event => {
+    const pick = event.target.closest('[data-home-start]');
+    if (pick) { start(pick.dataset.homeStart); return; }
     const button = event.target.closest('[data-home]');
     if (!button) return;
-    if (button.dataset.home === 'make') api.navigate('live', { intent: 'make-card' });
-    if (button.dataset.home === 'invite') api.navigate('live', { intent: 'invite' });
-    if (button.dataset.home === 'demo') api.navigate('space', { showDemo: true });
-    if (button.dataset.home === 'resume') api.navigate('live', { roomId: button.dataset.room });
-    if (button.dataset.home === 'retry') load();
-    if (button.dataset.home === 'join') api.navigate('live', { intent: 'join-room' });
-    if (button.dataset.home === 'photo') openCard(button.dataset.id);
+    if (button.dataset.home === 'round') api.navigate('explore', round ? { resumeSessionId: round.id } : null);
+    if (button.dataset.home === 'records') api.navigate('records', { section: 'map' });
+    if (button.dataset.home === 'music') api.navigate('records', { section: 'music' });
   }, { signal });
-  render();
-  load();
-  return () => { life.abort(); api.spatial?.publish({ cards: [] }); photos.clear(); };
+  const unsubscribe = subscribeSavedMusic(tracks => {
+    const count = page.querySelector('[data-home-music]');
+    if (count) count.textContent = tracks.length;
+  });
+
+  renderPicks();
+  // The courtyard frames itself around this cover; no cards go on the scene.
+  api.spatial?.publish({ mode: 'home', cards: [] });
+  return () => { life.abort(); unsubscribe(); };
 }
