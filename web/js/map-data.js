@@ -1,9 +1,9 @@
 import { REAL_CATALOGUE_VERSION, realArtists, realSongs, realEdges } from './map-catalogue.js';
 
-// Original fictional IDs remain stable for saved routes and the Space demo.
+// Original fictional IDs remain stable for saved routes.
 // Real artists have a separate ID namespace and are never joined to this graph.
+// Catalogue growth only adds ids, so stored sessions stay valid without a version bump.
 export const MAP_DATA_VERSION = 'catalogues-2026-09-v1';
-export const MAP_EVENT_ID = 'echo-live-2026';
 
 const fictionalArtists = [
   { id: 'a', name: '林间', tag: '流行 / R&B', color: '#df8a72', bio: '从熟悉的旋律出发', songs: ['晚风来信', '慢半拍', '回声里的你'] },
@@ -19,8 +19,14 @@ const fictionalArtists = [
 
 export const catalogues = {
   // rounds: fixed, reproducible 寻声 puzzles (start → target), each checked to be ≥ 2 co steps apart.
+  // The first real pair is the default round; later pairs are only appended so a stored roundCursor keeps its meaning.
   real: { id: 'real', label: '真实合作精选', version: REAL_CATALOGUE_VERSION, start: 'real-jay', target: 'real-gem', hasStyle: false,
-    rounds: [['real-fei', 'real-gem'], ['real-amei', 'real-stefanie'], ['real-cindy', 'real-jam'], ['real-gary', 'real-jinsha'], ['real-charlene', 'real-fei']] },
+    rounds: [
+      ['real-fei', 'real-gem'], ['real-amei', 'real-stefanie'], ['real-cindy', 'real-jam'], ['real-gary', 'real-jinsha'], ['real-charlene', 'real-fei'],
+      // 2026-09-28 expansion (references/research/2026-09-28/network-expansion.md): 4–6 songs apart.
+      ['real-fei', 'real-yichun'], ['real-cheer', 'real-sandy'], ['real-qingfeng', 'real-yoga'], ['real-jolin', 'real-yichun'],
+      ['real-lara', 'real-qingfeng'], ['real-andrew', 'real-asi'], ['real-jackson', 'real-sandy'],
+    ] },
   fictional: { id: 'fictional', label: '情景示例', version: 'fictional-2026-09-v1', start: 'a', target: 'f', hasStyle: true,
     rounds: [['b', 'h'], ['d', 'h'], ['a', 'f']] },
 };
