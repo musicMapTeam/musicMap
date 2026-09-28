@@ -65,12 +65,12 @@ function routeView(name) {
   return views.includes(view) ? view : 'home';
 }
 
-/** Old invitation links carried ?room=; retired route names become their new home. */
+/** Old invitation links carried ?room=. A retired or unknown route shows the courtyard, and the address says so. */
 function tidyUrl() {
   const url = new URL(location.href);
   if (url.searchParams.has('room')) url.searchParams.delete('room');
-  const legacy = LEGACY.get(url.hash.slice(2));
-  if (legacy) url.hash = `/${legacy}`;
+  // The skip link's own fragment is left alone; a bare address stays bare.
+  if (url.hash && url.hash !== '#main-content') url.hash = `/${routeView(url.hash.slice(2))}`;
   if (url.href !== location.href) history.replaceState(null, '', url);
 }
 
@@ -144,7 +144,8 @@ function updateChrome() {
   const storageNote = document.querySelector('#storage-warning');
   if (storageNote) storageNote.hidden = !saveFailed;
   const sectionNames = { home: '从喜欢，走向未知', explore: '唱片店', records: '我的发现' };
-  document.title = `${sectionNames[state.view]} · Music Map`;
+  // The brand comes first in the tab, as it does on the wordmark.
+  document.title = `Music Map · ${sectionNames[state.view]}`;
 }
 
 function navItems() {
@@ -161,9 +162,9 @@ function navItems() {
 function shell() {
   root.innerHTML = `
     <header class="app-masthead app-studio-shell">
-      <button class="brand" data-nav="home" aria-label="回到小院 · 樱下放映 Music Map">
+      <button class="brand" data-nav="home" aria-label="Music Map · 樱下放映 · 夜场唱片店，回到小院">
         <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
-        <span class="brand-wordmark">樱下放映<small>Music Map</small></span>
+        <span class="brand-wordmark">Music Map<small>樱下放映 · 夜场唱片店</small></span>
       </button>
       <nav class="primary-nav" aria-label="主要导航">${navItems()}</nav>
       <div class="masthead-tools"><button class="demo-help icon-button" id="demo-help" aria-label="关于 Music Map" aria-haspopup="dialog" aria-controls="about-dialog">${icon('info')}</button></div>
@@ -176,7 +177,7 @@ function shell() {
     <nav class="mobile-nav" aria-label="手机导航">${navItems()}</nav>
     <dialog id="about-dialog" class="about-dialog" aria-labelledby="about-title">
       <div class="about-top"><h2 id="about-title">Music Map</h2><button class="icon-button" id="close-about" aria-label="关闭关于">${icon('x')}</button></div>
-      <p class="about-intro">从喜欢，走向未知。</p><div class="about-facts"><p><b>寻声</b><span>唱片店里选好起点和终点，只能翻开所在歌手手边的合唱；沿翻开的合唱前往才算一步，翻开和提示不计步。</span></p><p><b>图鉴</b><span>完整图鉴摊开本专题收录的全部合唱，可从任意一位歌手出发自由漫游。</span></p><p><b>来源</b><span>每条连线都是一首真实的共同演唱录音，附有来源；制作署名只列已核实的部分。</span></p><p><b>曲库</b><span>开放曲库是公开数据集里的共同署名曲目，可搜索、留下，不连入关系图。</span></p><p><b>音频</b><span>这一版没有试听音频。</span></p><p><b>数据</b><span>探索记录和留下的歌只存在当前浏览器，清除网站数据后无法找回。</span></p></div>
+      <p class="about-intro">从喜欢，走向未知。</p><div class="about-facts"><p><b>寻声</b><span>在唱片店选好起点和终点，只能翻开所在歌手手边的合唱；沿翻开的合唱前往才算一步，翻开、提示和查看都不计步。</span></p><p><b>图鉴</b><span>唱片店里的完整图鉴摊开收录的全部合唱，可从任意一位歌手出发自由漫游。</span></p><p><b>来源</b><span>每条连线都是一首真实的共同演唱录音，附有来源；制作署名只列已核实的部分。</span></p><p><b>曲库</b><span>开放曲库只列公开数据集里的共同署名，不一定是合唱，也不连入关系图。</span></p><p><b>音频</b><span>这一版不含音频，不能试听。</span></p><p><b>数据</b><span>探索记录和留下的歌只存在这个浏览器里，清除网站数据后无法找回。</span></p></div>
       <button class="button button--primary" id="start-experience">知道了</button>
     </dialog>`;
   root.addEventListener('click', event => {
