@@ -1,7 +1,7 @@
 /* map-round — 0.15 寻声一局.
    The puzzle as physical paper on a lamp-lit table: a question slip (题签) pinned
    top-left, a dark crate holding the hand of record cards, face-down kraft sleeves
-   with a ？, and a setlist that shares the duet ticket's perforated paper.
+   with a ？, and a setlist printed on perforated ticket paper.
    Night surfaces come from night-shell tokens; every value keeps a light fallback. */
 
 html[data-theme='sakura'] {
@@ -236,7 +236,7 @@ html[data-theme='sakura'] body .map-dialog {
   & .map-track__copy span { font-size:13px; line-height:1.55; color:#5d6858; }
   & .map-track__copy small, & .map-track__copy .map-track__credit-preview { display:block; margin-top:2px; font-size:12px; line-height:1.55; color:#6b6a5c; }
   & .map-track__index { font-size:12px; }
-  & .map-track__take, & .map-track__listen { font-size:13px; min-height:38px; }
+  & .map-track__listen { font-size:13px; min-height:38px; }
   & .map-track__save { width:40px; min-width:40px; height:40px; min-height:40px; }
   & .map-credits>summary { font-size:13px; }
   & .map-credits>summary small { font-size:12px; }

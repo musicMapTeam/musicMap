@@ -84,7 +84,6 @@ html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback) .map-
 .map-network-selection__actions { display:flex; flex-wrap:wrap; justify-content:flex-end; align-items:center; margin-left:auto; gap:4px; }
 html[data-theme='sakura'] .map-studio .map-network-selection__actions .button { min-height:40px; padding:8px 12px; font-size:14px; border-radius:3px; white-space:nowrap; gap:6px; }
 html[data-theme='sakura'] .map-studio .map-network-selection__actions .map-round-to { background:#f3e1dc; color:#8f3f4d; }
-html[data-theme='sakura'] .map-studio .map-network-selection__actions .map-space-link { background:#35614d; color:#fffcef; }
 .map-network-selection__actions .icon { width:14px; height:14px; }
 .map-network-neighbors { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:8px; min-width:0; padding:6px 0 8px; }
 .map-network-connection { display:flex; flex-direction:column; align-items:start; gap:3px; min-width:0; min-height:58px; padding:9px 12px; border:1px solid #c9c29f80; border-radius:3px; background:#f1eedd; color:#24382d; cursor:pointer; text-align:left; }

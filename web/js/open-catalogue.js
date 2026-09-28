@@ -10,14 +10,6 @@ function importPreviousSaves(api) {
   catch { api.toast('旧探索记录仍保留，歌曲收藏暂未同步到浏览器'); }
 }
 
-function bringToLive(track, api) {
-  const state = api.getState();
-  const resumeSessionId = state.view === 'explore' ? state.map.activeId : null;
-  api.update(updated => { updated.space.mapReturnId = resumeSessionId; });
-  const { savedAt, ...songDraft } = track;
-  api.navigate('live', { intent: 'create-room', songDraft, ...(resumeSessionId ? { resumeSessionId } : {}) });
-}
-
 function updateSaveButton(button, track, saved) {
   button.innerHTML = icon(saved ? 'check' : 'plus');
   button.classList.toggle('is-saved', saved);
@@ -26,7 +18,7 @@ function updateSaveButton(button, track, saved) {
   button.title = saved ? '已留下，点击取消收藏' : '留下这首歌';
 }
 
-function musicRow(track, index, { saved, detail, onSave, onTake }) {
+function musicRow(track, index, { saved, detail, onSave }) {
   const row = document.createElement('article'); row.className = 'open-catalogue__record'; row.dataset.musicId = track.id;
   const info = document.createElement('details');
   const summary = document.createElement('summary');
@@ -38,9 +30,7 @@ function musicRow(track, index, { saved, detail, onSave, onTake }) {
   const actions = document.createElement('div'); actions.className = 'music-row__actions';
   const save = document.createElement('button'); save.type = 'button'; save.className = 'icon-button music-row__save'; save.dataset.musicSave = track.id;
   updateSaveButton(save, track, saved); save.addEventListener('click', onSave);
-  const take = document.createElement('button'); take.type = 'button'; take.className = 'button button--quiet music-row__take'; take.textContent = '带到现场';
-  take.setAttribute('aria-label', `把《${track.title}》带到现场`); take.addEventListener('click', onTake);
-  actions.append(save, take); row.append(info, actions); return row;
+  actions.append(save); row.append(info, actions); return row;
 }
 
 export function mountOpenCatalogue(api) {
@@ -67,10 +57,9 @@ export function mountOpenCatalogue(api) {
       list.append(musicRow(snapshot, index, {
         saved: savedIds.has(track.id), detail,
         onSave() {
-          try { api.toast(toggleSavedMusic(snapshot) ? '已留下，在收藏里继续' : '已取消收藏'); }
+          try { api.toast(toggleSavedMusic(snapshot) ? '已留下，可在「我的发现 · 留下的歌」找到' : '已取消收藏'); }
           catch { api.toast('收藏还未保存，请检查浏览器存储空间后重试'); }
         },
-        onTake() { dialog.close(); bringToLive(snapshot, api); },
       }));
     });
     if (!tracks.length) { const empty = document.createElement('p'); empty.className = 'open-catalogue__empty'; empty.textContent = '这箱唱片里还没有。换个关键词吧。'; list.append(empty); }
@@ -125,7 +114,6 @@ export function mountSavedMusic(container, api) {
             (buttons[Math.min(index, buttons.length - 1)] || container.querySelector('[data-music-explore]'))?.focus({ preventScroll: true });
           } catch { api.toast('这首歌尚未移除，请检查浏览器存储空间后重试'); }
         },
-        onTake() { bringToLive(track, api); },
       }));
     });
   }

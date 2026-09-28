@@ -202,7 +202,7 @@ function tracksHTML(session, trackIds, api, source = '', showVersion = false, sh
     return `<div class="map-track">
       <span class="map-track__index" aria-hidden="true">${String(index + 1).padStart(2, '0')}</span>
       <div class="map-track__copy">${creditLink ? button('credits', `${escapeHTML(song.title)}<span aria-hidden="true">↗</span>`, 'map-track__title', `data-id="${id}" data-session="${session.id}" aria-label="查看《${escapeHTML(song.title)}》的作品署名"`) : `<strong>${escapeHTML(song.title)}</strong>`}<span>${song.artists.map(artistName).map(escapeHTML).join(' / ')}</span>${showVersion && (song.recordingLabel || song.versionLabel) ? `<small>${escapeHTML(song.recordingLabel || song.versionLabel)}</small>` : !showVersion && song.creditSummary ? `<small class="map-track__credit-preview">${escapeHTML(song.creditSummary)}</small>` : ''}</div>
-      <div class="map-track__actions">${listenHTML(song, api)}${song.dataset === 'real' ? button('take-song', '带到现场', 'button button--quiet map-track__take', `data-id="${id}" data-session="${session.id}" aria-label="把《${escapeHTML(song.title)}》带到现场"`) : ''}${button('save', api.icon(saved ? 'check' : 'plus'), `icon-button map-track__save ${saved ? 'is-saved' : ''}`, `data-id="${id}" data-session="${session.id}" data-source="${escapeHTML(source)}" aria-label="${saved ? '移除' : '留下'}《${escapeHTML(song.title)}》" aria-pressed="${saved}" title="${saved ? '已留下，点击移除' : '留下这首作品'}"`)}</div>
+      <div class="map-track__actions">${listenHTML(song, api)}${button('save', api.icon(saved ? 'check' : 'plus'), `icon-button map-track__save ${saved ? 'is-saved' : ''}`, `data-id="${id}" data-session="${session.id}" data-source="${escapeHTML(source)}" aria-label="${saved ? '移除' : '留下'}《${escapeHTML(song.title)}》" aria-pressed="${saved}" title="${saved ? '已留下，点击移除' : '留下这首作品'}"`)}</div>
     </div>${showCredits && !fogged ? creditsHTML(song, api) : ''}`;
   }).join('');
 }
@@ -407,7 +407,7 @@ function roundHTML(map, api, session, presentation) {
   const menu = menuHTML(api, [
     ['寻声', `${button('challenge', '自选起点和终点', 'button button--quiet')}${!closed ? button('reveal', '放弃并揭晓', 'button button--quiet') : ''}${closed ? button('recap', '连线歌单', 'button button--quiet', `data-session="${session.id}"`) : ''}`],
     ['图谱', `${button('return-roam', '完整图鉴<small>会显示全部合作</small>', 'button button--quiet map-menu-atlas', `data-session="${session.id}"`)}${catalogueSwitchHTML(dataset)}`],
-    ['资料', `<button type="button" class="button button--quiet" data-open-catalogue>开放曲库</button>${button('history', '探索记录', 'button button--quiet')}${button('space', `${isReal ? '去同场' : '示例现场'} ${api.icon('arrow-up-right')}`, 'button button--quiet', `title="${isReal ? '为自己的活动创建房间，可返回这次探索' : '回声现场 · 虚构情景'}"`)}`],
+    ['资料', `<button type="button" class="button button--quiet" data-open-catalogue>开放曲库</button>${button('history', '探索记录', 'button button--quiet')}`],
     ['视野', zoomToolsHTML(api), 'map-menu-zoom'],
   ]);
   const question = `<span class="is-from">${escapeHTML(artistName(session.start))}</span><i aria-hidden="true">→</i><span class="is-to">${escapeHTML(artistName(session.target))}</span><span class="map-round-slip__ask">，隔着几首歌？</span>`;
@@ -450,20 +450,19 @@ function atlasHTML(map, api, session, presentation) {
   const relationUnit = session.mode === 'co' ? '次合作' : '条标签连接';
   const isChallenge = session.type === 'challenge';
   const isComplete = isClosed(session);
-  const isEventArtist = ['a', 'b'].includes(node.id);
   const selectedId = datasetForArtist(map.view.selectedArtistId) === dataset ? map.view.selectedArtistId : node.id;
   const selectedArtist = artistById[selectedId];
   const selectedLinks = getNeighbors(selectedId, session.mode, dataset);
   const neighborOfCurrent = getNeighbors(node.id, 'co', dataset).some(edge => otherArtist(edge, node.id) === selectedId);
   const progress = atlasProgress(map, dataset);
-  const liveRound = [...map.sessions].reverse().find(item => isRound(item) && sessionDataset(item) === dataset && item.status === 'active');
+  const pendingRound = [...map.sessions].reverse().find(item => isRound(item) && sessionDataset(item) === dataset && item.status === 'active');
   const title = isChallenge ? '合作挑战' : '完整图鉴';
   const sub = isChallenge
     ? `${escapeHTML(artistName(session.start))} → ${escapeHTML(artistName(session.target))} · ${isComplete ? '已抵达' : '进行中'} · ${session.path.length - 1} 步`
     : session.mode === 'style' ? '策展标签 · 人工整理，不代表合作' : `你已亲手翻开 ${progress.opened}/${progress.total} 首合作`;
   const primary = isChallenge
     ? button('return-roam', '返回图鉴', 'button button--quiet', `data-session="${session.id}"`)
-    : liveRound ? button('resume', `回到寻声 ${api.icon('arrow-right')}`, 'button button--primary map-atlas-play', `data-session="${liveRound.id}"`) : button('round-next', `开一局 ${api.icon('arrow-right')}`, 'button button--primary map-atlas-play');
+    : pendingRound ? button('resume', `回到寻声 ${api.icon('arrow-right')}`, 'button button--primary map-atlas-play', `data-session="${pendingRound.id}"`) : button('round-next', `开一局 ${api.icon('arrow-right')}`, 'button button--primary map-atlas-play');
   const menu = menuHTML(api, [
     ['图谱', `${catalogueSwitchHTML(dataset)}${catalogue.hasStyle ? `<div class="map-mode-switch" role="group" aria-label="关系类型">${button('mode', '合作', session.mode === 'co' ? 'is-active' : '', `data-mode="co" aria-pressed="${session.mode === 'co'}"`)}${button('mode', '策展标签', session.mode === 'style' ? 'is-active' : '', `data-mode="style" aria-pressed="${session.mode === 'style'}" ${isChallenge ? 'disabled' : ''}`)}</div>` : ''}`],
     ['寻声', `${button('round-next', '开一局寻声', 'button button--quiet')}${button('challenge', '自选起点和终点', 'button button--quiet')}`],
@@ -484,7 +483,7 @@ function atlasHTML(map, api, session, presentation) {
       </div>
     </div>
     <div class="map-studio-dock">
-      <div class="map-network-selection"><span class="map-network-stamp" style="--node-tone:${selectedArtist.color}" aria-hidden="true"><i></i></span><div><h2>${escapeHTML(selectedArtist.name)}</h2><span>${selectedLinks.length} ${relationUnit} <i>·</i> ${selectedArtist.songIds.length} 首作品${selectedId === node.id ? ' <i>·</i> 你在这里' : ''}</span></div><div class="map-network-selection__actions">${button('artist', `作品 ${api.icon('arrow-up-right')}`, 'button button--quiet', `data-id="${selectedId}"`)}${roundTo ? button('round-to', '和 TA 隔几首？', 'button button--quiet map-round-to', `data-id="${selectedId}" aria-label="开一局寻声：从${escapeHTML(artistName(node.id))}到${escapeHTML(selectedArtist.name)}，隔着几首歌？"`) : ''}${button('space', `${api.icon('users')} ${isReal ? '去同场' : isEventArtist ? '关联示例现场' : '示例现场'}`, 'button button--quiet map-space-link', `title="${isReal ? '为自己的活动创建房间，可返回这次探索' : '回声现场 · 虚构情景'}"`)}</div></div>
+      <div class="map-network-selection"><span class="map-network-stamp" style="--node-tone:${selectedArtist.color}" aria-hidden="true"><i></i></span><div><h2>${escapeHTML(selectedArtist.name)}</h2><span>${selectedLinks.length} ${relationUnit} <i>·</i> ${selectedArtist.songIds.length} 首作品${selectedId === node.id ? ' <i>·</i> 你在这里' : ''}</span></div><div class="map-network-selection__actions">${button('artist', `作品 ${api.icon('arrow-up-right')}`, 'button button--quiet', `data-id="${selectedId}"`)}${roundTo ? button('round-to', '和 TA 隔几首？', 'button button--quiet map-round-to', `data-id="${selectedId}" aria-label="开一局寻声：从${escapeHTML(artistName(node.id))}到${escapeHTML(selectedArtist.name)}，隔着几首歌？"`) : ''}</div></div>
       <details class="map-network-index" data-map-index ${open ? 'open' : ''}><summary><span>${selectedLinks.length} 条连接</span><small>已走 ${session.path.length - 1} 步</small>${api.icon('chevron-right')}</summary><div class="map-network-index__body">
       <div class="map-network-neighbors" aria-label="${escapeHTML(selectedArtist.name)}的连接">${selectedLinks.map(edge => button('edge', `<span>${escapeHTML(artistName(otherArtist(edge, selectedId)))}</span><small>${escapeHTML(songTitle(edge))}</small>`, 'map-network-connection', `data-id="${edge.id}"`)).join('') || '<span class="map-inline-empty">暂未收录连接</span>'}</div>
       <div class="map-route-bar"><div class="map-route-controls">${button('back', api.icon('arrow-left'), 'icon-button', `aria-label="返回上一位${isChallenge ? '并撤销一步' : ''}" ${session.path.length < 2 || isComplete ? 'disabled' : ''}`)}${button('reset', api.icon('rotate'), 'icon-button', `aria-label="回到起点" ${session.path.length < 2 || isComplete ? 'disabled' : ''}`)}</div><div class="map-route-trail" aria-label="当前路线">${session.path.map((step, index) => `<span ${index === session.path.length - 1 ? 'aria-current="step"' : ''}>${escapeHTML(artistName(step.id))}</span>`).join('<span class="map-route-trail__arrow" aria-hidden="true">→</span>')}</div>${button('recap', `${currentSavedSongs(session).length} 首收藏`, 'button button--quiet', `data-session="${session.id}" data-map-saved-count="${session.id}"`)}</div>
@@ -547,7 +546,7 @@ function roundProgressHTML(session, api) {
     <p class="map-storage-note">翻开的唱片、提示与路线仅保存在当前浏览器。</p>`;
 }
 
-/** 连线歌单：抵达或揭晓后的回顾。与双联票根共用纸张与票条语言。 */
+/** 连线歌单：抵达或揭晓后的回顾，用唱片店的票条纸张列出路线上的每首合唱。 */
 function setlistHTML(session, api) {
   const dataset = sessionDataset(session);
   const isReal = dataset === 'real';
@@ -574,7 +573,7 @@ function setlistHTML(session, api) {
     const saved = songIsSaved(session, song.id);
     const title = song.credits?.length ? button('credits', `《${escapeHTML(song.title)}》`, 'map-setlist__title', `data-id="${song.id}" data-session="${session.id}" aria-label="查看《${escapeHTML(song.title)}》的作品署名"`) : `<strong class="map-setlist__title">《${escapeHTML(song.title)}》</strong>`;
     const meta = song.dataset === 'real' ? `<span class="map-setlist__version">${escapeHTML(song.recordingLabel || song.versionLabel || '')}</span>${evidenceHTML(edge, api)}` : '<span class="map-setlist__version">示例合作 · 虚构，无音源</span>';
-    const actions = `${button('save', `${api.icon(saved ? 'check' : 'plus')}<span>${saved ? '已留下' : '留下'}</span>`, `button button--quiet map-setlist__save${saved ? ' is-saved' : ''}`, `data-id="${song.id}" data-session="${session.id}" data-source="从连线歌单留下" aria-pressed="${saved}" aria-label="${saved ? '移除' : '留下'}《${escapeHTML(song.title)}》"`)}${song.dataset === 'real' ? button('take-song', `带到现场 ${api.icon('arrow-up-right')}`, 'button button--quiet map-setlist__take', `data-id="${song.id}" data-session="${session.id}" aria-label="把《${escapeHTML(song.title)}》带到现场"`) : ''}`;
+    const actions = `${button('save', `${api.icon(saved ? 'check' : 'plus')}<span>${saved ? '已留下' : '留下'}</span>`, `button button--quiet map-setlist__save${saved ? ' is-saved' : ''}`, `data-id="${song.id}" data-session="${session.id}" data-source="从连线歌单留下" aria-pressed="${saved}" aria-label="${saved ? '移除' : '留下'}《${escapeHTML(song.title)}》"`)}`;
     return `${stop}<li class="map-setlist__song" style="--i:${index * 2 + 1}"><div class="map-setlist__ticket"><span class="map-setlist__no" aria-hidden="true">${String(index + 1).padStart(2, '0')}</span><div class="map-setlist__copy">${title}${meta}</div><div class="map-setlist__actions">${actions}</div></div></li>`;
   }).join('');
   const alternatives = arrived ? shortestChains(session.start, session.target, dataset, 3).filter(chain => chain.edges.map(edge => edge.id).join() !== route.edges.map(edge => edge.id).join()) : shortestChains(session.start, session.target, dataset, 3).slice(1);
@@ -653,7 +652,7 @@ function panelHTML(map, api, recordsOnly = false) {
   if (panel === 'credits') {
     const song = songs[map.view.creditSongId];
     const allowed = !fog;
-    if (song?.credits?.length && allowed) content = `<div class="map-credit-heading"><span class="map-credit-disc" style="--credit-tone:${artistById[song.artists[0]].color}" aria-hidden="true"></span><div><span class="eyebrow">作品署名</span><h2>${escapeHTML(song.title)}</h2><p>${escapeHTML(song.recordingLabel)}</p></div></div>${creditsHTML(song, api, true)}${fog ? '<p class="map-round-sealed-note">署名表按来源原样列出；非演唱署名不表示合唱。</p>' : ''}<div class="map-credit-bottom"><span>无内置音频</span>${button('take-song', '带到现场', 'button button--quiet', `data-id="${song.id}" data-session="${session.id}"`)}${button('save', `${api.icon(songIsSaved(session, song.id) ? 'check' : 'plus')} ${songIsSaved(session, song.id) ? '已留下' : '留下作品'}`, 'button button--quiet', `data-id="${song.id}" data-session="${session.id}" data-source="查看作品制作署名后留下" aria-pressed="${songIsSaved(session, song.id)}"`)}</div>`;
+    if (song?.credits?.length && allowed) content = `<div class="map-credit-heading"><span class="map-credit-disc" style="--credit-tone:${artistById[song.artists[0]].color}" aria-hidden="true"></span><div><span class="eyebrow">作品署名</span><h2>${escapeHTML(song.title)}</h2><p>${escapeHTML(song.recordingLabel)}</p></div></div>${creditsHTML(song, api, true)}${fog ? '<p class="map-round-sealed-note">署名表按来源原样列出；非演唱署名不表示合唱。</p>' : ''}<div class="map-credit-bottom"><span>无内置音频</span>${button('save', `${api.icon(songIsSaved(session, song.id) ? 'check' : 'plus')} ${songIsSaved(session, song.id) ? '已留下' : '留下作品'}`, 'button button--quiet', `data-id="${song.id}" data-session="${session.id}" data-source="查看作品制作署名后留下" aria-pressed="${songIsSaved(session, song.id)}"`)}</div>`;
   }
   if (panel === 'relations' && !fog) {
     const id = datasetForArtist(map.view.selectedArtistId) === dataset ? map.view.selectedArtistId : currentNode(session).id;
@@ -1014,7 +1013,7 @@ function attachInteractions(container, api, recordsOnly) {
           ids.forEach(songId => { if (!selected.saved.some(item => item.id === songId)) selected.saved.push({ id: songId, source: '从连线歌单留下', savedAt: Date.now() }); });
           selected.updated = Date.now();
         }, true, control ? { control } : null);
-        api.toast(pending.length ? `已留下 ${pending.length} 首${sessionDataset(owner) === 'real' ? '，可在「我的收藏 · 音乐收藏」找到' : '（示例，仅存这次记录）'}` : '这几首都已留下');
+        api.toast(pending.length ? `已留下 ${pending.length} 首${sessionDataset(owner) === 'real' ? '，可在「我的发现 · 留下的歌」找到' : '（示例，仅存这次记录）'}` : '这几首都已留下');
         break;
       }
       case 'move': {
@@ -1144,23 +1143,6 @@ function attachInteractions(container, api, recordsOnly) {
         });
         api.toast('已删除这条记录');
         break;
-      case 'take-song': {
-        if (songs[id]?.dataset !== 'real') break;
-        const original = sessionById(map, sessionId) || session;
-        api.update(state => { state.space.mapReturnId = original?.id || null; });
-        api.navigate('live', { intent: 'create-room', songDraft: songDraft(songs[id]), resumeSessionId: original?.id });
-        break;
-      }
-      case 'space': {
-        api.update(state => { state.space.mapReturnId = session?.id || null; });
-        if (dataset === 'real') {
-          const suggestion = getSavedMusic().find(track => track.dataset === 'real' && session.saved.some(item => item.id === track.id));
-          const payload = { from: 'real-map', intent: 'create-room', resumeSessionId: session.id };
-          if (suggestion) { const { savedAt, ...draft } = suggestion; payload.songDraft = draft; }
-          api.navigate('live', payload);
-        } else api.navigate('space', { showDemo: true });
-        break;
-      }
     }
   }
   container.addEventListener('click', event => runAction(event.target.closest('[data-map-action]')), { signal });

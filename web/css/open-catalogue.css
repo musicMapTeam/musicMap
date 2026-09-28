@@ -26,7 +26,6 @@
 .music-row__actions { display:flex; align-items:center; align-self:start; gap:5px; padding-top:20px; }
 .music-row__actions .music-row__save { width:32px; height:32px; min-height:32px; border-radius:50%; }
 .music-row__save.is-saved { color:var(--mint); background:color-mix(in srgb,var(--mint) 11%,transparent); }
-.music-row__actions .music-row__take { min-height:32px; padding:7px 10px; border-radius:20px; font-size:13px; white-space:nowrap; }
 .saved-music { width:100%; }
 .saved-music__heading { display:flex; justify-content:space-between; align-items:baseline; gap:16px; margin-bottom:14px; }
 .saved-music__heading h2 { margin:0; color:var(--text); font-size:18px; font-weight:550; }
@@ -36,7 +35,6 @@
 .saved-music__empty { display:grid; justify-items:center; gap:14px; padding:44px 22px; border:1px solid var(--line); border-radius:24px; background:color-mix(in srgb,var(--surface) 72%,transparent); }
 .saved-music__empty>.icon { width:28px; height:28px; color:var(--muted); }
 .saved-music__empty p { margin:0; font-size:13px; color:var(--muted); }
-html[data-theme] .map-track__actions .map-track__take { min-height:32px; padding:6px 8px; font-size:12px; white-space:nowrap; border-radius:16px; }
 
 @media(max-width:600px) {
   .open-catalogue { padding:23px 18px; }
@@ -47,6 +45,5 @@ html[data-theme] .map-track__actions .map-track__take { min-height:32px; padding
   .open-catalogue__copy small { font-size:12px; line-height:1.6; }
   .open-catalogue__record p { margin-left:31px; }
   .music-row__actions { gap:2px; }
-  .music-row__actions .music-row__take { padding:7px 9px; font-size:12px; }
   .music-row__actions .music-row__save { width:29px; height:29px; min-height:29px; }
 }
