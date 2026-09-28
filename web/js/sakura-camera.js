@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { gsap } from 'gsap';
+import { TALL_EXPLORE } from './sakura-framing.js';
 
 const desktop = {
   home: { eye: [10.7, 8.6, 16.5], at: [-.35, 1.0, -.1], fov: 40 },
@@ -34,9 +35,12 @@ export function createCameraDirector(camera, { size, reduced, onFrame, onShot, g
     const { key } = active;
     const { width, height } = size();
     const mobile = width <= 760;
-    // A tall phone looks at the record table from the west, so its long side runs down the screen.
-    // Decided by the viewport only (same rule as sakura-framing), so opening paper never rotates the table.
-    const tall = key === 'explore' && height > width * 1.9;
+    // Only a very tall screen looks at the record table from the west, so its long side runs down the screen.
+    // The free room between a phone's header tools and its dock or hand is wider than tall on common phones
+    // (measured 2026-09-29: 390×844 roam 366×319, 360×740 roam 336×215), where the lengthwise table printed
+    // up to a third smaller. Decided by the viewport only (same rule as sakura-framing), so opening paper, or
+    // switching between 寻声 and 完整图鉴, never turns the table.
+    const tall = key === 'explore' && height > width * TALL_EXPLORE;
     const shots = mobile ? portrait : desktop;
     // An unknown key frames the courtyard rather than a stop that no longer exists.
     const shot = tall ? tallExplore : shots[key] || shots.home;
@@ -44,9 +48,13 @@ export function createCameraDirector(camera, { size, reduced, onFrame, onShot, g
     const endEye = new THREE.Vector3(...shot.eye);
     const endFov = shot.fov;
     const layout = getLayout(key); const rect = layout.rect;
-    const bottomPadding = key === 'explore' ? (mobile ? 28 : 24) : 14;
-    const fitWidth = Math.max(1, rect.width - 24); const fitHeight = Math.max(1, rect.height - 12 - bottomPadding);
-    const centerX = (rect.left + rect.right) / 2; const centerY = (rect.top + 12 + rect.bottom - bottomPadding) / 2;
+    // A phone's record table is framed by its paper (sakura-scene), edge to edge of the free room: the
+    // room already keeps 9px from every control, and name tags may lie on the rim beyond the paper.
+    const paperOnly = key === 'explore' && mobile;
+    const sidePadding = paperOnly ? 4 : 12; const topPadding = paperOnly ? 4 : 12;
+    const bottomPadding = key === 'explore' ? (mobile ? 6 : 24) : 14;
+    const fitWidth = Math.max(1, rect.width - sidePadding * 2); const fitHeight = Math.max(1, rect.height - topPadding - bottomPadding);
+    const centerX = (rect.left + rect.right) / 2; const centerY = (rect.top + topPadding + rect.bottom - bottomPadding) / 2;
     const endFrame = { x: .5 - centerX / width, y: .5 - centerY / height };
     const bounds = getBounds(key);
     if (bounds && !bounds.isEmpty()) {

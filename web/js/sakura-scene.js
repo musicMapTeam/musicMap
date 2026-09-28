@@ -170,6 +170,9 @@ export function mountSakuraScene(host, { onAction, view = 'home', onShot } = {})
   const boundsOf = object => object ? new THREE.Box3().setFromObject(object) : new THREE.Box3();
   const subjectBounds = {
     explore: new THREE.Box3(new THREE.Vector3(-1.97, 1.0, -2.65), new THREE.Vector3(1.97, 1.6, .05)),
+    // A phone frames the printed paper itself (±1.86 × ±1.25 on the table top, see sakura-music), so the
+    // records fill the room between the header tools and the dock; the wooden rim may run under the paper UI.
+    explorePhone: new THREE.Box3(new THREE.Vector3(-1.86, 1.2, -2.55), new THREE.Vector3(1.86, 1.23, -.05)),
     records: boundsOf(model.shelf),
     home: new THREE.Box3(),
   };
@@ -274,7 +277,10 @@ export function mountSakuraScene(host, { onAction, view = 'home', onShot } = {})
     isActive: () => director.active.key === 'explore' && !director.travelling && !framing.layout.blocked,
     onChange() { renderer.shadowMap.needsUpdate = true; if (reduced.matches) requestDraw(); },
   });
-  function boundsForShot(key) { return subjectBounds[key] || subjectBounds.home; }
+  function boundsForShot(key) {
+    if (key === 'explore' && width <= 760) return subjectBounds.explorePhone;
+    return subjectBounds[key] || subjectBounds.home;
+  }
   const courtyardCenter = subjectBounds.home.getCenter(new THREE.Vector3());
   // Without the animation loop (reduced motion), every tween update and content change asks for a frame.
   // One table update fires dozens of those synchronously, so they share the next frame instead of each
