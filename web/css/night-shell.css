@@ -1,4 +1,4 @@
-/* night-shell — 0.15. Loaded last: the night venue, its shell and the front door.
+/* night-shell — 0.16. Loaded last: the night venue, its shell and the front door.
    Three surfaces: cream type on the night sky, lit paper for objects in the scene,
    and dark glass for the controls that stay on screen. With WebGL off
    (body.spatial-fallback) the page returns to light paper and dark ink. */
@@ -44,21 +44,14 @@ html[data-theme='sakura'] body:not(.spatial-fallback) .brand-mark i:nth-child(2)
 html[data-theme='sakura'] body:not(.spatial-fallback) .brand-mark i:nth-child(3) { background:#86b596; }
 
 /* ---------- Top-right tools: dark glass ---------- */
-html[data-theme='sakura'] body .courtyard-join { min-height:40px; padding:9px 16px; gap:8px; font:500 14px/1.2 var(--font-display); white-space:nowrap; }
-html[data-theme='sakura'] body:not(.spatial-fallback) .courtyard-join {
-  border:1px solid var(--night-glass-line); border-radius:22px; background:var(--night-glass);
-  color:var(--night-glass-ink); box-shadow:0 6px 18px #02041266;
-}
 html[data-theme='sakura'] body:not(.spatial-fallback) .masthead-tools .demo-help {
   width:40px; height:40px; min-width:40px; min-height:40px; border:1px solid var(--night-glass-line);
   border-radius:50%; background:var(--night-glass); color:var(--night-glass-ink); box-shadow:0 6px 18px #02041266;
 }
-html[data-theme='sakura'] body:not(.spatial-fallback) :is(.courtyard-join,.masthead-tools .demo-help):hover { background:var(--night-glass-strong); color:#fff; border-color:#ffffff40; }
-/* The front door carries its own 我有邀请码 link. */
-html[data-theme='sakura'] body[data-spatial-section='home'] .courtyard-join { display:none; }
+html[data-theme='sakura'] body:not(.spatial-fallback) .masthead-tools .demo-help:hover { background:var(--night-glass-strong); color:#fff; border-color:#ffffff40; }
 
 /* ---------- Focus on the night ---------- */
-html[data-theme='sakura'] body:not(.spatial-fallback) :is(.brand,.courtyard-join,.demo-help,.world-compass button,.mobile-nav .nav-item,.world-pin):focus-visible {
+html[data-theme='sakura'] body:not(.spatial-fallback) :is(.brand,.demo-help,.world-compass button,.mobile-nav .nav-item,.world-pin):focus-visible {
   outline:2px solid var(--night-amber); outline-offset:3px;
 }
 
@@ -110,26 +103,6 @@ html[data-theme='sakura'] body .home-paper.home-paper--compact { padding:14px 18
 @media(min-width:761px) {
   html[data-theme='sakura'] body .home-cover .home-paper { position:relative; inset:auto; width:344px; max-width:100%; pointer-events:auto; }
 }
-html[data-theme='sakura'] body .home-paper .home-first-card { display:flex; align-items:center; gap:12px; padding:4px 0 12px; }
-html[data-theme='sakura'] body .home-paper .home-first-card__art {
-  flex:none; display:grid; place-items:center; width:34px; height:34px; margin:0; border:0; border-radius:50%;
-  background:#f3e0de; color:#8f5566; box-shadow:none; transform:none;
-}
-html[data-theme='sakura'] body .home-paper .home-first-card__art .icon { width:18px; height:18px; }
-html[data-theme='sakura'] body .home-first-card__copy { min-width:0; }
-html[data-theme='sakura'] body .home-first-card__copy strong { display:block; font:500 20px/1.35 var(--font-serif); letter-spacing:.04em; color:var(--paper-ink); }
-html[data-theme='sakura'] body .home-first-card__copy small { display:block; margin:2px 0 0; font:400 12px/1.5 var(--font-display); color:var(--paper-muted); }
-html[data-theme='sakura'] body .home-paper .home-recent>summary {
-  display:flex; align-items:center; gap:8px; min-height:40px; padding:2px 0 8px;
-  list-style:none; cursor:pointer; font:600 14px/1.4 var(--font-display); color:var(--paper-ink);
-}
-html[data-theme='sakura'] body .home-paper .home-recent>summary small { font:500 12px/1 var(--font-mono); color:var(--paper-muted); }
-html[data-theme='sakura'] body .home-paper .home-recent>summary>.icon { width:14px; height:14px; margin-left:auto; color:var(--paper-muted); }
-html[data-theme='sakura'] body .home-paper .home-memory-list { margin:2px 0 12px; gap:10px; }
-html[data-theme='sakura'] body .home-paper .home-memory { color:var(--paper-ink); border-radius:3px; }
-html[data-theme='sakura'] body .home-paper .home-memory__copy small { font-size:12px; color:var(--paper-muted); margin-bottom:2px; }
-html[data-theme='sakura'] body .home-paper .home-memory__copy strong { font-size:14px; font-weight:600; }
-html[data-theme='sakura'] body .home-paper .home-memory:hover .home-memory__copy strong { color:#35614d; }
 html[data-theme='sakura'] body .home-paper .home-paper__actions { gap:8px; padding-top:12px; border-top:1px dashed #6b765840; }
 html[data-theme='sakura'] body .home-paper .home-paper__actions .button {
   min-height:46px; padding:11px 12px; gap:6px; border-radius:3px; font:600 14px/1.2 var(--font-display);
@@ -139,13 +112,11 @@ html[data-theme='sakura'] body .home-paper .home-paper__actions .button--seconda
 html[data-theme='sakura'] body .home-paper .home-paper__actions .button--secondary:hover:not(:disabled) { background:#f3ecd9; }
 html[data-theme='sakura'] body .home-paper .home-paper__actions .icon { width:16px; height:16px; }
 html[data-theme='sakura'] body .home-paper .home-paper__foot { display:flex; flex-wrap:wrap; justify-content:flex-start; gap:0 16px; margin-top:2px; }
-html[data-theme='sakura'] body .home-paper .home-paper__foot>[data-home='demo'] { margin-left:auto; }
 html[data-theme='sakura'] body .home-paper .home-paper__foot button {
   min-height:40px; padding:8px 0; font:500 13px/1.3 var(--font-display); color:var(--paper-muted);
 }
 html[data-theme='sakura'] body .home-paper .home-paper__foot button:hover { color:var(--paper-ink); }
 html[data-theme='sakura'] body .home-paper .home-paper__foot .icon { width:13px; height:13px; }
-html[data-theme='sakura'] body .home-paper .home-paper__status { padding:4px 0 8px; font-size:13px; color:var(--paper-muted); }
 html[data-theme='sakura'] body .home-paper::before { background:#b6bfa38c; }
 
 @media(prefers-reduced-motion:no-preference) {
@@ -191,23 +162,16 @@ html[data-theme='sakura'] body .world-pin::before {
   background:var(--night-amber); box-shadow:0 0 0 3px #ffc27a33,0 0 10px #ffc27a; vertical-align:1px;
 }
 html[data-theme='sakura'] body .world-pin:hover { background:#fff9ee; box-shadow:0 8px 22px #04061480,0 0 22px #ffc27a47; }
-html[data-theme='sakura'] body .world-pin--photo { min-height:32px; max-width:160px; padding:7px 12px 7px 10px; border-radius:6px; font:500 12px/1.2 var(--font-display); }
-html[data-theme='sakura'] body .world-pin--photo::before {
-  content:'↗'; width:auto; height:auto; margin:0 5px 0 0; background:none; box-shadow:none; font-size:12px; color:#8a5d68; vertical-align:0;
-}
 
 /* ---------- Paper in lamplight: every page's sheet sits on the night ---------- */
 html[data-theme='sakura'] body:not(.spatial-fallback) .main-content {
   background:#fffcf2fa; border-color:var(--paper-edge);
   box-shadow:var(--paper-shadow-night),inset 0 0 0 1px #62725a0a;
 }
-html[data-theme='sakura'] body:not(.spatial-fallback) :is(.live-room-ticket,.live-room-tray) { box-shadow:var(--paper-shadow-night); border-color:#ece3cc; }
-html[data-theme='sakura'] body dialog[open]:is(.live-dialog,.sp-dialog,.library-dialog,.map-dialog,.about-dialog,.memory-export) {
+html[data-theme='sakura'] body dialog[open]:is(.map-dialog,.about-dialog) {
   box-shadow:var(--paper-shadow-night),inset 6px 0 #e8e0ca,inset 7px 0 #d7cfb8;
 }
-html[data-theme='sakura'] body :is(.live-dialog,.sp-dialog,.library-dialog,.map-dialog,.about-dialog,.memory-export)::backdrop { background:#0a0d241f; backdrop-filter:none; }
-html[data-theme='sakura'] body:not(.spatial-fallback) .space-studio__sample { background:#fffcf3f0; font-size:12px; min-height:32px; }
-html[data-theme='sakura'] body:not(.spatial-fallback) .space-studio__actions { background:#fffcf3f5; box-shadow:var(--paper-shadow-night-soft); }
+html[data-theme='sakura'] body :is(.map-dialog,.about-dialog)::backdrop { background:#0a0d241f; backdrop-filter:none; }
 
 /* ---------- About ---------- */
 html[data-theme='sakura'] body .about-facts p b { font-size:14px; }
@@ -226,11 +190,18 @@ html[data-theme='sakura'] body.spatial-fallback .toast { box-shadow:0 12px 36px 
 /* ---------- Collection sheet ---------- */
 html[data-theme='sakura'] body .collection-page .records-heading>.button { min-height:40px; padding:9px 14px; font-size:13px; }
 
+/* ---------- Quiet button on paper ---------- */
+html[data-theme='sakura'] body .button--secondary { background:#fffdf6; color:var(--paper-ink); }
+html[data-theme='sakura'] body .button--secondary:hover:not(:disabled) { background:#f3ecd9; color:var(--paper-ink); }
+
 /* ---------- Tablet ---------- */
 @media(min-width:761px) and (max-width:1100px) {
   html[data-theme='sakura'] body .home-cover { left:32px; top:96px; width:360px; gap:22px; }
   html[data-theme='sakura'] body .home-cover .home-paper { width:332px; }
   html[data-theme='sakura'] body .world-caption { left:24px; }
+  /* The narrower column may wrap the steps: their numbers separate them, so no rule can lead a line. */
+  html[data-theme='sakura'] body .home-hero__steps { column-gap:14px; }
+  html[data-theme='sakura'] body .home-hero__steps>li+li { margin-left:0; padding-left:0; border-left:0; }
 }
 /* Short desktop windows set the title on one line. */
 @media(min-width:761px) and (max-height:780px) {
@@ -250,8 +221,6 @@ html[data-theme='sakura'] body .collection-page .records-heading>.button { min-h
   html[data-theme='sakura'] body .app-studio-shell .brand { gap:8px; }
   html[data-theme='sakura'] body .app-studio-shell .brand-wordmark { font-size:15px; letter-spacing:.1em; }
   html[data-theme='sakura'] body .brand-wordmark small { margin-top:2px; font-size:12px; letter-spacing:.02em; }
-  html[data-theme='sakura'] body .courtyard-join { min-height:38px; padding:8px 12px; gap:6px; font-size:13px; }
-  html[data-theme='sakura'] body .courtyard-join>.icon { width:15px; height:15px; }
   html[data-theme='sakura'] body:not(.spatial-fallback) .masthead-tools .demo-help { width:38px; height:38px; min-width:38px; min-height:38px; }
 
   html[data-theme='sakura'] body .home-cover { display:contents; }
@@ -262,18 +231,16 @@ html[data-theme='sakura'] body .collection-page .records-heading>.button { min-h
   html[data-theme='sakura'] body .home-hero__title>span { display:inline-block; }
   html[data-theme='sakura'] body .home-hero__title>span:last-child { margin-left:0; }
   html[data-theme='sakura'] body .home-hero__lede { margin-bottom:8px; font-size:15px; line-height:1.6; }
-  html[data-theme='sakura'] body .home-hero__steps { font-size:12px; }
-  html[data-theme='sakura'] body .home-hero__steps>li+li { margin-left:8px; padding-left:9px; }
+  html[data-theme='sakura'] body .home-hero__steps { column-gap:12px; font-size:12px; }
+  html[data-theme='sakura'] body .home-hero__steps>li+li { margin-left:0; padding-left:0; border-left:0; }
   html[data-theme='sakura'] body .home-paper { left:16px; right:16px; bottom:92px; width:auto; }
   html[data-theme='sakura'] body .home-paper.home-paper--compact { padding:12px 16px 4px; }
-  html[data-theme='sakura'] body .home-paper .home-first-card { padding:2px 0 10px; }
   html[data-theme='sakura'] body .home-paper .home-paper__actions { padding-top:10px; }
   html[data-theme='sakura'] body .home-paper .home-paper__foot button { min-height:38px; }
 
   html[data-theme='sakura'] body .world-caption { top:70px; left:16px; }
   html[data-theme='sakura'] body .world-caption>strong { font-size:16px; }
   html[data-theme='sakura'] body .world-pin { min-height:32px; padding:7px 12px 7px 10px; font-size:12px; }
-  html[data-theme='sakura'] body .world-pin--photo { max-width:128px; font-size:12px; }
 
   html[data-theme='sakura'] body:not(.spatial-fallback) .mobile-nav {
     left:16px; right:16px; bottom:max(12px,env(safe-area-inset-bottom)); gap:3px; padding:5px;
@@ -286,11 +253,11 @@ html[data-theme='sakura'] body .collection-page .records-heading>.button { min-h
   html[data-theme='sakura'] body:not(.spatial-fallback) .mobile-nav .nav-item>.icon { width:20px; height:20px; }
   html[data-theme='sakura'] body:not(.spatial-fallback) .mobile-nav .nav-item.active { background:var(--paper-lit); color:#223a2e; font-weight:600; }
 }
-/* The narrowest phones keep the invite pill on one line; the brand's subtitle steps aside (it stays in the brand's label). */
+/* The narrowest phones keep the masthead on one line; the brand's subtitle steps aside (it stays in the brand's label). */
 @media(max-width:340px) {
   html[data-theme='sakura'] body:not([data-spatial-section='home']) .brand-wordmark small { display:none; }
 }
-@media(max-width:760px) and (max-height:700px) {
+@media(max-width:760px) and (max-height:760px) {
   html[data-theme='sakura'] body .home-hero__steps { display:none; }
 }
 @media(max-width:760px) and (max-height:620px) {
@@ -299,8 +266,6 @@ html[data-theme='sakura'] body .collection-page .records-heading>.button { min-h
   html[data-theme='sakura'] body .home-hero__title { margin-bottom:0; }
   /* Short phones: the slip gives the courtyard a little more height. */
   html[data-theme='sakura'] body .home-paper.home-paper--compact { padding-top:10px; }
-  html[data-theme='sakura'] body .home-paper .home-first-card { padding-bottom:8px; }
-  html[data-theme='sakura'] body .home-paper .home-first-card__copy strong { font-size:18px; }
   html[data-theme='sakura'] body .home-paper .home-paper__actions { padding-top:8px; }
   html[data-theme='sakura'] body .home-paper .home-paper__actions .button { min-height:44px; }
   html[data-theme='sakura'] body .home-paper .home-paper__foot button { min-height:36px; }

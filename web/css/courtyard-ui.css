@@ -15,33 +15,22 @@ html[data-theme='sakura'] .brand-mark i:nth-child(2) { height:22px; transform:ro
 html[data-theme='sakura'] .brand-mark i:nth-child(3) { height:22px; transform:rotate(240deg); background:#446d57; }
 html[data-theme='sakura'] .primary-nav { display:none; }
 html[data-theme='sakura'] .masthead-tools { position:static; gap:10px; pointer-events:auto; }
-.courtyard-join { display:inline-flex; align-items:center; gap:7px; min-height:40px; padding:9px 15px; border:1px solid #fff9; border-radius:22px; background:#fffdf4eb; box-shadow:0 3px 12px #3349360b; color:#476050; font-size:14px; }
-.courtyard-join>.icon { width:16px; height:16px; }
 html[data-theme='sakura'] .masthead-tools .demo-help { width:40px; height:40px; min-width:40px; min-height:40px; color:#40584a; background:#fffdf4b8; }
 /* Place name, compass and place labels are dark glass and lantern paper: see night-shell.css. */
 .world-compass { bottom:25px; gap:0; }
 html[data-theme='sakura'] .main-content { top:94px; right:32px; bottom:97px; width:530px; max-width:calc(100vw - 64px); padding:25px; border-radius:9px 24px 24px 24px; border:1px solid #ffffffe0; background:#fffdf5f7; box-shadow:0 15px 60px #334b3324,inset 0 0 0 1px #62725a0a; }
-html[data-theme='sakura'] :is(.sp-dialog,.live-dialog,.map-dialog) { top:94px; right:32px; width:530px; max-width:calc(100vw - 64px); max-height:calc(100dvh - 118px); border-radius:9px 24px 24px 24px; border:1px solid #fff; box-shadow:0 15px 70px #30443229; }
+html[data-theme='sakura'] .map-dialog { top:94px; right:32px; width:530px; max-width:calc(100vw - 64px); max-height:calc(100dvh - 118px); border-radius:9px 24px 24px 24px; border:1px solid #fff; box-shadow:0 15px 70px #30443229; }
 html[data-theme='sakura'] .about-dialog { width:min(440px,calc(100vw - 32px)); padding:28px; border-radius:10px 24px 24px 24px; color:var(--text); }
 .about-intro { margin:4px 0 23px; font:500 27px/1.5 'Songti SC','SimSun',serif; color:var(--mint); }
 html[data-theme='sakura'] .about-facts p { padding:12px 0; margin:0; border-color:var(--line); }
 html[data-theme='sakura'] .about-dialog #start-experience { margin-top:24px; }
 html[data-theme='sakura'] .button--primary { box-shadow:inset 0 1px #ffffff1a,0 3px 6px #34543d0f; }
 html[data-theme='sakura'] .button--primary:hover:not(:disabled) { background:#294f3e; }
+/* Front door: the section is a plain frame; hero and slip are placed in night-shell.css (spatial-world.css makes it full height over the scene). */
+.home-studio { position:relative; isolation:isolate; width:100%; margin:0; padding:0; }
 .home-paper { position:absolute; right:32px; bottom:104px; width:312px; padding:16px 18px 10px; border:1px solid #ffffffed; border-radius:5px 20px 20px 20px; background:#fffdf3f7; box-shadow:0 15px 50px #42513c20,0 2px 5px #3040320b; color:var(--text); pointer-events:auto; }
 .home-paper::before { content:''; position:absolute; left:18px; top:-5px; width:37px; height:10px; transform:rotate(-6deg); background:#b1c2a18c; }
-.home-memory-list { display:grid; gap:9px; margin:2px 0 14px; }
-.home-memory { display:flex; align-items:center; gap:11px; width:100%; border:0; padding:0; background:none; text-align:left; color:var(--text); }
-.home-memory__image { flex:none; width:43px; height:51px; overflow:hidden; padding:3px 3px 9px; border:1px solid #e8e4d7; background:#fff; transform:rotate(-5deg); box-shadow:0 3px 5px #3b50341a; }
-.home-memory:nth-child(2) .home-memory__image { transform:rotate(4deg); }
-.home-memory__image img { width:100%; height:100%; object-fit:cover; }
-.home-memory__copy { min-width:0; flex:1; }
-.home-memory__copy small { display:block; font-size:12px; color:var(--muted); margin-bottom:3px; }
-.home-memory__copy strong { display:block; max-width:100%; font-size:14px; line-height:1.6; font-weight:550; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.home-memory>.icon { width:15px; height:15px; color:var(--mint); }
-.home-first-card { display:flex; align-items:center; gap:16px; padding:11px 0 20px; }
-.home-first-card__art { display:grid; place-items:center; width:47px; height:56px; color:#8b6070; background:#eee0d9; border:5px solid #fffdf5; border-bottom-width:12px; box-shadow:1px 3px 7px #42503c20; transform:rotate(-9deg); }
-.home-first-card__art .icon { width:24px; height:24px; }
+/* The slip's round button and footer links. */
 .home-paper__actions { display:flex; gap:7px; padding-top:13px; border-top:1px dashed #6b765838; }
 html[data-theme='sakura'] .home-paper__actions .button { padding:11px 10px; min-height:44px; font-size:14px; border-radius:10px; gap:6px; }
 .home-paper__actions .button:first-child { flex:1.2; }
@@ -50,41 +39,9 @@ html[data-theme='sakura'] .home-paper__actions .button { padding:11px 10px; min-
 .home-paper__foot { display:flex; justify-content:space-between; gap:6px; margin-top:5px; }
 .home-paper__foot button { display:flex; align-items:center; gap:4px; min-height:35px; padding:7px 0; border:0; background:none; color:#657160; font-size:13px; }
 .home-paper__foot .icon { width:12px; height:12px; }
-.home-paper__status { display:block; padding:8px 0; color:var(--muted); font-size:13px; }
-.home-paper__status button { border:0; background:none; color:var(--mint); text-decoration:underline; }
-.home-fallback-cards { display:none; }
 body.spatial-fallback .home-paper { position:relative; inset:auto; width:100%; }
-body.spatial-fallback .home-fallback-cards { display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:25px; }
-.home-fallback-cards button { padding:7px; border:1px solid var(--line); border-radius:12px; background:var(--paper); }
-.home-fallback-cards img { width:100%; aspect-ratio:.8; object-fit:cover; }
-.home-fallback-cards span { display:block; font-size:13px; padding:10px 0; }
 /* The masthead passes clicks through; without the compass this bar is the only way between places. */
 html[data-theme='sakura'] body.spatial-fallback .primary-nav { display:flex; position:fixed; top:auto; bottom:22px; left:50%; width:auto; transform:translateX(-50%); flex-direction:row; pointer-events:auto; }
-html[data-theme='sakura'] .live-entry-head { margin-bottom:18px; }
-html[data-theme='sakura'] .live-entry-copy { padding:6px 0; border:0; border-radius:0; background:none; box-shadow:none; }
-html[data-theme='sakura'] .live-entry-copy h1 { font:500 26px/1.5 'Songti SC','SimSun',serif; margin-bottom:24px; }
-html[data-theme='sakura'] .live-gate-note { margin-top:15px; font-size:12px; line-height:1.7; }
-html[data-theme='sakura'] .live-room-head h1 { font:550 23px/1.5 var(--font-display); letter-spacing:.01em; }
-.live-room-menu { position:relative; color:var(--muted); font-size:12px; }
-.live-room-menu>summary { display:flex; align-items:center; justify-content:center; gap:5px; list-style:none; cursor:pointer; min-height:38px; padding:8px; }
-.live-room-menu>summary::-webkit-details-marker { display:none; }
-.live-room-menu>summary>.icon { width:12px; height:12px; transition:transform .18s; }
-.live-room-menu[open]>summary>.icon { transform:rotate(90deg); }
-.live-room-menu__items { position:absolute; z-index:7; top:100%; right:0; min-width:120px; padding:7px 13px; border:1px solid var(--line); border-radius:12px; background:var(--studio-panel); box-shadow:var(--studio-shadow); }
-html[data-theme='sakura'] .live-room-menu__items .text-button { display:flex; width:100%; min-height:41px; text-align:left; color:var(--text); }
-html[data-theme='sakura'] .live-compose__context [data-compose-draft] { margin-left:auto; font-size:12px; color:#955b65; white-space:nowrap; }
-html[data-theme='sakura'] .live-compose__context [data-compose-draft][hidden] { display:none; }
-html[data-theme='sakura'] .live-compose__context>span:nth-child(2) { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-html[data-theme='sakura'] .live-own-section .live-card { background:#f1eee3; border:1px solid #6b735319; padding:7px; border-radius:5px 15px 15px 15px; box-shadow:0 3px 9px #4e624211; }
-html[data-theme='sakura'] .live-card-photo { border-radius:4px; }
-html[data-theme='sakura'] .main-content .live-own-actions { gap:8px; }
-html[data-theme='sakura'] .main-content .live-own-actions>.button { flex:none; }
-html[data-theme='sakura'] .main-content .live-own-actions>.text-button { margin-left:auto; }
-html[data-theme='sakura'] .live-room-ribbon { margin-bottom:22px; border-bottom:1px dashed var(--line); }
-html[data-theme='sakura'] .live-empty-memory { font-size:12px; padding:13px 0; }
-html[data-theme='sakura'] .library-card { padding:8px; background:#fffdf5; border:1px solid #69745a20; border-radius:4px 15px 15px 15px; box-shadow:0 4px 12px #3b4f3310; }
-html[data-theme='sakura'] .library-card__cover { border-radius:4px; }
-html[data-theme='sakura'] .library-toolbar { margin-bottom:17px; }
 html[data-theme='sakura'] .collection-page .records-filters { width:100%; margin-bottom:19px; background:#f0eee3; border-radius:12px; padding:4px; }
 html[data-theme='sakura'] .collection-page .records-filters button { flex:1; border-radius:9px; min-height:36px; padding:8px 10px; font-size:12px; }
 html[data-theme='sakura'] .records-filters button[aria-pressed='true'] { background:#fffdf6; box-shadow:0 2px 6px #3f4d3610; color:var(--mint); }
@@ -102,7 +59,7 @@ html[data-theme='sakura'] .map-studio .map-artist-panel { padding:0; border:0; b
 html[data-theme='sakura'] .map-studio .map-studio-dock { padding:10px 0; margin-top:8px; background:none; }
 html[data-theme='sakura'] .map-studio .map-foot { margin-top:3px; padding:7px 0; }
 @media(min-width:761px) and (max-width:1100px) {
-  html[data-theme='sakura'] .main-content,html[data-theme='sakura'] :is(.sp-dialog,.live-dialog,.map-dialog) { width:440px; right:22px; }
+  html[data-theme='sakura'] .main-content,html[data-theme='sakura'] .map-dialog { width:440px; right:22px; }
   .home-paper { right:22px; width:290px; }
 }
 @media(max-width:760px) {
@@ -112,25 +69,15 @@ html[data-theme='sakura'] .map-studio .map-foot { margin-top:3px; padding:7px 0;
   html[data-theme='sakura'] .masthead-tools { gap:5px; }
   html[data-theme='sakura'] .masthead-tools .demo-help { width:38px; height:38px; min-width:38px; min-height:38px; }
   html[data-theme='sakura'] .main-content { top:32dvh; left:12px; right:12px; bottom:87px; width:auto; max-width:none; padding:20px; border-radius:8px 24px 24px 24px; }
-  html[data-theme='sakura'] :is(.sp-dialog,.live-dialog,.map-dialog) { inset:auto 12px 87px; width:auto; max-width:none; max-height:72dvh; padding:20px; border-radius:8px 24px 24px 24px; }
-  html[data-theme='sakura'] .live-dialog.live-dialog--compose { --compose-max-height:76dvh; }
+  html[data-theme='sakura'] .map-dialog { inset:auto 12px 87px; width:auto; max-width:none; max-height:72dvh; padding:20px; border-radius:8px 24px 24px 24px; }
   /* Light paper navigation remains for the WebGL fallback; the night version is glass (night-shell.css). */
   html[data-theme='sakura'] .mobile-nav { left:16px; right:16px; bottom:max(12px,env(safe-area-inset-bottom)); padding:5px; border:1px solid #fff; border-radius:22px; background:#fffdf5f7; box-shadow:0 6px 24px #4c644124; }
   html[data-theme='sakura'] .mobile-nav .nav-item { flex:1; flex-direction:column; gap:3px; min-height:54px; padding:6px 2px; border-radius:17px; font-size:12px; color:#56655a; }
   html[data-theme='sakura'] .mobile-nav .nav-item>.icon { width:20px; height:20px; }
   html[data-theme='sakura'] .mobile-nav .nav-item.active { color:#2c4f3b; background:#e5eadb; }
   .home-paper { right:16px; left:16px; bottom:92px; width:auto; }
-  .home-memory-list { grid-template-columns:1fr; margin-bottom:10px; }
-  .home-memory__image { width:36px; height:44px; }
-  html[data-theme='sakura'] .live-room-head h1 { font-size:21px; }
-  html[data-theme='sakura'] .live-room-ribbon { flex-wrap:nowrap; margin:14px 0 18px; }
-  html[data-theme='sakura'] .live-room-ribbon>span:first-child { flex-basis:auto; min-width:0; }
-  html[data-theme='sakura'] .main-content .live-own-actions>.text-button { margin-left:0; font-size:12px; }
   html[data-theme='sakura'] .collection-page .records-filters button { font-size:12px; padding:8px 4px; }
   html[data-theme='sakura'] .map-studio .map-stage-column,html[data-theme='sakura'] .map-studio .map-stage { min-height:270px; height:270px; }
   html[data-theme='sakura'] body.spatial-fallback .primary-nav { display:none; }
   html[data-theme='sakura'] body.spatial-fallback .main-content { margin:79px 12px 100px; }
-}
-@media(prefers-reduced-motion:reduce) {
-  .live-room-menu>summary>.icon { transition:none; }
 }
