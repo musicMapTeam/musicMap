@@ -4,15 +4,11 @@ import { gsap } from 'gsap';
 const desktop = {
   home: { eye: [10.7, 8.6, 16.5], at: [-.35, 1.0, -.1], fov: 40 },
   explore: { eye: [.25, 8.35, .16], at: [0, 1.22, -1.3], fov: 42 },
-  live: { eye: [-.6, 3.6, 7.1], at: [-3.8, 1.6, 1.4], fov: 40 },
-  editor: { eye: [7.2, 5.6, 5.5], at: [4, 1, 1.6], fov: 37 },
   records: { eye: [-.6, 2.4, 1.3], at: [1.3, 1.25, -2.3], fov: 46 },
 };
 const portrait = {
   home: { eye: [12, 18, 29], at: [-.8, .8, .3], fov: 43 },
   explore: { eye: [.08, 12, 1.4], at: [0, 1.22, -1.3], fov: 45 },
-  live: { eye: [-3, 4.4, 10.8], at: [-3.8, 1.5, 1.4], fov: 48 },
-  editor: { eye: [6.6, 5.5, 6.6], at: [4, 1, 1.6], fov: 43 },
   records: { eye: [-.55, 2.4, 2.8], at: [1.2, 1.25, -2.3], fov: 46 },
 };
 
@@ -25,7 +21,7 @@ export function createCameraDirector(camera, { size, reduced, onFrame, onShot, g
   let tween;
   let settle;
   let pending = Promise.resolve(true);
-  let active = { key: 'home', id: null, point: null };
+  let active = { key: 'home' };
   let navigationMove = false;
   function projection() {
     const { width, height } = size();
@@ -35,22 +31,24 @@ export function createCameraDirector(camera, { size, reduced, onFrame, onShot, g
   }
   function stop() { tween?.kill(); tween = null; navigationMove = false; settle?.(false); settle = null; }
   function destination() {
-    const { key, id, point } = active;
+    const { key } = active;
     const { width, height } = size();
     const mobile = width <= 760;
     // A tall phone looks at the record table from the west, so its long side runs down the screen.
     // Decided by the viewport only (same rule as sakura-framing), so opening paper never rotates the table.
     const tall = key === 'explore' && height > width * 1.9;
-    const shot = tall ? tallExplore : (mobile ? portrait : desktop)[key] || desktop.live;
-    const endTarget = point?.clone() || new THREE.Vector3(...shot.at);
-    const endEye = point ? point.clone().add(new THREE.Vector3(mobile ? .65 : 1.35, mobile ? .65 : .8, mobile ? 4.6 : 3.7)) : new THREE.Vector3(...shot.eye);
-    const endFov = point ? 39 : shot.fov;
+    const shots = mobile ? portrait : desktop;
+    // An unknown key frames the courtyard rather than a stop that no longer exists.
+    const shot = tall ? tallExplore : shots[key] || shots.home;
+    const endTarget = new THREE.Vector3(...shot.at);
+    const endEye = new THREE.Vector3(...shot.eye);
+    const endFov = shot.fov;
     const layout = getLayout(key); const rect = layout.rect;
     const bottomPadding = key === 'explore' ? (mobile ? 28 : 24) : 14;
     const fitWidth = Math.max(1, rect.width - 24); const fitHeight = Math.max(1, rect.height - 12 - bottomPadding);
     const centerX = (rect.left + rect.right) / 2; const centerY = (rect.top + 12 + rect.bottom - bottomPadding) / 2;
     const endFrame = { x: .5 - centerX / width, y: .5 - centerY / height };
-    const bounds = getBounds(key, id);
+    const bounds = getBounds(key);
     if (bounds && !bounds.isEmpty()) {
       const backward = endEye.clone().sub(endTarget).normalize();
       const right = new THREE.Vector3().crossVectors(camera.up, backward).normalize();
@@ -91,25 +89,25 @@ export function createCameraDirector(camera, { size, reduced, onFrame, onShot, g
         projection(); onFrame();
       },
       onComplete() { tween = null; const wasNavigation = navigationMove; navigationMove = false;
-        if (wasNavigation) onShot(active.key, active.id, false); settle?.(true); settle = null;
+        if (wasNavigation) onShot(active.key, false); settle?.(true); settle = null;
       },
     });
   }
-  function go(key, { point = null, id = null, immediate = false, force = false } = {}) {
-    if (!force && active.key === key && active.id === id) return pending;
-    stop(); active = { key, id, point: point?.clone() || null };
+  function go(key, { immediate = false, force = false } = {}) {
+    if (!force && active.key === key) return pending;
+    stop(); active = { key };
     navigationMove = !immediate && !reduced.matches;
-    onShot(key, id, navigationMove);
+    onShot(key, navigationMove);
     const end = destination();
-    if (!navigationMove) { arrive(end); onShot(key, id, false); pending = Promise.resolve(true); return pending; }
+    if (!navigationMove) { arrive(end); onShot(key, false); pending = Promise.resolve(true); return pending; }
     pending = new Promise(resolve => { settle = resolve; });
-    animate(end, key === 'photo' ? .82 : 1.05); return pending;
+    animate(end, 1.05); return pending;
   }
   function reframe(immediate = false) {
     if (getLayout(active.key).blocked) { projection(); onFrame(); return pending; }
     const end = destination(); tween?.kill(); tween = null;
     if (immediate || reduced.matches) {
-      arrive(end); if (navigationMove) onShot(active.key, active.id, false);
+      arrive(end); if (navigationMove) onShot(active.key, false);
       navigationMove = false; settle?.(true); settle = null;
     } else animate(end, navigationMove ? .4 : .28);
     return pending;

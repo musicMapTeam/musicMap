@@ -50,7 +50,7 @@ export function createSakuraPrintwork({ THREE, textures, materials }) {
         context.beginPath(); context.moveTo(24, 365 + i * 19);
         context.bezierCurveTo(167, 246 + i * 18, 316, 353 + i * 13, 488, 213 + i * 17); context.stroke();
       }
-      type(context, 'AFTER THE SHOW', 32, 57, 25);
+      type(context, 'FOLLOW A VOICE', 32, 57, 25);
       type(context, 'SIDE A   /   33 RPM', 32, 487, 17);
     } else if (edition === 1) {
       for (let i = 0; i < 9; i++) {

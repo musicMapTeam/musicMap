@@ -5,8 +5,9 @@ const WATCH = [
   '.map-studio-head', '.map-studio-title', '.map-studio-tools', '.map-stage-top',
   '.map-round-slip', '.map-round-tools', '.map-round-note', '.map-round-hand',
   '.map-studio-dock', '.map-undo',
-  '.live-room-ticket', '.live-room-tray', '#live-surface[data-live-state="entry"]', '.home-paper', '.home-hero',
-  '.main-content', 'dialog[open]', '.live-room-menu[open] .live-room-menu__items',
+  // The Map home reuses the courtyard cover: its headline and the compact paper.
+  '.home-paper', '.home-hero',
+  '.main-content', 'dialog[open]',
 ].join(',');
 const INK = '.brand,.masthead-tools,.world-caption,.world-compass,.mobile-nav,.home-hero';
 const overlaps = (a, b, gap = 0) => a.left < b.right + gap && a.right > b.left - gap && a.top < b.bottom + gap && a.bottom > b.top - gap;
@@ -40,7 +41,7 @@ export function createSakuraFraming(host, { getShot, onChange, onLabelsChange })
     const horizontal = [...new Set([base.left, base.right, ...obstacles.flatMap(item => [clampX(item.left - 9), clampX(item.right + 9)])])].sort((a, b) => a - b);
     // A tall phone turns the record table lengthwise (see sakura-camera), so it wants a tall frame.
     const tall = key === 'explore' && layoutHeight > layoutWidth * 1.9;
-    const desired = tall ? .7 : ({ explore: 1.5, live: 1.4, home: 1.7, editor: 1.25, records: .8, photo: .95 })[key] || 1.3;
+    const desired = tall ? .7 : ({ explore: 1.5, home: 1.7, records: .8 })[key] || 1.3;
     const minWidth = mobile ? base.width * .7 : Math.min(340, base.width * .42);
     let best = null; let bestScore = -1;
     for (let leftIndex = 0; leftIndex < horizontal.length - 1; leftIndex++) for (let rightIndex = leftIndex + 1; rightIndex < horizontal.length; rightIndex++) {
