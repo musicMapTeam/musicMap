@@ -19,7 +19,7 @@ html[data-theme='sakura'] body .home-search__field input:focus-visible { outline
 
 html[data-theme='sakura'] body .home-search__picks { display:flex; flex-wrap:wrap; gap:6px; margin:8px 0 0; }
 html[data-theme='sakura'] body .home-pick {
-  display:inline-flex; align-items:center; gap:7px; min-height:40px; margin:0; padding:6px 13px 6px 11px;
+  display:inline-flex; align-items:center; gap:7px; min-height:44px; margin:0; padding:6px 13px 6px 11px;
   border:1px solid #566b5140; border-radius:999px; background:#fffdf6; color:var(--paper-ink);
   font:500 14px/1.2 var(--font-display); white-space:nowrap; transition:background .18s,border-color .18s;
 }

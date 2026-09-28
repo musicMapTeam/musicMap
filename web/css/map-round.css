@@ -236,8 +236,10 @@ html[data-theme='sakura'] body .map-dialog {
   & .map-track__copy span { font-size:13px; line-height:1.55; color:#5d6858; }
   & .map-track__copy small, & .map-track__copy .map-track__credit-preview { display:block; margin-top:2px; font-size:12px; line-height:1.55; color:#6b6a5c; }
   & .map-track__index { font-size:12px; }
-  & .map-track__listen { font-size:13px; min-height:38px; }
-  & .map-track__save { width:40px; min-width:40px; height:40px; min-height:40px; }
+  & .map-track__listen { font-size:13px; min-height:44px; }
+  & .map-track__save { width:44px; min-width:44px; height:44px; min-height:44px; }
+  /* A song title that opens its credits keeps the row's rhythm but takes a 44px tap band across its line. */
+  & .map-track__copy .map-track__title { position:relative; min-width:44px; padding-block:10.5px; margin-block:-10.5px; }
   & .map-credits>summary { font-size:13px; }
   & .map-credits>summary small { font-size:12px; }
   & .map-credit-table { font-size:13px; }
@@ -254,7 +256,7 @@ html[data-theme='sakura'] body .map-dialog {
   & .map-field { font-size:14px; }
   & .map-field select, & .map-input { font-size:15px; }
   & .map-form-error { font-size:13px; }
-  & .map-panel-actions .button { min-height:42px; font-size:14px; }
+  & .map-panel-actions .button { min-height:44px; font-size:14px; }
   & .map-recap-stats>span { font-size:13px; }
   & .map-recap-section h3 { font-size:14px; }
   & .map-current-route { font-size:14px; }
@@ -267,6 +269,51 @@ html[data-theme='sakura'] body .map-dialog {
   & .map-search-result small { font-size:12px; }
   & .map-search-label { font-size:13px; }
   & .map-inline-empty { font-size:14px; }
+}
+/* ---------- 本次发现 / 探索回顾 of a roam: overview, kept songs, legs of the walk, singers ---------- */
+html[data-theme='sakura'] body .map-dialog {
+  & .map-recap-overview { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); margin:6px 0 18px; padding:10px 0; border-block:2px dashed #d8ccad; }
+  & .map-recap-overview>div { display:flex; flex-direction:column; gap:2px; min-width:0; padding:0 12px; border-left:1px solid #e3d8bd; }
+  & .map-recap-overview>div:first-child { padding-left:0; border-left:0; }
+  & .map-recap-overview dt { font-size:12px; letter-spacing:.08em; color:#6b6a5c; }
+  & .map-recap-overview dd { margin:0; font:500 15px/1.45 var(--round-serif); color:#1f3a2d; overflow-wrap:anywhere; }
+  & .map-recap-overview dd b { font:600 22px/1.2 var(--round-serif); color:#2f5e4e; font-variant-numeric:tabular-nums; }
+  & .map-recap-kept { margin-top:0; }
+  & .map-recap-kept h3 { margin-bottom:4px; }
+  & .map-recap-kept .map-track { border-bottom:1px dashed #e3d8bd; }
+  & .map-track__copy .map-track__source { color:#2f5e4e; }
+  & .map-dialog__content .map-undo { position:static; display:flex; align-items:center; justify-content:space-between; gap:10px; max-width:none; margin:10px 0 0; padding:6px 6px 6px 12px; border:1px solid #d8ccad; border-radius:3px; background:#f4ecd8; box-shadow:none; color:#24382d; font-size:14px; }
+  & .map-dialog__content .map-undo .button { min-height:44px; padding:8px 14px; }
+  & .map-recap-fold>summary { min-height:48px; }
+  & .map-walk { margin:4px 0 14px; }
+  /* Each leg has its own rail: no ink joins the last record of one leg to the first of the next. */
+  & .map-walk__leg { margin:0; padding:0 0 0 20px; list-style:none; border-left:2px solid #d9b98a; }
+  & .map-walk__hop { position:relative; padding:8px 0 10px; }
+  & .map-walk__hop::before { content:''; position:absolute; left:-27px; top:13px; width:12px; height:12px; border-radius:50%; background:var(--node-tone); box-shadow:0 0 0 3px #fbf3e2,0 0 0 4px #b98642; }
+  & .map-walk__hop h4 { margin:0 0 2px; font:500 15px/1.5 var(--round-serif); color:#1f3a2d; }
+  & .map-walk__hop h4 span[aria-hidden] { padding:0 4px; color:#8a8474; }
+  & .map-walk__hop>p { margin:0 0 2px; font-size:13px; line-height:1.55; color:#5d6858; }
+  & .map-walk__hop .map-track { padding-bottom:0; }
+  & .map-walk__turn { display:flex; align-items:center; gap:8px; margin:8px 0; padding:8px 12px; border:1px dashed #cdb98f; border-radius:2px; background:#f4ecd8; color:#8f4452; font-size:14px; line-height:1.5; }
+  & .map-walk__turn span { font-size:16px; }
+  & .map-recap-people { display:grid; margin:2px 0 10px; padding:0; list-style:none; }
+  & .map-recap-people li { display:flex; align-items:center; gap:12px; min-height:56px; padding:4px 0; border-bottom:1px dashed #e3d8bd; }
+  & .map-recap-people__sleeve { flex:none; display:grid; place-items:center; width:32px; height:32px; background:var(--node-tone); border:3px solid #fffdf3; box-shadow:1px 2px 0 #c7bfa3; transform:rotate(-6deg); }
+  & .map-recap-people__sleeve i { width:14px; height:14px; border-radius:50%; background:repeating-radial-gradient(#4b5b53 0 1px,#849282 2px 3px); }
+  & .map-recap-people__name { flex:1; min-width:0; font:500 16px/1.4 var(--round-serif); color:#1f3a2d; overflow-wrap:anywhere; }
+  & .map-recap-people__name small { display:inline-block; margin-left:8px; padding:1px 6px; border-radius:2px; background:#2f5e4e; color:#fff9ec; font:600 12px/1.4 var(--font-display); letter-spacing:.04em; vertical-align:2px; }
+  & .map-recap-people__go { flex:none; min-height:44px; padding:8px 12px; border:1px solid #d8ccad; border-radius:3px; background:#f6efdc; color:#24382d; font-size:14px; gap:6px; }
+  & .map-recap-people__go .icon { width:14px; height:14px; }
+  & .map-recap-next .button, & .map-dialog--replace .map-panel-actions .button { min-height:44px; }
+}
+@media(max-width:520px) {
+  html[data-theme='sakura'] body .map-dialog {
+    & .map-recap-overview { grid-template-columns:repeat(2,minmax(0,1fr)); row-gap:10px; }
+    & .map-recap-overview>div:nth-child(3) { padding-left:0; border-left:0; }
+    & .map-recap-next { display:grid; grid-template-columns:1fr 1fr; }
+    & .map-recap-next .button { justify-content:center; }
+    & .map-recap-next .button:first-child { grid-column:1/-1; }
+  }
 }
 .map-timeline__tone { margin-left:6px; padding:0 5px; border:1.5px solid currentColor; border-radius:50%; font:700 12px/1.4 var(--round-serif); font-style:normal; color:#2f6b4f; }
 .map-timeline__tone.is-far { color:#a4473f; }

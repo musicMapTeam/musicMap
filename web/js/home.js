@@ -1,5 +1,6 @@
 import { artistById, artistName, artistsInDataset, datasetForArtist } from './map-data.js';
 import { getSavedMusic, subscribeSavedMusic } from './music-library.js';
+import { recordProgressed } from './map.js';
 
 const escape = value => String(value ?? '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
 // Width, case and punctuation never decide a match: "jj lin", "ＧＥＭ" and "g.e.m." all find their singer.
@@ -68,7 +69,7 @@ export function mountHome(container, api) {
           </button>
         </div>
         <div class="home-paper__foot">
-          <button type="button" data-home="records">我的发现 <span class="home-count">${map.sessions.length}</span></button>
+          <button type="button" data-home="records">我的发现 <span class="home-count">${map.sessions.filter(recordProgressed).length}</span></button>
           <button type="button" data-home="music">留下的歌 <span class="home-count" data-home-music>${getSavedMusic().length}</span></button>
           <button type="button" data-open-catalogue aria-haspopup="dialog">开放曲库 ${api.icon('arrow-up-right')}</button>
         </div>
@@ -113,7 +114,7 @@ export function mountHome(container, api) {
     if (pick) { start(pick.dataset.homeStart); return; }
     const button = event.target.closest('[data-home]');
     if (!button) return;
-    if (button.dataset.home === 'round') api.navigate('explore', round ? { resumeSessionId: round.id } : null);
+    if (button.dataset.home === 'round') api.navigate('explore', resume ? { resumeSessionId: round.id } : { round: 'next' });
     if (button.dataset.home === 'records') api.navigate('records', { section: 'map' });
     if (button.dataset.home === 'music') api.navigate('records', { section: 'music' });
   }, { signal });
