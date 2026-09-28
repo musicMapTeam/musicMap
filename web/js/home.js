@@ -44,7 +44,7 @@ export function mountHome(container, api) {
   const resume = round && touched(round);
   const pair = round ? `${datasetForArtist(round.start) === 'fictional' ? '情景示例 · ' : ''}${artistName(round.start)} → ${artistName(round.target)}` : '';
   const roundTitle = resume ? '继续寻声' : '两位歌手之间，隔着几首歌？';
-  const roundMeta = resume ? `${pair} · 已走 ${steps} 步` : round ? `寻声 · ${pair}` : '寻声 · 在唱片店开一局';
+  const roundMeta = resume ? `${pair} · 已走 ${steps} 步` : round ? `${round.friend ? '朋友出的题' : '寻声'} · ${pair}` : '寻声 · 在唱片店开一局';
   const returning = map.sessions.some(touched) || getSavedMusic().length > 0;
 
   // Written once: typing only repaints the picks, so focus and the title's entrance are never disturbed.

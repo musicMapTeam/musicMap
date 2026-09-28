@@ -282,8 +282,16 @@ html[data-theme='sakura'] body .map-dialog {
   & .map-recap-kept h3 { margin-bottom:4px; }
   & .map-recap-kept .map-track { border-bottom:1px dashed #e3d8bd; }
   & .map-track__copy .map-track__source { color:#2f5e4e; }
-  & .map-dialog__content .map-undo { position:static; display:flex; align-items:center; justify-content:space-between; gap:10px; max-width:none; margin:10px 0 0; padding:6px 6px 6px 12px; border:1px solid #d8ccad; border-radius:3px; background:#f4ecd8; box-shadow:none; color:#24382d; font-size:14px; }
+  /* The undo slip is pinned to the bottom of the scrolling paper, so a removal far down a long list is
+     undone without scrolling (in a roam's recap it stays pinned while its kept-songs list is in view). */
+  & .map-dialog__content .map-undo {
+    position:sticky; bottom:10px; z-index:3; display:flex; align-items:center; justify-content:space-between; gap:10px; max-width:none; margin:10px 0 0; padding:6px 6px 6px 12px;
+    border:1px solid #d8ccad; border-radius:3px; background:#f4ecd8; box-shadow:0 8px 22px #3a3a2a33,0 0 0 6px #fbf3e2e6; color:#24382d; font-size:14px;
+  }
   & .map-dialog__content .map-undo .button { min-height:44px; padding:8px 14px; }
+  /* The setlist and a roam's recap pin their own bar; the slip rides at its top, in flow, so it never
+     lies over a song however far the paper is scrolled. */
+  & :is(.map-setlist__actions-bar,.map-recap-next)>.map-undo { position:static; flex:1 0 100%; grid-column:1/-1; margin:0 0 2px; box-shadow:none; }
   & .map-recap-fold>summary { min-height:48px; }
   & .map-walk { margin:4px 0 14px; }
   /* Each leg has its own rail: no ink joins the last record of one leg to the first of the next. */
@@ -305,6 +313,9 @@ html[data-theme='sakura'] body .map-dialog {
   & .map-recap-people__go { flex:none; min-height:44px; padding:8px 12px; border:1px solid #d8ccad; border-radius:3px; background:#f6efdc; color:#24382d; font-size:14px; gap:6px; }
   & .map-recap-people__go .icon { width:14px; height:14px; }
   & .map-recap-next .button, & .map-dialog--replace .map-panel-actions .button { min-height:44px; }
+  /* The roam recap pins its next steps to the paper's foot, as the setlist pins its bar: a long list of
+     kept songs never hides 继续本次探索. The undo slip for a removal rides just above it. */
+  & .map-recap-next { position:sticky; bottom:0; z-index:2; margin-top:14px; padding:18px 0 12px; background:linear-gradient(#fff9e900,var(--object-paper,#fff9e9) 16px); }
 }
 @media(max-width:520px) {
   html[data-theme='sakura'] body .map-dialog {
@@ -312,7 +323,15 @@ html[data-theme='sakura'] body .map-dialog {
     & .map-recap-overview>div:nth-child(3) { padding-left:0; border-left:0; }
     & .map-recap-next { display:grid; grid-template-columns:1fr 1fr; }
     & .map-recap-next .button { justify-content:center; }
-    & .map-recap-next .button:first-child { grid-column:1/-1; }
+    & .map-recap-next>.button:first-of-type { grid-column:1/-1; }
+  }
+}
+/* A phone's paper sheet keeps to the lower half of the screen so the table stays in view. A paper that is
+   read or acted on as a whole (本次发现 / 探索回顾, 出题给朋友, the custom-round form, the confirmations)
+   may rise higher, so its songs and its actions are not squeezed under the pinned bar. */
+@media(max-width:760px) {
+  html[data-theme='sakura'] body dialog.map-dialog[open]:is(.map-dialog--recap,.map-dialog--share,.map-dialog--challenge,.map-dialog--replace,.map-dialog--reveal,.map-dialog--delete,.map-dialog--reset):not(.map-dialog--setlist) {
+    max-height:min(82dvh,calc(100dvh - 72px - env(safe-area-inset-top)));
   }
 }
 .map-timeline__tone { margin-left:6px; padding:0 5px; border:1.5px solid currentColor; border-radius:50%; font:700 12px/1.4 var(--round-serif); font-style:normal; color:#2f6b4f; }
@@ -382,11 +401,14 @@ html[data-theme='sakura'] body .map-dialog .map-setlist-head h2 { margin:8px 0 8
 .map-setlist__no { grid-area:no; display:grid; place-items:center; border-right:2px dashed #d8ccad; background:#f3e9d0; color:#8f4452; font:600 17px/1 var(--round-serif); letter-spacing:.02em; border-radius:4px 0 0 4px; }
 .map-setlist__copy { grid-area:copy; display:flex; flex-direction:column; align-items:flex-start; gap:3px; min-width:0; padding:12px 14px 0 16px; }
 html[data-theme='sakura'] body .map-setlist__title { display:inline; padding:0; border:0; background:none; font:600 17px/1.45 var(--font-display); color:#1f3a2d; text-align:left; cursor:pointer; text-decoration:underline; text-decoration-color:#d8ccad; text-underline-offset:4px; }
+/* A title that opens its credits takes a 44px tap band across its line without changing the ticket's rhythm
+   (positioned, so the band lies over the version line under it rather than under it). */
+html[data-theme='sakura'] body button.map-setlist__title { position:relative; display:inline-block; min-width:44px; min-height:44px; padding-block:max(0px,calc((44px - 1.45em) / 2)); margin-block:min(0px,calc((1.45em - 44px) / 2)); }
 html[data-theme='sakura'] body button.map-setlist__title:hover { text-decoration-color:#2f5e4e; }
 .map-setlist__version { font-size:13px; line-height:1.5; color:#5d6858; }
 .map-setlist__copy .map-evidence-link { font-size:13px; }
 .map-setlist__actions { grid-area:actions; display:flex; flex-wrap:wrap; gap:6px; padding:8px 14px 12px 16px; }
-html[data-theme='sakura'] body .map-setlist__actions .button { min-height:38px; padding:7px 12px; gap:5px; border:1px solid #d8ccad; border-radius:3px; background:#f6efdc; color:#24382d; font:500 13px/1.2 var(--font-display); }
+html[data-theme='sakura'] body .map-setlist__actions .button { min-height:44px; padding:7px 12px; gap:5px; border:1px solid #d8ccad; border-radius:3px; background:#f6efdc; color:#24382d; font:500 13px/1.2 var(--font-display); }
 html[data-theme='sakura'] body .map-setlist__actions .button:hover { background:#fff; }
 html[data-theme='sakura'] body .map-setlist__actions .map-setlist__save.is-saved { background:#e3ecde; color:#2f5e4e; border-color:#b7c9b0; }
 .map-setlist__actions .icon { width:14px; height:14px; }
@@ -552,3 +574,114 @@ html[data-theme='sakura'] body .map-dialog .map-setlist__actions-bar .map-setlis
 
 /* Without WebGL the table is ordinary page paper: keep it visible behind the record shop's dialogs. */
 html[data-theme='sakura'] body.spatial-fallback[data-view='explore']:has(.map-dialog[open]) .main-content { visibility:visible; }
+
+/* ---------- 朋友出的题: the friend's slip over a round opened from a shared link ---------- */
+/* It gives the pair and the rule, never an answer; the × folds it away for good. */
+html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback) .map-round-head.has-friend-note { grid-template-areas:'friend' 'slip' 'tools' 'note'; }
+.map-friend-note {
+  grid-area:friend; position:relative; display:grid; grid-template-columns:minmax(0,1fr) 44px; align-items:start; gap:2px 4px; margin:0; padding:10px 4px 10px 16px;
+  border-radius:2px; background:#fff6e4; color:#3e3214; box-shadow:0 10px 24px #0204125c,inset 0 0 0 1px #ecdcb8; transform:rotate(.4deg); pointer-events:auto;
+}
+.map-friend-note::before { content:''; position:absolute; left:18px; top:-7px; width:44px; height:13px; transform:rotate(-5deg); background:#c9d4b8c9; box-shadow:0 1px 2px #3a403826; }
+.map-friend-note__title { grid-column:1; margin:0; font:500 16px/1.5 var(--round-serif); letter-spacing:.02em; color:#1f3a2d; }
+.map-friend-note__title b { font:600 14px/1.5 var(--font-display); letter-spacing:.06em; color:#8f4452; }
+.map-friend-note__rule { grid-column:1/-1; margin:0; padding-right:10px; font:400 13px/1.6 var(--font-display); color:#5a513c; text-wrap:pretty; }
+/* The × keeps a 44px target without making the first line 44px tall (its margins give the room back). */
+html[data-theme='sakura'] body .map-friend-note__close { grid-column:2; grid-row:1; width:44px; min-width:44px; height:44px; min-height:44px; margin:-10px 0 -14px; padding:0; border:0; border-radius:50%; background:none; color:#6b5a4c; }
+html[data-theme='sakura'] body .map-friend-note__close:hover { background:#f1e4c6; color:#3e3214; }
+html[data-theme='sakura'] body .map-friend-note__close:focus-visible { outline:2px solid var(--round-ink,#24382d); outline-offset:-2px; }
+.map-friend-note__close .icon { width:16px; height:16px; }
+
+/* ---------- 出题给朋友 / 保存战绩卡 on the closed round's bar ---------- */
+html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback) .map-round-hand--closed.has-share { grid-template-areas:'who done' 'who share'; row-gap:6px; }
+.map-round-hand__share { grid-area:share; display:flex; justify-content:flex-end; gap:6px; }
+html[data-theme='sakura'] body .map-round-hand__share .button { min-height:44px; padding:8px 14px; gap:6px; border:1px dashed #ffffff47; border-radius:22px; background:none; color:var(--round-glass-ink); font:500 14px/1.2 var(--font-display); white-space:nowrap; }
+html[data-theme='sakura'] body .map-round-hand__share .button:hover { background:#ffffff1a; color:#fff; }
+html[data-theme='sakura'] body .map-round-hand__share .button:focus-visible { outline:2px solid var(--night-amber,#ffc27a); outline-offset:2px; }
+.map-round-hand__share .icon { width:14px; height:14px; }
+
+/* ---------- The setlist's share strip, the roam's card and the form's second action ---------- */
+html[data-theme='sakura'] body .map-dialog {
+  & .map-setlist__share { margin:-4px 0 20px; padding:12px 14px 14px; border:1px dashed #cdb98f; border-radius:3px; background:#f7efdc; }
+  & .map-setlist__share h3 { margin:0 0 2px; font:600 15px/1.45 var(--font-display); color:#1f3a2d; }
+  & .map-setlist__share p { margin:0 0 10px; font-size:13px; line-height:1.6; color:#5d6858; }
+  & :is(.map-setlist__share-actions,.map-recap-card) .button { min-height:44px; padding:8px 12px; gap:6px; border:1px solid #d8ccad; border-radius:3px; background:#fffaf0; color:#24382d; font:500 14px/1.2 var(--font-display); white-space:nowrap; }
+  & :is(.map-setlist__share-actions,.map-recap-card) .button:hover { background:#fff; border-color:#b9ab86; }
+  & .map-setlist__share-actions { display:flex; flex-wrap:wrap; gap:6px; }
+  & .map-setlist__share-actions .map-share-round { border-color:#2f5e4e; background:#2f5e4e; color:#fffaf0; font-weight:600; }
+  & .map-setlist__share-actions .map-share-round:hover { background:#24493c; border-color:#24493c; color:#fff; }
+  & :is(.map-setlist__share-actions,.map-recap-card) .icon { width:14px; height:14px; }
+  & .map-recap-card { display:flex; align-items:center; gap:12px; margin:16px 0 4px; padding:12px 14px; border:1px dashed #cdb98f; border-radius:3px; background:#f7efdc; }
+  & .map-recap-card p { flex:1; min-width:0; margin:0; font-size:13px; line-height:1.6; color:#5d6858; }
+  & .map-recap-card .button { flex:none; }
+  & .map-form-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:4px; }
+  & .map-form-actions .button { min-height:44px; font-size:14px; gap:6px; }
+  & .map-form-actions .button--quiet { border:1px solid #d8ccad; background:#f6efdc; color:#24382d; }
+  & .map-form-actions .icon { width:14px; height:14px; }
+  & .map-share-field input { width:100%; min-height:46px; padding:10px 12px; font:400 14px/1.4 var(--font-mono,monospace); color:#24382d; background:#fffdf6; border:1px solid #cfc3a5; border-radius:3px; }
+  & .map-share-message { margin:10px 0 0; padding:10px 12px; border-left:3px solid #cdb98f; background:#f4ecd8; font-size:14px; line-height:1.6; color:#3d4a40; }
+}
+@media(max-width:520px) {
+  html[data-theme='sakura'] body .map-dialog {
+    & .map-setlist__share-actions { display:grid; grid-template-columns:1fr 1fr; }
+    & .map-setlist__share-actions .button { justify-content:center; padding-inline:8px; }
+    & .map-setlist__share-actions .map-setlist__another { grid-column:1/-1; }
+    & .map-recap-card { flex-direction:column; align-items:stretch; }
+    & .map-recap-card .button { justify-content:center; }
+    & .map-form-actions .button { flex:1; justify-content:center; }
+  }
+}
+
+/* ---------- Phone: the friend's slip gives the rule (the question slip under it names the pair) ---------- */
+@media(max-width:760px) {
+  html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback) .map-round-head.has-friend-note { grid-template-areas:'friend' 'slip' 'tools' 'note'; }
+  .map-friend-note { padding:6px 2px 6px 12px; transform:none; }
+  .map-friend-note__title { font:600 14px/1.5 var(--font-display); }
+  .map-friend-note__pair { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+  .map-friend-note__rule { font-size:12px; line-height:1.5; text-wrap:balance; }
+  html[data-theme='sakura'] body .map-friend-note__close { margin:-12px 0 -11px; }
+  html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback) .map-round-hand--closed.has-share { grid-template-areas:'who' 'done' 'share'; }
+  .map-round-hand__share { width:100%; }
+  html[data-theme='sakura'] body .map-round-hand__share .button { flex:1; justify-content:center; padding:8px 6px; }
+}
+
+/* ---------- Without WebGL ---------- */
+html[data-theme='sakura'] body.spatial-fallback[data-view='explore'] {
+  & .map-round-head.has-friend-note { grid-template-areas:'friend friend' 'slip tools' 'note note'; }
+  & .map-friend-note { transform:none; box-shadow:0 2px 0 #e2d7bb,inset 0 0 0 1px #ecdcb8; }
+  & .map-round-hand--closed.has-share { grid-template-areas:'who done' 'who share'; }
+  /* The shop scrolls as a page here: the undo slip rides just above the bottom nav, wherever the page is. */
+  & .map-studio>.map-undo {
+    position:fixed; z-index:30; left:50%; right:auto; bottom:calc(104px + env(safe-area-inset-bottom)); transform:translateX(-50%); width:max-content; max-width:min(440px,calc(100vw - 24px));
+    display:flex; align-items:center; gap:12px; margin:0; padding:4px 4px 4px 14px; border:1px solid #d8ccad; border-radius:3px; background:#fbf3e2; color:#24382d; font-size:14px; box-shadow:0 10px 28px #3a403840;
+  }
+}
+@media(max-width:760px) {
+  html[data-theme='sakura'] body.spatial-fallback[data-view='explore'] {
+    & .map-round-head.has-friend-note { grid-template-areas:'friend' 'slip' 'tools' 'note'; }
+    & .map-round-hand--closed.has-share { grid-template-areas:'who' 'done' 'share'; }
+    & .map-studio>.map-undo { bottom:calc(86px + env(safe-area-inset-bottom)); }
+    /* A round opens as the 3D phone table does: slip, table and hand in one screen above the nav (map.js
+       fits the table's height to what is left). − 全图 + wait in 目录 (视野), as they do over the 3D table,
+       and who you are shares one row with the two ways back. */
+    & .map-round .map-stage-top { display:none; }
+    & .map-round-route { flex-direction:row; align-items:center; }
+    /* On a phone too short for both, the hand is pinned above the nav, so 翻开 is always in reach. */
+    & .map-round-hand { position:sticky; z-index:8; bottom:calc(86px + env(safe-area-inset-bottom)); }
+  }
+}
+/* A desktop window reads the friend's slip in one line (the pair, then the rule), so the table and the
+   hand under it keep their room above the bottom nav (map.js fits the table's height to what is left). */
+@media(min-width:761px) {
+  html[data-theme='sakura'] body.spatial-fallback[data-view='explore'] {
+    & .map-friend-note { grid-template-columns:auto minmax(0,1fr) 44px; align-items:center; column-gap:14px; padding-block:7px; }
+    & .map-friend-note__rule { grid-column:2; grid-row:1; padding-right:0; }
+    & .map-friend-note__close { grid-column:3; margin:-10px 0; }
+  }
+}
+/* 2D table: 你在这里 / 终点 rides in front of the name in one tag; a tag that stands off its record (see
+   labelNodes in map.js) is tied to it by a pencilled leader, drawn under the paper and never taking taps. */
+.map-network-node__label.has-leader::after {
+  content:''; position:absolute; z-index:-1; left:var(--leader-x); top:calc(var(--leader-y) - .75px); width:var(--leader-length); height:1.5px;
+  background:#4d5a4ccc; transform:rotate(var(--leader-angle)); transform-origin:0 50%; pointer-events:none;
+}

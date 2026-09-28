@@ -17,6 +17,7 @@ import '../css/scene-layout.css';
 import '../css/map-round.css';
 import '../css/home-map.css';
 import '../css/night-shell.css';
+import '../css/share-card.css';
 import { OverlayScrollbars } from 'overlayscrollbars';
 import { mountThemes } from './themes.js';
 import { icon } from './icons.js';
@@ -52,6 +53,8 @@ function load() {
       // 0.15 saves also carry the Space demo (cards with photos) and its actor; neither is read any more.
       const { space, actor, ...kept } = saved;
       droppedLegacy = space !== undefined || actor !== undefined;
+      // An undo slip belongs to the visit that made the removal; a new visit starts without one.
+      if (kept.map) kept.map.undo = null;
       return { ...kept, routePayload: null };
     }
   } catch {
@@ -74,9 +77,27 @@ function tidyUrl() {
   if (url.href !== location.href) history.replaceState(null, '', url);
 }
 
+/** A 寻声 puzzle from a friend: `?from=<start>&to=<target>#/explore`. The pair is read once and taken
+ *  off the address (a reload or a copied address does not deal it again); the record shop checks it
+ *  against the catalogue. Nothing else is read from the link. */
+function takeSharedRound() {
+  const url = new URL(location.href);
+  if (!url.searchParams.has('from') && !url.searchParams.has('to')) return null;
+  const id = name => (url.searchParams.get(name) || '').trim().slice(0, 64);
+  const round = { start: id('from'), target: id('to') };
+  url.searchParams.delete('from');
+  url.searchParams.delete('to');
+  url.hash = '/explore';
+  history.replaceState(null, '', url);
+  return round;
+}
+
+const sharedRound = takeSharedRound();
 const state = load();
 state.view = routeView(location.hash.slice(2));
 tidyUrl();
+// The record shop deals the friend's pair on its first drawing (mountMap's {round:{start,target}} entry).
+if (sharedRound) Object.assign(state, { view: 'explore', routePayload: { round: sharedRound, fromFriend: true } });
 
 function toast(message) {
   clearTimeout(toastTimer);

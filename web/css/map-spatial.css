@@ -4,17 +4,20 @@
 
 /* ---------- Scene name tags: lit paper on the table ---------- */
 .world-music-label {
-  /* The painted tag is compact lit paper; the button around it is a full 44px touch target. The paper
-     lies on ::before, inset by --tag-band, and the leader runs under it, so a leader leaves the paper's
-     edge. The label engine measures the button, so touch targets never overlap each other. */
-  --tag-band:6px;
+  /* The button is the painted tag (lit paper on ::before), and the label engine keeps painted tags apart.
+     Its touch target grows toward 44px through the invisible .world-music-hit band, which sakura-music trims
+     to the free room around the tag (--touch-*), so bands never reach another tag or record. */
   position:absolute; z-index:3; top:0; left:0; display:flex; flex-direction:row; align-items:center; justify-content:center; gap:6px;
-  min-width:56px; max-width:190px; min-height:44px; padding:5px 11px; border:0; border-radius:3px;
+  min-width:56px; max-width:190px; min-height:32px; padding:0 11px; border:0; border-radius:3px;
   background:none; color:#24382d; cursor:pointer; pointer-events:auto;
 }
 .world-music-label::before {
-  content:''; position:absolute; z-index:-1; inset:var(--tag-band) 0; border:1px solid #cdbf9f; border-radius:3px;
+  content:''; position:absolute; z-index:-1; inset:0; border:1px solid #cdbf9f; border-radius:3px;
   background:#fff9ecf7; box-shadow:0 2px 0 #cbbd9b,0 6px 14px #0204123d; pointer-events:none;
+}
+:is(.world-music-label,.world-music-link)>.world-music-hit {
+  position:absolute; inset:calc(var(--touch-top,6px) * -1) calc(var(--touch-right,0px) * -1) calc(var(--touch-bottom,6px) * -1) calc(var(--touch-left,0px) * -1);
+  border-radius:4px; background:none;
 }
 .world-music-label[hidden] { display:none; }
 .world-music-label strong { font:600 14px/1.4 var(--font-display); letter-spacing:.02em; white-space:nowrap; }
@@ -24,7 +27,7 @@
 .world-music-label.is-target small { background:#b0525f; }
 .world-music-label.is-current::before { border-color:#2f5e4e; }
 .world-music-label.has-leader::after { content:''; position:absolute; z-index:-2; left:var(--leader-x); top:var(--leader-y); width:calc(var(--leader-length) + 9px); height:1.5px; background:#4d5a4ccc; transform:rotate(var(--leader-angle)) translateX(-9px); transform-origin:0 50%; pointer-events:none; }
-.world-music-label.is-selected { z-index:5; --tag-band:3px; }
+.world-music-label.is-selected { z-index:5; min-height:38px; }
 .world-music-label.is-selected::before { border-top:3px solid #b0525f; background:#fffaf0; }
 .world-music-label.is-selected strong { font-size:16px; }
 .world-music-label.is-highlighted::before { border-color:#b98642; }
@@ -39,13 +42,12 @@ body:has(dialog[open]) :is(.world-music-label,.world-music-link) { visibility:hi
 /* The route stays readable beside the setlist paper. */
 body:has(dialog.map-dialog--setlist[open]) :is(.world-music-label:is(.is-route,.is-target,.is-highlighted),.world-music-link:is(.is-route,.is-answer)) { visibility:visible; }
 .world-music-link {
-  /* A song title on the ink: the same compact paper on a 44px touch target as the name tags. */
-  --tag-band:9px;
-  position:absolute; z-index:2; display:flex; align-items:center; max-width:180px; min-height:44px; padding:3px 9px 3px 11px; border:0; border-radius:2px;
+  /* A song title on the ink: the same compact paper and trimmed touch band as the name tags. */
+  position:absolute; z-index:2; display:flex; align-items:center; max-width:180px; min-height:26px; padding:0 9px 0 11px; border:0; border-radius:2px;
   background:none; color:#24382d; font:500 13px/1.4 var(--font-display);
   white-space:nowrap; pointer-events:auto; cursor:pointer;
 }
-.world-music-link::before { content:''; position:absolute; z-index:-1; inset:var(--tag-band) 0; border-left:3px solid #2f5e4e; border-radius:2px; background:#fff9ecf2; box-shadow:0 3px 8px #02041233; pointer-events:none; }
+.world-music-link::before { content:''; position:absolute; z-index:-1; inset:0; border-left:3px solid #2f5e4e; border-radius:2px; background:#fff9ecf2; box-shadow:0 3px 8px #02041233; pointer-events:none; }
 .world-music-link>span { min-width:0; overflow:hidden; text-overflow:ellipsis; }
 .world-music-link[hidden] { display:none; }
 .world-music-link.is-route::before { border-left-color:#b98642; }
@@ -117,7 +119,9 @@ html[data-theme='sakura'] .map-studio .map-network-selection__actions .map-round
 .map-network-index>summary small { margin-left:auto; font-size:13px; font-weight:400; color:#5d6858; }
 .map-network-index>summary .icon { width:14px; height:14px; transition:transform .2s; }
 .map-network-index[open]>summary .icon { transform:rotate(90deg); }
-.map-network-index__body { min-width:0; max-height:min(250px,32dvh); overflow:auto; overscroll-behavior:contain; scrollbar-width:thin; }
+/* The open list scrolls inside a short band (two rows and a peek of the third), so the dock never
+   climbs over the table; map.js folds it again after each move. */
+.map-network-index__body { min-width:0; max-height:min(176px,22dvh); overflow:auto; overscroll-behavior:contain; scrollbar-width:thin; }
 /* ---------- 本次探索: the roam's own strip across the top of the dock ---------- */
 .map-roam-bar { display:flex; flex-wrap:wrap; align-items:center; gap:6px; min-width:0; margin:0 0 8px; padding:0 0 8px; border-bottom:1px dashed #b7ab8a70; }
 html[data-theme] .map-studio .map-roam-bar .button {
@@ -259,9 +263,10 @@ html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback) .map-
 .map-network-node.is-target small { background:#b0525f; }
 .map-network-node.is-selected strong { background:#f2dcd6; }
 .map-network-node.is-current i { box-shadow:0 0 0 3px #f5eddc,0 0 0 6px #2f5e4e; }
-/* The anchor, then the selection and the records one tap away, lie on top of the rest, so 你在这里 is
-   never under another record and a crowded phone table never hides the next step. */
-.map-network-node:is(.is-selected,.is-reachable) { z-index:3; }
+/* The anchor, then the selection, the records one tap away and a round's way so far, lie on top of the
+   rest, so 你在这里 is never under another record, a crowded phone table never hides the next step, and a
+   visited singer's name is never under a face-down card. */
+.map-network-node:is(.is-selected,.is-reachable,.is-route,.is-highlighted) { z-index:3; }
 .map-network-node.is-current,.map-network-node.is-target { z-index:4; }
 .map-network-node:focus-visible { z-index:5; }
 .map-network-node.is-target i { box-shadow:0 0 0 3px #f5eddc,0 0 0 6px #b0525f; }
@@ -270,6 +275,13 @@ html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback) .map-
 .map-network-node.is-unknown i { position:relative; border:2px solid #c9b993; border-radius:3px; background:repeating-linear-gradient(45deg,#efe5cf 0 5px,#e2d5b6 5px 6px); box-shadow:0 2px 0 #d2c29d; }
 .map-network-node.is-unknown strong { position:absolute; left:4px; top:4px; display:grid; place-items:center; width:36px; height:36px; padding:0; background:none; box-shadow:none; color:#7a6438; font:600 19px/1 var(--font-serif,'Songti SC','SimSun',serif); }
 .map-network-node[hidden] { display:none; }
+/* A phone's table holds all 29 records in a hand's width. A face-down card takes no tap, so it is printed
+   smaller there, which leaves the names that matter room to sit beside their records. */
+@media(max-width:760px) {
+  .map-network-fallback .map-network-node.is-unknown { width:32px; height:32px; }
+  .map-network-fallback .map-network-node.is-unknown i { width:28px; height:28px; }
+  .map-network-fallback .map-network-node.is-unknown strong { left:2px; top:2px; width:28px; height:28px; font-size:15px; }
+}
 .map-network-fallback .map-graph-lines { position:absolute; inset:0; width:100%; height:100%; pointer-events:auto; }
 .map-network-line { stroke:#8d8f7d; stroke-width:3; fill:none; cursor:pointer; }
 .map-network-line.is-active { stroke:#2f5e4e; stroke-width:4; }
@@ -303,12 +315,17 @@ html[data-theme='sakura'] body.spatial-fallback[data-view='explore'] {
 
 /* ---------- Phone ---------- */
 @media(max-width:760px) {
-  .world-music-label { --tag-band:7px; min-width:44px; max-width:148px; min-height:44px; padding:3px 8px; gap:5px; }
-  .world-music-label.is-selected { --tag-band:5px; }
+  .world-music-label { min-width:44px; max-width:148px; min-height:29px; padding:0 8px; gap:5px; }
+  .world-music-label.is-selected { min-height:31px; }
   .world-music-label strong { font-size:13px; }
   .world-music-label.is-selected strong { font-size:14px; }
-  .world-music-label small { padding:1px 5px; font-size:12px; }
-  .world-music-link { --tag-band:10px; font-size:12px; max-width:132px; padding:2px 7px 2px 9px; }
+  /* A phone prints the name only (its aria-label keeps 你在这里 / 终点): where you stand is a green-ink
+     tag and the goal a rose one, the colours of the desktop tabs and of the round's slip. */
+  .world-music-label small { display:none; }
+  .world-music-label:is(.is-current,.is-target) { color:#fff9ec; }
+  .world-music-label.is-current::before, .world-music-label.is-current:hover::before { border-color:#24382d; background:#2f5e4e; }
+  .world-music-label.is-target::before, .world-music-label.is-target:hover::before { border-color:#8f3f4d; background:#b0525f; }
+  .world-music-link { font-size:12px; max-width:132px; min-height:24px; padding:0 7px 0 9px; }
   .map-shop-menu>div { width:min(288px,calc(100vw - 24px)); max-height:calc(100dvh - 190px); }
   .map-network-neighbors { grid-template-columns:repeat(2,minmax(0,1fr)); }
   .map-network-connection span { font-size:14px; }
@@ -319,11 +336,12 @@ html[data-theme='sakura'] body.spatial-fallback[data-view='explore'] {
   }
   html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback) .map-atlas {
     & .map-studio-head { top:64px; left:12px; right:12px; align-items:stretch; gap:8px; }
-    & .map-studio-title { max-width:none; padding:9px 14px 9px; }
+    /* A long route scrolls inside the slip instead of widening it (and pushing the tools off screen). */
+    & .map-studio-title { min-width:0; max-width:100%; padding:9px 14px 9px; }
     & .map-studio-title h1 { font-size:19px; letter-spacing:.06em; }
     & .map-studio-sub { font-size:13px; margin-top:2px; }
     & .map-roam-bar { margin-bottom:6px; padding-bottom:6px; }
-    & .map-studio-tools { justify-content:space-between; gap:2px; padding:4px; }
+    & .map-studio-tools { justify-content:space-between; gap:2px; margin-left:0; padding:4px; }
     & .map-studio-tools>.button, & .map-shop-menu>summary { flex:1; justify-content:center; min-height:44px; padding:8px 6px; font-size:14px; white-space:nowrap; }
     & .map-studio-tools>.button:not([data-map-action='search']) .icon { display:none; }
     & .map-shop-menu { flex:1; display:flex; }
@@ -336,7 +354,7 @@ html[data-theme='sakura'] body.spatial-fallback[data-view='explore'] {
     & .map-network-selection__actions { width:100%; justify-content:flex-start; margin-left:0; }
     & .map-network-selection__actions .button { flex:1; justify-content:center; }
     & .map-network-index>summary { margin-top:6px; min-height:44px; }
-    & .map-network-index__body { max-height:26dvh; }
+    & .map-network-index__body { max-height:clamp(96px,17dvh,150px); }
   }
   html[data-theme='sakura'] body.spatial-fallback[data-view='explore'] {
     & .main-content { width:calc(100% - 24px); padding:12px; margin-top:76px; }
@@ -366,3 +384,16 @@ html[data-theme='sakura'] body.spatial-fallback[data-view='explore'] {
   }
 }
 @media(prefers-reduced-motion:reduce) { .map-network-index>summary .icon,.map-shop-menu>summary .icon { transition:none; } }
+
+/* A route longer than its crumb: the cut end fades out (map.js marks which end is cut). */
+.map-route-trail.is-cut-start { -webkit-mask-image:linear-gradient(90deg,transparent,#000 40px); mask-image:linear-gradient(90deg,transparent,#000 40px); }
+.map-route-trail.is-cut-end { -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 40px),transparent); mask-image:linear-gradient(90deg,#000 calc(100% - 40px),transparent); }
+.map-route-trail.is-cut-start.is-cut-end { -webkit-mask-image:linear-gradient(90deg,transparent,#000 40px,#000 calc(100% - 40px),transparent); mask-image:linear-gradient(90deg,transparent,#000 40px,#000 calc(100% - 40px),transparent); }
+
+/* Without WebGL, 我的发现 is in-flow page paper (position:relative). The offsets that lay the album over the
+   scene (top/right/left in spatial-objects.css) would only shift it, down and past the screen's edge. */
+html[data-theme='sakura'] body.spatial-fallback[data-spatial-section='records'] .main-content { inset:auto; }
+
+/* 我的发现 · 留下的歌 (and the 开放曲库 rows): each row's 留下 / 移除 control is a full 44px round
+   button, as every other icon button in the shop, on a phone too (open-catalogue.css had cut it to 32/29). */
+html[data-theme] body .music-row__actions .music-row__save { width:44px; min-width:44px; height:44px; min-height:44px; }
