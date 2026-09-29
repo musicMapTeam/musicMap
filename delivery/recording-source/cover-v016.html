@@ -1,0 +1,130 @@
+<!doctype html>
+<!-- 0.16 参赛封面源（1920×1080），Music Map 唯一主线。三张图都是应用实际画面，只做缩放、裁切和旋转，不改内容：
+     唱片桌 = docs/assets/themes/roam-desktop-v016.png（1440×900，完整图鉴自由漫游）；
+     小院 = docs/assets/themes/home-desktop-v016.png（1440×900，只裁出右侧三维小院）；
+     战绩卡 = docs/assets/themes/card-challenge-v016.png（1080×1350，应用实际导出的寻声战绩卡 PNG）。
+     在仓库根目录起本地静态服务（如 python3 -m http.server），以 1920×1080 打开 /delivery/recording-source/cover-v016.html 截图，即得 delivery/cover.png。
+     截图前确认没有浏览器扩展注入的节点。0.15 Space 封面源仍在 cover-v015.html 与 Git 历史（3dd102c）。 -->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1920,height=1080">
+<title>Music Map · 参赛封面 0.16</title>
+<style>
+  :root {
+    --ink: #fff4e2; --ink-soft: #ece1ce; --muted: #cfc3b0; --amber: #ffc27a; --pink: #f5b0c1;
+    --paper: #fbf3e2; --paper-top: #fff9ec; --paper-edge: #fff3d9;
+    --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    --mono: "SF Mono", Menlo, Consolas, monospace;
+    --shadow: 0 30px 70px #020412b3, 0 4px 10px #0204124d, 0 0 60px #ffc27a1f;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; }
+  body {
+    position: relative; font-family: var(--font); color: var(--ink);
+    background:
+      radial-gradient(1100px 480px at 20% 114%, #e0907e5c, transparent 70%),
+      radial-gradient(1000px 700px at 72% 52%, #ffc27a1a, transparent 70%),
+      linear-gradient(180deg, #11143a 0%, #1b1d48 44%, #29244f 70%, #3f2e5c 100%);
+  }
+  body::before {
+    content: ""; position: absolute; inset: 0; opacity: .2; pointer-events: none;
+    background: repeating-radial-gradient(circle at 70% 50%, transparent 0 46px, #ffffff14 47px, transparent 48px);
+  }
+  .lights { position: absolute; left: 0; top: 0; width: 1920px; height: 150px; }
+
+  /* Left: name, line, loop. */
+  .brand { position: absolute; left: 120px; top: 156px; display: flex; align-items: center; gap: 18px; }
+  .brand svg { width: 64px; height: 64px; flex: none; }
+  .brand b { display: block; font-size: 56px; line-height: 1; font-weight: 700; letter-spacing: .01em; text-shadow: 0 0 28px #ffc27a4d; }
+  .brand small { display: block; margin-top: 10px; font-size: 21px; color: var(--muted); letter-spacing: .12em; }
+  .copy { position: absolute; left: 120px; top: 326px; width: 860px; }
+  .kicker { display: flex; align-items: center; gap: 14px; font-size: 24px; font-weight: 600; color: var(--amber); letter-spacing: .16em; }
+  .kicker i { width: 12px; height: 12px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 0 6px #ffc27a2e, 0 0 18px var(--amber); }
+  h1 { margin: 22px 0 34px; font-size: 138px; line-height: 1.1; font-weight: 800; letter-spacing: -.01em; text-shadow: 0 6px 40px #0a0d2699; }
+  h1 span { display: block; }
+  h1 span + span { margin-left: 1em; color: var(--pink); }
+  .lede { font-size: 38px; line-height: 1.5; font-weight: 500; color: var(--ink-soft); }
+  .facts { display: flex; margin-top: 30px; font-size: 24px; color: var(--muted); }
+  .facts li { list-style: none; padding: 0 22px; border-left: 1px solid #ffffff2e; }
+  .facts li:first-child { padding-left: 0; border: 0; }
+  .facts em { font-style: normal; font-family: var(--mono); font-weight: 600; color: var(--amber); margin-right: 8px; }
+
+  /* Right: real screens, laid on the night like lit paper prints. */
+  .print { position: absolute; padding: 12px; border-radius: 6px; background: linear-gradient(180deg, var(--paper-top), var(--paper)); box-shadow: var(--shadow); }
+  .print img, .print .crop { display: block; border-radius: 2px; }
+  .print figcaption { position: absolute; font-size: 20px; font-weight: 600; letter-spacing: .08em; color: var(--ink); white-space: nowrap; text-shadow: 0 1px 2px #070a1acc, 0 0 16px #070a1a; }
+  .print figcaption i { font-style: normal; color: var(--amber); margin-right: 10px; }
+  .tape { position: absolute; width: 132px; height: 30px; background: #e9dcc0d9; box-shadow: 0 1px 3px #0204122e; }
+
+  .table { left: 962px; top: 150px; transform: rotate(-1.6deg); }
+  .table img { width: 848px; height: 530px; }
+  .table figcaption { left: 4px; top: -44px; }
+  .table .tape { left: 360px; top: -14px; transform: rotate(-2deg); }
+
+  .yard { left: 946px; top: 664px; transform: rotate(2.2deg); }
+  .yard .crop { width: 400px; height: 272px; background: url(../../docs/assets/themes/home-desktop-v016.png) -354px -139px / 835.2px 522px no-repeat; }
+  .yard figcaption { left: 4px; bottom: -42px; }
+
+  .card { left: 1482px; top: 484px; transform: rotate(3.6deg); padding: 0; background: none; border-radius: 22px; }
+  .card img { width: 348px; height: 435px; border-radius: 22px; box-shadow: 0 0 0 1px #fff3d93d; }
+  .card figcaption { right: 6px; bottom: -44px; }
+  .petal { position: absolute; width: 14px; height: 20px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; background: #f5b0c1; opacity: .7; }
+
+  .foot { position: absolute; left: 120px; right: 120px; bottom: 30px; display: flex; justify-content: space-between; font-size: 20px; color: var(--muted); }
+  .foot b { color: var(--pink); font-weight: 600; }
+</style>
+</head>
+<body>
+  <svg class="lights" viewBox="0 0 1920 150" aria-hidden="true">
+    <defs><radialGradient id="g"><stop offset="0" stop-color="#ffe2aa"/><stop offset=".3" stop-color="#ffbe6e" stop-opacity=".55"/><stop offset="1" stop-color="#ff9650" stop-opacity="0"/></radialGradient></defs>
+    <path d="M-20 40 Q 480 118 960 52 T 1940 44" fill="none" stroke="#c9b8d8" stroke-opacity=".45" stroke-width="2"/>
+    <g id="bulbs"></g>
+  </svg>
+
+  <div class="brand">
+    <svg viewBox="-24 -24 48 48" aria-hidden="true"><g transform="rotate(-15)">
+      <ellipse cx="0" cy="-12" rx="8" ry="13.2" fill="#f0a6b6"/>
+      <ellipse cx="0" cy="-12" rx="8" ry="13.2" fill="#ffd6c8" transform="rotate(120)"/>
+      <ellipse cx="0" cy="-12" rx="8" ry="13.2" fill="#86b596" transform="rotate(240)"/>
+    </g></svg>
+    <div><b>Music Map</b><small>樱下放映 · 夜场唱片店</small></div>
+  </div>
+
+  <section class="copy">
+    <p class="kicker"><i></i>华语音乐探索 · 真实合唱</p>
+    <h1><span>从喜欢，</span><span>走向未知。</span></h1>
+    <p class="lede">沿真实合唱，翻开下一位歌手，找到下一首歌。</p>
+    <ol class="facts"><li><em>29</em>位艺人</li><li><em>37</em>份合唱录音</li><li>每份附官方来源</li></ol>
+  </section>
+
+  <figure class="print table">
+    <span class="tape" aria-hidden="true"></span>
+    <img src="../../docs/assets/themes/roam-desktop-v016.png" alt="唱片店完整图鉴：从周杰伦出发自由漫游的实际截图">
+    <figcaption><i>唱片店</i>沿合唱，一位位走下去</figcaption>
+  </figure>
+  <figure class="print yard">
+    <div class="crop" role="img" aria-label="首页三维夜场小院的实际截图（裁切）"></div>
+    <figcaption><i>小院</i>从喜欢的歌手出发</figcaption>
+  </figure>
+  <figure class="print card">
+    <img src="../../docs/assets/themes/card-challenge-v016.png" alt="应用实际导出的寻声战绩卡">
+    <figcaption><i>战绩卡</i>出题给朋友</figcaption>
+  </figure>
+
+  <i class="petal" style="left:58px;top:600px;transform:rotate(-24deg) scale(.85)" aria-hidden="true"></i>
+  <i class="petal" style="left:1868px;top:720px;transform:rotate(70deg) scale(.7)" aria-hidden="true"></i>
+  <i class="petal" style="left:720px;top:948px;transform:rotate(12deg)" aria-hidden="true"></i>
+
+  <footer class="foot"><span>腾讯音乐首届高校 AI Hackathon · 赛道 2 创新音乐产品</span><span><b>页面为实际截图</b> · MVP 0.16</span></footer>
+
+  <script>
+    const path = document.querySelector('.lights path'); const g = document.getElementById('bulbs');
+    const len = path.getTotalLength();
+    for (let i = 1; i < 22; i++) {
+      const p = path.getPointAtLength(len * i / 22);
+      g.insertAdjacentHTML('beforeend', `<circle cx="${p.x}" cy="${p.y + 14}" r="26" fill="url(#g)"/><line x1="${p.x}" y1="${p.y}" x2="${p.x}" y2="${p.y + 8}" stroke="#c9b8d8" stroke-opacity=".5"/><ellipse cx="${p.x}" cy="${p.y + 15}" rx="6" ry="8" fill="#ffe6b0"/>`);
+    }
+  </script>
+</body>
+</html>
