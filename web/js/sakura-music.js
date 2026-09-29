@@ -6,6 +6,21 @@ const MIN_ZOOM = 1;
 const MAX_ZOOM = 2.8;
 const SLEEVE = .38;
 const INK_WIDTH = { quiet: .010, route: .018, answer: .013, stub: .014 };
+/** A phone frames the records whose names it must show no closer than this (see focusView). */
+const FOCUS_ZOOM = 2.2;
+/** Paper kept clear around the framed records: room for ink and a tag between a record and the paper's edge. */
+const FOCUS_MARGIN = .12;
+/** The touch band around a tag grows toward this height, but only into free room (see fitTouchBands). */
+const TOUCH = 44;
+/** Records shrink as the catalogue grows (12 sleeves print at full size) so a full table never overlaps. */
+const sleeveScale = count => THREE.MathUtils.clamp(Math.sqrt(12 / Math.max(1, count)), .7, 1);
+/** The names a table must always show: where you stand, the goal, the selection and every record one
+ *  tap away (in a round that is the face-up hand). Other names appear where the table has room. */
+const needsName = data => Boolean(data && !data.unknown && (data.current || data.target || data.selected || data.adjacent));
+// Candidate spots a needed tag may take on a printed leader: below, above, beside, then the diagonals.
+const LEADER_ANGLES = [90, 270, 0, 180, 30, 150, 210, 330, 60, 120, 240, 300].map(degrees => degrees * Math.PI / 180);
+const LEADER_REACH = [8, 20, 34, 50, 70, 95, 125];
+const covers = (box, rect) => box.left < rect.right && box.right > rect.left && box.top < rect.bottom && box.bottom > rect.top;
 
 /** One persistent graph printed on the record shop's real table. In a 寻声 round,
  *  unknown artists lie face down (a shared paper back, no name, no colour) and only
@@ -81,6 +96,7 @@ export function createSakuraMusic({ world, cel, host, canvas, camera, reduced, o
   const originalTouchAction = canvas.style.touchAction;
   let enabled = false; let key = null; let drag = null; let moved = false; let suppressClickUntil = 0;
   let lastCeremony = null; let ceremonyTimeline = null; let lastFlash = null;
+  let nodeScale = 1; let round = null; let anchor = '';
 
   function coverTexture(artist) {
     const surface = document.createElement('canvas'); surface.width = 256; surface.height = 256;
@@ -136,7 +152,8 @@ export function createSakuraMusic({ world, cel, host, canvas, camera, reduced, o
     const halo = object(haloRing, selectedInk, [0, .029, 0], [.249, .249, .249], group);
     halo.rotation.x = -Math.PI / 2; halo.castShadow = false;
     const button = document.createElement('button'); button.type = 'button';
-    button.className = 'world-music-label world-music-label--node'; button.innerHTML = '<small></small><strong></strong>';
+    // The <i> is the tag's invisible touch band (map-spatial.css); project() trims it to the free room.
+    button.className = 'world-music-label world-music-label--node'; button.innerHTML = '<small></small><strong></strong><i class="world-music-hit" aria-hidden="true"></i>';
     button.hidden = true; button.style.touchAction = 'none'; host.append(button);
     const node = { group, record, stock, panel, halo, button, data: null, texture: null, identity: '', screen: null, flip: null, turning: false, releaseLabel: framing.watchLabel(button) };
     button.addEventListener('click', event => { if (!consumeClick(event) && node.data && !node.data.unknown) activate({ type: 'music', action: 'select', id: node.data.id }); });
@@ -155,7 +172,7 @@ export function createSakuraMusic({ world, cel, host, canvas, camera, reduced, o
   }
   /** Resting height and size: a selected, face-up record stands lifted off the paper. */
   const restY = node => node.data?.selected && !node.data?.unknown ? .065 : .012;
-  const restScale = node => node.data?.selected && !node.data?.unknown ? 1.23 : 1;
+  const restScale = node => nodeScale * (node.data?.selected && !node.data?.unknown ? 1.23 : 1);
   function assignNode(node, data, first) {
     const previous = node.data; node.data = data;
     const unknown = Boolean(data.unknown);
@@ -168,7 +185,7 @@ export function createSakuraMusic({ world, cel, host, canvas, camera, reduced, o
       const turning = !unknown && previous?.unknown && !first && !reduced.matches;
       node.identity = identity;
       if (turning) turnOver(node, data.revealDelay || 0);
-      else { node.flip?.kill(); node.flip = null; node.turning = false; node.group.scale.x = data.selected ? 1.23 : 1; showFace(node, unknown); }
+      else { node.flip?.kill(); node.flip = null; node.turning = false; node.group.scale.x = restScale(node); showFace(node, unknown); }
     }
     node.group.userData.action = unknown ? { type: 'music', action: 'sealed', id: data.id } : data.disabled ? null : { type: 'music', action: 'select', id: data.id };
     const muted = unknown || (!data.selected && !data.adjacent && !data.highlighted && !data.current && !data.target && !data.route);
@@ -190,7 +207,7 @@ export function createSakuraMusic({ world, cel, host, canvas, camera, reduced, o
     for (const state of ['selected', 'adjacent', 'visited', 'highlighted', 'current', 'target', 'route']) node.button.classList.toggle(`is-${state}`, !unknown && Boolean(data[state]));
     node.button.classList.toggle('is-muted', muted);
     node.group.position.x = data.x; node.group.position.z = data.z;
-    const scale = data.selected && !unknown ? 1.23 : 1;
+    const scale = restScale(node);
     // A record that is turning over owns its lift and settle; the flip lands on the resting height.
     if ((first || previous?.selected !== data.selected || previous?.unknown !== data.unknown) && !node.turning) {
       const duration = first || reduced.matches ? 0 : .24;
@@ -207,7 +224,7 @@ export function createSakuraMusic({ world, cel, host, canvas, camera, reduced, o
     // The settle reads the selection when it starts, so a record selected mid-turn lands lifted.
     node.flip = gsap.timeline({ delay, onUpdate: onChange, onComplete() { node.turning = false; node.flip = null; onChange?.(); } })
       .to(node.group.position, { y: .09, duration: .12, ease: 'power2.out' }, 0)
-      .to(node.group.scale, { x: 0.02, duration: .14, ease: 'power2.in' }, 0)
+      .to(node.group.scale, { x: .02 * nodeScale, duration: .14, ease: 'power2.in' }, 0)
       .call(() => showFace(node, false), null, .14)
       .to(node.group.scale, { x: () => restScale(node), z: () => restScale(node), duration: .18, ease: 'back.out(2)' }, .14)
       .to(node.group.position, { y: () => restY(node), duration: .2, ease: 'power2.inOut' }, .2);
@@ -221,7 +238,7 @@ export function createSakuraMusic({ world, cel, host, canvas, camera, reduced, o
   function createEdge(data) {
     const group = new THREE.Group(); group.name = 'music-connection'; printwork.add(group);
     const button = document.createElement('button'); button.type = 'button'; button.className = 'world-music-link';
-    button.innerHTML = '<span aria-hidden="true"></span>'; button.hidden = true; button.style.touchAction = 'none'; host.append(button);
+    button.innerHTML = '<span aria-hidden="true"></span><i class="world-music-hit" aria-hidden="true"></i>'; button.hidden = true; button.style.touchAction = 'none'; host.append(button);
     button.addEventListener('click', event => { if (!consumeClick(event) && edge.data && !edge.data.stub) activate({ type: 'music', action: 'edge', id: edge.data.id }); });
     const edge = { group, button, data: null, midpoint: new THREE.Vector3(), curve: null, identity: '', parts: [], grow: null, growing: false, releaseLabel: framing.watchLabel(button) };
     edges.set(data.id, edge); return edge;
@@ -268,14 +285,17 @@ export function createSakuraMusic({ world, cel, host, canvas, camera, reduced, o
       const from = data.stub ? data.from : [...nodes.values()].find(node => node.data?.current)?.data.id;
       if (from === data.b) curve = new THREE.QuadraticBezierCurve3(curve.v2.clone(), curve.v1.clone(), curve.v0.clone());
       // The hint stub leaves the sleeve's edge and stops well short of the other record:
-      // a pencilled direction with an arrowhead, never a name.
+      // a pencilled direction with an arrowhead, never a name. Distances follow the sleeve size.
       if (data.stub) {
-        const length = Math.max(.3, curve.getLength());
-        const t0 = Math.min(.45, .34 / length); const t1 = Math.min(t0 + .42 / length, Math.max(t0 + .16, 1 - .3 / length));
+        // It starts past the player's lifted sleeve (×1.23) and ends clear of the other one.
+        const length = Math.max(.3, curve.getLength()); const half = SLEEVE / 2 * nodeScale;
+        const start = Math.min(length * .45, half * 1.23 + .035);
+        const stop = Math.min(start + .42 * nodeScale, length - half - .02, Math.max(start + .1, length - half - .05));
+        const t0 = start / length; const t1 = Math.max(t0 + .08, Math.min(.92, stop / length));
         curve = new THREE.QuadraticBezierCurve3(curve.getPoint(t0), curve.getPoint((t0 + t1) / 2), curve.getPoint(t1));
       }
       edge.curve = curve; curve.getPoint(.5, edge.midpoint);
-      const dashes = data.kind === 'style' ? 7 : data.answer ? 9 : data.stub ? 3 : 1;
+      const dashes = data.kind === 'style' ? 7 : data.answer ? 9 : data.stub ? (curve.getLength() > .2 ? 3 : 2) : 1;
       const fill = data.stub ? .72 : .58;
       const radius = INK_WIDTH[tier] || INK_WIDTH.quiet;
       const stroke = path => {
@@ -286,7 +306,7 @@ export function createSakuraMusic({ world, cel, host, canvas, camera, reduced, o
         stroke(dashes === 1 ? curve : new THREE.QuadraticBezierCurve3(curve.getPoint(index / dashes), curve.getPoint((index + fill / 2) / dashes), curve.getPoint((index + fill) / dashes)));
       }
       if (data.stub) {
-        const tip = curve.getPoint(1); const back = curve.getTangent(1).setY(0).normalize().multiplyScalar(-.09);
+        const tip = curve.getPoint(1); const back = curve.getTangent(1).setY(0).normalize().multiplyScalar(-Math.max(.07, .09 * nodeScale));
         for (const angle of [-.62, .62]) stroke(new THREE.LineCurve3(tip, tip.clone().add(back.clone().applyAxisAngle(new THREE.Vector3(0, 1, 0), angle))));
       }
       if (animate && (!wasVisible || data.stub)) growEdge(edge, data.stub ? .5 : .4);
@@ -368,16 +388,56 @@ export function createSakuraMusic({ world, cel, host, canvas, camera, reduced, o
     }
     const newGraph = key !== payload.key; key = payload.key;
     if (newGraph) { stopGesture(); gsap.killTweensOf(view); Object.assign(view, { zoom: 1, x: 0, z: 0 }); }
+    nodeScale = sleeveScale(payload.nodes.length);
     const nodeIds = new Set(payload.nodes.map(node => node.id)); const edgeIds = new Set(payload.edges.map(edge => edge.id));
     for (const [id, edge] of edges) if (!edgeIds.has(id)) { releaseEdge(edge); edges.delete(id); }
     for (const [id, node] of nodes) if (!nodeIds.has(id)) { releaseNode(node); nodes.delete(id); }
     for (const data of payload.nodes) { const exists = nodes.has(data.id); assignNode(nodes.get(data.id) || createNode(data), data, newGraph || !exists || !wasEnabled); }
     const animateInk = wasEnabled && !newGraph && !reduced.matches;
     for (const data of payload.edges) if (nodes.has(data.a) && nodes.has(data.b)) assignEdge(edges.get(data.id) || createEdge(data), data, animateInk);
+    round = payload.round || null;
+    // On a phone a free roam follows the player: each move (or a new table) centres the neighbourhood.
+    // A round keeps the table the player chose (it opens whole, see map.js) and only steps back in when a
+    // needed record, its start or its goal has left the view. 全图 (fit) stays whole until the next move.
+    const nextAnchor = JSON.stringify([payload.key, Boolean(round), ...['current', 'target'].map(state => payload.nodes.find(node => node[state])?.id || '')]);
+    const moved = nextAnchor !== anchor; anchor = nextAnchor;
+    const reframe = phone() && !payload.ceremony && !ceremonyTimeline && ((moved && !round) || (!pointers.size && !focusInView()));
     if (payload.ceremony && payload.ceremony.token !== lastCeremony) playCeremony(payload.ceremony);
     else if (!payload.ceremony && ceremonyTimeline) finishCeremony();
     if (payload.flash && payload.flash.token !== lastFlash) flashNode(payload.flash);
-    applyView();
+    if (reframe) frameFocus(wasEnabled && !newGraph);
+    else applyView();
+  }
+  const phone = () => (host.clientWidth || framing.layout.width) <= 760;
+  /** The records a phone keeps in view: every needed name, plus a round's route and revealed answer,
+   *  so its start and goal both stay on the table. */
+  function focusPoints() {
+    return [...nodes.values()].map(node => node.data).filter(data => needsName(data) || (round && data && !data.unknown && (data.route || data.highlighted)));
+  }
+  /** Zoom and pan that print the focus records as large as the paper allows. The sleeves grow with the
+   *  zoom, so the margin does too: zoom = 2(P − m) / (span + 2·half), per axis. */
+  function focusView() {
+    const points = focusPoints(); if (!points.length) return { zoom: 1, x: 0, z: 0 };
+    const half = SLEEVE / 2 * nodeScale * 1.23;
+    const span = axis => { const values = points.map(point => point[axis]); return [Math.min(...values), Math.max(...values)]; };
+    const [minX, maxX] = span('x'); const [minZ, maxZ] = span('z');
+    const zoom = THREE.MathUtils.clamp(Math.min(
+      2 * (PAPER.x - FOCUS_MARGIN) / (maxX - minX + 2 * half),
+      2 * (PAPER.z - FOCUS_MARGIN) / (maxZ - minZ + 2 * half)), MIN_ZOOM, FOCUS_ZOOM);
+    // A table that would barely change stays whole.
+    if (zoom < 1.08) return { zoom: 1, x: 0, z: 0 };
+    return clampView({ zoom, x: -(minX + maxX) / 2 * zoom, z: -(minZ + maxZ) / 2 * zoom });
+  }
+  function focusInView() {
+    const half = SLEEVE / 2 * nodeScale * 1.23 * view.zoom;
+    return focusPoints().every(point => Math.abs(point.x * view.zoom + view.x) <= PAPER.x - .055 - half && Math.abs(point.z * view.zoom + view.z) <= PAPER.z - .055 - half);
+  }
+  function frameFocus(animate) {
+    const next = focusView();
+    gsap.killTweensOf(view);
+    if (animate && !reduced.matches) gsap.to(view, { ...next, duration: .32, ease: 'power2.out', onUpdate: applyView });
+    else { Object.assign(view, next); applyView(); }
+    return { zoom: next.zoom };
   }
   function withinPaper(point, margin = 0) { return Math.abs(point.x) <= PAPER.x - margin && Math.abs(point.z) <= PAPER.z - margin; }
   function localPosition(clientX, clientY) {
@@ -413,6 +473,8 @@ export function createSakuraMusic({ world, cel, host, canvas, camera, reduced, o
     }
     if (command === 'zoom-in' || command === 'zoom-out') return { zoom: zoomAt(view.zoom * (command === 'zoom-in' ? 1.28 : 1 / 1.28), undefined, true) };
     if (command === 'focus') {
+      // A phone centres where you stand at a zoom where the names one tap away can be read.
+      if (phone()) return frameFocus(true);
       if (view.zoom === 1) return control('fit');
       const selected = [...nodes.values()].find(node => node.data.selected);
       if (selected) {
@@ -480,28 +542,81 @@ export function createSakuraMusic({ world, cel, host, canvas, camera, reduced, o
     return { x: (projector.x + 1) * width / 2, y: (1 - projector.y) * height / 2, depth: projector.z };
   }
   const rectAround = (x, y, half) => ({ left: x - half, top: y - half, right: x + half, bottom: y + half });
-  /** Name tags sit beside their sleeve, never on another record; only a crowded
-   *  table lets a tag overlap sleeves, and still never the UI or another tag. */
-  function positionLabel(node, sleeves, mobile) {
+  /** Name tags sit beside their sleeve and never cover the UI or another tag. A quiet name shows only
+   *  where the table has room: clear of every record, or on a crowded table over quieter records, never
+   *  over one whose name is needed. A needed name (needsName) is placed first and always finds a spot:
+   *  the nearest free one, stepping out on a printed leader or over a quiet record, whichever hides least. */
+  function positionLabel(node, sleeves, mobile, needed, packed = []) {
     const { x, y, r } = node.screen; const size = framing.labelSize(node.button);
     const w = size.width; const h = size.height; const gap = mobile ? 3 : 5;
+    // [centre x, top, kind, how far the spot is from its sleeve]
     const candidates = [
-      [x, y + r * .72 + gap, 'below'], [x, y - r * .72 - gap - h, 'above'],
-      [x + r * .8 + w / 2 + gap, y - h / 2, 'side'], [x - r * .8 - w / 2 - gap, y - h / 2, 'side'],
-      [x + r * .55 + w / 2, y + r * .55, 'corner'], [x - r * .55 - w / 2, y + r * .55, 'corner'],
-      [x + r * .55 + w / 2, y - r * .55 - h, 'corner'], [x - r * .55 - w / 2, y - r * .55 - h, 'corner'],
-      [x, y + r * .15, 'over'],
+      [x, y + r * .72 + gap, 'below', 0], [x, y - r * .72 - gap - h, 'above', .1],
+      [x + r * .8 + w / 2 + gap, y - h / 2, 'side', .2], [x - r * .8 - w / 2 - gap, y - h / 2, 'side', .2],
+      [x + r * .55 + w / 2, y + r * .55, 'corner', .3], [x - r * .55 - w / 2, y + r * .55, 'corner', .3],
+      [x + r * .55 + w / 2, y - r * .55 - h, 'corner', .3], [x - r * .55 - w / 2, y - r * .55 - h, 'corner', .3],
     ];
-    const others = sleeves.filter(item => item.node !== node).map(item => item.rect);
-    let placed = candidates.find(([left, top, kind]) => kind !== 'over' && framing.placeLabel(node.button, left, top, 'top', others));
-    if (!placed) placed = candidates.find(([left, top]) => framing.placeLabel(node.button, left, top, 'top'));
-    if (!placed) return false;
+    // Where you stand is the one name that must read as its record's: it steps out on a leader only a
+    // little way, and rather than stand far off on a long leader it lies over its own record (centred on
+    // it, so it hides the least around). Other needed names still prefer any leader to hiding a record.
+    const anchor = Boolean(needed && node.data?.current);
+    // Further out, the tag's near edge sits `reach` px past the sleeve in each direction.
+    if (needed) LEADER_REACH.forEach((reach, step) => { for (const angle of LEADER_ANGLES) {
+      const dx = Math.cos(angle); const dy = Math.sin(angle);
+      candidates.push([x + dx * (r * .8 + reach + Math.abs(dx) * w / 2), y + dy * (r * .8 + reach + Math.abs(dy) * h / 2) - h / 2, 'leader', 1 + step * (anchor ? 3 : 1)]);
+    } });
+    // Over its own sleeve: after the leaders up to 50px, since it hides the record the name belongs to.
+    candidates.push(anchor ? [x, y - h / 2, 'over', 2] : [x, y + r * .15, 'over', 4.5]);
+    const others = sleeves.filter(item => item.node !== node);
+    // A needed name may also use a free pocket beside the paper UI, clear of every control.
+    const fits = avoid => ([left, top]) => framing.placeLabel(node.button, left, top, 'top', avoid, needed);
+    const own = rectAround(x, y, r * .9);
+    // For 你在这里, hiding a record whose name is needed (one tap away, the goal) costs 40: more than its
+    // longest leader (19) even with two quiet records hidden on the way (16). It steps out on a leader rather
+    // than lie over the singer it points to next (it used to cover 王嘉尔 beside 林俊杰 at 1440).
+    const neededCost = anchor ? 40 : 16;
+    const hides = ([left, top, kind]) => {
+      const box = { left: left - w / 2, right: left + w / 2, top, bottom: top + h };
+      // The anchor's tag counts only the records' bodies it would hide (a tilted corner is not a record hidden).
+      return others.reduce((sum, item) => sum + (covers(box, needed && !anchor ? item.span : item.rect) ? item.needed ? neededCost : 8 : 0), 0) + (kind !== 'over' && covers(box, own) ? .6 : 0);
+    };
+    let placed = null;
+    if (needed) {
+      // Distance and hidden records share one cost: every leader on the list (up to 125px) beats covering
+      // another record, even a face-down one, and covering a record whose name is needed comes last.
+      // A free spot right beside the sleeve costs under 1 and beats everything else, so try those first.
+      const rank = list => list.map((candidate, index) => ({ candidate, index, cost: candidate[3] + hides(candidate) }))
+        .sort((a, b) => a.cost - b.cost || a.index - b.index).map(item => item.candidate);
+      placed = rank(candidates.slice(0, 8)).find(fits(others.map(item => item.span))) || rank(candidates).find(fits(null));
+      // Last resort on a very small table: line the tag up with the tags already placed, row by row,
+      // so the gaps between them are used instead of left as slivers.
+      if (!placed && packed.length) {
+        const spots = []; const tops = new Set();
+        // Rows keep the gap placeLabel asks for above and below (room for the 44px touch bands).
+        const along = box => Math.max(3.5, TOUCH - Math.min(h, box.bottom - box.top) + 1.5);
+        for (const box of packed) { tops.add(box.top); tops.add(box.bottom + along(box)); tops.add(box.top - h - along(box)); }
+        for (const top of tops) {
+          const xs = new Set([x]);
+          for (const box of packed) if (box.top < top + h && box.bottom > top) { xs.add(box.left - 3.5 - w / 2); xs.add(box.right + 3.5 + w / 2); }
+          for (const cx of xs) spots.push([cx, top, 'leader', 1 + Math.hypot(cx - x, top + h / 2 - y) / 20]);
+        }
+        placed = rank(spots).find(fits(null));
+      }
+    } else {
+      placed = candidates.find(candidate => candidate[2] !== 'over' && fits(others.map(item => item.rect))(candidate));
+      // Crowded: the spot that hides the fewest other records (its own sleeve counts for less).
+      if (!placed) placed = candidates.map((candidate, index) => ({ candidate, index, cost: hides(candidate) }))
+        .sort((a, b) => a.cost - b.cost || a.index - b.index).map(item => item.candidate)
+        .find(fits(others.filter(item => item.needed).map(item => item.rect)));
+    }
+    if (!placed) return null;
     const [labelX, labelY, kind] = placed;
     node.button.style.transform = `translate3d(${labelX}px,${labelY}px,0) translate(-50%,0)`;
-    // A short printed leader from a sideways tag to its own sleeve; decorative only.
-    const leader = kind === 'side' || kind === 'corner';
+    const box = { left: labelX - w / 2, right: labelX + w / 2, top: labelY, bottom: labelY + h };
+    // A printed leader from a tag that stands off its sleeve; decorative only.
+    const leader = kind === 'side' || kind === 'corner' || kind === 'leader';
     node.button.classList.toggle('has-leader', leader);
-    if (!leader) return true;
+    if (!leader) return box;
     const left = labelX - w / 2;
     const startX = THREE.MathUtils.clamp(x - left, 0, w); const startY = THREE.MathUtils.clamp(y - labelY, 0, h);
     const toX = x - left - startX; const toY = y - labelY - startY; const length = Math.hypot(toX, toY);
@@ -510,12 +625,55 @@ export function createSakuraMusic({ world, cel, host, canvas, camera, reduced, o
     node.button.style.setProperty('--leader-y', `${startY}px`);
     node.button.style.setProperty('--leader-length', `${reach}px`);
     node.button.style.setProperty('--leader-angle', `${Math.atan2(toY, toX)}rad`);
-    return true;
+    return box;
+  }
+  /** Each shown tag's invisible touch band grows to 44px. It takes free room first: half-way to a
+   *  neighbouring tag, never over a control, and clear of the other records, taking more on one side where
+   *  the other is short. Where the records leave too little, it reaches over a record's edge rather than
+   *  stay short (the label engine keeps tags far enough apart for this, see placeLabel in sakura-framing),
+   *  so every name is a full target and two bands never meet. */
+  function fitTouchBands(tags, sleeves) {
+    const split = (need, before, after) => {
+      let first = Math.min(before, Math.ceil(need / 2)); const second = Math.min(after, need - first);
+      first = Math.min(before, need - second);
+      return [first, second];
+    };
+    for (const tag of tags) {
+      const { box } = tag;
+      const needY = Math.max(0, Math.ceil(TOUCH - (box.bottom - box.top))); const needX = Math.max(0, Math.ceil(TOUCH - (box.right - box.left)));
+      const room = withRecords => {
+        const free = { top: needY, right: needX, bottom: needY, left: needX };
+        const limit = (rect, share) => {
+          if (rect.left < box.right + free.right && rect.right > box.left - free.left) {
+            if (rect.bottom <= box.top) free.top = Math.min(free.top, (box.top - rect.bottom) * share);
+            if (rect.top >= box.bottom) free.bottom = Math.min(free.bottom, (rect.top - box.bottom) * share);
+          }
+          if (rect.top < box.bottom + free.bottom && rect.bottom > box.top - free.top) {
+            if (rect.right <= box.left) free.left = Math.min(free.left, (box.left - rect.right) * share);
+            if (rect.left >= box.right) free.right = Math.min(free.right, (rect.left - box.right) * share);
+          }
+        };
+        for (const other of tags) if (other !== tag) limit(other.box, .5);
+        if (withRecords) for (const sleeve of sleeves) if (sleeve.node !== tag.node) limit(sleeve.rect, 1);
+        for (const control of framing.layout.obstacles) limit(control, 1);
+        Object.keys(free).forEach(side => { free[side] = Math.max(0, Math.floor(free[side])); });
+        const [top, bottom] = split(needY, free.top, free.bottom); const [left, right] = split(needX, free.left, free.right);
+        return { top, right, bottom, left, full: top + bottom >= needY && left + right >= needX };
+      };
+      let band = room(true);
+      if (!band.full) band = room(false);
+      const value = ['top', 'right', 'bottom', 'left'].map(side => band[side]).join(' ');
+      if (tag.button.dataset.touch === value) continue;
+      tag.button.dataset.touch = value;
+      ['top', 'right', 'bottom', 'left'].forEach(side => tag.button.style.setProperty(`--touch-${side}`, `${band[side]}px`));
+    }
   }
   function project(camera, width, height, active) {
     const mobile = width <= 760;
-    const priority = node => node.data?.current ? 6 : node.data?.target ? 5 : node.data?.selected ? 4 : node.data?.highlighted || node.data?.route ? 3 : node.data?.adjacent ? 2 : node.data?.visited ? 1 : 0;
-    const orderedNodes = [...nodes.values()].sort((a, b) => priority(b) - priority(a));
+    // Needed names first (where you stand, the goal, the selection, one tap away), then route and answer.
+    const priority = node => node.data?.current ? 7 : node.data?.target ? 6 : node.data?.selected ? 5 : node.data?.adjacent ? 4 : node.data?.highlighted || node.data?.route ? 3 : node.data?.visited ? 1 : 0;
+    // Equal standing: the better-connected record is named first on a crowded table.
+    const orderedNodes = [...nodes.values()].sort((a, b) => priority(b) - priority(a) || (b.data?.count || 0) - (a.data?.count || 0));
     const sleeves = [];
     const focused = document.activeElement;
     for (const node of orderedNodes) {
@@ -526,37 +684,72 @@ export function createSakuraMusic({ world, cel, host, canvas, camera, reduced, o
       const r = Math.max(8, Math.hypot(edgePoint.x - center.x, edgePoint.y - center.y));
       node.screen = { ...center, r };
       if (!enabled || !active || !withinPaper(local, .055) || center.depth < -1 || center.depth > 1) { node.screen.off = true; continue; }
-      sleeves.push({ node, rect: rectAround(center.x, center.y, r * .9) });
+      // `rect` is the sleeve's body; `span` reaches its tilted corners and printed edge (the projected centre
+      // sits a few px off the painted card), which a needed name keeps clear of.
+      sleeves.push({ node, rect: rectAround(center.x, center.y, r * .9), span: rectAround(center.x, center.y, r * 1.12 + 6), needed: needsName(node.data) });
     }
     // Visibility is assigned once per label per frame (never hidden-then-shown), and a tag
     // that holds keyboard focus stays where it was rather than dropping focus to the page.
+    const nameable = node => enabled && active && !node.data?.unknown;
+    const placeable = node => nameable(node) && !node.screen.off && !node.turning;
+    // Needed names go first. A greedy pass can box in a name placed late, so a pass that leaves one out
+    // is tried again with the names that found no spot moved up (where you stand always leads).
+    const start = framing.labelMark();
+    const arrange = order => { framing.rewindLabels(start); const boxes = new Map(); for (const node of order) { const box = positionLabel(node, sleeves, mobile, true, [...boxes.values()]); if (box) boxes.set(node, box); } return boxes; };
+    let order = orderedNodes.filter(node => placeable(node) && needsName(node.data));
+    let boxes = arrange(order); let best = { order, size: boxes.size };
+    for (let attempt = 1; attempt < 4 && boxes.size < order.length; attempt++) {
+      const lead = order.filter(node => node.data.current);
+      order = [...lead, ...order.filter(node => !boxes.has(node) && !lead.includes(node)), ...order.filter(node => boxes.has(node) && !lead.includes(node))];
+      boxes = arrange(order);
+      if (boxes.size > best.size) best = { order, size: boxes.size };
+    }
+    if (best.order !== order) boxes = arrange(best.order);
+    for (const node of orderedNodes) if (placeable(node) && !needsName(node.data)) {
+      const box = positionLabel(node, sleeves, mobile, false);
+      if (box) boxes.set(node, box);
+    }
+    const tags = [];
     for (const node of orderedNodes) {
-      const eligible = enabled && active && !node.data?.unknown;
-      const placed = eligible && !node.screen.off && !node.turning && positionLabel(node, sleeves, mobile);
-      const hidden = !placed && !(eligible && node.button === focused);
+      const box = boxes.get(node);
+      if (box) tags.push({ node, button: node.button, box });
+      const hidden = !box && !(nameable(node) && node.button === focused);
       if (node.button.hidden !== hidden) node.button.hidden = hidden;
     }
-    const sleeveRects = sleeves.map(item => item.rect);
+    // Song titles never cover a named record; a face-down one may sit under a title on a crowded table.
+    const sleeveRects = sleeves.filter(item => !item.node.data?.unknown).map(item => item.rect);
     // The song you just turned over (touching where you stand) is named before older route ink.
     const edgeRank = data => data.stub ? 0 : data.active ? 3 : data.highlighted || data.answer ? 2 : data.route ? 1 : 0;
     for (const edge of [...edges.values()].sort((a, b) => edgeRank(b.data) - edgeRank(a.data))) {
       const eligible = enabled && active && !edge.data.stub && (edge.data.active || edge.data.highlighted || edge.data.route || edge.data.answer);
       let placed = false;
+      // On the ink first; on a crowded table, just beside it (never over a record).
       if (eligible && !edge.growing) for (const t of [.5, .4, .6, .32, .68]) {
         edge.curve.getPoint(t, location); printwork.localToWorld(location);
         const local = furniture.worldToLocal(location.clone()); const screen = screenPoint(location, camera, width, height);
         if (!withinPaper(local, .04) || screen.depth < -1 || screen.depth > 1) continue;
+        edge.curve.getPoint(Math.min(1, t + .05), rim); printwork.localToWorld(rim);
+        const ahead = screenPoint(rim, camera, width, height);
+        const along = Math.hypot(ahead.x - screen.x, ahead.y - screen.y) || 1;
+        const nx = -(ahead.y - screen.y) / along; const ny = (ahead.x - screen.x) / along;
         const size = framing.labelSize(edge.button);
-        const box = { left: screen.x - size.width / 2, right: screen.x + size.width / 2, top: screen.y - size.height / 2, bottom: screen.y + size.height / 2 };
-        if (sleeveRects.some(rect => box.left < rect.right + 4 && box.right > rect.left - 4 && box.top < rect.bottom + 4 && box.bottom > rect.top - 4)) continue;
-        if (!framing.placeLabel(edge.button, screen.x, screen.y, 'center')) continue;
-        edge.button.style.transform = `translate3d(${screen.x}px,${screen.y}px,0) translate(-50%,-50%)`;
-        placed = true;
-        break;
+        const beside = Math.abs(nx) * size.width / 2 + Math.abs(ny) * size.height / 2 + 5;
+        for (const shift of [0, beside, -beside]) {
+          const cx = screen.x + nx * shift; const cy = screen.y + ny * shift;
+          const box = { left: cx - size.width / 2, right: cx + size.width / 2, top: cy - size.height / 2, bottom: cy + size.height / 2 };
+          if (sleeveRects.some(rect => box.left < rect.right + 4 && box.right > rect.left - 4 && box.top < rect.bottom + 4 && box.bottom > rect.top - 4)) continue;
+          if (!framing.placeLabel(edge.button, cx, cy, 'center')) continue;
+          edge.button.style.transform = `translate3d(${cx}px,${cy}px,0) translate(-50%,-50%)`;
+          tags.push({ button: edge.button, box });
+          placed = true;
+          break;
+        }
+        if (placed) break;
       }
       const hidden = !placed && !(eligible && edge.button === focused);
       if (edge.button.hidden !== hidden) edge.button.hidden = hidden;
     }
+    fitTouchBands(tags, sleeves);
   }
   canvas.addEventListener('pointerdown', onPointerDown); host.addEventListener('pointerdown', onPointerDown);
   canvas.addEventListener('pointermove', onPointerMove); canvas.addEventListener('pointerup', onPointerUp); canvas.addEventListener('pointercancel', onPointerUp);

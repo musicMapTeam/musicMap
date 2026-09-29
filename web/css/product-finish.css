@@ -1,22 +1,7 @@
-/* 0.9: the visitor's own nights, songs and memories form one continuous app. */
-.home-photo-loading { display:flex; flex-direction:column; gap:12px; align-items:center; justify-content:center; height:100%; color:var(--muted); font-size:12px; }
+/* The collection sheet (我的发现): heading and tabs read as one continuous page. */
 .collection-page { width:100%; }
-html[data-theme] .live-dialog--saved .live-saved-note { padding:16px; gap:12px; border:0; border-radius:12px; }
-html[data-theme] .live-dialog--saved .live-saved-note strong { font-size:15px; }
-html[data-theme] .live-dialog--saved .live-saved-note p { margin:6px 0 0; font-size:13px; line-height:1.7; }
-html[data-theme] .live-dialog--saved .live-saved-actions { grid-template-columns:1fr 1fr; margin-top:16px; gap:8px; }
-html[data-theme] .live-dialog--saved .live-saved-actions .button { min-height:46px; padding:10px 8px; font-size:13px; }
-html[data-theme] .live-dialog--saved .live-saved-actions .text-button { justify-content:center; min-height:42px; font-size:12px; }
-html[data-theme] .live-dialog--saved #live-dialog-content>.text-button:last-child { display:none; }
 html[data-theme] .collection-page .records-filters { display:flex; width:fit-content; max-width:100%; gap:2px; }
 html[data-theme] .collection-page .records-filters button { padding:9px 13px; white-space:nowrap; font-size:13px; }
-html[data-theme='sakura'] .live-room-head { display:block; }
-html[data-theme='sakura'] .live-room-head h1 { font-size:22px; line-height:1.4; margin:0 0 7px; }
-html[data-theme='sakura'] .live-room-tools { margin-top:12px; gap:12px; }
-html[data-theme='sakura'] .live-empty-wall { min-height:0; padding:20px; border-radius:17px; }
-html[data-theme='sakura'] .live-empty-wall h3 { margin:0 0 8px; font-size:16px; }
-html[data-theme='sakura'] .live-empty-wall p { margin:0 0 14px; font-size:12px; }
-html[data-theme='sakura'] .live-empty-memory { padding:12px 0; font-size:12px; }
 html[data-theme='sakura'] .collection-page .records-heading { margin-bottom:18px; }
 html[data-theme='sakura'] .collection-page .records-heading>.button { font-size:13px; padding:9px 14px; }
 html[data-theme='sakura'] .collection-page .records-filters { width:100%; }

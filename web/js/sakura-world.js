@@ -3,7 +3,7 @@ import { createSakuraPrintwork } from './sakura-printwork.js';
 /**
  * Original procedural set for the music courtyard.
  * World units are metres; the shop faces +Z. The owner controls the camera,
- * lights, animation clock, photo maps and disposal of the supplied resources.
+ * lights, animation clock and disposal of the supplied resources.
  */
 export function buildSakuraWorld({ THREE, world, mesh, box, cylinder, ball, rod, label, geometry, toon, cel, materials, textures }) {
   const group = (name, position = [0, 0, 0], parent = world) => {
@@ -15,7 +15,7 @@ export function buildSakuraWorld({ THREE, world, mesh, box, cylinder, ball, rod,
   const basic = color => registerMaterial(new THREE.MeshBasicMaterial({ color }));
   const creamInk = basic('#eee2bf');
   const darkInk = basic('#3e514c');
-  // Night values: bulbs are warm, photo paper is softened so it does not glare
+  // Night values: bulbs are warm, label paper is softened so it does not glare
   // against the dark yard, and the shop windows glow from inside.
   const warmLamp = basic('#ffe3a6');
   const paper = basic('#f9f0df');
@@ -272,55 +272,9 @@ export function buildSakuraWorld({ THREE, world, mesh, box, cylinder, ball, rod,
   }
   sign('33 / 45', [0, 2.255, .373], .41, .12, '#f2e7d3', '#42696a', shelf);
 
-  // Working desk: paper is a physical surface with a pen, tape, scissors and
-  // instant camera, instead of UI controls painted across a flat backdrop.
-  const desk = action(group('card-making-desk', [4, 0, 1.6]), { type: 'editor' });
-  for (const x of [-.77, .77]) for (const z of [-.43, .43]) {
-    rod([x, .1, z], [x * .91, 1.04, z * .91], .045, toon.green, desk);
-  }
-  roundBox([0, 1.03, 0], [1.93, .115, 1.35], warmWood, desk);
-  roundBox([0, 1.093, .035], [1.1, .021, .84], toon.cream, desk);
-  const draft = group('unfinished-photo-card', [-.095, 1.113, .03], desk);
-  draft.rotation.y = -.08;
-  roundBox([0, 0, 0], [.51, .012, .65], paper, draft);
-  const draftImageMaterial = registerMaterial(new THREE.MeshBasicMaterial({ color: '#ffffff' }));
-  const draftImageMesh = noShadow(mesh(geometry(new THREE.PlaneGeometry(.435, .425)), draftImageMaterial, [0, .014, -.04], [1, 1, 1], draft));
-  draftImageMesh.name = 'current-card-draft-image';
-  draftImageMesh.rotation.x = -Math.PI / 2;
-  box([-.054, .011, .245], [.28, .007, .012], toon.leaf, draft);
-  box([-.088, .011, .281], [.211, .007, .009], toon.sand, draft);
-  for (let i = 0; i < 3; i++) {
-    const scrap = roundBox([.428, 1.113 + i * .006, .19], [.28, .007, .37], [toon.mint, toon.rose, paper][i], desk);
-    scrap.rotation.y = .22 + i * .12;
-  }
-  rod([-.655, 1.115, -.16], [-.58, 1.115, .22], .015, toon.green, desk);
-  const pencilTip = geometry(new THREE.ConeGeometry(.018, .06, 8));
-  const tip = mesh(pencilTip, toon.cream, [-.574, 1.115, .247], [1, 1, 1], desk); tip.rotation.x = Math.PI / 2;
-  const tapeRing = noShadow(mesh(geometry(new THREE.TorusGeometry(.09, .028, 10, 32)), toon.coral, [.704, 1.139, .34], [1, 1, 1], desk));
-  tapeRing.rotation.x = -Math.PI / 2;
-  for (const x of [.48, .65]) {
-    const loop = noShadow(mesh(geometry(new THREE.TorusGeometry(.041, .011, 8, 20)), toon.green, [x, 1.114, -.293], [1, 1, 1], desk));
-    loop.rotation.x = -Math.PI / 2;
-  }
-  rod([.505, 1.115, -.264], [.619, 1.115, -.045], .009, toon.sand, desk);
-  rod([.623, 1.12, -.264], [.509, 1.12, -.045], .009, toon.sand, desk);
-  const instantCamera = group('instant-camera', [-.601, 1.259, -.36], desk);
-  instantCamera.rotation.y = -.14;
-  roundBox([0, 0, 0], [.47, .31, .24], toon.cream, instantCamera);
-  roundBox([0, -.088, .013], [.49, .13, .265], toon.coral, instantCamera);
-  const lens = cylinder([0, .026, .143], [.083, .055, .083], toon.green, instantCamera); lens.rotation.x = Math.PI / 2;
-  const lensGlass = cylinder([0, .026, .178], [.056, .019, .056], toon.ink, instantCamera); lensGlass.rotation.x = Math.PI / 2;
-  box([-.14, .09, .129], [.081, .052, .013], warmLamp, instantCamera);
-  box([0, -.109, .151], [.26, .015, .013], toon.ink, instantCamera);
-  const stool = group('desk-stool', [4.09, 0, 2.76]);
-  cylinder([0, .66, 0], [.3, .085, .3], toon.cream, stool);
-  for (let i = 0; i < 3; i++) {
-    const angle = i * Math.PI * 2 / 3;
-    rod([Math.cos(angle) * .22, .09, Math.sin(angle) * .22], [Math.cos(angle) * .15, .63, Math.sin(angle) * .15], .032, toon.green, stool);
-  }
-
-  // A circular timber stage, quiet enough to remain a small courtyard gig.
-  const stage = action(group('tree-side-stage', [-4, 0, .5]), { type: 'navigate', view: 'live' });
+  // A low timber platform under the tree: a stool and a resting guitar make a
+  // quiet listening corner. It is ambiance only and carries no action.
+  const stage = group('tree-side-stage', [-4, 0, .5]);
   cylinder([0, .15, 0], [1.2, .23, 1.2], warmWood, stage);
   cylinder([0, .279, 0], [1.21, .04, 1.21], toon.cream, stage);
   for (let i = -3; i <= 3; i++) {
@@ -328,15 +282,6 @@ export function buildSakuraWorld({ THREE, world, mesh, box, cylinder, ball, rod,
     const halfWidth = Math.sqrt(1.19 ** 2 - z ** 2);
     noShadow(box([0, .302, z], [halfWidth * 2, .006, .015], warmWood, stage));
   }
-  for (let i = 0; i < 3; i++) {
-    const angle = i * Math.PI * 2 / 3;
-    rod([.43, .337, .35], [.43 + Math.cos(angle) * .25, .315, .35 + Math.sin(angle) * .25], .016, toon.ink, stage);
-  }
-  rod([.43, .35, .35], [.43, 1.59, .35], .018, toon.ink, stage);
-  rod([.43, 1.56, .35], [.04, 1.75, .35], .014, toon.ink, stage);
-  const microphone = roundBox([-.014, 1.767, .35], [.175, .057, .063], toon.ink, stage);
-  microphone.rotation.z = -.15;
-  tube([[.09, 1.754, .35], [.35, 1.49, .375], [.47, .48, .383], [.86, .306, .74]], .009, toon.ink, stage);
   const performanceStool = group('performance-stool', [-.43, .3, -.17], stage);
   cylinder([0, .52, 0], [.23, .08, .23], toon.green, performanceStool);
   for (const x of [-.155, .155]) for (const z of [-.155, .155]) rod([x, 0, z], [x * .85, .5, z * .85], .025, warmWood, performanceStool);
@@ -350,39 +295,6 @@ export function buildSakuraWorld({ THREE, world, mesh, box, cylinder, ball, rod,
   box([0, -.022, .073], [.103, .033, .011], toon.ink, guitar);
   for (let i = 0; i < 4; i++) rod([-.017 + i * .011, -.011, .084], [-.017 + i * .011, .825, .023], .0017, creamInk, guitar);
   for (const x of [-.06, .06]) for (const y of [.766, .813]) ball([x, y, -.012], [.019, .011, .013], toon.gold, guitar);
-  const speaker = group('small-stage-speaker', [.79, .3, -.52], stage);
-  roundBox([0, .3, 0], [.38, .59, .33], toon.green, speaker);
-  for (const [y, radius] of [[.21, .113], [.443, .052]]) {
-    const cone = cylinder([0, y, .17], [radius, .02, radius], toon.ink, speaker); cone.rotation.x = Math.PI / 2;
-    const cap = cylinder([0, y, .186], [radius * .37, .015, radius * .37], toon.leaf, speaker); cap.rotation.x = Math.PI / 2;
-  }
-
-  // Six detachable photograph slots. Only the first two are initially visible;
-  // the owner fills/hides the others using cards it is actually allowed to show.
-  // The paper never contains a clip: it can be lifted cleanly from the stand.
-  const photoWall = group('two-view-photo-wall', [-3.8, 0, 1.4]);
-  for (const x of [-1.56, 1.56]) {
-    box([x, 1.32, 0], [.074, 2.55, .085], toon.green, photoWall);
-    roundBox([x, .093, 0], [.47, .075, .58], toon.sand, photoWall);
-  }
-  box([0, 2.575, 0], [3.26, .087, .096], toon.green, photoWall);
-  for (const y of [2.414, 1.274]) tube([[-1.57, y, .013], [0, y - .054, .013], [1.57, y, .013]], .008, toon.wood, photoWall);
-  sign('OUR NIGHT', [0, 2.566, .062], .91, .125, '#f6edda', '#42696a', photoWall);
-  const photoCards = ['stage', 'crowd', 'slot-2', 'slot-3', 'slot-4', 'slot-5'].map((id, index) => {
-    const x = (index % 3 - 1) * 1.04;
-    const y = index < 3 ? 1.903 : .763;
-    const object = action(group(`photo-${id}`, [x, y, .065], photoWall), { type: 'photo', id });
-    object.rotation.z = index % 2 ? -.028 : .03;
-    object.visible = index < 2;
-    roundBox([0, 0, 0], [.86, .975, .022], paper, object);
-    const imageMaterial = registerMaterial(new THREE.MeshBasicMaterial({ color: '#ffffff' }));
-    const imageMesh = noShadow(mesh(geometry(new THREE.PlaneGeometry(.742, .741)), imageMaterial, [0, .043, .016], [1, 1, 1], object));
-    imageMesh.name = `photo-image-${id}`;
-    // Clip remains on the stand when the card is picked up.
-    roundBox([x, y + .478, .064], [.063, .138, .051], toon.gold, photoWall);
-    world.updateMatrixWorld(true);
-    return { id, object, imageMesh, anchor: object.getWorldPosition(new THREE.Vector3()) };
-  });
 
   function pot(position, size = 1, flowers = false, parent = world) {
     const planter = group('courtyard-planter', position, parent);
@@ -408,12 +320,11 @@ export function buildSakuraWorld({ THREE, world, mesh, box, cylinder, ball, rod,
   }
   pot([-2.63, .085, .29], 1.18, true);
   pot([2.69, .085, .09], 1.1, false);
-  pot([4.74, 1.093, 1.077], .56, true);
   pot([-.76, .238, -2.84], .75, false);
   pot([-5.21, .085, 2.56], .85, true);
 
   // A quiet waiting corner fills the side of the yard, leaving the central
-  // route, photo wall and desk clear. Slats, a tote and records tell one story.
+  // route to the shop clear. Slats, a tote and records tell one story.
   const bench = group('listening-bench', [4.31, .065, -1.12]);
   bench.rotation.y = -.18;
   for (const x of [-.77, .77]) {
@@ -681,7 +592,7 @@ export function buildSakuraWorld({ THREE, world, mesh, box, cylinder, ball, rod,
 
   // Twenty individually phased petals belong to the two nearby trees. They
   // have a slight curled surface and tumble through depth, never a screen-space
-  // overlay. Their paths stay behind the photo wall and outside the shop walls.
+  // overlay. Their paths stay under the two crowns and outside the shop walls.
   const driftingGeometry = geometry(new THREE.ShapeGeometry(petalShape, 7));
   const driftingVertices = driftingGeometry.attributes.position;
   for (let i = 0; i < driftingVertices.count; i++) {
@@ -693,7 +604,7 @@ export function buildSakuraWorld({ THREE, world, mesh, box, cylinder, ball, rod,
   driftingPetals.name = 'slow-drifting-cherry-petals';
   driftingPetals.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
   driftingPetals.frustumCulled = false;
-  // A decorative petal crossing a ray must never steal a click from a card.
+  // A decorative petal crossing a ray must never steal a click from the shop.
   driftingPetals.raycast = () => {};
   const drifts = Array.from({ length: 20 }, (_, index) => {
     const left = index < 12;
@@ -732,8 +643,9 @@ export function buildSakuraWorld({ THREE, world, mesh, box, cylinder, ball, rod,
   posePetals(0);
   world.add(driftingPetals);
 
-  // One strand connects the stage, storefront and worktable. The owner adds two
-  // warm point lights near it; the bulbs themselves are flat and self-lit.
+  // One strand runs from the listening corner across the storefront to the right
+  // of the yard. The owner adds two warm point lights near it; the bulbs
+  // themselves are flat and self-lit.
   const wires = [
     [[-5.9, 3.39, 1.06], [-3.1, 2.97, 1.35], [0, 3.06, 1.48]],
     [[0, 3.06, 1.48], [3, 2.93, 1.45], [5.86, 3.43, 1.1]],
@@ -771,7 +683,7 @@ export function buildSakuraWorld({ THREE, world, mesh, box, cylinder, ball, rod,
     for (let i = 1; i < 8; i++) { const point = path.getPoint(i / 8); halo([point.x, point.y - .187, point.z], .62); }
   });
   for (const x of [-1.15, 1.15]) halo([x, 2.5, .48], 1.1, roof);
-  // A small par can on the left festoon pole lights the stage; its beam is a soft additive cone.
+  // A small par can on the left festoon pole lights the listening corner; its beam is a soft additive cone.
   const head = new THREE.Vector3(-5.82, 3.3, 1.1); const aim = new THREE.Vector3(-4, .32, .35);
   const can = group('stage-par-can', head.toArray());
   can.quaternion.setFromUnitVectors(new THREE.Vector3(0, -1, 0), aim.clone().sub(head).normalize());
@@ -803,19 +715,8 @@ export function buildSakuraWorld({ THREE, world, mesh, box, cylinder, ball, rod,
   tube([[-.24, .11, -.06], [-.34, .091, .076], [-.18, .061, .213], [.019, .065, .2]], .041, toon.cream, cat);
   ball([.168, .048, .141], [.118, .041, .05], toon.cream, cat);
 
-  const anchors = {
-    home: new THREE.Vector3(-.2, 1.55, -.05),
-    explore: new THREE.Vector3(-.1, 1.35, .8),
-    live: new THREE.Vector3(-3.8, 1.73, 1.48),
-    stage: new THREE.Vector3(-4, 1.16, .5),
-    editor: new THREE.Vector3(4, 1.12, 1.6),
-    records: new THREE.Vector3(1.45, 1.28, -2.08),
-  };
-  // Textures created by label() are already registered by the owner helper;
-  // externally supplied photo maps must be added to the same textures Set.
-  void textures;
   return {
-    roof, record, photoCards, desk, draftImageMesh, shelf, anchors,
+    roof, record, shelf,
     exploreShadowBlockers: [shopLeftWall, shopFrontBeam],
     // Handles for the one-time opening light-up; values at rest are the night look.
     night: { haloMaterial, beamMaterial, windowGlow, warmLamp, lampColor: warmLamp.color.clone() },

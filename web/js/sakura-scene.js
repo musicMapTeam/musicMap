@@ -20,15 +20,17 @@ const PRESETS = {
   night: { hemi: 1.35, sun: .85, fill: .32, shopGlow: 7, festoonL: 6, festoonR: 6, stageSpot: 48, tableSpot: 0 },
   explore: { hemi: 1.2, sun: .3, fill: .2, shopGlow: 0, festoonL: 6, festoonR: 6, stageSpot: 48, tableSpot: 190 },
   records: { hemi: 1.35, sun: .7, fill: .3, shopGlow: 6.5, festoonL: 6, festoonR: 6, stageSpot: 48, tableSpot: 0 },
-  // The worktable is under the right half of the string lights; they burn a little brighter while a card is made.
-  editor: { hemi: 1.4, sun: .8, fill: .36, shopGlow: 7, festoonL: 6, festoonR: 9.5, stageSpot: 48, tableSpot: 0 },
 };
 // The shop light hangs by the door at night and under the right pendant, over the cabinet, in the records view.
-const SHOP_GLOW_AT = { night: [0, 2.35, -.55], explore: [0, 2.35, -.55], editor: [0, 2.35, -.55], records: [1.15, 2.3, -1.05] };
+const SHOP_GLOW_AT = { night: [0, 2.35, -.55], explore: [0, 2.35, -.55], records: [1.15, 2.3, -1.05] };
+// The courtyard has three camera stops, one per route. Retired routes land in the courtyard.
+const SHOTS = new Set(['home', 'explore', 'records']);
+const LEGACY_SHOTS = { space: 'home', live: 'home' };
+const shotFor = (view, fallback = 'home') => LEGACY_SHOTS[view] || (SHOTS.has(view) ? view : fallback);
 let introPlayed = false;
 
 /** Original music street, rendered with Sakura Crossing's MIT cel/ink pipeline. */
-export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}) {
+export function mountSakuraScene(host, { onAction, view = 'home', onShot } = {}) {
   let renderer;
   try {
     renderer = new THREE.WebGLRenderer({ antialias: false, stencil: false, powerPreference: 'low-power' });
@@ -40,24 +42,23 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
     fallback.innerHTML = '<span></span>';
     host.append(fallback);
     document.body.classList.add('spatial-fallback');
-    return { setView() {}, setContent() {}, setMusic() {}, musicControl() {}, focus: () => Promise.resolve(true), restore() {}, dispose() { fallback.remove(); host.classList.remove('sakura-scene--fallback'); document.body.classList.remove('spatial-fallback'); } };
+    return { setView: () => Promise.resolve(true), setContent() {}, setMusic() {}, musicControl() {}, focus: () => Promise.resolve(true), restore: () => Promise.resolve(true), dispose() { fallback.remove(); host.classList.remove('sakura-scene--fallback'); document.body.classList.remove('spatial-fallback'); } };
   }
 
   host.classList.add('sakura-scene');
   const canvas = renderer.domElement;
   canvas.className = 'sakura-scene__canvas';
   canvas.setAttribute('role', 'img');
-  canvas.setAttribute('aria-label', '夜晚的樱下音乐小院，串灯亮着。可通过物件标记或下方导航进入唱片店、照片墙、工作桌与收藏。');
+  canvas.setAttribute('aria-label', '夜晚的樱下音乐小院，串灯亮着，唱片店开着门。可通过物件标记或下方导航前往小院、唱片店与我的发现。');
   host.append(canvas);
   const compass = document.createElement('nav');
   compass.className = 'world-compass';
   compass.setAttribute('aria-label', '音乐小院');
-  compass.innerHTML = '<div><button data-world-view="space">小院</button><button data-world-view="explore">唱片店</button><button data-world-view="live">照片墙</button><button data-world-editor>工作桌</button><button data-world-view="records">收藏</button></div>';
+  compass.innerHTML = '<div><button data-world-view="home">小院</button><button data-world-view="explore">唱片店</button><button data-world-view="records">我的发现</button></div>';
   host.append(compass);
   compass.addEventListener('click', event => {
-    const button = event.target.closest('button');
-    if (!button) return;
-    onAction?.(button.hasAttribute('data-world-editor') ? { type: 'editor' } : { type: 'navigate', view: button.dataset.worldView });
+    const button = event.target.closest('button[data-world-view]');
+    if (button) onAction?.({ type: 'navigate', view: button.dataset.worldView });
   });
   const hotspots = document.createElement('div'); hotspots.className = 'world-hotspots'; host.append(hotspots);
   const caption = document.createElement('div'); caption.className = 'world-caption';
@@ -154,7 +155,7 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
   const shopGlow = new THREE.PointLight(NIGHT.lamp, PRESETS.night.shopGlow, 6.5, 2); shopGlow.position.set(0, 2.35, -.55); scene.add(shopGlow);
   const festoonL = new THREE.PointLight(NIGHT.bulb, PRESETS.night.festoonL, 4.5, 2); festoonL.position.set(-3.3, 2.7, 2.45); scene.add(festoonL);
   const festoonR = new THREE.PointLight(NIGHT.bulb, PRESETS.night.festoonR, 4.5, 2); festoonR.position.set(3.4, 2.65, 2.35); scene.add(festoonR);
-  // A par can on the left festoon pole lights the stage.
+  // A par can on the left festoon pole lights the platform of the listening corner.
   const stageSpot = new THREE.SpotLight(NIGHT.stage, PRESETS.night.stageSpot, 9, .38, .5, 2); stageSpot.position.set(-5.82, 3.3, 1.1);
   stageSpot.target.position.set(-4, .32, .35); scene.add(stageSpot, stageSpot.target);
   // Kept dark except in the record-shop view, where it lights the pull-out table from above.
@@ -165,16 +166,20 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
   const model = buildSakuraWorld({ THREE, world, mesh, box, cylinder, ball, rod, label, geometry, toon, cel: celMaterials.cel, materials, textures });
   // Capture original object bounds before static meshes are moved into batches.
   world.updateMatrixWorld(true);
+  // A missing object gives an empty box (the camera then keeps its authored shot) instead of throwing.
+  const boundsOf = object => object ? new THREE.Box3().setFromObject(object) : new THREE.Box3();
   const subjectBounds = {
     explore: new THREE.Box3(new THREE.Vector3(-1.97, 1.0, -2.65), new THREE.Vector3(1.97, 1.6, .05)),
-    live: new THREE.Box3().setFromObject(world.getObjectByName('two-view-photo-wall')).expandByScalar(.05),
-    editor: new THREE.Box3().setFromObject(model.desk),
-    records: new THREE.Box3().setFromObject(model.shelf),
+    // A phone frames the printed paper itself (±1.86 × ±1.25 on the table top, see sakura-music), so the
+    // records fill the room between the header tools and the dock; the wooden rim may run under the paper UI.
+    explorePhone: new THREE.Box3(new THREE.Vector3(-1.86, 1.2, -2.55), new THREE.Vector3(1.86, 1.23, -.05)),
+    records: boundsOf(model.shelf),
     home: new THREE.Box3(),
   };
-  const photoBounds = model.photoCards.map(card => new THREE.Box3().setFromObject(card.object));
-  const courtyardParts = new Set(['open-record-shop', 'removable-shop-roof', 'tree-side-stage', 'two-view-photo-wall', 'card-making-desk', 'desk-stool', 'listening-bench', 'courtyard-fence']);
-  world.children.filter(object => courtyardParts.has(object.name)).forEach(object => subjectBounds.home.union(new THREE.Box3().setFromObject(object)));
+  // The courtyard overview keeps the open record shop in the middle. The fence and the two near
+  // crowns hold its width, so the left and right corners stay part of the yard.
+  const courtyardParts = new Set(['open-record-shop', 'removable-shop-roof', 'record-counter', 'tree-side-stage', 'listening-bench', 'record-crate', 'sleeping-shop-cat', 'courtyard-fence']);
+  world.children.filter(object => courtyardParts.has(object.name)).forEach(object => subjectBounds.home.union(boundsOf(object)));
   const instanceMatrix = new THREE.Matrix4(); const canopyBox = new THREE.Box3(); const canopyCenter = new THREE.Vector3();
   world.children.filter(object => object.isInstancedMesh && object.name.startsWith('cherry-canopy-')).forEach(object => {
     object.geometry.computeBoundingBox();
@@ -184,7 +189,7 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
       if (Math.abs(canopyCenter.x) < 7 && canopyCenter.z > -5.8) subjectBounds.home.union(canopyBox);
     }
   });
-  batchStaticMeshes(THREE, world, { exclude: [model.roof, model.record, model.shelf, model.draftImageMesh, ...model.exploreShadowBlockers, ...model.photoCards.map(card => card.object)] });
+  batchStaticMeshes(THREE, world, { exclude: [model.roof, model.record, model.shelf, ...model.exploreShadowBlockers] });
   batchStaticMeshes(THREE, model.shelf);
   const pipeline = new Pipeline(renderer, scene, camera, { pixelBudget: 2e6, maxPixelRatio: 1.5 });
   const ink = pipeline.ink.mat.uniforms;
@@ -245,54 +250,36 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
       .to(rig.stageSpot, { intensity: preset.stageSpot, duration: .55, ease: 'power3.out' }, .8)
       .to(dark, { beamOpacity: state.beamOpacity, duration: .55, ease: 'power3.out', onUpdate: apply }, .8);
   }
-  const loader = new THREE.TextureLoader();
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
   let width = 1; let height = 1;
-  let currentView = view;
-  let currentMode = view === 'space' ? 'home' : view;
-  let activePhoto = null;
-  let draftCard = null;
+  let currentView = shotFor(view);
   let disposed = false;
   let visible = true;
   let frame = 0; let lastTime = 0; let sceneTime = 0; let queuedDraw = 0;
   const pins = [];
   const staticPins = [
     ['唱片店', new THREE.Vector3(0, 2.6, 1), { type: 'navigate', view: 'explore' }],
-    ['照片墙', new THREE.Vector3(-3.8, 2.85, 1.4), { type: 'navigate', view: 'live' }],
-    ['工作桌', new THREE.Vector3(4, 1.75, 1.6), { type: 'editor' }],
   ];
   for (const [title, position, action] of staticPins) {
     const button = document.createElement('button'); button.className = 'world-pin'; button.textContent = title;
     button.addEventListener('click', () => onAction?.(action)); hotspots.append(button);
     pins.push({ button, position, homeOnly: true });
   }
-  const photoSlots = model.photoCards.map((card, index) => {
-    const button = document.createElement('button'); button.className = 'world-pin world-pin--photo'; button.hidden = true;
-    const slot = { ...card, index, button, data: null, texture: null,
-      rest: { position: card.object.position.clone(), rotation: card.object.rotation.clone(), scale: card.object.scale.clone() } };
-    button.addEventListener('click', () => { if (slot.data) onAction?.({ type: 'photo', id: slot.data.id }); });
-    hotspots.append(button); card.object.visible = false;
-    return slot;
-  });
   let director;
   const framing = createSakuraFraming(host, {
-    getShot: () => director?.active.key || (view === 'space' ? 'home' : view),
+    getShot: () => director?.active.key || currentView,
     onChange() { if (!disposed) { director?.reframe(); projectPins(); requestDraw(); } },
     onLabelsChange() { if (!disposed) { projectPins(); if (reduced.matches) requestDraw(); } },
   });
-  pins.forEach(pin => framing.watchLabel(pin.button)); photoSlots.forEach(slot => framing.watchLabel(slot.button));
+  pins.forEach(pin => framing.watchLabel(pin.button));
   const music = createSakuraMusic({ world, cel: celMaterials.cel, host: hotspots, canvas, camera, reduced, onAction, framing,
     isActive: () => director.active.key === 'explore' && !director.travelling && !framing.layout.blocked,
     onChange() { renderer.shadowMap.needsUpdate = true; if (reduced.matches) requestDraw(); },
   });
-  function boundsForShot(key, id) {
-    if (key !== 'photo') return subjectBounds[key] || subjectBounds.live;
-    const slot = photoSlots.find(item => item.data?.id === id);
-    if (!slot) return subjectBounds.live;
-    const bounds = photoBounds[slot.index]; const center = bounds.getCenter(new THREE.Vector3()).add(new THREE.Vector3(0, .26, .82));
-    const extent = bounds.getSize(new THREE.Vector3()).multiplyScalar(1.28).addScalar(.06);
-    return new THREE.Box3().setFromCenterAndSize(center, extent);
+  function boundsForShot(key) {
+    if (key === 'explore' && width <= 760) return subjectBounds.explorePhone;
+    return subjectBounds[key] || subjectBounds.home;
   }
   const courtyardCenter = subjectBounds.home.getCenter(new THREE.Vector3());
   // Without the animation loop (reduced motion), every tween update and content change asks for a frame.
@@ -307,8 +294,13 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
     if (queuedDraw) { cancelAnimationFrame(queuedDraw); queuedDraw = 0; }
     if (disposed || !visible || !width || !height) return;
     // Reframing can move the camera back on small screens; keep haze beyond the venue.
-    scene.fog.near = Math.max(24, camera.position.distanceTo(courtyardCenter) + 7);
+    const distance = camera.position.distanceTo(courtyardCenter);
+    scene.fog.near = Math.max(24, distance + 7);
     scene.fog.far = scene.fog.near + 22;
+    // A short phone leaves a thin band between headline and paper; the far plane follows the camera
+    // back so the courtyard is small there, never clipped away.
+    const far = Math.max(80, Math.ceil(distance + 32));
+    if (camera.far !== far) { camera.far = far; camera.updateProjectionMatrix(); }
     pipeline.render();
   }
   const projected = new THREE.Vector3();
@@ -326,18 +318,12 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
     music.project(camera, width, height, director.active.key === 'explore');
     // Visibility is assigned once per frame, never toggled, so a focused label keeps its focus.
     pins.forEach(pin => { if (director.active.key === 'home') positionPin(pin.button, pin.position); else pin.button.hidden = true; });
-    photoSlots.forEach(slot => {
-      // The front door reaches personal cards through its paper; labels belong to the wall itself.
-      if (!slot.data || !['live', 'photo'].includes(director.active.key)) { slot.button.hidden = true; return; }
-      const position = slot.object.getWorldPosition(new THREE.Vector3()); position.y -= .5;
-      positionPin(slot.button, position);
-    });
   }
   director = createCameraDirector(camera, {
     size: () => ({ width, height }), reduced,
     getLayout: key => framing.get(key), getBounds: boundsForShot,
     onFrame() { projectPins(); if (reduced.matches) requestDraw(); },
-    onShot(key, id, travelling) {
+    onShot(key, travelling) {
       applyLighting(key, !travelling || reduced.matches);
       model.roof.visible = key !== 'explore';
       model.exploreShadowBlockers.forEach(object => { object.castShadow = key !== 'explore'; });
@@ -349,93 +335,25 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
       ink.uFadeStart.value = distantPortrait ? 42 : 23; ink.uFadeEnd.value = distantPortrait ? 70 : 43;
       host.dataset.shot = key;
       if (travelling) host.dataset.travelling = 'true'; else delete host.dataset.travelling;
-      compass.querySelectorAll('button').forEach(button => {
-        const selected = button.hasAttribute('data-world-editor') ? key === 'editor' : button.dataset.worldView === (key === 'home' ? 'space' : key === 'photo' ? 'live' : key);
-        button.setAttribute('aria-pressed', String(selected));
-      });
-      caption.querySelector('strong').textContent = ({ home: '小院', explore: '唱片店', live: '照片墙', editor: '工作桌', records: '收藏架', photo: '现场卡' })[key];
-      onShot?.(key, id, travelling);
+      compass.querySelectorAll('button').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.worldView === key)));
+      caption.querySelector('strong').textContent = ({ home: '小院', explore: '唱片店', records: '我的发现' })[key] || '小院';
+      // The shell keeps its (shot, id, travelling) signature; the courtyard has no per-item shots.
+      onShot?.(key, null, travelling);
     },
   });
-  function resetPhoto(slot, immediate = false) {
-    if (!slot) return;
-    for (const property of ['position', 'rotation', 'scale']) {
-      gsap.killTweensOf(slot.object[property]);
-      const end = slot.rest[property];
-      gsap.to(slot.object[property], { x: end.x, y: end.y, z: end.z, duration: immediate || reduced.matches ? 0 : .4, ease: 'power3.out', onUpdate: () => { renderer.shadowMap.needsUpdate = true; if (reduced.matches) requestDraw(); } });
-    }
+  /** Routes pick the shot; a retired route ('space', 'live') returns to the courtyard. */
+  function setView(next, { immediate = false } = {}) {
+    const shot = shotFor(next);
+    const changed = currentView !== shot;
+    currentView = shot;
+    if (!changed && director.active.key === shot) return Promise.resolve(true);
+    return director.go(shot, { immediate });
   }
-  function releasePhoto(immediate = false) { resetPhoto(activePhoto, immediate); activePhoto = null; }
-  function baseShot() { return currentView === 'space' ? currentMode === 'home' ? 'home' : 'live' : currentView; }
-  function setView(next, { mode, immediate = false } = {}) {
-    const changed = currentView !== next || (mode && mode !== currentMode);
-    currentView = next; currentMode = mode || (next === 'space' ? 'home' : next);
-    if (!changed && director.active.key === baseShot()) return Promise.resolve(true);
-    releasePhoto(); return director.go(baseShot(), { immediate });
-  }
-  function focus(kind, id) {
-    if (kind !== 'photo') { releasePhoto(); return director.go(kind); }
-    const slot = photoSlots.find(item => item.data?.id === id);
-    if (!slot) return director.go(baseShot());
-    if (activePhoto !== slot) {
-      releasePhoto(); activePhoto = slot;
-      gsap.to(slot.object.position, { y: slot.rest.position.y + .26, z: slot.rest.position.z + .82, duration: reduced.matches ? 0 : .7, ease: 'power3.inOut', onUpdate: () => { renderer.shadowMap.needsUpdate = true; } });
-      gsap.to(slot.object.rotation, { x: 0, y: 0, z: -.04, duration: reduced.matches ? 0 : .7, ease: 'power3.inOut' });
-      gsap.to(slot.object.scale, { x: 1.28, y: 1.28, z: 1.28, duration: reduced.matches ? 0 : .7, ease: 'power3.inOut' });
-    }
-    const point = slot.anchor.clone(); point.y += .23; point.z += .65;
-    return director.go('photo', { point, id });
-  }
-  function restore() { releasePhoto(); return director.go(baseShot()); }
-  function setContent(cards = [], mode) {
-    if (mode && mode !== currentMode) { currentMode = mode; if (!['photo', 'editor'].includes(director.active.key)) director.go(baseShot()); }
-    // A newly loaded image must not move a card that is already being viewed.
-    const remaining = new Map(cards.slice(0, 6).map(card => [card.id, card]));
-    const assigned = photoSlots.map(slot => {
-      const card = remaining.get(slot.data?.id) || null;
-      if (card) remaining.delete(card.id);
-      return card;
-    });
-    const incoming = remaining.values();
-    assigned.forEach((card, index) => { if (!card) assigned[index] = incoming.next().value || null; });
-    const nextDraft = cards.find(card => card.isOwn) || null;
-    if (draftCard?.id !== nextDraft?.id || draftCard?.src !== nextDraft?.src) {
-      model.draftImageMesh.material.map = null; model.draftImageMesh.material.color.set('#e5cdd1'); model.draftImageMesh.material.needsUpdate = true;
-    }
-    draftCard = nextDraft;
-    photoSlots.forEach((slot, index) => {
-      const next = assigned[index];
-      if (activePhoto === slot && slot.data?.id !== next?.id) { releasePhoto(true); director.go(baseShot()); }
-      const changed = slot.data?.src !== next?.src || slot.data?.id !== next?.id;
-      slot.data = next; slot.object.visible = Boolean(next); slot.button.hidden = !next;
-      if (next) {
-        slot.object.userData.action = { type: 'photo', id: next.id };
-        const owner = next.subtitle?.split(' · ')[0] || '现场';
-        const label = currentView === 'space' && !next.local && next.eventTitle ? next.eventTitle : `${owner}的卡`;
-        slot.button.textContent = label.length > 12 ? `${label.slice(0, 11)}…` : label;
-        slot.button.setAttribute('aria-label', `查看${label}${next.isDemo ? '，示例' : ''}`);
-      }
-      if (!changed) return;
-      if (slot.texture) { slot.texture.dispose(); textures.delete(slot.texture); slot.texture = null; }
-      slot.imageMesh.material.map = null; slot.imageMesh.material.needsUpdate = true;
-      if (!next?.src) return;
-      const expected = next.src;
-      const texture = loader.load(expected, loaded => {
-        if (disposed || slot.data?.src !== expected) { loaded.dispose(); textures.delete(loaded); return; }
-        const imageAspect = loaded.image.width / loaded.image.height;
-        const params = slot.imageMesh.geometry.parameters;
-        const shapeAspect = params.width / params.height;
-        if (imageAspect > shapeAspect) { loaded.repeat.x = shapeAspect / imageAspect; loaded.offset.x = (1 - loaded.repeat.x) / 2; }
-        else { loaded.repeat.y = imageAspect / shapeAspect; loaded.offset.y = (1 - loaded.repeat.y) / 2; }
-        slot.imageMesh.material.map = loaded; slot.imageMesh.material.color.set('#ffffff'); slot.imageMesh.material.needsUpdate = true;
-        if (slot.data.isOwn) { model.draftImageMesh.material.map = loaded; model.draftImageMesh.material.color.set('#ffffff'); model.draftImageMesh.material.needsUpdate = true; }
-        requestDraw();
-      });
-      texture.colorSpace = THREE.SRGBColorSpace; texture.minFilter = THREE.LinearFilter; texture.generateMipmaps = false;
-      slot.texture = texture; textures.add(texture);
-    });
-    renderer.shadowMap.needsUpdate = true; projectPins(); requestDraw();
-  }
+  /** Looks at one of the three stops without changing the route; an unknown kind stays on the current view. */
+  function focus(kind) { return director.go(shotFor(kind, currentView)); }
+  function restore() { return director.go(currentView); }
+  /** Kept for the shell's publish() contract. The courtyard shows no user cards, so this is a no-op. */
+  function setContent() {}
   function picked(event) {
     const rect = canvas.getBoundingClientRect();
     pointer.set((event.clientX - rect.left) / rect.width * 2 - 1, -(event.clientY - rect.top) / rect.height * 2 + 1);
@@ -458,7 +376,7 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
     frame = 0;
     if (disposed || !visible || document.hidden || reduced.matches) return;
     if (!lastTime) lastTime = now;
-    if (now - lastTime >= 1000 / (director.moving || activePhoto || intro?.isActive() ? 60 : 30)) {
+    if (now - lastTime >= 1000 / (director.moving || intro?.isActive() ? 60 : 30)) {
       sceneTime += Math.min((now - lastTime) / 1000, .1); lastTime = now;
       model.update?.(sceneTime); projectPins(); draw();
     }
@@ -467,7 +385,7 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
   function updateMotion() {
     cancelAnimationFrame(frame); frame = 0; lastTime = 0;
     if (disposed || !visible || document.hidden) return;
-    if (reduced.matches) { intro?.progress(1); gsap.getTweensOf([...Object.values(rig), shopGlow.position]).forEach(tween => tween.progress(1)); director.finish(); music.finish(); photoSlots.forEach(slot => { gsap.getTweensOf([slot.object.position, slot.object.rotation, slot.object.scale]).forEach(tween => tween.progress(1)); }); model.update?.(0); projectPins(); draw(); }
+    if (reduced.matches) { intro?.progress(1); gsap.getTweensOf([...Object.values(rig), shopGlow.position]).forEach(tween => tween.progress(1)); director.finish(); music.finish(); model.update?.(0); projectPins(); draw(); }
     else { draw(); frame = requestAnimationFrame(tick); }
   }
   function resize() {
@@ -480,13 +398,12 @@ export function mountSakuraScene(host, { onAction, view = 'space', onShot } = {}
   const intersectionObserver = new IntersectionObserver(entries => { visible = entries[0]?.isIntersecting ?? false; updateMotion(); }, { threshold: .01 });
   intersectionObserver.observe(host);
   document.addEventListener('visibilitychange', updateMotion); reduced.addEventListener('change', updateMotion);
-  resize(); director.go(baseShot(), { immediate: true, force: true }); model.update?.(0); playIntro(); updateMotion();
+  resize(); director.go(currentView, { immediate: true, force: true }); model.update?.(0); playIntro(); updateMotion();
   return { setView, setContent, setMusic: music.setMusic, musicControl: music.control, focus, restore, dispose() {
     disposed = true; cancelAnimationFrame(frame); cancelAnimationFrame(queuedDraw); director.dispose();
     intro?.kill(); gsap.killTweensOf([...Object.values(rig), shopGlow.position]);
     music.dispose();
     framing.dispose();
-    photoSlots.forEach(slot => { gsap.killTweensOf([slot.object.position, slot.object.rotation, slot.object.scale]); });
     resizeObserver.disconnect(); intersectionObserver.disconnect();
     document.removeEventListener('visibilitychange', updateMotion); reduced.removeEventListener('change', updateMotion);
     canvas.removeEventListener('pointermove', onPointerMove); canvas.removeEventListener('pointerleave', onPointerLeave); canvas.removeEventListener('click', onCanvasClick);

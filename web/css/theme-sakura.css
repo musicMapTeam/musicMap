@@ -1,5 +1,5 @@
 /* Sakura screening: cream paper, bottle-green ink and a small original street stage.
-   Load after the shared theme bridge. Functional markup and photographs are intact. */
+   Load after the shared theme bridge. Functional markup is intact. */
 html[data-theme="sakura"] {
   --sk-ink: var(--theme-ink, #304a3e);
   --sk-paper: #faf5e8;
@@ -16,89 +16,15 @@ html[data-theme="sakura"] .sakura-scene__fallback { display: grid; align-content
 html[data-theme="sakura"] .sakura-scene__fallback > span { display: block; width: 160px; aspect-ratio: 1; border-radius: 50%; border: 1px solid #35584180; background: radial-gradient(circle, #edbac0 0 17%, transparent 17.5%), repeating-radial-gradient(circle, #385c49 0 3px, #466955 4px 5px, #385c49 6px 9px); box-shadow: 18px 12px 0 #f7dfdc; }
 html[data-theme="sakura"] .sakura-scene__fallback strong { text-align: center; font: 850 28px/1.12 var(--font-display, Arial, sans-serif); letter-spacing: -.045em; }
 
-/* Physical cards: preserve the user's photographs, change only their paper. */
-html[data-theme="sakura"] :is(.sp-ticket, .live-card, .sp-memory, .live-memory) {
-  background: #fffaf0;
-  border: 1px solid #7c8b6b30;
-  border-radius: 10px;
-  box-shadow: 3px 4px 0 #aab39619;
-  color: var(--sk-ink);
-}
-html[data-theme="sakura"] :is(.sp-ticket__paper, .live-card-content, .sp-memory__body) { background: #fffaf0; color: var(--sk-ink); }
-html[data-theme="sakura"] .sp-ticket__paper { background-image: repeating-linear-gradient(0deg, #7b806403 0 1px, transparent 1px 4px); }
-html[data-theme="sakura"] :is(.sp-ticket__caption, .live-card-author, .sp-memory__body h3) { color: var(--sk-ink); }
-html[data-theme="sakura"] :is(.sp-ticket__song, .live-card-track) { color: #486953; border-color: var(--sk-line); }
-html[data-theme="sakura"] :is(.sp-ticket__event, .sp-ticket__author, .live-card-author small) { color: #67725f; }
-html[data-theme="sakura"] :is(.sp-ticket__stub, .live-ticket-strip) { background: #e7ead8; border-color: #62795551; color: var(--sk-ink); }
-/* Ticket notches are real cuts in the paper (mask), so paper, lamp-lit night or scene all show through; no painted dots. */
-html[data-theme="sakura"] .sp-ticket { --sp-stub-h: 62px; background: transparent; border-color: transparent; box-shadow: 0 1px 0 #7c8b6b2e, 0 8px 18px #1d22182b; }
-html[data-theme="sakura"] .sp-ticket--small { --sp-stub-h: 50px; }
-html[data-theme="sakura"] .sp-ticket--preview { --sp-stub-h: 48px; }
-html[data-theme="sakura"] .sp-ticket__paper {
-  -webkit-mask: radial-gradient(circle 7px at 0 calc(100% - var(--sp-stub-h)), #0000 95%, #000), radial-gradient(circle 7px at 100% calc(100% - var(--sp-stub-h)), #0000 95%, #000);
-  -webkit-mask-composite: source-in;
-  mask: radial-gradient(circle 7px at 0 calc(100% - var(--sp-stub-h)), #0000 95%, #000), radial-gradient(circle 7px at 100% calc(100% - var(--sp-stub-h)), #0000 95%, #000);
-  mask-composite: intersect;
-}
-html[data-theme="sakura"] .sp-ticket .sp-ticket__stub { height: var(--sp-stub-h); min-height: 0; flex-wrap: nowrap; padding-block: 0; }
-html[data-theme="sakura"] .sp-ticket .sp-ticket__stub::before,
-html[data-theme="sakura"] .sp-ticket .sp-ticket__stub::after { display: none; }
-/* Readable ticket print (≥12px) wherever the ticket sits, including the studio demo overrides. */
-html[data-theme="sakura"] .sp-ticket .sp-ticket__image-top { font-size: 12px; letter-spacing: .04em; }
-html[data-theme="sakura"] .sp-ticket .sp-ticket__image-top > span:last-child { font-size: 12px; }
-html[data-theme="sakura"] .sp-ticket .sp-ticket__event { flex-wrap: wrap; gap: 2px 10px; font-size: 12px; letter-spacing: .02em; }
-html[data-theme="sakura"] .sp-ticket .sp-ticket__song { font-size: 13px; }
-html[data-theme="sakura"] .sp-ticket .sp-ticket__author { min-width: 0; white-space: nowrap; font-size: 13px; }
-html[data-theme="sakura"] .sp-ticket .sp-ticket__author > span:last-child { font-size: 12px; }
-html[data-theme="sakura"] .sp-ticket .sp-ticket__code { font-size: 12px; }
-html[data-theme="sakura"] .sp-ticket--small .sp-ticket__event > span:last-child { display: none; }
-html[data-theme="sakura"] .sp-ticket--small .sp-ticket__code,
-html[data-theme="sakura"] .sp-ticket--small .sp-ticket__author > span:last-child { display: none; }
-html[data-theme="sakura"] .live-ticket { border: 1px solid #69805c3b; background: #fffaf0; color: var(--sk-ink); box-shadow: 4px 7px 0 #9aab7d21; }
-html[data-theme="sakura"] .live-ticket-mast { border-color: var(--sk-green); }
-html[data-theme="sakura"] .live-ticket-mast > b { background: var(--sk-pink); color: var(--sk-rose); }
-html[data-theme="sakura"] .live-ticket-title i { color: var(--sk-rose); }
-html[data-theme="sakura"] :is(.sp-dialog, .live-dialog, .map-dialog) { background: var(--sk-paper); color: var(--sk-ink); border: 1px solid #6b7b5a54; border-radius: 14px; box-shadow: 0 22px 90px #33483435; }
-html[data-theme="sakura"] :is(.sp-dialog, .live-dialog, .map-dialog)::backdrop { background: #2f443c66; backdrop-filter: blur(6px); }
-html[data-theme="sakura"] :is(.sp-editor__submit, .live-editor-save) { background: #f3efdf; border-color: var(--sk-line); box-shadow: 0 -8px 22px #61724710; }
+/* Dialogs are the same cream paper as the rest of the shop. */
+html[data-theme="sakura"] .map-dialog { background: var(--sk-paper); color: var(--sk-ink); border: 1px solid #6b7b5a54; border-radius: 14px; box-shadow: 0 22px 90px #33483435; }
+html[data-theme="sakura"] .map-dialog::backdrop { background: #2f443c66; backdrop-filter: blur(6px); }
 
 /* The map becomes a printed neighbourhood plan, with record-shaped landmarks. */
 html[data-theme="sakura"] .map-workspace { background: #faf6e9; border: 1px solid #78856c47; border-radius: 15px; box-shadow: 4px 6px 0 #9baa8619; }
 html[data-theme="sakura"] .map-stage-column { background: repeating-linear-gradient(0deg, #48664a06 0 1px, transparent 1px 28px), repeating-linear-gradient(90deg, #48664a06 0 1px, transparent 1px 28px); }
-html[data-theme="sakura"] .map-optical-field { opacity: .14; color: #74886b; }
 html[data-theme="sakura"] .map-artist-panel { background: #eef0e2; border-color: #7f8d7240; }
-html[data-theme="sakura"] .map-node__disc { border-color: #759577; background: #e7eadc; box-shadow: inset 0 0 0 7px #fffaf043, 0 5px 0 #647d5020; }
-html[data-theme="sakura"] .map-node__disc::before,
-html[data-theme="sakura"] .map-node__disc::after { border-color: #69876448; }
-html[data-theme="sakura"] .map-node__disc i { border-color: #517052; background: #78957a; box-shadow: none; }
-html[data-theme="sakura"] .map-node:hover .map-node__disc { border-color: #355a42; box-shadow: 0 5px 0 #647d5040; }
-html[data-theme="sakura"] .map-node--orbit::before { background: #f7f3e6; border: 1px solid #72886632; border-radius: 8px 16px 8px 16px; box-shadow: none; filter: none; }
-html[data-theme="sakura"] .map-node--orbit .map-node__disc,
-html[data-theme="sakura"] .map-node--orbit:hover .map-node__disc { background: #dce6d2; border-color: #527453; box-shadow: none; }
-html[data-theme="sakura"] .map-node--center { background: #efd0cd; box-shadow: 0 0 0 9px #eecbce4d, 0 0 0 18px #eecbce26; }
-html[data-theme="sakura"] .map-node--center .map-node__disc { background: #edd3cf; border-color: #b0777f; box-shadow: inset 0 0 0 7px #fff3e95c; }
-html[data-theme="sakura"] .map-node--center .map-node__disc::before,
-html[data-theme="sakura"] .map-node--center .map-node__disc::after { border-color: #9c667540; }
-html[data-theme="sakura"] :is(.map-node__name, .map-node--center .map-node__name) { color: #304c3d; }
-html[data-theme="sakura"] :is(.map-node__tag, .map-node__hint, .map-node--center .map-node__tag) { color: #64715b; }
-html[data-theme="sakura"] .map-discovery { background: #edf0df; border-color: #708965; border-radius: 0 9px 9px 0; }
-html[data-theme="sakura"] .map-discovery--first { background: #f6e7e2; border-color: #b17c86; }
-html[data-theme="sakura"] .map-discovery--first .map-discovery__label { color: #935464; }
 html[data-theme="sakura"] .map-catalogue__switch button.is-active { border-color: var(--sk-rose); }
-
-/* Live retains invitation and consent surfaces, in soft daylight. */
-html[data-theme="sakura"] .live-entry-art { border-radius: 18px 18px 5px 5px; background: #dce7d4; color: var(--sk-green); border: 1px solid #69806429; }
-html[data-theme="sakura"] .live-art-type i { -webkit-text-stroke-color: #4c7258; }
-html[data-theme="sakura"] .live-entry-pair .live-card { box-shadow: 0 10px 18px #48624424; }
-html[data-theme="sakura"] :is(.live-incoming, .sp-exchange-notice--incoming) { background: #f3dfde; border-color: #ae7580; color: var(--sk-ink); }
-html[data-theme="sakura"] .live-room-ribbon { border-color: #788e673d; background: transparent; }
-html[data-theme="sakura"] :is(.live-empty-card, .live-saved-note, .live-return-slip) { background: #f4eddf; color: var(--sk-ink); border-color: #6980524d; border-radius: 8px; }
-html[data-theme="sakura"] .live-upload-preview { border: 1px dashed #6c875960; border-radius: 9px; background: #e8eddf; }
-html[data-theme="sakura"] .live-upload-preview > span { background: #faf5e8ed; color: #485e49; }
-html[data-theme="sakura"] .live-invite-layout { background: #e2e8d5; border: 1px solid #78936c3d; border-radius: 10px; }
-html[data-theme="sakura"] :is(.live-match, .live-pair-reason) { border-color: #789168; }
-html[data-theme="sakura"] .live-pair-reason { background: #e9eddd; }
-html[data-theme="sakura"] .live-local-link { background: #f3e3dd; color: #80575a; border-color: #b78485; }
 
 @media (max-width: 760px) {
   html[data-theme="sakura"] .sakura-scene__fallback { gap: 16px; padding: 20px; }

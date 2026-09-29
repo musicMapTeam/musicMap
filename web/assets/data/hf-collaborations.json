@@ -17,1729 +17,1794 @@
     "uniqueTrackIds": 89741,
     "multiArtistRows": 30075,
     "genres": 114,
-    "selectedTracks": 120
+    "zhGenreRows": 2000,
+    "zhCoCreditRows": 175,
+    "excludedRows": 19,
+    "eligibleUniqueTrackIds": 149,
+    "selectedTracks": 126
   },
+  "genres": [
+    "mandopop",
+    "cantopop"
+  ],
   "creditMeaning": "原始 artists 字段列出的共同署名艺人；具体演唱、词曲、编曲、制作与演奏分工未提供。",
-  "selection": "从 2–5 名艺人的记录中按采集时 popularity 降序选取；track_id 去重，再按曲名+艺人名单去重；同一首位艺人最多 3 首，共 120 首。不是当前榜单或统计抽样。",
+  "selection": "仅取固定快照中 track_genre 为 mandopop 或 cantopop 的记录，要求列出 2–5 名不同艺人且曲名、专辑非空；排除列有 11 个指定字符串之一的记录：内容风险姓名 Namewee、Kris Wu、明日花綺羅，以及 Unknown、Sony Studio、Tom Brown 等占位或录音室 / 制作署名。先按 track_id 去重，再按去掉末尾版本括注与“ - ”后缀的曲名 + 艺人名单去重；同一首位艺人最多 3 首，剩余全部收录，共 126 首。采集时的 popularity 只用于去重取舍和列表顺序，不表示当前热度或排名；不是榜单或统计抽样。",
   "tracks": [
     {
-      "id": "hf-3nqQXoyQOWXiESFLlDF1hG",
-      "title": "Unholy (feat. Kim Petras)",
+      "id": "hf-0FfNFvy5KRRyB2snvK39zL",
+      "title": "I'm Alive",
       "artists": [
-        "Sam Smith",
-        "Kim Petras"
+        "W.M.L",
+        "Vicky Chen"
       ],
-      "album": "Unholy (feat. Kim Petras)",
+      "album": "I'm Alive",
       "source": {
-        "rowIndex": 20001,
-        "recordNumber": 20002,
-        "trackId": "3nqQXoyQOWXiESFLlDF1hG"
+        "rowIndex": 70189,
+        "recordNumber": 70190,
+        "trackId": "0FfNFvy5KRRyB2snvK39zL"
       }
     },
     {
-      "id": "hf-2tTmW7RDtMQtBk7m2rYeSw",
-      "title": "Quevedo: Bzrp Music Sessions, Vol. 52",
+      "id": "hf-07DWACsD58aEdq6XnDadLh",
+      "title": "手心的薔薇",
       "artists": [
-        "Bizarrap",
-        "Quevedo"
+        "JJ Lin",
+        "G.E.M."
       ],
-      "album": "Quevedo: Bzrp Music Sessions, Vol. 52",
+      "album": "新地球",
       "source": {
-        "rowIndex": 51664,
-        "recordNumber": 51665,
-        "trackId": "2tTmW7RDtMQtBk7m2rYeSw"
+        "rowIndex": 70077,
+        "recordNumber": 70078,
+        "trackId": "07DWACsD58aEdq6XnDadLh"
       }
     },
     {
-      "id": "hf-4uUG5RXrOk84mYEfFvj3cK",
-      "title": "I'm Good (Blue)",
+      "id": "hf-1JLtvvPsHwLyd2ufASdkWV",
+      "title": "感谢你曾来过",
       "artists": [
-        "David Guetta",
-        "Bebe Rexha"
+        "阿涵",
+        "Ayo97"
       ],
-      "album": "I'm Good (Blue)",
+      "album": "感谢你曾来过",
       "source": {
-        "rowIndex": 20008,
-        "recordNumber": 20009,
-        "trackId": "4uUG5RXrOk84mYEfFvj3cK"
+        "rowIndex": 70226,
+        "recordNumber": 70227,
+        "trackId": "1JLtvvPsHwLyd2ufASdkWV"
       }
     },
     {
-      "id": "hf-6Sq7ltF9Qa7SNFBsV5Cogx",
-      "title": "Me Porto Bonito",
+      "id": "hf-4JY5s40ymnG18f6wxQtzPw",
+      "title": "珊瑚海",
       "artists": [
-        "Bad Bunny",
-        "Chencho Corleone"
+        "Jay Chou",
+        "Lara Liang"
       ],
-      "album": "Un Verano Sin Ti",
+      "album": "11月的蕭邦",
       "source": {
-        "rowIndex": 67358,
-        "recordNumber": 67359,
-        "trackId": "6Sq7ltF9Qa7SNFBsV5Cogx"
+        "rowIndex": 70021,
+        "recordNumber": 70022,
+        "trackId": "4JY5s40ymnG18f6wxQtzPw"
       }
     },
     {
-      "id": "hf-3k3NWokhRRkEPhCzPmV8TW",
-      "title": "Ojitos Lindos",
+      "id": "hf-3TYzES2lL8BTPE4uudj0Hj",
+      "title": "不得不愛",
       "artists": [
-        "Bad Bunny",
-        "Bomba Estéreo"
+        "Will Pan",
+        "Xian Zi"
       ],
-      "album": "Un Verano Sin Ti",
+      "album": "高手",
       "source": {
-        "rowIndex": 67500,
-        "recordNumber": 67501,
-        "trackId": "3k3NWokhRRkEPhCzPmV8TW"
+        "rowIndex": 70061,
+        "recordNumber": 70062,
+        "trackId": "3TYzES2lL8BTPE4uudj0Hj"
       }
     },
     {
-      "id": "hf-0mBP9X2gPCuapvpZ7TGDk3",
-      "title": "Left and Right (Feat. Jung Kook of BTS)",
+      "id": "hf-5AnD1Tmu5hKPeHGyxGq6LJ",
+      "title": "飄流教室",
       "artists": [
-        "Charlie Puth",
-        "Jung Kook",
-        "BTS"
+        "Leo Ku",
+        "Edan 呂爵安"
       ],
-      "album": "Left and Right (Feat. Jung Kook of BTS)",
+      "album": "飄流教室",
       "source": {
-        "rowIndex": 20017,
-        "recordNumber": 20018,
-        "trackId": "0mBP9X2gPCuapvpZ7TGDk3"
+        "rowIndex": 12180,
+        "recordNumber": 12181,
+        "trackId": "5AnD1Tmu5hKPeHGyxGq6LJ"
       }
     },
     {
-      "id": "hf-0WtM2NBVQNNJLh6scP13H8",
-      "title": "Calm Down (with Selena Gomez)",
+      "id": "hf-77BQceOpfvUBXgokOFHYMm",
+      "title": "說好不哭",
       "artists": [
-        "Rema",
-        "Selena Gomez"
+        "Jay Chou",
+        "Ashin Chen"
       ],
-      "album": "Calm Down (with Selena Gomez)",
+      "album": "最偉大的作品",
       "source": {
-        "rowIndex": 81100,
-        "recordNumber": 81101,
-        "trackId": "0WtM2NBVQNNJLh6scP13H8"
+        "rowIndex": 70038,
+        "recordNumber": 70039,
+        "trackId": "77BQceOpfvUBXgokOFHYMm"
       }
     },
     {
-      "id": "hf-3F5CgOj3wFlRv51JsHbxhe",
-      "title": "Jimmy Cooks (feat. 21 Savage)",
+      "id": "hf-1XXvo0XLQqEnIb0fjEr0C8",
+      "title": "Drowning",
       "artists": [
-        "Drake",
-        "21 Savage"
+        "高爾宣 OSN",
+        "李浩瑋 Howard Lee"
       ],
-      "album": "Honestly, Nevermind",
+      "album": "Drowning",
       "source": {
-        "rowIndex": 51203,
-        "recordNumber": 51204,
-        "trackId": "3F5CgOj3wFlRv51JsHbxhe"
+        "rowIndex": 70302,
+        "recordNumber": 70303,
+        "trackId": "1XXvo0XLQqEnIb0fjEr0C8"
       }
     },
     {
-      "id": "hf-79HZAZNnOE97rb2hnI0XQr",
-      "title": "LOKERA",
+      "id": "hf-40NvsEFexANIROSnKIMYXB",
+      "title": "自我安慰",
       "artists": [
-        "Rauw Alejandro",
-        "Lyanno",
-        "Brray"
+        "Leo Ku",
+        "MC 張天賦"
       ],
-      "album": "LOKERA",
+      "album": "自我安慰",
       "source": {
-        "rowIndex": 67801,
-        "recordNumber": 67802,
-        "trackId": "79HZAZNnOE97rb2hnI0XQr"
+        "rowIndex": 12193,
+        "recordNumber": 12194,
+        "trackId": "40NvsEFexANIROSnKIMYXB"
       }
     },
     {
-      "id": "hf-41oY4WCTj5kccfesTVFnvN",
-      "title": "Tarot",
+      "id": "hf-1WzMnzTmdWbJZ3OhizMtbX",
+      "title": "Frenemy",
       "artists": [
-        "Bad Bunny",
-        "Jhayco"
+        "MC 張天賦",
+        "Kaho Hung"
       ],
-      "album": "Un Verano Sin Ti",
+      "album": "Frenemy",
       "source": {
-        "rowIndex": 67865,
-        "recordNumber": 67866,
-        "trackId": "41oY4WCTj5kccfesTVFnvN"
+        "rowIndex": 12286,
+        "recordNumber": 12287,
+        "trackId": "1WzMnzTmdWbJZ3OhizMtbX"
       }
     },
     {
-      "id": "hf-4zN21mbAuaD0WqtmaTZZeP",
-      "title": "Ferrari",
+      "id": "hf-68tZwwRuo9ip5gRQFG1XWF",
+      "title": "開始懂了",
       "artists": [
-        "James Hype",
-        "Miggy Dela Rosa"
+        "Stefanie Sun",
+        "Jerry",
+        "Lin Zheng-Zhong"
       ],
-      "album": "Ferrari",
+      "album": "我要的幸福",
       "source": {
-        "rowIndex": 20811,
-        "recordNumber": 20812,
-        "trackId": "4zN21mbAuaD0WqtmaTZZeP"
+        "rowIndex": 70147,
+        "recordNumber": 70148,
+        "trackId": "68tZwwRuo9ip5gRQFG1XWF"
       }
     },
     {
-      "id": "hf-2rurDawMfoKP4uHyb2kJBt",
-      "title": "Te Felicito",
+      "id": "hf-6us212S3fCRIQwOwNExqLH",
+      "title": "愛我的時候",
       "artists": [
-        "Shakira",
-        "Rauw Alejandro"
+        "Eric Chou",
+        "單依純"
       ],
-      "album": "Te Felicito",
+      "album": "愛我的時候",
       "source": {
-        "rowIndex": 67602,
-        "recordNumber": 67603,
-        "trackId": "2rurDawMfoKP4uHyb2kJBt"
+        "rowIndex": 70222,
+        "recordNumber": 70223,
+        "trackId": "6us212S3fCRIQwOwNExqLH"
       }
     },
     {
-      "id": "hf-7MXVkk9YMctZqd1Srtv4MB",
-      "title": "Starboy",
+      "id": "hf-3N0srZgpRLSY2ziJ1FsJh9",
+      "title": "Work",
       "artists": [
-        "The Weeknd",
-        "Daft Punk"
+        "高爾宣 OSN",
+        "sunkis"
       ],
-      "album": "Starboy",
+      "album": "Work",
       "source": {
-        "rowIndex": 81004,
-        "recordNumber": 81005,
-        "trackId": "7MXVkk9YMctZqd1Srtv4MB"
+        "rowIndex": 70360,
+        "recordNumber": 70361,
+        "trackId": "3N0srZgpRLSY2ziJ1FsJh9"
       }
     },
     {
-      "id": "hf-1cKHdTo9u0ZymJdPGSh6nq",
-      "title": "I Was Never There",
+      "id": "hf-6qnSA1GSwRtgHCqaD1jQin",
+      "title": "今天陽光就是特別耀眼特別和諧 feat. 韋禮安",
       "artists": [
-        "The Weeknd",
-        "Gesaffelstein"
+        "Pets Tseng",
+        "WeiBird"
       ],
-      "album": "My Dear Melancholy,",
+      "album": "今天陽光就是特別耀眼特別和諧",
       "source": {
-        "rowIndex": 81101,
-        "recordNumber": 81102,
-        "trackId": "1cKHdTo9u0ZymJdPGSh6nq"
+        "rowIndex": 70490,
+        "recordNumber": 70491,
+        "trackId": "6qnSA1GSwRtgHCqaD1jQin"
       }
     },
     {
-      "id": "hf-1ga4PztXOIw1yBbdUt2X8v",
-      "title": "GATÚBELA",
+      "id": "hf-7LyCtbxher5m97MImn5M3l",
+      "title": "不該",
       "artists": [
-        "KAROL G",
-        "Maldy"
+        "Jay Chou",
+        "A-Mei Chang"
       ],
-      "album": "GATÚBELA",
+      "album": "周杰倫的床邊故事",
       "source": {
-        "rowIndex": 88609,
-        "recordNumber": 88610,
-        "trackId": "1ga4PztXOIw1yBbdUt2X8v"
+        "rowIndex": 70126,
+        "recordNumber": 70127,
+        "trackId": "7LyCtbxher5m97MImn5M3l"
       }
     },
     {
-      "id": "hf-7ef4DlsgrMEH11cDZd32M6",
-      "title": "One Kiss (with Dua Lipa)",
+      "id": "hf-7ovUSP7jWkzWR2SHptYJfd",
+      "title": "你被寫在我的歌裡",
       "artists": [
-        "Calvin Harris",
-        "Dua Lipa"
+        "Sodagreen",
+        "Ella Chen"
       ],
-      "album": "One Kiss (with Dua Lipa)",
+      "album": "你在煩惱什麼",
       "source": {
-        "rowIndex": 20014,
-        "recordNumber": 20015,
-        "trackId": "7ef4DlsgrMEH11cDZd32M6"
+        "rowIndex": 70199,
+        "recordNumber": 70200,
+        "trackId": "7ovUSP7jWkzWR2SHptYJfd"
       }
     },
     {
-      "id": "hf-1DIXPcTDzTj8ZMHt3PDt8p",
-      "title": "Gangsta's Paradise",
+      "id": "hf-4PMakIBWXujbe2MIsuZtOc",
+      "title": "對等關係 (feat. 張惠妹)",
       "artists": [
-        "Coolio",
-        "L.V."
+        "Ronghao Li",
+        "A-Mei Chang"
       ],
-      "album": "Gangsta's Paradise",
+      "album": "對等關係 (feat. 張惠妹)",
       "source": {
-        "rowIndex": 37000,
-        "recordNumber": 37001,
-        "trackId": "1DIXPcTDzTj8ZMHt3PDt8p"
+        "rowIndex": 70304,
+        "recordNumber": 70305,
+        "trackId": "4PMakIBWXujbe2MIsuZtOc"
       }
     },
     {
-      "id": "hf-5HCyWlXZPP0y6Gqq8TgA20",
-      "title": "STAY (with Justin Bieber)",
+      "id": "hf-7DQOE8yIchm7bPPvJ0w6Bf",
+      "title": "好心分手",
       "artists": [
-        "The Kid LAROI",
-        "Justin Bieber"
+        "Candy Lo",
+        "Leehom Wang"
       ],
-      "album": "STAY (with Justin Bieber)",
+      "album": "不能不愛…盧巧音精選",
       "source": {
-        "rowIndex": 51004,
-        "recordNumber": 51005,
-        "trackId": "5HCyWlXZPP0y6Gqq8TgA20"
+        "rowIndex": 12057,
+        "recordNumber": 12058,
+        "trackId": "7DQOE8yIchm7bPPvJ0w6Bf"
       }
     },
     {
-      "id": "hf-59nOXPmaKlBfGMDeOVGrIK",
-      "title": "WAIT FOR U (feat. Drake & Tems)",
+      "id": "hf-6zeblz6qaURo2JphS7XeFz",
+      "title": "一表人才",
       "artists": [
-        "Future",
-        "Drake",
-        "Tems"
+        "Edan 呂爵安",
+        "Feng Ze"
       ],
-      "album": "I NEVER LIKED YOU",
+      "album": "一表人才",
       "source": {
-        "rowIndex": 51751,
-        "recordNumber": 51752,
-        "trackId": "59nOXPmaKlBfGMDeOVGrIK"
+        "rowIndex": 12905,
+        "recordNumber": 12906,
+        "trackId": "6zeblz6qaURo2JphS7XeFz"
       }
     },
     {
-      "id": "hf-5jt25aFjW2kNoBqaEVaz5W",
-      "title": "LA INOCENTE",
+      "id": "hf-7LmFgyIHlXRqjDOt68RQoQ",
+      "title": "凉凉 - 電視劇《三生三世十里桃花》片尾曲",
       "artists": [
-        "Mora",
-        "Feid"
+        "Aska Yang",
+        "Zhang Bichen"
       ],
-      "album": "MICRODOSIS",
+      "album": "凉凉",
       "source": {
-        "rowIndex": 68611,
-        "recordNumber": 68612,
-        "trackId": "5jt25aFjW2kNoBqaEVaz5W"
+        "rowIndex": 70027,
+        "recordNumber": 70028,
+        "trackId": "7LmFgyIHlXRqjDOt68RQoQ"
       }
     },
     {
-      "id": "hf-72yP0DUlWPyH8P7IoxskwN",
-      "title": "Hold Me Closer",
+      "id": "hf-53WV5mAY2opmFC0r0LjRdM",
+      "title": "小酒窩",
       "artists": [
-        "Elton John",
-        "Britney Spears"
+        "JJ Lin",
+        "Charlene Choi"
       ],
-      "album": "Hold Me Closer",
+      "album": "JJ陸",
       "source": {
-        "rowIndex": 79051,
-        "recordNumber": 79052,
-        "trackId": "72yP0DUlWPyH8P7IoxskwN"
+        "rowIndex": 70287,
+        "recordNumber": 70288,
+        "trackId": "53WV5mAY2opmFC0r0LjRdM"
       }
     },
     {
-      "id": "hf-0u2P5u6lvoDfwTYjAADbn4",
-      "title": "lovely (with Khalid)",
+      "id": "hf-01PSJFZbSRujjSk9d2Gbla",
+      "title": "再也沒有你",
       "artists": [
-        "Billie Eilish",
-        "Khalid"
+        "Lara Liang",
+        "Andrew Tan"
       ],
-      "album": "lovely (with Khalid)",
+      "album": "來者何人{}",
       "source": {
-        "rowIndex": 81053,
-        "recordNumber": 81054,
-        "trackId": "0u2P5u6lvoDfwTYjAADbn4"
+        "rowIndex": 70491,
+        "recordNumber": 70492,
+        "trackId": "01PSJFZbSRujjSk9d2Gbla"
       }
     },
     {
-      "id": "hf-3uUuGVFu1V7jTQL60S1r8z",
-      "title": "Where Are You Now",
+      "id": "hf-58XI7GWbSNjhltlsrUz6pt",
+      "title": "知否知否 - \"知否知否应是绿肥红瘦\" 电视剧主题曲",
       "artists": [
-        "Lost Frequencies",
-        "Calum Scott"
+        "Hu Xia",
+        "Yisa Yu"
       ],
-      "album": "Where Are You Now",
+      "album": "知否知否 (\"知否知否应是绿肥红瘦\" 电视剧主题曲)",
       "source": {
-        "rowIndex": 20560,
-        "recordNumber": 20561,
-        "trackId": "3uUuGVFu1V7jTQL60S1r8z"
+        "rowIndex": 70185,
+        "recordNumber": 70186,
+        "trackId": "58XI7GWbSNjhltlsrUz6pt"
       }
     },
     {
-      "id": "hf-6VBhH7CyP56BXjp8VsDFPZ",
-      "title": "Kesariya (From \"Brahmastra\")",
+      "id": "hf-2d3DoAIDeUC58X3mzDRmDs",
+      "title": "你最珍貴",
       "artists": [
-        "Pritam",
-        "Arijit Singh",
-        "Amitabh Bhattacharya"
+        "Jacky Cheung",
+        "高慧君"
       ],
-      "album": "Kesariya (From \"Brahmastra\")",
+      "album": "不後悔",
       "source": {
-        "rowIndex": 55001,
-        "recordNumber": 55002,
-        "trackId": "6VBhH7CyP56BXjp8VsDFPZ"
+        "rowIndex": 12266,
+        "recordNumber": 12267,
+        "trackId": "2d3DoAIDeUC58X3mzDRmDs"
       }
     },
     {
-      "id": "hf-0fea68AdmYNygeTGI4RC18",
-      "title": "LA CANCIÓN",
+      "id": "hf-0WzdHebEnoKHlTxq5x2e67",
+      "title": "私奔到月球",
       "artists": [
-        "J Balvin",
-        "Bad Bunny"
+        "Mayday",
+        "Cheer Chen"
       ],
-      "album": "OASIS",
+      "album": "離開地球表面",
       "source": {
-        "rowIndex": 68600,
-        "recordNumber": 68601,
-        "trackId": "0fea68AdmYNygeTGI4RC18"
+        "rowIndex": 70241,
+        "recordNumber": 70242,
+        "trackId": "0WzdHebEnoKHlTxq5x2e67"
       }
     },
     {
-      "id": "hf-0kTMK4gNFfLXaTb62w1UaJ",
-      "title": "BABY OTAKU",
+      "id": "hf-3dGkfiu2IKSWZRfmBoUxvV",
+      "title": "Without You - Acoustic Version",
       "artists": [
-        "Pablo Pesadilla",
-        "Polimá Westcoast",
-        "Nickoog Clk",
-        "Fran C"
+        "高爾宣 OSN",
+        "Vicky Chen"
       ],
-      "album": "BABY OTAKU",
+      "album": "#osnrap",
       "source": {
-        "rowIndex": 68604,
-        "recordNumber": 68605,
-        "trackId": "0kTMK4gNFfLXaTb62w1UaJ"
+        "rowIndex": 70399,
+        "recordNumber": 70400,
+        "trackId": "3dGkfiu2IKSWZRfmBoUxvV"
       }
     },
     {
-      "id": "hf-6DoL1yYIwEW7VZMRaJhoJI",
-      "title": "La Llevo Al Cielo (Ft. Ñengo Flow)",
+      "id": "hf-2TkAUHBaCReXruGnMVPGNL",
+      "title": "Bedroom (feat. Anne-Marie)",
       "artists": [
-        "Chris Jedi",
-        "Anuel AA",
-        "Chencho Corleone",
-        "Ñengo Flow"
+        "JJ Lin",
+        "Anne-Marie"
       ],
-      "album": "La Llevo Al Cielo (Ft. Ñengo Flow)",
+      "album": "Bedroom (feat. Anne-Marie)",
       "source": {
-        "rowIndex": 68663,
-        "recordNumber": 68664,
-        "trackId": "6DoL1yYIwEW7VZMRaJhoJI"
+        "rowIndex": 70112,
+        "recordNumber": 70113,
+        "trackId": "2TkAUHBaCReXruGnMVPGNL"
       }
     },
     {
-      "id": "hf-73vIOb4Q7YN6HeJTbscRx5",
-      "title": "Miss You",
+      "id": "hf-40fcXSuSb80MekMZM1ei2J",
+      "title": "溫柔 #MaydayBlue20th - feat.孫燕姿",
       "artists": [
-        "Oliver Tree",
-        "Robin Schulz"
+        "Mayday",
+        "Stefanie Sun"
       ],
-      "album": "Miss You",
+      "album": "溫柔 #MaydayBlue20th",
       "source": {
-        "rowIndex": 3300,
-        "recordNumber": 3301,
-        "trackId": "73vIOb4Q7YN6HeJTbscRx5"
+        "rowIndex": 70387,
+        "recordNumber": 70388,
+        "trackId": "40fcXSuSb80MekMZM1ei2J"
       }
     },
     {
-      "id": "hf-0xzI1KAr0Yd9tv8jlIk3sn",
-      "title": "Bad Decisions (with BTS & Snoop Dogg)",
+      "id": "hf-6tzOEJ2tqSiAxHw9CAT9Ru",
+      "title": "別勉強",
       "artists": [
-        "benny blanco",
-        "BTS",
-        "Snoop Dogg"
+        "G.E.M.",
+        "Eric Chou"
       ],
-      "album": "Bad Decisions (with BTS & Snoop Dogg)",
+      "album": "摩天動物園",
       "source": {
-        "rowIndex": 20030,
-        "recordNumber": 20031,
-        "trackId": "0xzI1KAr0Yd9tv8jlIk3sn"
+        "rowIndex": 70725,
+        "recordNumber": 70726,
+        "trackId": "6tzOEJ2tqSiAxHw9CAT9Ru"
       }
     },
     {
-      "id": "hf-10xV5l9nhLvFpR8mqzs0bL",
-      "title": "Numb",
+      "id": "hf-6h9km3YJWVABKCV6SVF9LS",
+      "title": "你那麼愛她",
       "artists": [
-        "Marshmello",
-        "Khalid"
+        "林隆璇",
+        "Sam Lee"
       ],
-      "album": "Numb",
+      "album": "Men's Talk About Love新歌+1992~2005精選",
       "source": {
-        "rowIndex": 20251,
-        "recordNumber": 20252,
-        "trackId": "10xV5l9nhLvFpR8mqzs0bL"
+        "rowIndex": 70979,
+        "recordNumber": 70980,
+        "trackId": "6h9km3YJWVABKCV6SVF9LS"
       }
     },
     {
-      "id": "hf-7fZBQnc0zXwVybgCIrQQil",
-      "title": "Belly Dancer",
+      "id": "hf-6kZfjIUmJqQAosGKyOcOIk",
+      "title": "相愛很難 - 電影\"男人四十\"歌曲",
       "artists": [
-        "Imanbek",
-        "BYOR"
+        "Jacky Cheung",
+        "Anita Mui"
       ],
-      "album": "Belly Dancer",
+      "album": "他在那裡",
       "source": {
-        "rowIndex": 20419,
-        "recordNumber": 20420,
-        "trackId": "7fZBQnc0zXwVybgCIrQQil"
+        "rowIndex": 12321,
+        "recordNumber": 12322,
+        "trackId": "6kZfjIUmJqQAosGKyOcOIk"
       }
     },
     {
-      "id": "hf-0QBzMgT7NIeoCYy3sJCof1",
-      "title": "Bam Bam (feat. Ed Sheeran)",
+      "id": "hf-7Fr7Ag2bQyJl86BtsFmdOW",
+      "title": "隔離 - Studio Live Duet",
       "artists": [
-        "Camila Cabello",
-        "Ed Sheeran"
+        "Jace Chan",
+        "Terence Lam"
       ],
-      "album": "Bam Bam (feat. Ed Sheeran)",
+      "album": "Processing",
       "source": {
-        "rowIndex": 20654,
-        "recordNumber": 20655,
-        "trackId": "0QBzMgT7NIeoCYy3sJCof1"
+        "rowIndex": 12379,
+        "recordNumber": 12380,
+        "trackId": "7Fr7Ag2bQyJl86BtsFmdOW"
       }
     },
     {
-      "id": "hf-4gzsuuZypVbxs0Af1LSZyB",
-      "title": "Lo Siento BB:/ (with Bad Bunny & Julieta Venegas)",
+      "id": "hf-3kQvyf0lMEpcn0xGWM1blY",
+      "title": "我也難過的",
       "artists": [
-        "Tainy",
-        "Bad Bunny",
-        "Julieta Venegas"
+        "吳林峰",
+        "謝芊彤"
       ],
-      "album": "Lo Siento BB:/ (with Bad Bunny & Julieta Venegas)",
+      "album": "我也難過的",
       "source": {
-        "rowIndex": 68701,
-        "recordNumber": 68702,
-        "trackId": "4gzsuuZypVbxs0Af1LSZyB"
+        "rowIndex": 12704,
+        "recordNumber": 12705,
+        "trackId": "3kQvyf0lMEpcn0xGWM1blY"
       }
     },
     {
-      "id": "hf-18asYwWugKjjsihZ0YvRxO",
-      "title": "The Motto",
+      "id": "hf-47qkmo2smLRBNlbzDEwZHS",
+      "title": "如果的事",
       "artists": [
-        "Tiësto",
-        "Ava Max"
+        "Christine Fan",
+        "Angela Chang"
       ],
-      "album": "The Motto",
+      "album": "一比一",
       "source": {
-        "rowIndex": 20418,
-        "recordNumber": 20419,
-        "trackId": "18asYwWugKjjsihZ0YvRxO"
+        "rowIndex": 70497,
+        "recordNumber": 70498,
+        "trackId": "47qkmo2smLRBNlbzDEwZHS"
       }
     },
     {
-      "id": "hf-27NovPIUIRrOZoCHxABJwK",
-      "title": "INDUSTRY BABY (feat. Jack Harlow)",
+      "id": "hf-4eH9ujPhZSF0HZ1c004wtb",
+      "title": "致姗姗来迟的你",
       "artists": [
-        "Lil Nas X",
-        "Jack Harlow"
+        "A Si",
+        "Yoga Lin"
       ],
-      "album": "INDUSTRY BABY (feat. Jack Harlow)",
+      "album": "我愚蠢的理想主义",
       "source": {
-        "rowIndex": 51050,
-        "recordNumber": 51051,
-        "trackId": "27NovPIUIRrOZoCHxABJwK"
+        "rowIndex": 70503,
+        "recordNumber": 70504,
+        "trackId": "4eH9ujPhZSF0HZ1c004wtb"
       }
     },
     {
-      "id": "hf-4xkOaSrkexMciUUogZKVTS",
-      "title": "Till I Collapse",
+      "id": "hf-2LoGv4HSbilp1SVoQ10Qw6",
+      "title": "Black Out (feat. 9m88)",
       "artists": [
-        "Eminem",
-        "Nate Dogg"
+        "ØZI",
+        "9m88"
       ],
-      "album": "The Eminem Show",
+      "album": "ØZI: The Album",
       "source": {
-        "rowIndex": 51277,
-        "recordNumber": 51278,
-        "trackId": "4xkOaSrkexMciUUogZKVTS"
+        "rowIndex": 70850,
+        "recordNumber": 70851,
+        "trackId": "2LoGv4HSbilp1SVoQ10Qw6"
       }
     },
     {
-      "id": "hf-4woTEX1wYOTGDqNXuavlRC",
-      "title": "Superman",
+      "id": "hf-3hdQIQYs13Gv2gdncFvKZ0",
+      "title": "How Many Times - Studio Live",
       "artists": [
-        "Eminem",
-        "Dina Rae"
+        "MC 張天賦",
+        "Jay Fung"
       ],
-      "album": "The Eminem Show",
+      "album": "How Many Times (Studio Live)",
       "source": {
-        "rowIndex": 51503,
-        "recordNumber": 51504,
-        "trackId": "4woTEX1wYOTGDqNXuavlRC"
+        "rowIndex": 12323,
+        "recordNumber": 12324,
+        "trackId": "3hdQIQYs13Gv2gdncFvKZ0"
       }
     },
     {
-      "id": "hf-4iJyoBOLtHqaGxP12qzhQI",
-      "title": "Peaches (feat. Daniel Caesar & Giveon)",
+      "id": "hf-2edBRoaI2F2ST6WK0jdLUX",
+      "title": "屋頂",
       "artists": [
-        "Justin Bieber",
-        "Daniel Caesar",
-        "Giveon"
+        "Landy Wen",
+        "Jay Chou"
       ],
-      "album": "Justice",
+      "album": "有點野",
       "source": {
-        "rowIndex": 81207,
-        "recordNumber": 81208,
-        "trackId": "4iJyoBOLtHqaGxP12qzhQI"
+        "rowIndex": 70662,
+        "recordNumber": 70663,
+        "trackId": "2edBRoaI2F2ST6WK0jdLUX"
       }
     },
     {
-      "id": "hf-1r9xUipOqoNwggBpENDsvJ",
-      "title": "Enemy (with JID) - from the series Arcane League of Legends",
+      "id": "hf-22Dglcz1VwyXTCEBt6PIdG",
+      "title": "不是我不明白",
       "artists": [
-        "Imagine Dragons",
-        "JID",
-        "Arcane",
-        "League of Legends"
+        "Fish Leong",
+        "Crowd Lu"
       ],
-      "album": "Enemy (with JID) [from the series Arcane League of Legends]",
+      "album": "親親",
       "source": {
-        "rowIndex": 91022,
-        "recordNumber": 91023,
-        "trackId": "1r9xUipOqoNwggBpENDsvJ"
+        "rowIndex": 70859,
+        "recordNumber": 70860,
+        "trackId": "22Dglcz1VwyXTCEBt6PIdG"
       }
     },
     {
-      "id": "hf-2vXKRlJBXyOcvZYTdNeckS",
-      "title": "Lost in the Fire (feat. The Weeknd)",
+      "id": "hf-3ZNVR4Nl4NLVioCv4zyFhq",
+      "title": "另一個天堂",
       "artists": [
-        "Gesaffelstein",
-        "The Weeknd"
+        "Leehom Wang",
+        "Jane Zhang"
       ],
-      "album": "Hyperion",
+      "album": "王力宏全新創作大碟 心.跳",
       "source": {
-        "rowIndex": 17000,
-        "recordNumber": 17001,
-        "trackId": "2vXKRlJBXyOcvZYTdNeckS"
+        "rowIndex": 70912,
+        "recordNumber": 70913,
+        "trackId": "3ZNVR4Nl4NLVioCv4zyFhq"
       }
     },
     {
-      "id": "hf-5nujrmhLynf4yMoMtj8AQF",
-      "title": "Levitating (feat. DaBaby)",
+      "id": "hf-7xAVLrbnud6OrU6f4FmxDr",
+      "title": "羅生門",
       "artists": [
-        "Dua Lipa",
-        "DaBaby"
+        "Juno Mak",
+        "Kay Tse"
       ],
-      "album": "Future Nostalgia",
+      "album": "羅生門",
       "source": {
-        "rowIndex": 20007,
-        "recordNumber": 20008,
-        "trackId": "5nujrmhLynf4yMoMtj8AQF"
+        "rowIndex": 12050,
+        "recordNumber": 12051,
+        "trackId": "7xAVLrbnud6OrU6f4FmxDr"
       }
     },
     {
-      "id": "hf-6RUKPb4LETWmmr3iAEQktW",
-      "title": "Something Just Like This",
+      "id": "hf-49TW63ZUE5HJ7hSqyjbCu1",
+      "title": "戀愛頻率",
       "artists": [
-        "The Chainsmokers",
-        "Coldplay"
+        "Andy Hui",
+        "許慧欣"
       ],
-      "album": "Memories...Do Not Open",
+      "album": "我還能愛誰",
       "source": {
-        "rowIndex": 20059,
-        "recordNumber": 20060,
-        "trackId": "6RUKPb4LETWmmr3iAEQktW"
+        "rowIndex": 12631,
+        "recordNumber": 12632,
+        "trackId": "49TW63ZUE5HJ7hSqyjbCu1"
       }
     },
     {
-      "id": "hf-4qu63nuBpdn0qHUHuObEj1",
-      "title": "Leave Before You Love Me (with Jonas Brothers)",
+      "id": "hf-05N5PhoJCpHIxzyGYiqthJ",
+      "title": "目黑 - 合唱版",
       "artists": [
-        "Marshmello",
-        "Jonas Brothers"
+        "Endy Chow",
+        "Fiona Sit"
       ],
-      "album": "Leave Before You Love Me",
+      "album": "周國賢同名EP",
       "source": {
-        "rowIndex": 20154,
-        "recordNumber": 20155,
-        "trackId": "4qu63nuBpdn0qHUHuObEj1"
+        "rowIndex": 12530,
+        "recordNumber": 12531,
+        "trackId": "05N5PhoJCpHIxzyGYiqthJ"
       }
     },
     {
-      "id": "hf-1bgKMxPQU7JIZEhNsM1vFs",
-      "title": "Words (feat. Zara Larsson)",
+      "id": "hf-1VpHU8KcaoB2WVVV2KDWEn",
+      "title": "廣島之戀",
       "artists": [
-        "Alesso",
-        "Zara Larsson"
+        "Karen Mok",
+        "張洪量"
       ],
-      "album": "Words (feat. Zara Larsson)",
+      "album": "做自己 TO BE",
       "source": {
-        "rowIndex": 30365,
-        "recordNumber": 30366,
-        "trackId": "1bgKMxPQU7JIZEhNsM1vFs"
+        "rowIndex": 12901,
+        "recordNumber": 12902,
+        "trackId": "1VpHU8KcaoB2WVVV2KDWEn"
       }
     },
     {
-      "id": "hf-3rb0tMq42WfggucPm0HHkA",
-      "title": "Bad Memories (feat. Elley Duhé & FAST BOY)",
+      "id": "hf-487CwH00ao0LRep28i58sT",
+      "title": "jagi (feat. KIRE)",
       "artists": [
-        "MEDUZA",
-        "James Carter",
-        "Elley Duhé",
-        "FAST BOY"
+        "Shi Shi",
+        "KIRE"
       ],
-      "album": "Bad Memories (feat. Elley Duhé & FAST BOY)",
+      "album": "jagi (feat. KIRE)",
       "source": {
-        "rowIndex": 30466,
-        "recordNumber": 30467,
-        "trackId": "3rb0tMq42WfggucPm0HHkA"
+        "rowIndex": 70807,
+        "recordNumber": 70808,
+        "trackId": "487CwH00ao0LRep28i58sT"
       }
     },
     {
-      "id": "hf-1WCEAGGRD066z2Q89ObXTq",
-      "title": "Crazy What Love Can Do",
+      "id": "hf-7nlBO1PoiiB5rjro96w35l",
+      "title": "聽海浪",
       "artists": [
-        "David Guetta",
-        "Becky Hill",
-        "Ella Henderson"
+        "Byejack",
+        "Midnight."
       ],
-      "album": "Crazy What Love Can Do",
+      "album": "Bluesea EP (Extended Version)",
       "source": {
-        "rowIndex": 30532,
-        "recordNumber": 30533,
-        "trackId": "1WCEAGGRD066z2Q89ObXTq"
+        "rowIndex": 12876,
+        "recordNumber": 12877,
+        "trackId": "7nlBO1PoiiB5rjro96w35l"
       }
     },
     {
-      "id": "hf-1zi7xx7UVEFkmKfv06H8x0",
-      "title": "One Dance",
+      "id": "hf-4YiLuz7hZ6ysG5iJxNlDmX",
+      "title": "Storm - English Version",
       "artists": [
-        "Drake",
-        "Wizkid",
-        "Kyla"
+        "吳青峰",
+        "AURORA"
       ],
-      "album": "Views",
+      "album": "Storm (English Version)",
       "source": {
-        "rowIndex": 51300,
-        "recordNumber": 51301,
-        "trackId": "1zi7xx7UVEFkmKfv06H8x0"
+        "rowIndex": 70292,
+        "recordNumber": 70293,
+        "trackId": "4YiLuz7hZ6ysG5iJxNlDmX"
       }
     },
     {
-      "id": "hf-3UmaczJpikHgJFyBTAJVoz",
-      "title": "Stan",
+      "id": "hf-6AjARrb0g2jgGLpm0gOAYx",
+      "title": "友情歲月",
       "artists": [
-        "Eminem",
-        "Dido"
+        "Jordan Chan",
+        "Ekin Cheng",
+        "謝天華",
+        "林曉峰"
       ],
-      "album": "The Marshall Mathers LP",
+      "album": "黃金兄弟 (電影原聲)",
       "source": {
-        "rowIndex": 51301,
-        "recordNumber": 51302,
-        "trackId": "3UmaczJpikHgJFyBTAJVoz"
+        "rowIndex": 12654,
+        "recordNumber": 12655,
+        "trackId": "6AjARrb0g2jgGLpm0gOAYx"
       }
     },
     {
-      "id": "hf-2hLXUbsOU9cDb9RFva9FYr",
-      "title": "MEMORIAS",
+      "id": "hf-2kmwkxaPjSwJ1fe7SFROTs",
+      "title": "綠光",
       "artists": [
-        "Mora",
-        "Jhayco"
+        "Stefanie Sun",
+        "Shen Darren"
       ],
-      "album": "MICRODOSIS",
+      "album": "風箏",
       "source": {
-        "rowIndex": 68612,
-        "recordNumber": 68613,
-        "trackId": "2hLXUbsOU9cDb9RFva9FYr"
+        "rowIndex": 70571,
+        "recordNumber": 70572,
+        "trackId": "2kmwkxaPjSwJ1fe7SFROTs"
       }
     },
     {
-      "id": "hf-2TDyyEBasw10wu5Uh94bR1",
-      "title": "PUNTO 40",
+      "id": "hf-5ZFN0GcP1IA5jUp9kf1X03",
+      "title": "今天妳要嫁給我",
       "artists": [
-        "Rauw Alejandro",
-        "Baby Rasta"
+        "Jolin Tsai",
+        "David Tao"
       ],
-      "album": "PUNTO 40",
+      "album": "唯舞獨尊演唱會鮮聽版&特別混音專輯",
       "source": {
-        "rowIndex": 68653,
-        "recordNumber": 68654,
-        "trackId": "2TDyyEBasw10wu5Uh94bR1"
+        "rowIndex": 70962,
+        "recordNumber": 70963,
+        "trackId": "5ZFN0GcP1IA5jUp9kf1X03"
       }
     },
     {
-      "id": "hf-48AJSd42lXpicsGqcgopof",
-      "title": "X ÚLTIMA VEZ",
+      "id": "hf-7GDwYUuvu1qjah9rAH15AH",
+      "title": "現代愛情故事",
       "artists": [
-        "Daddy Yankee",
-        "Bad Bunny"
+        "Chilam",
+        "Xu Qiu Yi"
       ],
-      "album": "LEGENDADDY",
+      "album": "EMI 星聲傳集之張智霖",
       "source": {
-        "rowIndex": 68721,
-        "recordNumber": 68722,
-        "trackId": "48AJSd42lXpicsGqcgopof"
+        "rowIndex": 12781,
+        "recordNumber": 12782,
+        "trackId": "7GDwYUuvu1qjah9rAH15AH"
       }
     },
     {
-      "id": "hf-5fhcuVxuBWfgNXGuyAtLmr",
-      "title": "Los Cachos",
+      "id": "hf-7F92rki4H1RZ68OrOZQy4u",
+      "title": "畫沙",
       "artists": [
-        "Piso 21",
-        "Manuel Turizo"
+        "Cindy Yen",
+        "Jay Chou"
       ],
-      "album": "Los Cachos",
+      "album": "袁詠琳Cindy",
       "source": {
-        "rowIndex": 68729,
-        "recordNumber": 68730,
-        "trackId": "5fhcuVxuBWfgNXGuyAtLmr"
+        "rowIndex": 70690,
+        "recordNumber": 70691,
+        "trackId": "7F92rki4H1RZ68OrOZQy4u"
       }
     },
     {
-      "id": "hf-1ri9ZUkBJVFUdgwzCnfcYs",
-      "title": "MAMIII",
+      "id": "hf-0k4FG9l3OrxLt5NQU3uEkR",
+      "title": "I'm not yours (feat. 安室奈美惠)",
       "artists": [
-        "Becky G",
-        "KAROL G"
+        "Jolin Tsai",
+        "Namie Amuro"
       ],
-      "album": "MAMIII",
+      "album": "呸",
       "source": {
-        "rowIndex": 88705,
-        "recordNumber": 88706,
-        "trackId": "1ri9ZUkBJVFUdgwzCnfcYs"
+        "rowIndex": 70794,
+        "recordNumber": 70795,
+        "trackId": "0k4FG9l3OrxLt5NQU3uEkR"
       }
     },
     {
-      "id": "hf-2bRKxuH1o7pTmb1y4GfdEc",
-      "title": "Clean White Noise - Loopable with no fade",
+      "id": "hf-46dMEqSYXPLEQosHOse0H0",
+      "title": "堅強的理由",
       "artists": [
-        "White Noise Baby Sleep",
-        "White Noise for Babies"
+        "Karen Mok",
+        "Wu Bai"
       ],
-      "album": "Best White Noise for Baby Sleep - Loopable with No Fade",
+      "album": "I SAY",
       "source": {
-        "rowIndex": 101376,
-        "recordNumber": 101377,
-        "trackId": "2bRKxuH1o7pTmb1y4GfdEc"
+        "rowIndex": 12300,
+        "recordNumber": 12301,
+        "trackId": "46dMEqSYXPLEQosHOse0H0"
       }
     },
     {
-      "id": "hf-7BKLCZ1jbUBVqRi2FVlTVw",
-      "title": "Closer",
+      "id": "hf-3oTmOv9KjIcOfRTfGH5c62",
+      "title": "我是誰 (電視劇《狼殿下》主題曲)",
       "artists": [
-        "The Chainsmokers",
-        "Halsey"
+        "Jolin Tsai",
+        "Jony J"
       ],
-      "album": "Closer",
+      "album": "《狼殿下》影視原聲帶",
       "source": {
-        "rowIndex": 20004,
-        "recordNumber": 20005,
-        "trackId": "7BKLCZ1jbUBVqRi2FVlTVw"
+        "rowIndex": 70365,
+        "recordNumber": 70366,
+        "trackId": "3oTmOv9KjIcOfRTfGH5c62"
       }
     },
     {
-      "id": "hf-0lYBSQXN6rCTvUZvg9S0lU",
-      "title": "Let Me Love You",
+      "id": "hf-2r4Qugm13w48DJ13jCUQgo",
+      "title": "(......小王子)(feat. ohashiTrio)",
       "artists": [
-        "DJ Snake",
-        "Justin Bieber"
+        "吳青峰",
+        "大橋三重唱"
       ],
-      "album": "Encore",
+      "album": "馬拉美的星期二",
       "source": {
-        "rowIndex": 20005,
-        "recordNumber": 20006,
-        "trackId": "0lYBSQXN6rCTvUZvg9S0lU"
+        "rowIndex": 70694,
+        "recordNumber": 70695,
+        "trackId": "2r4Qugm13w48DJ13jCUQgo"
       }
     },
     {
-      "id": "hf-0k4d5YPDr1r7FX77VdqWez",
-      "title": "You Right",
+      "id": "hf-36zXp2vEis00HRdX3pYEMr",
+      "title": "我們萬歲",
       "artists": [
-        "Doja Cat",
-        "The Weeknd"
+        "Eason Chan",
+        "eason and the duo band"
       ],
-      "album": "Planet Her",
+      "album": "L.O.V.E.",
       "source": {
-        "rowIndex": 20100,
-        "recordNumber": 20101,
-        "trackId": "0k4d5YPDr1r7FX77VdqWez"
+        "rowIndex": 12258,
+        "recordNumber": 12259,
+        "trackId": "36zXp2vEis00HRdX3pYEMr"
       }
     },
     {
-      "id": "hf-3ZFTkvIE7kyPt6Nu3PEa7V",
-      "title": "Hips Don't Lie (feat. Wyclef Jean)",
+      "id": "hf-2HgSK0w0mfcB9dEnFMYagd",
+      "title": "年少無知 - (劇集 \"天與地\" 片尾曲)",
       "artists": [
-        "Shakira",
-        "Wyclef Jean"
+        "Bowie Lam",
+        "陳豪",
+        "黃德斌"
       ],
-      "album": "Oral Fixation, Vol. 2 (Expanded Edition)",
+      "album": "年少無知 (劇集 \"天與地\" 片尾曲)",
       "source": {
-        "rowIndex": 20365,
-        "recordNumber": 20366,
-        "trackId": "3ZFTkvIE7kyPt6Nu3PEa7V"
+        "rowIndex": 12705,
+        "recordNumber": 12706,
+        "trackId": "2HgSK0w0mfcB9dEnFMYagd"
       }
     },
     {
-      "id": "hf-02VBYrHfVwfEWXk5DXyf0T",
-      "title": "Leave The Door Open",
+      "id": "hf-24L9JvI4WHMIG5RfjWkkqF",
+      "title": "獨一無二",
       "artists": [
-        "Bruno Mars",
-        "Anderson .Paak",
-        "Silk Sonic"
+        "AGA",
+        "Gin Lee"
       ],
-      "album": "An Evening With Silk Sonic",
+      "album": "Ginadoll Concert Live",
       "source": {
-        "rowIndex": 20602,
-        "recordNumber": 20603,
-        "trackId": "02VBYrHfVwfEWXk5DXyf0T"
+        "rowIndex": 12978,
+        "recordNumber": 12979,
+        "trackId": "24L9JvI4WHMIG5RfjWkkqF"
       }
     },
     {
-      "id": "hf-2VxeLyX666F8uXCJ0dZF8B",
-      "title": "Shallow",
+      "id": "hf-6Q1Ekf6C8V0e7aOCymgscs",
+      "title": "Don't Wanna Lie (feat. 8lak & Hosea)",
       "artists": [
-        "Lady Gaga",
-        "Bradley Cooper"
+        "Patrick Brasca",
+        "8lak",
+        "Hosea"
       ],
-      "album": "A Star Is Born Soundtrack",
+      "album": "燥熱",
       "source": {
-        "rowIndex": 20909,
-        "recordNumber": 20910,
-        "trackId": "2VxeLyX666F8uXCJ0dZF8B"
+        "rowIndex": 70656,
+        "recordNumber": 70657,
+        "trackId": "6Q1Ekf6C8V0e7aOCymgscs"
       }
     },
     {
-      "id": "hf-0bI7K9Becu2dtXK1Q3cZNB",
-      "title": "Don't Be Shy",
+      "id": "hf-29sgXiafZq3bSkSGoafvli",
+      "title": "輕熟女27 (我只在乎你)",
       "artists": [
-        "Tiësto",
-        "KAROL G"
+        "MC HotDog",
+        "關彥淳"
       ],
-      "album": "Don't Be Shy",
+      "album": "貧民百萬歌星 2009-2012 Best Singles Collection",
       "source": {
-        "rowIndex": 30305,
-        "recordNumber": 30306,
-        "trackId": "0bI7K9Becu2dtXK1Q3cZNB"
+        "rowIndex": 70852,
+        "recordNumber": 70853,
+        "trackId": "29sgXiafZq3bSkSGoafvli"
       }
     },
     {
-      "id": "hf-3Z7CaxQkqbIs1rewKi6v4W",
-      "title": "Hot In It",
+      "id": "hf-6ZRdwFsEw5crjTzHo6Idxh",
+      "title": "Take It Slow",
       "artists": [
-        "Tiësto",
-        "Charli XCX"
+        "Crispy脆樂團",
+        "恐龍的皮"
       ],
-      "album": "Hot In It",
+      "album": "愛是我們必經的辛苦",
       "source": {
-        "rowIndex": 30458,
-        "recordNumber": 30459,
-        "trackId": "3Z7CaxQkqbIs1rewKi6v4W"
+        "rowIndex": 70855,
+        "recordNumber": 70856,
+        "trackId": "6ZRdwFsEw5crjTzHo6Idxh"
       }
     },
     {
-      "id": "hf-7MIhUdNJtaOnDmC5nBC1fb",
-      "title": "Deep Down (feat. Never Dull)",
+      "id": "hf-5noC8HGZaLiXNdvGmjemGP",
+      "title": "Moonlight (feat. 袁婭維)",
       "artists": [
-        "Alok",
-        "Ella Eyre",
-        "Kenny Dope",
-        "Never Dull"
+        "Will Pan",
+        "TIA RAY"
       ],
-      "album": "Deep Down (feat. Never Dull)",
+      "album": "節奏先生",
       "source": {
-        "rowIndex": 31681,
-        "recordNumber": 31682,
-        "trackId": "7MIhUdNJtaOnDmC5nBC1fb"
+        "rowIndex": 70955,
+        "recordNumber": 70956,
+        "trackId": "5noC8HGZaLiXNdvGmjemGP"
       }
     },
     {
-      "id": "hf-503OTo2dSqe7qk76rgsbep",
-      "title": "Still D.R.E.",
+      "id": "hf-0tSbBmOAukoqCsFfYYAI2A",
+      "title": "(......醉鬼阿Q)(feat. 孫燕姿)",
       "artists": [
-        "Dr. Dre",
-        "Snoop Dogg"
+        "吳青峰",
+        "Stefanie Sun"
       ],
-      "album": "2001",
+      "album": "(......醉鬼阿Q)",
       "source": {
-        "rowIndex": 37050,
-        "recordNumber": 37051,
-        "trackId": "503OTo2dSqe7qk76rgsbep"
+        "rowIndex": 70845,
+        "recordNumber": 70846,
+        "trackId": "0tSbBmOAukoqCsFfYYAI2A"
       }
     },
     {
-      "id": "hf-7nFJSfGvvV0WjatTZN6QYi",
-      "title": "Bamba (feat. Aitch & BIA)",
+      "id": "hf-7roRA1aMpy9axwLnwdFhOb",
+      "title": "敢愛敢做",
       "artists": [
-        "Luciano",
-        "Aitch",
-        "BIA"
+        "George Lam",
+        "David Ling Jr"
       ],
-      "album": "Bamba (feat. Aitch & BIA)",
+      "album": "祥情廿載",
       "source": {
-        "rowIndex": 39408,
-        "recordNumber": 39409,
-        "trackId": "7nFJSfGvvV0WjatTZN6QYi"
+        "rowIndex": 12463,
+        "recordNumber": 12464,
+        "trackId": "7roRA1aMpy9axwLnwdFhOb"
       }
     },
     {
-      "id": "hf-1XGmzt0PVuFgQYYnV2It7A",
-      "title": "Payphone",
+      "id": "hf-1o5PE9VNUd8EJtcYLA3QxP",
+      "title": "漸漸",
       "artists": [
-        "Maroon 5",
-        "Wiz Khalifa"
+        "Eason Chan",
+        "eason and the duo band"
       ],
-      "album": "Overexposed Track By Track",
+      "album": "L.O.V.E.",
       "source": {
-        "rowIndex": 81668,
-        "recordNumber": 81669,
-        "trackId": "1XGmzt0PVuFgQYYnV2It7A"
+        "rowIndex": 12563,
+        "recordNumber": 12564,
+        "trackId": "1o5PE9VNUd8EJtcYLA3QxP"
       }
     },
     {
-      "id": "hf-48QmG1dfvMuYLxMPt7KSRA",
-      "title": "No Lie",
+      "id": "hf-4yOMpzImEy2xWT5e5i1cAD",
+      "title": "敏感(LH x Z.TAO)",
       "artists": [
-        "Sean Paul",
-        "Dua Lipa"
+        "Lu Han",
+        "Z.TAO"
       ],
-      "album": "Mad Love The Prequel",
+      "album": "敏感(LH x Z.TAO)",
       "source": {
-        "rowIndex": 20003,
-        "recordNumber": 20004,
-        "trackId": "48QmG1dfvMuYLxMPt7KSRA"
+        "rowIndex": 70102,
+        "recordNumber": 70103,
+        "trackId": "4yOMpzImEy2xWT5e5i1cAD"
       }
     },
     {
-      "id": "hf-4HBZA5flZLE435QTztThqH",
-      "title": "Stuck with U (with Justin Bieber)",
+      "id": "hf-3yUsuJrixeXnCnR7ulQ36N",
+      "title": "石徑",
       "artists": [
-        "Ariana Grande",
-        "Justin Bieber"
+        "Hins Cheung",
+        "Keeva Mak"
       ],
-      "album": "Stuck with U",
+      "album": "No. Eleven",
       "source": {
-        "rowIndex": 20050,
-        "recordNumber": 20051,
-        "trackId": "4HBZA5flZLE435QTztThqH"
+        "rowIndex": 12832,
+        "recordNumber": 12833,
+        "trackId": "3yUsuJrixeXnCnR7ulQ36N"
       }
     },
     {
-      "id": "hf-2dpaYNEQHiRxtZbfNsse99",
-      "title": "Happier",
+      "id": "hf-35KzQtjAlRJiV85veCiX6z",
+      "title": "月球上碰面",
       "artists": [
-        "Marshmello",
-        "Bastille"
+        "Fiona Sit",
+        "Juno Mak"
       ],
-      "album": "Happier",
+      "album": "月球上碰面",
       "source": {
-        "rowIndex": 20056,
-        "recordNumber": 20057,
-        "trackId": "2dpaYNEQHiRxtZbfNsse99"
+        "rowIndex": 12761,
+        "recordNumber": 12762,
+        "trackId": "35KzQtjAlRJiV85veCiX6z"
       }
     },
     {
-      "id": "hf-0VO8gYVDSwM1Qdd2GsMoYK",
-      "title": "Moth To A Flame (with The Weeknd)",
+      "id": "hf-7t2NEWONd6piQvE8uyXSsJ",
+      "title": "自知之明",
       "artists": [
-        "Swedish House Mafia",
-        "The Weeknd"
+        "Pong Nan",
+        "Tang Siu Hau"
       ],
-      "album": "Paradise Again",
+      "album": "自知之明",
       "source": {
-        "rowIndex": 20412,
-        "recordNumber": 20413,
-        "trackId": "0VO8gYVDSwM1Qdd2GsMoYK"
+        "rowIndex": 12800,
+        "recordNumber": 12801,
+        "trackId": "7t2NEWONd6piQvE8uyXSsJ"
       }
     },
     {
-      "id": "hf-32OlwWuMpZ6b0aN2RZOeMS",
-      "title": "Uptown Funk (feat. Bruno Mars)",
+      "id": "hf-0LML5iWVpYfMmYqLyWwPiO",
+      "title": "[Jiang Yanli & Jin Zixuan] Yong Ge",
       "artists": [
-        "Mark Ronson",
-        "Bruno Mars"
+        "Lara Liang",
+        "Yang Qiyu"
       ],
-      "album": "Uptown Special",
+      "album": "The Untamed",
       "source": {
-        "rowIndex": 20716,
-        "recordNumber": 20717,
-        "trackId": "32OlwWuMpZ6b0aN2RZOeMS"
+        "rowIndex": 70699,
+        "recordNumber": 70700,
+        "trackId": "0LML5iWVpYfMmYqLyWwPiO"
       }
     },
     {
-      "id": "hf-0HaRLPnr887lcQM2YQzkff",
-      "title": "For My Hand (feat. Ed Sheeran)",
+      "id": "hf-0tkbJCn5k7lqeOKPaXAXcg",
+      "title": "樓下有人",
       "artists": [
-        "Burna Boy",
-        "Ed Sheeran"
+        "Leo Ku",
+        "葉巧琳"
       ],
-      "album": "Love, Damini",
+      "album": "樓下有人",
       "source": {
-        "rowIndex": 20917,
-        "recordNumber": 20918,
-        "trackId": "0HaRLPnr887lcQM2YQzkff"
+        "rowIndex": 12900,
+        "recordNumber": 12901,
+        "trackId": "0tkbJCn5k7lqeOKPaXAXcg"
       }
     },
     {
-      "id": "hf-1RF02Cf80mTaeNXG2P2boR",
-      "title": "21 Reasons (feat. Ella Henderson)",
+      "id": "hf-0Bpy7wcAOMg5ut2ERwPSbk",
+      "title": "兩旬之歌",
       "artists": [
-        "Nathan Dawe",
-        "Ella Henderson"
+        "Byejack",
+        "Slizznico"
       ],
-      "album": "21 Reasons (feat. Ella Henderson)",
+      "album": "兩旬之歌",
       "source": {
-        "rowIndex": 20926,
-        "recordNumber": 20927,
-        "trackId": "1RF02Cf80mTaeNXG2P2boR"
+        "rowIndex": 12095,
+        "recordNumber": 12096,
+        "trackId": "0Bpy7wcAOMg5ut2ERwPSbk"
       }
     },
     {
-      "id": "hf-3sa06xVNmLLYIxdNNmVQN8",
-      "title": "Where Did You Go? (feat. MNEK)",
+      "id": "hf-7HBG18C9NTlN5rFVOc3yX7",
+      "title": "漩渦",
       "artists": [
-        "Jax Jones",
-        "MNEK"
+        "Anthony Wong",
+        "Cass Phang"
       ],
-      "album": "Where Did You Go (feat. MNEK)",
+      "album": "ACOUSTIC…AND A LITTLE MORE",
       "source": {
-        "rowIndex": 30690,
-        "recordNumber": 30691,
-        "trackId": "3sa06xVNmLLYIxdNNmVQN8"
+        "rowIndex": 12261,
+        "recordNumber": 12262,
+        "trackId": "7HBG18C9NTlN5rFVOc3yX7"
       }
     },
     {
-      "id": "hf-7AQim7LbvFVZJE3O8TYgf2",
-      "title": "Fuck Love (feat. Trippie Redd)",
+      "id": "hf-0a0z74CqgCXrC3UyYATdLC",
+      "title": "Try - Kung Fu Panda 3 Official Theme Song",
       "artists": [
-        "XXXTENTACION",
-        "Trippie Redd"
+        "Patrick Brasca",
+        "Jay Chou"
       ],
-      "album": "17",
+      "album": "Kung Fu Panda 3 (Music from the Motion Picture)",
       "source": {
-        "rowIndex": 33002,
-        "recordNumber": 33003,
-        "trackId": "7AQim7LbvFVZJE3O8TYgf2"
+        "rowIndex": 70498,
+        "recordNumber": 70499,
+        "trackId": "0a0z74CqgCXrC3UyYATdLC"
       }
     },
     {
-      "id": "hf-3GCdLUSnKSMJhs4Tj6CV3s",
-      "title": "All The Stars (with SZA)",
+      "id": "hf-7kw4judGjxQqThpPe02MQB",
+      "title": "眠眠",
       "artists": [
-        "Kendrick Lamar",
-        "SZA"
+        "Yisa Yu",
+        "霍尊"
       ],
-      "album": "Black Panther The Album Music From And Inspired By",
+      "album": "电视剧《离人心上》原声带",
       "source": {
-        "rowIndex": 51350,
-        "recordNumber": 51351,
-        "trackId": "3GCdLUSnKSMJhs4Tj6CV3s"
+        "rowIndex": 70485,
+        "recordNumber": 70486,
+        "trackId": "7kw4judGjxQqThpPe02MQB"
       }
     },
     {
-      "id": "hf-40iJIUlhi6renaREYGeIDS",
-      "title": "Fair Trade (with Travis Scott)",
+      "id": "hf-4QwWiSJkCeGx99JDAroYHW",
+      "title": "情未了",
       "artists": [
-        "Drake",
-        "Travis Scott"
+        "Christopher Wong",
+        "Vivian Chow"
       ],
-      "album": "Certified Lover Boy",
+      "album": "黃凱芹給您留念30首",
       "source": {
-        "rowIndex": 51700,
-        "recordNumber": 51701,
-        "trackId": "40iJIUlhi6renaREYGeIDS"
+        "rowIndex": 12149,
+        "recordNumber": 12150,
+        "trackId": "4QwWiSJkCeGx99JDAroYHW"
       }
     },
     {
-      "id": "hf-5aucVLKiumD89mxVCB4zvS",
-      "title": "Rush Hour (Feat. j-hope of BTS)",
+      "id": "hf-1Juu6Lvbf5ByIghY6uDbM0",
+      "title": "把歌談心",
       "artists": [
-        "Crush",
-        "j-hope"
+        "林姍姍",
+        "David Ling Jr"
       ],
-      "album": "Rush Hour",
+      "album": "我愛經典系列",
       "source": {
-        "rowIndex": 65002,
-        "recordNumber": 65003,
-        "trackId": "5aucVLKiumD89mxVCB4zvS"
+        "rowIndex": 12178,
+        "recordNumber": 12179,
+        "trackId": "1Juu6Lvbf5ByIghY6uDbM0"
       }
     },
     {
-      "id": "hf-6TsVhM8qIkWN5cJVDIVbbz",
-      "title": "Besos Moja2",
+      "id": "hf-0YKJCMDtdfZs6MTtUSnBk9",
+      "title": "無言的結局",
       "artists": [
-        "Wisin & Yandel",
-        "ROSALÍA"
+        "Daniel Lo",
+        "林淑容"
       ],
-      "album": "La Última Misión",
+      "album": "羅時豐國語精選",
       "source": {
-        "rowIndex": 68655,
-        "recordNumber": 68656,
-        "trackId": "6TsVhM8qIkWN5cJVDIVbbz"
+        "rowIndex": 70394,
+        "recordNumber": 70395,
+        "trackId": "0YKJCMDtdfZs6MTtUSnBk9"
       }
     },
     {
-      "id": "hf-6mmPpaltUZK7xjNlBPQQ0p",
-      "title": "Desesperados",
+      "id": "hf-5xEI8SlNjEsan3EG40DSLj",
+      "title": "螢火 Firefly",
       "artists": [
-        "Rauw Alejandro",
-        "Chencho Corleone"
+        "Byejack",
+        "Trickie Bonnie"
       ],
-      "album": "VICE VERSA",
+      "album": "螢火 Firefly",
       "source": {
-        "rowIndex": 68668,
-        "recordNumber": 68669,
-        "trackId": "6mmPpaltUZK7xjNlBPQQ0p"
+        "rowIndex": 12196,
+        "recordNumber": 12197,
+        "trackId": "5xEI8SlNjEsan3EG40DSLj"
       }
     },
     {
-      "id": "hf-2vmfvSoZBFAt9hhRoEByLi",
-      "title": "Volví",
+      "id": "hf-6nTynZhI11TUVxnwZxSLTV",
+      "title": "鴛鴦酒杯",
       "artists": [
-        "Aventura",
-        "Bad Bunny"
+        "Jody Chiang",
+        "Hong Ronghong"
       ],
-      "album": "Volví",
+      "album": "不想伊",
       "source": {
-        "rowIndex": 68800,
-        "recordNumber": 68801,
-        "trackId": "2vmfvSoZBFAt9hhRoEByLi"
+        "rowIndex": 70391,
+        "recordNumber": 70392,
+        "trackId": "6nTynZhI11TUVxnwZxSLTV"
       }
     },
     {
-      "id": "hf-0G2zPzWqVjR68iNPmx2TBe",
-      "title": "Volando - Remix",
+      "id": "hf-7m9lrMzOMbFWEaRISYukDY",
+      "title": "舞伴",
       "artists": [
-        "Mora",
-        "Bad Bunny",
-        "Sech"
+        "陳盈潔",
+        "袁小迪"
       ],
-      "album": "Volando (Remix)",
+      "album": "陳盈潔 (台語暢銷精選)",
       "source": {
-        "rowIndex": 68802,
-        "recordNumber": 68803,
-        "trackId": "0G2zPzWqVjR68iNPmx2TBe"
+        "rowIndex": 70447,
+        "recordNumber": 70448,
+        "trackId": "7m9lrMzOMbFWEaRISYukDY"
       }
     },
     {
-      "id": "hf-5GF0X7GdNmnouKcdhhRmtm",
-      "title": "Party en el Barrio (feat. Duki)",
+      "id": "hf-5UgEQZEqCBogjiEEGnZzu7",
+      "title": "情難斷夢袂醒",
       "artists": [
-        "Paulo Londra",
-        "Duki"
+        "陳中",
+        "邱芸子"
       ],
-      "album": "Party en el Barrio (feat. Duki)",
+      "album": "陳中+邱芸子情歌對唱",
       "source": {
-        "rowIndex": 68813,
-        "recordNumber": 68814,
-        "trackId": "5GF0X7GdNmnouKcdhhRmtm"
+        "rowIndex": 70487,
+        "recordNumber": 70488,
+        "trackId": "5UgEQZEqCBogjiEEGnZzu7"
       }
     },
     {
-      "id": "hf-7hynhxDoDpgMIV12JuVtNa",
-      "title": "UN PESO",
+      "id": "hf-1RUKoAMk3lluNoQYDMKs71",
+      "title": "千個太陽",
       "artists": [
-        "J Balvin",
-        "Bad Bunny",
-        "Marciano Cantero"
+        "Deanie Ip",
+        "Elisa Chan",
+        "散芬芳合唱團"
       ],
-      "album": "OASIS",
+      "album": "林振強依然愛不完",
       "source": {
-        "rowIndex": 68904,
-        "recordNumber": 68905,
-        "trackId": "7hynhxDoDpgMIV12JuVtNa"
+        "rowIndex": 12295,
+        "recordNumber": 12296,
+        "trackId": "1RUKoAMk3lluNoQYDMKs71"
       }
     },
     {
-      "id": "hf-4jPy3l0RUwlUI9T5XHBW2m",
-      "title": "Mood (feat. iann dior)",
+      "id": "hf-64HMLLB30Tlt8bW9AcImL0",
+      "title": "就要揮別",
       "artists": [
-        "24kGoldn",
-        "iann dior"
+        "楊芳儀",
+        "徐曉菁"
       ],
-      "album": "El Dorado",
+      "album": "楊芳儀 徐曉菁 重唱專輯",
       "source": {
-        "rowIndex": 81460,
-        "recordNumber": 81461,
-        "trackId": "4jPy3l0RUwlUI9T5XHBW2m"
+        "rowIndex": 70634,
+        "recordNumber": 70635,
+        "trackId": "64HMLLB30Tlt8bW9AcImL0"
       }
     },
     {
-      "id": "hf-6JIC3hbC28JZKZ8AlAqX8h",
-      "title": "Cold Heart - PNAU Remix",
+      "id": "hf-0a5bri0S23Mx2e62v2HsYU",
+      "title": "鐵幕誘惑",
       "artists": [
-        "Elton John",
-        "Dua Lipa",
-        "PNAU"
+        "Aaron Kwok",
+        "Frankie"
       ],
-      "album": "The Lockdown Sessions",
+      "album": "郭富城精選2006",
       "source": {
-        "rowIndex": 91151,
-        "recordNumber": 91152,
-        "trackId": "6JIC3hbC28JZKZ8AlAqX8h"
+        "rowIndex": 12230,
+        "recordNumber": 12231,
+        "trackId": "0a5bri0S23Mx2e62v2HsYU"
       }
     },
     {
-      "id": "hf-7eJMfftS33KTjuF7lTsMCx",
-      "title": "death bed (coffee for your head)",
+      "id": "hf-4wTJ5BMVyeAJ6bvgULQ40u",
+      "title": "不懂愛你",
       "artists": [
-        "Powfu",
-        "beabadoobee"
+        "Daniel Chan",
+        "林京燁"
       ],
-      "album": "death bed (coffee for your head)",
+      "album": "不懂愛你",
       "source": {
-        "rowIndex": 94000,
-        "recordNumber": 94001,
-        "trackId": "7eJMfftS33KTjuF7lTsMCx"
+        "rowIndex": 12277,
+        "recordNumber": 12278,
+        "trackId": "4wTJ5BMVyeAJ6bvgULQ40u"
       }
     },
     {
-      "id": "hf-2kx5sQgmjYug0GiDh1a4sU",
-      "title": "Living Life, In The Night",
+      "id": "hf-3PCUdfQ0MdU8tkzi2uN6wr",
+      "title": "真愛在明天",
       "artists": [
-        "Cheriimoya",
-        "Sierra Kidd"
+        "Vivian Chow",
+        "Leon Lai"
       ],
-      "album": "Living Life, In The Night",
+      "album": "萬千寵愛30首",
       "source": {
-        "rowIndex": 94002,
-        "recordNumber": 94003,
-        "trackId": "2kx5sQgmjYug0GiDh1a4sU"
+        "rowIndex": 12298,
+        "recordNumber": 12299,
+        "trackId": "3PCUdfQ0MdU8tkzi2uN6wr"
       }
     },
     {
-      "id": "hf-64dLd6rVqDLtkXFYrEUHIU",
-      "title": "New Gold (feat. Tame Impala and Bootie Brown)",
+      "id": "hf-7DakGWtWA6lU53HvQi96pz",
+      "title": "In Love With You",
       "artists": [
-        "Gorillaz",
-        "Tame Impala",
-        "Bootie Brown"
+        "Jacky Cheung",
+        "Regine Velasquez"
       ],
-      "album": "New Gold (feat. Tame Impala and Bootie Brown)",
+      "album": "Best of OPM Love Duets & Best of OPM Classic Love Songs",
       "source": {
-        "rowIndex": 3253,
-        "recordNumber": 3254,
-        "trackId": "64dLd6rVqDLtkXFYrEUHIU"
+        "rowIndex": 12299,
+        "recordNumber": 12300,
+        "trackId": "7DakGWtWA6lU53HvQi96pz"
       }
     },
     {
-      "id": "hf-6GomT970rCOkKAyyrwJeZi",
-      "title": "Move Your Body",
+      "id": "hf-7eQuR3bAlmlHqvlr0Q8uPm",
+      "title": "常在我心間...愛你不分早晚",
       "artists": [
-        "Öwnboss",
-        "Sevek"
+        "Michael Kwan",
+        "Tracy Huang"
       ],
-      "album": "Move Your Body",
+      "album": "BTB-常在我心間...愛你不分早晚-關正傑",
       "source": {
-        "rowIndex": 9000,
-        "recordNumber": 9001,
-        "trackId": "6GomT970rCOkKAyyrwJeZi"
+        "rowIndex": 12389,
+        "recordNumber": 12390,
+        "trackId": "7eQuR3bAlmlHqvlr0Q8uPm"
       }
     },
     {
-      "id": "hf-06KyNuuMOX1ROXRhj787tj",
-      "title": "We Don't Talk Anymore (feat. Selena Gomez)",
+      "id": "hf-52VircFKPvIsgIjjsbhJsQ",
+      "title": "放過自己 - Acoustic Version",
       "artists": [
-        "Charlie Puth",
-        "Selena Gomez"
+        "G5SH",
+        "Marz23"
       ],
-      "album": "Nine Track Mind",
+      "album": "放過自己 (Acoustic Version)",
       "source": {
-        "rowIndex": 20018,
-        "recordNumber": 20019,
-        "trackId": "06KyNuuMOX1ROXRhj787tj"
+        "rowIndex": 70685,
+        "recordNumber": 70686,
+        "trackId": "52VircFKPvIsgIjjsbhJsQ"
       }
     },
     {
-      "id": "hf-0qOnSQQF0yzuPWsXrQ9paz",
-      "title": "Stereo Hearts (feat. Adam Levine)",
+      "id": "hf-5mWSFPkmo4u0rDUrp2ppiH",
+      "title": "嫁妝",
       "artists": [
-        "Gym Class Heroes",
-        "Adam Levine"
+        "陳中",
+        "邱芸子"
       ],
-      "album": "The Papercut Chronicles II",
+      "album": "陳中+邱芸子情歌對唱",
       "source": {
-        "rowIndex": 20022,
-        "recordNumber": 20023,
-        "trackId": "0qOnSQQF0yzuPWsXrQ9paz"
+        "rowIndex": 70686,
+        "recordNumber": 70687,
+        "trackId": "5mWSFPkmo4u0rDUrp2ppiH"
       }
     },
     {
-      "id": "hf-2JzZzZUQj3Qff7wapcbKjc",
-      "title": "See You Again (feat. Charlie Puth)",
+      "id": "hf-4K3Iu3WLo19LIkfcpfldQL",
+      "title": "出來面對",
       "artists": [
-        "Wiz Khalifa",
-        "Charlie Puth"
+        "魏嘉瑩 Arrow Wei",
+        "WONFU"
       ],
-      "album": "See You Again (feat. Charlie Puth)",
+      "album": "我很好",
       "source": {
-        "rowIndex": 20055,
-        "recordNumber": 20056,
-        "trackId": "2JzZzZUQj3Qff7wapcbKjc"
+        "rowIndex": 70698,
+        "recordNumber": 70699,
+        "trackId": "4K3Iu3WLo19LIkfcpfldQL"
       }
     },
     {
-      "id": "hf-0z8hI3OPS8ADPWtoCjjLl6",
-      "title": "Summer of Love (Shawn Mendes & Tainy)",
+      "id": "hf-59z2K4f6SOa3Z41ymlOvje",
+      "title": "相思夢難圓 - 修復版",
       "artists": [
-        "Shawn Mendes",
-        "Tainy"
+        "麗莎",
+        "郭炳堅"
       ],
-      "album": "Summer Of Love",
+      "album": "麗莎, Vol. 2 (珍藏版) [修復版]",
       "source": {
-        "rowIndex": 20157,
-        "recordNumber": 20158,
-        "trackId": "0z8hI3OPS8ADPWtoCjjLl6"
+        "rowIndex": 12430,
+        "recordNumber": 12431,
+        "trackId": "59z2K4f6SOa3Z41ymlOvje"
       }
     },
     {
-      "id": "hf-5WtfUKzXircvW8l5aaVZWT",
-      "title": "What A Time (feat. Niall Horan)",
+      "id": "hf-6TMZ0p19g05PzIDuKxgkp2",
+      "title": "茫茫到深更",
       "artists": [
-        "Julia Michaels",
-        "Niall Horan"
+        "陳中",
+        "邱芸子"
       ],
-      "album": "Inner Monologue Part 1",
+      "album": "陳中+邱芸子情歌對唱",
       "source": {
-        "rowIndex": 20359,
-        "recordNumber": 20360,
-        "trackId": "5WtfUKzXircvW8l5aaVZWT"
+        "rowIndex": 70789,
+        "recordNumber": 70790,
+        "trackId": "6TMZ0p19g05PzIDuKxgkp2"
       }
     },
     {
-      "id": "hf-748mdHapucXQri7IAO8yFK",
-      "title": "Kiss Me More (feat. SZA)",
+      "id": "hf-21ycMPCnfeUMxg3eArabhp",
+      "title": "我現在會好好的 - TVBS「女力報到愛的故事」片尾曲",
       "artists": [
-        "Doja Cat",
-        "SZA"
+        "陳威全",
+        "Danny Koo"
       ],
-      "album": "Kiss Me More (feat. SZA)",
+      "album": "我現在會好好的 - TVBS「女力報到愛的故事」片尾曲",
       "source": {
-        "rowIndex": 20404,
-        "recordNumber": 20405,
-        "trackId": "748mdHapucXQri7IAO8yFK"
+        "rowIndex": 70792,
+        "recordNumber": 70793,
+        "trackId": "21ycMPCnfeUMxg3eArabhp"
       }
     },
     {
-      "id": "hf-6f5ExP43esnvdKPddwKXJH",
-      "title": "Better Days (NEIKED x Mae Muller x Polo G)",
+      "id": "hf-0OU0Y8sFNuV14W3tbqNKDS",
+      "title": "有意 - (劇集 \"烈火雄心III\" 片尾曲)",
       "artists": [
-        "NEIKED",
-        "Mae Muller",
-        "Polo G"
+        "Kevin Cheng",
+        "Myolie Wu"
       ],
-      "album": "Better Days (NEIKED x Mae Muller x Polo G)",
+      "album": "有意 (劇集 \"烈火雄心III\" 片尾曲)",
       "source": {
-        "rowIndex": 20752,
-        "recordNumber": 20753,
-        "trackId": "6f5ExP43esnvdKPddwKXJH"
+        "rowIndex": 12337,
+        "recordNumber": 12338,
+        "trackId": "0OU0Y8sFNuV14W3tbqNKDS"
       }
     },
     {
-      "id": "hf-4cG7HUWYHBV6R6tHn1gxrl",
-      "title": "Friday (feat. Mufasa & Hypeman) - Dopamine Re-Edit",
+      "id": "hf-3yeUq7XSirAb4p6QNOvAqw",
+      "title": "I LOVE YOU SO太愛妳",
       "artists": [
-        "Riton",
-        "Nightcrawlers",
-        "Mufasa & Hypeman",
-        "Dopamine"
+        "Aaron Kwok",
+        "Beta Soul"
       ],
-      "album": "Friday (feat. Mufasa & Hypeman) [Dopamine Re-Edit]",
+      "album": "True Legend 101",
       "source": {
-        "rowIndex": 30572,
-        "recordNumber": 30573,
-        "trackId": "4cG7HUWYHBV6R6tHn1gxrl"
+        "rowIndex": 12499,
+        "recordNumber": 12500,
+        "trackId": "3yeUq7XSirAb4p6QNOvAqw"
       }
     },
     {
-      "id": "hf-2Foc5Q5nqNiosCNqttzHof",
-      "title": "Get Lucky (feat. Pharrell Williams & Nile Rodgers) - Radio Edit",
+      "id": "hf-7dSGmCi7S81C9fFiIw2yv1",
+      "title": "紫釵恨",
       "artists": [
-        "Daft Punk",
-        "Pharrell Williams",
-        "Nile Rodgers"
+        "張偉文",
+        "胡美儀"
       ],
-      "album": "Get Lucky (feat. Pharrell Williams & Nile Rodgers) [Radio Edit]",
+      "album": "胡美儀摩登名曲精選",
       "source": {
-        "rowIndex": 31261,
-        "recordNumber": 31262,
-        "trackId": "2Foc5Q5nqNiosCNqttzHof"
+        "rowIndex": 12629,
+        "recordNumber": 12630,
+        "trackId": "7dSGmCi7S81C9fFiIw2yv1"
       }
     },
     {
-      "id": "hf-7tqhbajSfrz2F7E1Z75ASX",
-      "title": "Ain't No Mountain High Enough",
+      "id": "hf-3q5DarVoP2OGdlbp50YfOX",
+      "title": "回頭看看我",
       "artists": [
-        "Marvin Gaye",
-        "Tammi Terrell"
+        "Feng Ze",
+        "采子"
       ],
-      "album": "United",
+      "album": "回頭看看我",
       "source": {
-        "rowIndex": 37401,
-        "recordNumber": 37402,
-        "trackId": "7tqhbajSfrz2F7E1Z75ASX"
+        "rowIndex": 70733,
+        "recordNumber": 70734,
+        "trackId": "3q5DarVoP2OGdlbp50YfOX"
       }
     },
     {
-      "id": "hf-42TMa2hgBNjte4uV7jNCnQ",
-      "title": "Baller",
+      "id": "hf-6PfK0jvFrTeS98QhNVJaG2",
+      "title": "出嫁",
       "artists": [
-        "Shubh",
-        "Ikky"
+        "Zhang Qing Fang",
+        "優客李林"
       ],
-      "album": "Baller",
+      "album": "張清芳 25th 那些你最喜歡的歌",
       "source": {
-        "rowIndex": 51002,
-        "recordNumber": 51003,
-        "trackId": "42TMa2hgBNjte4uV7jNCnQ"
+        "rowIndex": 70799,
+        "recordNumber": 70800,
+        "trackId": "6PfK0jvFrTeS98QhNVJaG2"
       }
     },
     {
-      "id": "hf-29m79w9xPMH4YCD6r8JSmV",
-      "title": "Excuses",
+      "id": "hf-6MwdxH1iD9lNKNZcg9Gy28",
+      "title": "我有多麼喜歡你 (feat. 林宥嘉)",
       "artists": [
-        "AP Dhillon",
-        "Gurinder Gill",
-        "Intense"
+        "Jam Hsiao",
+        "Yoga Lin"
       ],
-      "album": "Excuses",
+      "album": "我有多麼喜歡你 (feat. 林宥嘉)",
       "source": {
-        "rowIndex": 51010,
-        "recordNumber": 51011,
-        "trackId": "29m79w9xPMH4YCD6r8JSmV"
+        "rowIndex": 70815,
+        "recordNumber": 70816,
+        "trackId": "6MwdxH1iD9lNKNZcg9Gy28"
       }
     },
     {
-      "id": "hf-3B54sVLJ402zGa6Xm4YGNe",
-      "title": "Unforgettable",
+      "id": "hf-6wLuAJgxUVcsmyEyF477FF",
+      "title": "心痛不再有",
       "artists": [
-        "French Montana",
-        "Swae Lee"
+        "方季惟",
+        "Pan Mei Chen"
       ],
-      "album": "Jungle Rules",
+      "album": "心痛不再有",
       "source": {
-        "rowIndex": 51150,
-        "recordNumber": 51151,
-        "trackId": "3B54sVLJ402zGa6Xm4YGNe"
+        "rowIndex": 70821,
+        "recordNumber": 70822,
+        "trackId": "6wLuAJgxUVcsmyEyF477FF"
       }
     },
     {
-      "id": "hf-2g6tReTlM2Akp41g0HaeXN",
-      "title": "Die Hard",
+      "id": "hf-6ZcatlNX0hgJljw6U1PPQt",
+      "title": "別弄花我的妝 (feat. Karencici)",
       "artists": [
-        "Kendrick Lamar",
-        "Blxst",
-        "Amanda Reifer"
+        "Sharon Kwan",
+        "Karencici"
       ],
-      "album": "Mr. Morale & The Big Steppers",
+      "album": "別弄花我的妝 (feat. Karencici)",
       "source": {
-        "rowIndex": 51750,
-        "recordNumber": 51751,
-        "trackId": "2g6tReTlM2Akp41g0HaeXN"
+        "rowIndex": 70848,
+        "recordNumber": 70849,
+        "trackId": "6ZcatlNX0hgJljw6U1PPQt"
       }
     },
     {
-      "id": "hf-7ycWLEP1GsNjVvcjawXz3z",
-      "title": "Praise The Lord (Da Shine) (feat. Skepta)",
+      "id": "hf-294jS0EVBue6WSgF38SCVl",
+      "title": "你我相逢",
       "artists": [
-        "A$AP Rocky",
-        "Skepta"
+        "Jody Chiang",
+        "施文彬"
       ],
-      "album": "TESTING",
+      "album": "愛不對人",
       "source": {
-        "rowIndex": 51753,
-        "recordNumber": 51754,
-        "trackId": "7ycWLEP1GsNjVvcjawXz3z"
+        "rowIndex": 70872,
+        "recordNumber": 70873,
+        "trackId": "294jS0EVBue6WSgF38SCVl"
       }
     },
     {
-      "id": "hf-0Fs9cdPDhptWEDJmiCbkEW",
-      "title": "She Knows (feat. Amber Coffman & Cults)",
+      "id": "hf-1DOhVriCUWPW7F5etUz1Ti",
+      "title": "心仍是冷",
       "artists": [
-        "J. Cole",
-        "Cults",
-        "Amber Coffman"
+        "倫永亮",
+        "Anita Mui"
       ],
-      "album": "Born Sinner (Deluxe Version)",
+      "album": "情歌1",
       "source": {
-        "rowIndex": 51761,
-        "recordNumber": 51762,
-        "trackId": "0Fs9cdPDhptWEDJmiCbkEW"
+        "rowIndex": 12549,
+        "recordNumber": 12550,
+        "trackId": "1DOhVriCUWPW7F5etUz1Ti"
       }
     },
     {
-      "id": "hf-0zlGnseLGzRIBA0TJcb3Bo",
-      "title": "Manike (From \"Thank God\")",
+      "id": "hf-0fTRcNCi7ox0PRfHpjtznl",
+      "title": "愛的呼喚",
       "artists": [
-        "Yohani",
-        "Jubin Nautiyal",
-        "Tanishk Bagchi",
-        "Rashmi Virag",
-        "Surya Ragunaathan"
+        "Aaron Kwok",
+        "Beta Soul"
       ],
-      "album": "Manike (From \"Thank God\")",
+      "album": "郭富城精選2006",
       "source": {
-        "rowIndex": 57001,
-        "recordNumber": 57002,
-        "trackId": "0zlGnseLGzRIBA0TJcb3Bo"
+        "rowIndex": 12599,
+        "recordNumber": 12600,
+        "trackId": "0fTRcNCi7ox0PRfHpjtznl"
       }
     },
     {
-      "id": "hf-2gam98EZKrF9XuOkU13ApN",
-      "title": "Promiscuous",
+      "id": "hf-0eMcN0mYyowOaqOk8xIhky",
+      "title": "受傷的心",
       "artists": [
-        "Nelly Furtado",
-        "Timbaland"
+        "Jacky Wu",
+        "Huang Yee Ling"
       ],
-      "album": "Loose",
+      "album": "玲聲若響Ⅱ精選輯",
       "source": {
-        "rowIndex": 67701,
-        "recordNumber": 67702,
-        "trackId": "2gam98EZKrF9XuOkU13ApN"
+        "rowIndex": 70881,
+        "recordNumber": 70882,
+        "trackId": "0eMcN0mYyowOaqOk8xIhky"
       }
     },
     {
-      "id": "hf-4R8BJggjosTswLxtkw8V7P",
-      "title": "No Me Conoce - Remix",
+      "id": "hf-5nykzzGNIZrQxv659tcMtb",
+      "title": "一生何求",
       "artists": [
-        "Jhayco",
-        "J Balvin",
-        "Bad Bunny"
+        "Danny Chan",
+        "Bryan Choy Hin Lok",
+        "David Ling Jr"
       ],
-      "album": "Famouz",
+      "album": "陳百強不朽金曲金藏集",
       "source": {
-        "rowIndex": 68700,
-        "recordNumber": 68701,
-        "trackId": "4R8BJggjosTswLxtkw8V7P"
+        "rowIndex": 12641,
+        "recordNumber": 12642,
+        "trackId": "5nykzzGNIZrQxv659tcMtb"
       }
     },
     {
-      "id": "hf-4srcMdbm2qzVG98tJajHxp",
-      "title": "Pantysito",
+      "id": "hf-6xruR6AwCTiybabrVblEQZ",
+      "title": "甲乙丙丁",
       "artists": [
-        "Alejo",
-        "Feid",
-        "ROBI"
+        "Andy Hui",
+        "Jacky Cheung",
+        "鄭中基"
       ],
-      "album": "Pantysito",
+      "album": "甲乙丙丁",
       "source": {
-        "rowIndex": 68714,
-        "recordNumber": 68715,
-        "trackId": "4srcMdbm2qzVG98tJajHxp"
+        "rowIndex": 12642,
+        "recordNumber": 12643,
+        "trackId": "6xruR6AwCTiybabrVblEQZ"
       }
     },
     {
-      "id": "hf-6ojZtz3sZr6ynvejLOqgCj",
-      "title": "Nos Comemos (feat. Ozuna)",
+      "id": "hf-38LsSBIm9vhqk0HEUTLWI8",
+      "title": "將冰山劈開",
       "artists": [
-        "Tiago PZK",
-        "Ozuna"
+        "Andy Hui",
+        "Anita Mui"
       ],
-      "album": "Nos Comemos (feat. Ozuna)",
+      "album": "許志安46首主打全精選",
       "source": {
-        "rowIndex": 68724,
-        "recordNumber": 68725,
-        "trackId": "6ojZtz3sZr6ynvejLOqgCj"
+        "rowIndex": 12673,
+        "recordNumber": 12674,
+        "trackId": "38LsSBIm9vhqk0HEUTLWI8"
       }
     },
     {
-      "id": "hf-4SSbtLDkepeOHAckM1FCBP",
-      "title": "LOS APARATOS",
+      "id": "hf-5bWDeuHFyP3hC16YctibZo",
+      "title": "熱力節拍Wou Bom Ba",
       "artists": [
-        "El Alfa",
-        "Noriel",
-        "Trueno"
+        "Grasshopper",
+        "Shirley Kwan",
+        "湯寶如",
+        "Winnie Lau"
       ],
-      "album": "LOS APARATOS",
+      "album": "草蜢音樂大全101",
       "source": {
-        "rowIndex": 68757,
-        "recordNumber": 68758,
-        "trackId": "4SSbtLDkepeOHAckM1FCBP"
+        "rowIndex": 12749,
+        "recordNumber": 12750,
+        "trackId": "5bWDeuHFyP3hC16YctibZo"
       }
     },
     {
-      "id": "hf-03a359wbiUsjN9h6yzXvmS",
-      "title": "She Don't Give a Fo",
+      "id": "hf-6ayLUgVfrEbkQDoSyCcrsR",
+      "title": "註定 -電視劇: 愛在有情天 主題曲(粵語)",
       "artists": [
-        "Duki",
-        "KHEA"
+        "陳秀雯",
+        "Ruco Chan"
       ],
-      "album": "She Don't Give a Fo",
+      "album": "勢在亞洲 超人氣電視劇主題曲巡禮",
       "source": {
-        "rowIndex": 68855,
-        "recordNumber": 68856,
-        "trackId": "03a359wbiUsjN9h6yzXvmS"
+        "rowIndex": 12837,
+        "recordNumber": 12838,
+        "trackId": "6ayLUgVfrEbkQDoSyCcrsR"
       }
     },
     {
-      "id": "hf-2tFwfmceQa1Y6nRPhYbEtC",
-      "title": "CÓMO SE SIENTE - Remix",
+      "id": "hf-2dyFuiklAzsV8Jh1ANLKrU",
+      "title": "前塵",
       "artists": [
-        "Jhayco",
-        "Bad Bunny"
+        "Sandy Lam",
+        "Wong Kei Wah"
       ],
-      "album": "CÓMO SE SIENTE (Remix)",
+      "album": "依然...林憶蓮 (30周年精選)",
       "source": {
-        "rowIndex": 68901,
-        "recordNumber": 68902,
-        "trackId": "2tFwfmceQa1Y6nRPhYbEtC"
+        "rowIndex": 12873,
+        "recordNumber": 12874,
+        "trackId": "2dyFuiklAzsV8Jh1ANLKrU"
       }
     },
     {
-      "id": "hf-0vHfVsEe6Ps0d8cZ9PGzSw",
-      "title": "Loco Por Perrearte - Remix",
+      "id": "hf-6obcfaN1hYGCy1dUuXMpao",
+      "title": "帝女花之香夭(Live)",
       "artists": [
-        "De La Ghetto",
-        "Rauw Alejandro"
+        "張偉文",
+        "May Ho"
       ],
-      "album": "Loco Por Perrearte (Remix)",
+      "album": "靚聲王張偉文唱好101-6CD世紀珍藏集",
       "source": {
-        "rowIndex": 68910,
-        "recordNumber": 68911,
-        "trackId": "0vHfVsEe6Ps0d8cZ9PGzSw"
+        "rowIndex": 12940,
+        "recordNumber": 12941,
+        "trackId": "6obcfaN1hYGCy1dUuXMpao"
       }
     },
     {
-      "id": "hf-6epn3r7S14KUqlReYr77hA",
-      "title": "Baby",
+      "id": "hf-0vgMpRUYhG2eNxmtPs0KN0",
+      "title": "笑容入我眼",
       "artists": [
-        "Justin Bieber",
-        "Ludacris"
+        "劉珺兒",
+        "Jia Liang Luo"
       ],
-      "album": "My World 2.0",
+      "album": "劉珺兒vs羅嘉良",
       "source": {
-        "rowIndex": 81211,
-        "recordNumber": 81212,
-        "trackId": "6epn3r7S14KUqlReYr77hA"
+        "rowIndex": 12959,
+        "recordNumber": 12960,
+        "trackId": "0vgMpRUYhG2eNxmtPs0KN0"
       }
     },
     {
-      "id": "hf-1TfqLAPs4K3s2rJMoCokcS",
-      "title": "Sweet Dreams (Are Made of This) - Remastered",
+      "id": "hf-5c4s9fJsSawgToKOt3fNt6",
+      "title": "幻影/ 霧之戀",
       "artists": [
-        "Eurythmics",
-        "Annie Lennox",
-        "Dave Stewart"
+        "Leslie Cheung",
+        "Alan Tam"
       ],
-      "album": "Sweet Dreams (Are Made Of This)",
+      "album": "首麟合唱歌",
       "source": {
-        "rowIndex": 91719,
-        "recordNumber": 91720,
-        "trackId": "1TfqLAPs4K3s2rJMoCokcS"
+        "rowIndex": 12664,
+        "recordNumber": 12665,
+        "trackId": "5c4s9fJsSawgToKOt3fNt6"
       }
     },
     {
-      "id": "hf-07MDkzWARZaLEdKxo6yArG",
-      "title": "Meet Me At Our Spot",
+      "id": "hf-7ti0olzQPvYNc7PSor2qrI",
+      "title": "流離所愛",
       "artists": [
-        "THE ANXIETY",
-        "WILLOW",
-        "Tyler Cole"
+        "Christopher Wong",
+        "余劍明"
       ],
-      "album": "THE ANXIETY",
+      "album": "黃凱芹給您留念30首",
       "source": {
-        "rowIndex": 3005,
-        "recordNumber": 3006,
-        "trackId": "07MDkzWARZaLEdKxo6yArG"
+        "rowIndex": 12699,
+        "recordNumber": 12700,
+        "trackId": "7ti0olzQPvYNc7PSor2qrI"
       }
     },
     {
-      "id": "hf-0TK2YIli7K1leLovkQiNik",
-      "title": "Señorita",
+      "id": "hf-0bFCMD0K7sxkz4qYWjP2Qu",
+      "title": "追憶",
       "artists": [
-        "Shawn Mendes",
-        "Camila Cabello"
+        "George Lam",
+        "David Ling Jr"
       ],
-      "album": "Señorita",
+      "album": "林子祥 24K Mastersonic Compilation",
       "source": {
-        "rowIndex": 20016,
-        "recordNumber": 20017,
-        "trackId": "0TK2YIli7K1leLovkQiNik"
+        "rowIndex": 12791,
+        "recordNumber": 12792,
+        "trackId": "0bFCMD0K7sxkz4qYWjP2Qu"
       }
     },
     {
-      "id": "hf-2kQuhkFX7uSVepCD3h29g5",
-      "title": "Smack That",
+      "id": "hf-0boCKVrrTzJbceMG0aMSDy",
+      "title": "@princejoyce (feat. ANSONBEAN)",
       "artists": [
-        "Akon",
-        "Eminem"
+        "Joyce Cheng",
+        "ANSONBEAN"
       ],
-      "album": "Konvicted",
+      "album": "@princejoyce (feat. ANSONBEAN)",
       "source": {
-        "rowIndex": 20413,
-        "recordNumber": 20414,
-        "trackId": "2kQuhkFX7uSVepCD3h29g5"
+        "rowIndex": 12848,
+        "recordNumber": 12849,
+        "trackId": "0boCKVrrTzJbceMG0aMSDy"
+      }
+    },
+    {
+      "id": "hf-07VFhQepf26fYJvy32mjeg",
+      "title": "要走的始終都要走",
+      "artists": [
+        "蔣志光",
+        "王利名"
+      ],
+      "album": "相逢.走",
+      "source": {
+        "rowIndex": 12973,
+        "recordNumber": 12974,
+        "trackId": "07VFhQepf26fYJvy32mjeg"
+      }
+    },
+    {
+      "id": "hf-1ejod1Qch2v2HDImZAtezI",
+      "title": "舊居中的鋼琴",
+      "artists": [
+        "George Lam",
+        "David Ling"
+      ],
+      "album": "林子祥 24K Mastersonic Compilation",
+      "source": {
+        "rowIndex": 12880,
+        "recordNumber": 12881,
+        "trackId": "1ejod1Qch2v2HDImZAtezI"
+      }
+    },
+    {
+      "id": "hf-3jwx9ayJw2lHEKRGCBbQwR",
+      "title": "依然相愛",
+      "artists": [
+        "Hacken Lee",
+        "Shirley Kwan"
+      ],
+      "album": "只想您會意",
+      "source": {
+        "rowIndex": 12976,
+        "recordNumber": 12977,
+        "trackId": "3jwx9ayJw2lHEKRGCBbQwR"
+      }
+    },
+    {
+      "id": "hf-1PKBW5ZFi8acWzQu4Fcw1g",
+      "title": "一刀了斷",
+      "artists": [
+        "Chilam",
+        "Myolie Wu"
+      ],
+      "album": "Loveholic",
+      "source": {
+        "rowIndex": 12979,
+        "recordNumber": 12980,
+        "trackId": "1PKBW5ZFi8acWzQu4Fcw1g"
+      }
+    },
+    {
+      "id": "hf-24AuGLZl2PN4spCRGcJZDT",
+      "title": "一起衝一起闖 (電影\"黃金兄弟\"主題曲)",
+      "artists": [
+        "Ekin Cheng",
+        "Jordan Chan",
+        "謝天華",
+        "錢嘉樂",
+        "林曉峰"
+      ],
+      "album": "黃金兄弟 (電影原聲)",
+      "source": {
+        "rowIndex": 12987,
+        "recordNumber": 12988,
+        "trackId": "24AuGLZl2PN4spCRGcJZDT"
+      }
+    },
+    {
+      "id": "hf-43wBEMmDjKXCR1l6vzHHAJ",
+      "title": "苦口良藥",
+      "artists": [
+        "陳慧珊",
+        "Andy Hui"
+      ],
+      "album": "Best Cantopop Tunes",
+      "source": {
+        "rowIndex": 12849,
+        "recordNumber": 12850,
+        "trackId": "43wBEMmDjKXCR1l6vzHHAJ"
       }
     }
   ]

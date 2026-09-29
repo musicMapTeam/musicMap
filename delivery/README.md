@@ -1,39 +1,34 @@
-# MVP 0.15.0 交付清单
+# MVP 0.16.0 交付清单
 
-2026-09-27 · 文档 2.6。本轮交付目标为 0.15.0；最终构建、运行包和操作画面以[项目状态](../docs/PROJECT_STATUS.md)为准。比赛封面已按 0.15 重做；视频仍是 0.4 旧版，需按 0.15 重新录屏，尚未开始。评审链接尚未部署，未代填报名或提交赛事。
+2026-09-29 · 文档 3.0。0.16 起参赛作品只有 **Music Map**（用户 2026-09-28 的决定，细节待与产品负责人对齐）；Music Space 退出参赛入口，保留在 main `3dd102c`（MVP 0.15.0）。在线 Demo 已公开部署；比赛视频尚未录制；封面已按 0.16 重做并提交（`7fa4147`），待团队终检。未代填报名，也未提交赛事。构建、部署与检查证据以[项目状态](../docs/PROJECT_STATUS.md)为准。
 
-| 文件 | 用途 | 规格 |
+| 文件 / 地址 | 用途 | 规格 / 状态 |
 | --- | --- | --- |
-| [music-map-space-demo.mp4](music-map-space-demo.mp4) | 0.4 实际操作演示视频（旧版，待按 0.15 重制） | 106秒、1920×1080、30fps、H.264、7,199,962字节（约6.87MiB）；中文字幕、无音轨，不含夜场、首屏、寻声或双联仪式页 |
-| [cover.png](cover.png) | 0.15 参赛封面「同一刻，另一面」：夜场排版、寻声题签截图与应用实际导出的双联票根（本地情景演示，AI 示例照片，页内注明） | 1920×1080、1,284,063 字节、PNG；已目视。源文件 [recording-source/cover-v015.html](recording-source/cover-v015.html) |
-| [视觉规范与画面](../docs/VISUAL_THEMES.md) | 当前樱下放映 · 夜场与历史预览 | 0.15 画面待登记；0.14 及更早截图保留原版本 |
-| `music-map-space-runtime.zip` | 0.15.0 完整运行包，不提交 Git | 最终大小见项目状态；页面 + Node/SQLite 后端 + 运行说明，共 6 文件，不含数据库、用户照片或凭据 |
-| `../dist/index.html` | 0.15.0 单文件情景演示，不提交 Git | 最终大小见项目状态；仅樱下放映 · 夜场，含许可证与版权声明。无后端可展示寻声、完整图鉴和本地 Space，联网照片需完整服务 |
-| [recording-source/](recording-source/) | 0.4录屏和封面的编辑源 | 原片摘要、精确剪点、FFmpeg字幕合成脚本、HTML封面、实际导出票根 |
-| [video-source/](video-source/) | 0.2 / 0.3历史展示源 | 旧截图编排源；旧视频和封面可由Git历史取得，不作为本轮录屏 |
-| [报名材料](../docs/competition/README.md) | 介绍与演示脚本 | 待团队补齐身份信息、访问链接和提交回执 |
+| [在线 Demo](https://musicmapteam.github.io/musicMap/) | 评审链接（公开） | GitHub Pages，`gh-pages` 分支只放构建产物（`index.html` 与 `.nojekyll`）。当前为 `7fa4147` 的构建（`e710bf8`），1,423,065 B；2026-09-29 09:12 本机请求返回 200，与该提交的干净构建逐字节一致。此前两次部署：`1e8323f`（来自 `d6b3de3`）、`4901e31`（来自 `0b1eadc`，1,410,882 B）。实体手机与中国大陆网络未检查。公开访问按 FAQ Q10 可能被认定为已上线，风险由用户接受 |
+| `../dist/index.html` | 0.16.0 单文件应用，不提交 Git | `npm run build` 生成；`7fa4147` 的干净构建为 1,423,065 B / gzip 392.03 kB（`0b1eadc` 为 1,410,882 B）。Three、GSAP、OverlayScrollbars、qrcode-generator 与数据都已内联，附许可声明；file:// 与任意静态托管都能打开。无后端、无账号、无音频，记录只存在浏览器本地 |
+| [cover.png](cover.png) | 16:9 参赛封面 | **0.16 封面，待团队终检。** 1920×1080、1,395,457 B，源文件 [recording-source/cover-v016.html](recording-source/cover-v016.html)：合成 `roam-desktop-v016`、`home-desktop-v016` 两张截图与实际导出的 `card-challenge-v016`，页内注明「页面为实际截图 · MVP 0.16」。这些截图的画面对应 `b5939d9` 的代码（见[项目状态](../docs/PROJECT_STATUS.md)）。封面、源文件与截图都在 `7fa4147` 提交。0.15 Space 封面「同一刻，另一面」（1,284,063 B）的源文件仍在 [recording-source/cover-v015.html](recording-source/cover-v015.html)，成品在 Git 历史（如 `3dd102c`） |
+| 比赛视频 | ≤3 分钟实际操作录屏 | **待录制。** 分镜见[报名材料](../docs/competition/README.md)第 2 节；完成后登记文件名、时长、分辨率、帧率、编码、大小、SHA256 与所用构建提交 |
+| [music-map-space-demo.mp4](music-map-space-demo.mp4) | 历史：0.4 Space 实际操作演示视频 | 106秒、1920×1080、30fps、H.264、7,199,962字节（约6.87MiB）；中文字幕、无音轨。内容以 Space 为主，不能作为 Music Map 的比赛视频 |
+| [视觉规范与画面](../docs/VISUAL_THEMES.md) | 夜场唱片店与历史预览 | 0.16 截图 14 张已提交（`7fa4147`），见视觉规范；来源登记见[项目状态](../docs/PROJECT_STATUS.md)。0.15 及更早截图保留原版本 |
+| [recording-source/](recording-source/) | 历史 0.4 录屏与 0.15 封面的编辑源，以及 0.16 封面源 `cover-v016.html` | 原片摘要、精确剪点、FFmpeg 字幕合成脚本、HTML 封面、实际导出票根。`render.mjs` 与 `edit-plan.json` 可作新录屏的字幕合成参考，字幕样式使用 Microsoft YaHei 字体 |
+| [video-source/](video-source/) | 历史：0.2 / 0.3 展示源 | 旧截图编排源；旧视频和封面可由Git历史取得，不作为本轮录屏 |
+| [报名材料](../docs/competition/README.md) | 介绍、视频脚本、评委问答与提交核对 | 待团队补齐身份信息、视频、封面终检和提交回执 |
 
-## 运行完整版本
+## 打开与重新构建
 
-解压运行包，安装 Node.js 24+，在包根目录执行：
+Demo 是一个静态 HTML 文件：直接双击 `dist/index.html`，或放到任意静态托管即可，不需要服务器、数据库或账号。
+
+从源码构建（Node.js 版本见 `.nvmrc`，Vite 8 要求 `^20.19.0 || >=22.12.0`）：
 
 ```sh
-node server/index.js
+npm ci
+npm run build     # 生成 dist/index.html
+npm run preview   # 本机预览 http://127.0.0.1:4173/
 ```
 
-打开 http://127.0.0.1:8787/ 。无需安装 npm 依赖；两个人用独立浏览器身份操作。详见包内 `RUN-ME.md`。本地服务与公开评审链接是两个不同交付状态。
+GitHub Actions 的 Build demo 工作流产出一个静态产物 `music-map-demo`（`dist/index.html` 与说明、许可文件），保留 14 天。公开 Demo 由 `gh-pages` 分支提供，该分支只放构建产物；每次更新都要记录来源提交，并重新检查线上链接。0.15 的 Node + SQLite 运行包 `music-map-space-runtime.zip` 已随 Space 退出，不再生成。
 
-## 从源码重新打包
-
-先在仓库根目录执行 `npm ci` 和 `npm run build`，再用 PowerShell：
-
-```powershell
-Compress-Archive -Path dist,server,package.json,RUN-ME.md,THIRD_PARTY_NOTICES.md -DestinationPath delivery/music-map-space-runtime.zip -Force
-```
-
-GitHub Actions 同时提供 `music-map-space-demo` 和 `music-map-space-runtime` 两份构建产物，保留14天。视频和封面已保存在仓库，[重渲染方式](recording-source/README.md)另有说明。
-
-## 0.15.0 视觉整改
+## 历史 0.15.0 视觉整改
 
 - **夜场**：小院从晴天午后改为傍晚到夜场演出，并冻结为最终美术方向。夜空靛紫、串灯琥珀、暖纸、樱粉与鼠尾草绿；月光投影，店内暖光、串灯、舞台灯与自发光夜樱；首次进入有短暂的开场亮灯。
 - **首屏**：首页首屏写「同一刻，另一面。」、一句承诺与交换三步「交换现场照片｜双方同意｜两人署名的双联票根」；首访纸卡注明照片默认私藏、双方同意才交换。

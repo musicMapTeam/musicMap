@@ -10,13 +10,11 @@ const scrollbarLicenseText = readFileSync(new URL('./web/assets/licenses/overlay
 const sakuraLicenseText = readFileSync(new URL('./web/assets/licenses/sakura-crossing-MIT.txt', import.meta.url), 'utf8');
 const gsapNotice = readFileSync(new URL('./web/assets/licenses/gsap-notice.txt', import.meta.url), 'utf8');
 const hfMetadata = JSON.parse(readFileSync(new URL('./web/assets/data/hf-collaborations.json', import.meta.url), 'utf8'));
+const hfTrackCount = hfMetadata.counts?.selectedTracks ?? hfMetadata.tracks.length;
 
 export default defineConfig({
   root: fileURLToPath(new URL('./web', import.meta.url)),
   base: './',
-  server: {
-    proxy: { '/api/live': 'http://127.0.0.1:8787' },
-  },
   plugins: [
     viteSingleFile(),
     {
@@ -29,8 +27,8 @@ export default defineConfig({
         bundle['index.html'].source += `\n<!-- Three.js 0.186.1, MIT License\n${threeLicenseText}\n-->\n`;
         bundle['index.html'].source += `\n<!-- OverlayScrollbars 2.16.0, MIT License\n${scrollbarLicenseText}\n-->\n`;
         bundle['index.html'].source += `\n<!-- Sakura Crossing renderer adaptation, MIT License\n${sakuraLicenseText}\n-->\n`;
-        bundle['index.html'].source += `\n<!-- GSAP and Flip 3.15.0, Standard No Charge license\n${gsapNotice}\n-->\n`;
-        bundle['index.html'].source += `\n<!-- Music metadata: ${hfMetadata.source.repository}, revision ${hfMetadata.source.revision}\n${hfMetadata.source.url}\nUpstream card labels its license bsd; no standalone LICENSE or BSD variant is supplied. This extract contains 120 factual track credits, no audio or lyrics.\n-->\n`;
+        bundle['index.html'].source += `\n<!-- GSAP 3.15.0, Standard No Charge license\n${gsapNotice}\n-->\n`;
+        bundle['index.html'].source += `\n<!-- Music metadata: ${hfMetadata.source.repository}, revision ${hfMetadata.source.revision}\n${hfMetadata.source.url}\nUpstream card labels its license bsd; no standalone LICENSE or BSD variant is supplied. This extract contains ${hfTrackCount} factual track credits, no audio or lyrics.\n-->\n`;
       },
     },
   ],

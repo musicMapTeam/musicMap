@@ -1,4 +1,4 @@
-GSAP 3.15.0 and Flip 3.15.0
+GSAP 3.15.0
 https://gsap.com
 
 Copyright 2008-2026, GreenSock. All rights reserved.
@@ -9,4 +9,4 @@ Distributed under the Standard "No Charge" GSAP License, not the MIT License.
 Official terms: https://gsap.com/community/standard-license/
 Upstream package: https://www.npmjs.com/package/gsap/v/3.15.0
 This notice preserves the copyright and license reference shipped in the source.
-Music Map uses unmodified GSAP and Flip for its own application interface.
+Music Map uses unmodified GSAP for its own application interface.
