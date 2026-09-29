@@ -8,5 +8,6 @@
 - [双 App 原型 HTML](双App_可点击界面原型.html)
 - [20 屏界面总览](双App_20屏界面总览.png)
 - [界面对比预览](双App_界面对比预览.png)
+- [Music Map PRD v0.2 原文](music-map-prd-v0.2/README.md)：产品负责人 igohomealone216 于 2026-09-26 提交（`9ce4f3d`）的 7 份文档，2026-09-29 原样复制，是当前产品方案的基线。
 
 当前执行基线见[产品定稿](../../product/docs/01-product-plan.md)。原材料中的固定步数、虚构用户或效果图不能代替已确认规则与真实实现。
