@@ -1,6 +1,6 @@
 # Music Map · 初赛产品方案
 
-版本：3.0 · 2026-09-29，对应应用 MVP 0.16.0（分支 `feat/map-mainline`，尚未推送或开 PR；只有构建文件已部署）。交付见[交付方案](02-delivery-plan.md)，实现见[实施规格](03-build-guide.md)，构建、画面与部署证据统一登记在[项目状态](../../docs/PROJECT_STATUS.md)。
+版本：3.0 · 2026-09-29，对应应用 MVP 0.16.0（分支 `feat/map-mainline`，经 PR #6 合并到 `main`；线上 Demo 由 `gh-pages` 构建文件提供）。交付见[交付方案](02-delivery-plan.md)，实现见[实施规格](03-build-guide.md)，构建、画面与部署证据统一登记在[项目状态](../../docs/PROJECT_STATUS.md)。
 
 **基线是产品负责人的 PRD v0.2。** 原文由 igohomealone216 于 2026-09-26 提交（`9ce4f3d`），2026-09-29 原样复制到 [`references/original-ideas/music-map-prd-v0.2/`](../../references/original-ideas/music-map-prd-v0.2/README.md)。本文沿用它的定位、漫游、发现清单与挑战规则，并逐项写明当前实现与它的差异。按 PRD 交接说明的优先级（[06-handoff §1](../../references/original-ideas/music-map-prd-v0.2/06-handoff.md)），冲突只做记录，不把代码现状直接改写成新需求。
 

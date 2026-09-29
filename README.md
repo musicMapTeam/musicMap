@@ -154,4 +154,4 @@ npm run preview   # 预览构建结果（npm start 与此相同）
   - GitHub Pages 公开部署与 FAQ Q10（用户已接受，产品负责人尚未表态）。
   - 完整 15 项见[产品方案 §9](product/docs/01-product-plan.md)。
 - **仍需完成**：视频、封面终检、目标用户试用、真机检查、报名与提交。
-- **分支**：功能分支 `feat/map-mainline` 还没有推送，也没有开 PR；推送、PR 与合并都等用户确认。线上只部署了构建产物。
+- **分支**：按用户 2026-09-29「推送并且合并」的授权，`feat/map-mainline` 经 PR #6 在 Build demo 检查通过后合并到 `main`。线上 Demo 仍由独立的 `gh-pages` 分支提供。
