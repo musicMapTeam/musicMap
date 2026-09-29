@@ -466,18 +466,16 @@ export async function buildDiscoveryCard(session) {
   nightBackdrop(ctx);
   petals(ctx);
   heading(ctx, '发现卡片 · 从喜欢，走向未知');
-  // The stub is as tall as its list (five songs and 等 N 首 fill the 400px it had): a short list moves the
-  // tear down, and the ticket above spreads its singers into the room, so neither half is left half empty.
+  // The ticket is as tall as what it carries: the singers' row above the tear, and a stub as tall as its
+  // list (five songs and 等 N 首 fill 400px). A short list makes a shorter ticket, centred in the night
+  // between the heading and the footer, so no blank band is left on the paper.
   const listed = kept.slice(0, MAX_KEPT);
   const rows = listed.length ? listed.length + (kept.length > MAX_KEPT ? 1 : 0) : 2;
   const stubHeight = 170 + (rows - 1) * 46;
-  const T = { x: 64, y: 318, w: 952, h: 900, r: 26 };
-  T.tear = T.y + T.h - stubHeight;
-  const room = T.tear - 818;
-  // Where the ticket's rows sit: the singers (a little larger) and the legend under them move down with the
-  // tear, so the gaps above the sleeves, under their names and above the tear grow alike.
-  const grow = Math.min(18, Math.round(room / 12));
-  const rowShift = Math.round(room * .42); const legendShift = rowShift + grow + Math.round(room * .18);
+  const UPPER = 500; const TALLEST = 900;
+  const T = { x: 64, w: 952, r: 26, h: UPPER + stubHeight };
+  T.y = 318 + Math.round((TALLEST - T.h) / 2);
+  T.tear = T.y + UPPER;
   ticketPaper(ctx, T);
   const left = T.x + 64; const right = T.x + T.w - 64;
   ctx.save();
@@ -503,15 +501,17 @@ export async function buildDiscoveryCard(session) {
   const slots = excerpt ? [...met.slice(0, 3), { gap: true }, ...met.slice(-2)] : met;
   const slotWidth = (right - left) / Math.max(slots.length, 4);
   const rowLeft = left + ((right - left) - slotWidth * slots.length) / 2;
-  const cy = T.y + 318 + rowShift; const sleeve = 92 + grow;
+  const cy = T.y + 318; const sleeve = 92;
   const tilts = [-.05, .04, -.03, .05, -.04, .03];
+  // → between two singers walked one to the next; ↩ where the walk went back before reaching the next one.
+  const glyphOf = (slot, index) => index === 0 || slot.gap || slots[index - 1].gap ? '' : slot.walked ? '→' : '↩';
+  const turned = slots.some((slot, index) => glyphOf(slot, index) === '↩');
   slots.forEach((slot, index) => {
     const cx = rowLeft + slotWidth * (index + .5);
-    if (index > 0) {
-      // → only between two singers walked one to the next; · where the walk turned back in between.
-      const glyph = slot.gap || slots[index - 1].gap ? '' : slot.walked ? '→' : '·';
+    const glyph = glyphOf(slot, index);
+    if (glyph) {
       ctx.save(); ctx.textAlign = 'center'; ctx.fillStyle = C.gold; setFont(ctx, 600, 30);
-      if (glyph) ctx.fillText(glyph, cx - slotWidth / 2, cy + 10);
+      ctx.fillText(glyph, cx - slotWidth / 2, cy + 10);
       ctx.restore();
     }
     if (slot.gap) {
@@ -526,11 +526,16 @@ export async function buildDiscoveryCard(session) {
     fitLine(ctx, artistName(slot.id), cx, cy + sleeve, slotWidth - 12, 26, { family: serif, weight: 600, min: 18 });
     ctx.restore();
   });
+  // The key under the row names each mark it uses. Beside a 节选 tag a long key drops its opening words.
   ctx.save();
+  setFont(ctx, 600, 21); spacing(ctx, 2);
+  const tagRoom = excerpt ? ctx.measureText(`节选 · 共 ${met.length} 位`).width + 26 + 24 : 0;
   ctx.textAlign = 'left'; ctx.fillStyle = C.muted; setFont(ctx, 400, 21); spacing(ctx, 1);
-  ctx.fillText('按遇见的先后 · →：沿合唱走过去', left, T.y + 458 + legendShift);
+  const walkKey = `→：沿合唱走过去${turned ? ' · ↩：退回后换个方向' : ''}`;
+  const legend = ctx.measureText(`按遇见的先后 · ${walkKey}`).width <= right - left - tagRoom ? `按遇见的先后 · ${walkKey}` : walkKey;
+  ctx.fillText(legend, left, T.y + 458, right - left - tagRoom);
   ctx.restore();
-  if (excerpt) tag(ctx, `节选 · 共 ${met.length} 位`, right, T.y + 458 + legendShift, { align: 'right' });
+  if (excerpt) tag(ctx, `节选 · 共 ${met.length} 位`, right, T.y + 458, { align: 'right' });
   // Stub: the songs kept on the way.
   const sy = T.tear;
   ctx.save();

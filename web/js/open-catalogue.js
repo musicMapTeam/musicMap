@@ -1,6 +1,7 @@
 import catalogue from '../assets/data/hf-collaborations.json';
 import { icon } from './icons.js';
-import { importLegacyMapMusic } from './map.js';
+import { importLegacyMapMusic, listenHTML } from './map.js';
+import { songs } from './map-data.js';
 import { getSavedMusic, toggleSavedMusic, removeSavedMusic, subscribeSavedMusic } from './music-library.js';
 
 const hfSnapshot = track => ({ id: track.id, title: track.title, artists: [...track.artists], source: catalogue.source.url, dataset: 'hf' });
@@ -10,16 +11,19 @@ function importPreviousSaves(api) {
   catch { api.toast('旧探索记录仍保留，歌曲收藏暂未同步到浏览器'); }
 }
 
+// 留下 / 移除, as in the record shop: the same words wherever a song is kept or let go.
 function updateSaveButton(button, track, saved) {
   button.innerHTML = icon(saved ? 'check' : 'plus');
   button.classList.toggle('is-saved', saved);
   button.setAttribute('aria-pressed', String(saved));
-  button.setAttribute('aria-label', `${saved ? '取消收藏' : '收藏'}《${track.title}》`);
-  button.title = saved ? '已留下，点击取消收藏' : '留下这首歌';
+  button.setAttribute('aria-label', `${saved ? '移除' : '留下'}《${track.title}》`);
+  button.title = saved ? '已留下，点击移除' : '留下这首歌';
 }
 
-function musicRow(track, index, { saved, detail, onSave }) {
-  const row = document.createElement('article'); row.className = 'open-catalogue__record'; row.dataset.musicId = track.id;
+/** One song row. The 开放曲库 toggles 留下 / 移除 with an icon; 留下的歌 (`removeOnly`) says 移除 in words.
+ *  `listen` is the 去 QQ 音乐听 line of a real recording; it sits under the row and never keeps or removes. */
+function musicRow(track, index, { saved, detail, onSave, removeOnly = false, listen = '' }) {
+  const row = document.createElement('article'); row.className = `open-catalogue__record${listen ? ' has-listen' : ''}`; row.dataset.musicId = track.id;
   const info = document.createElement('details');
   const summary = document.createElement('summary');
   const number = document.createElement('span'); number.className = 'open-catalogue__number'; number.textContent = String(index + 1).padStart(2, '0');
@@ -28,9 +32,22 @@ function musicRow(track, index, { saved, detail, onSave }) {
   const artists = document.createElement('small'); artists.textContent = track.artists.join(' · ');
   copy.append(title, artists); summary.append(number, copy); info.append(summary, detail);
   const actions = document.createElement('div'); actions.className = 'music-row__actions';
-  const save = document.createElement('button'); save.type = 'button'; save.className = 'icon-button music-row__save'; save.dataset.musicSave = track.id;
-  updateSaveButton(save, track, saved); save.addEventListener('click', onSave);
-  actions.append(save); row.append(info, actions); return row;
+  const save = document.createElement('button'); save.type = 'button'; save.dataset.musicSave = track.id;
+  if (removeOnly) {
+    save.className = 'button button--quiet music-row__remove';
+    save.textContent = '移除';
+    save.setAttribute('aria-label', `移除《${track.title}》`);
+  } else {
+    save.className = 'icon-button music-row__save';
+    updateSaveButton(save, track, saved);
+  }
+  save.addEventListener('click', onSave);
+  actions.append(save); row.append(info, actions);
+  if (listen) {
+    const line = document.createElement('div'); line.className = 'music-row__listen';
+    line.innerHTML = listen; row.append(line);
+  }
+  return row;
 }
 
 export function mountOpenCatalogue(api) {
@@ -57,7 +74,7 @@ export function mountOpenCatalogue(api) {
       list.append(musicRow(snapshot, index, {
         saved: savedIds.has(track.id), detail,
         onSave() {
-          try { api.toast(toggleSavedMusic(snapshot) ? '已留下，可在「我的发现 · 留下的歌」找到' : '已取消收藏'); }
+          try { api.toast(toggleSavedMusic(snapshot) ? '已留下，可在「我的发现 · 留下的歌」找到' : '已移除'); }
           catch { api.toast('收藏还未保存，请检查浏览器存储空间后重试'); }
         },
       }));
@@ -105,11 +122,13 @@ export function mountSavedMusic(container, api) {
       if (/^https?:\/\//.test(track.source)) {
         const source = document.createElement('a'); source.href = track.source; source.target = '_blank'; source.rel = 'noopener noreferrer'; source.textContent = '资料来源'; detail.append(' · ', source);
       }
+      // A kept recording of the verified catalogue offers the same QQ Music link as the record shop.
+      const song = track.dataset === 'real' ? songs[track.id] : null;
       list.append(musicRow(track, index, {
-        saved: true, detail,
+        saved: true, detail, removeOnly: true, listen: song?.dataset === 'real' ? listenHTML(song, icon, { reason: true }) : '',
         onSave() {
           try {
-            removeSavedMusic(track.id); api.toast('已取消收藏');
+            removeSavedMusic(track.id); api.toast('已移除');
             const buttons = [...container.querySelectorAll('[data-music-save]')];
             (buttons[Math.min(index, buttons.length - 1)] || container.querySelector('[data-music-explore]'))?.focus({ preventScroll: true });
           } catch { api.toast('这首歌尚未移除，请检查浏览器存储空间后重试'); }

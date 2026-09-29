@@ -234,8 +234,45 @@ function button(action, label, className = 'button button--quiet', attrs = '') {
   return `<button type="button" class="${className}" data-map-action="${action}" ${attrs}>${label}</button>`;
 }
 
-function listenHTML(song, api, className = 'map-track__listen') {
-  return (song?.listenLinks || []).map(link => `<a class="${className}" href="${escapeHTML(link.url)}" target="_blank" rel="noopener noreferrer" aria-label="在${escapeHTML(link.platform)}打开《${escapeHTML(song.title)}》${escapeHTML(link.label)}，新标签页">${className === 'map-track__listen' ? '去听' : escapeHTML(link.label)} ${api.icon('arrow-up-right')}</a>`).join('');
+/* ---------- 去 QQ 音乐听: the same recording on QQ Music, opened outside the app ----------
+ * Only recordings with a verified same-version page carry a link (map-catalogue.js); the others say so
+ * in a muted note. Listening and keeping stay apart: the link never keeps a song, 留下 never opens one. */
+const qqLink = song => song?.dataset === 'real' ? (song.listenLinks || []).find(link => link.provider === 'qq') || null : null;
+const qqLabel = song => `在 QQ 音乐打开《${song.title}》同一录音（新窗口）`;
+const qqMissing = song => song.listenStatus === 'qq-pending' ? 'QQ 音乐 · 同版本待确认' : 'QQ 音乐暂无同一版本';
+
+/** QQ Music's own vocal credit where it differs from our two singers (「QQ 音乐署名：周杰伦」). During a
+ *  寻声 round it is held back when it names anyone outside the song's own pair (QQ credits 私奔到月球 to
+ *  五月天), so it never names a singer the player has not met. */
+function qqCredit(song, fogged = false) {
+  const link = qqLink(song);
+  if (!link || link.creditMatches) return '';
+  if (fogged) {
+    const pair = song.artists.map(artistName);
+    if (link.singers.some(singer => !pair.some(name => singer.includes(name)))) return '';
+  }
+  return `QQ 音乐署名：${link.credit}`;
+}
+
+/** The listening line under a real song: the outbound link and QQ's credit, or why there is none.
+ *  `reason` also prints why a recording has no link; a fogged round never does (a reason can name a band). */
+export function listenHTML(song, icon, { fogged = false, reason = false } = {}) {
+  if (song?.dataset !== 'real') return '';
+  const link = qqLink(song);
+  if (link) {
+    const credit = qqCredit(song, fogged);
+    return `<div class="map-listen"><a class="map-listen__link" href="${escapeHTML(link.url)}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHTML(qqLabel(song))}">去 QQ 音乐听${icon('arrow-up-right')}</a>${credit ? `<small class="map-listen__credit">${escapeHTML(credit)}</small>` : ''}</div>`;
+  }
+  const known = !fogged && song.listenReason;
+  const why = reason && known ? `<small class="map-listen__reason">${escapeHTML(song.listenReason)}</small>` : '';
+  return `<div class="map-listen is-none"><span class="map-listen__none"${known && !reason ? ` title="${escapeHTML(song.listenReason)}"` : ''}>${qqMissing(song)}</span>${why}</div>`;
+}
+
+/** The hand card's copy, only once the card is turned over (the partner is known by then). */
+function handListenHTML(song, api) {
+  const link = qqLink(song);
+  if (link) return `<a class="map-round-card__listen" href="${escapeHTML(link.url)}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHTML(qqLabel(song))}" title="去 QQ 音乐听"><span class="map-round-card__listen-long">去 QQ 音乐听</span><span class="map-round-card__listen-short" aria-hidden="true">QQ</span>${api.icon('arrow-up-right')}</a>`;
+  return song?.dataset === 'real' ? `<span class="map-round-card__listen is-none">${qqMissing(song)}</span>` : '';
 }
 
 function evidenceHTML(edge, api) {
@@ -260,7 +297,8 @@ function creditsHTML(song, api, expanded = false) {
     const source = song.creditSources[index];
     return `<span class="map-credit-role">${escapeHTML(credit.role)}<a href="${escapeHTML(source.url)}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHTML(person.name)}的${escapeHTML(credit.role)}署名来源：${escapeHTML(source.label)}，新标签页" title="${escapeHTML(source.label)}">${index + 1}</a></span>`;
   }).join('')}</td></tr>`).join('')}</tbody></table>`;
-  const sources = `<details class="map-credit-sources"><summary>署名来源 <span>${song.creditSources.length}</span></summary><ol>${song.creditSources.map(source => `<li><a href="${escapeHTML(source.url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(source.label)} ${api.icon('arrow-up-right')}</a></li>`).join('')}</ol><p>核对于 ${song.checkedAt}。仅列已核实署名，未列出不表示未参与。</p></details>`;
+  // A source checked on another day than the song carries its own date.
+  const sources = `<details class="map-credit-sources"><summary>署名来源 <span>${song.creditSources.length}</span></summary><ol>${song.creditSources.map(source => `<li><a href="${escapeHTML(source.url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(source.label)} ${api.icon('arrow-up-right')}</a>${source.checkedAt && source.checkedAt !== song.checkedAt ? `<small>核对于 ${escapeHTML(source.checkedAt)}</small>` : ''}</li>`).join('')}</ol><p>核对于 ${song.checkedAt}。仅列已核实署名，未列出不表示未参与。</p></details>`;
   if (expanded) return `<div class="map-credits map-credits--expanded">${table}${sources}</div>`;
   return `<details class="map-credits"><summary><span>作品署名</span><small>${people.length} 位</small>${api.icon('chevron-right')}</summary>${table}${sources}</details>`;
 }
@@ -282,8 +320,8 @@ function tracksHTML(session, trackIds, api, source = '', showVersion = false, sh
         : !showVersion && song.creditSummary ? `<small class="map-track__credit-preview">${escapeHTML(song.creditSummary)}</small>` : '';
     return `<div class="map-track">
       <span class="map-track__index" aria-hidden="true">${String(index + 1).padStart(2, '0')}</span>
-      <div class="map-track__copy">${creditLink ? button('credits', `${escapeHTML(song.title)}<span aria-hidden="true">↗</span>`, 'map-track__title', `data-id="${id}" data-session="${session.id}" aria-label="查看《${escapeHTML(song.title)}》的作品署名"`) : `<strong>${escapeHTML(song.title)}</strong>`}<span>${song.artists.map(artistName).map(escapeHTML).join(' / ')}</span>${detail}</div>
-      <div class="map-track__actions">${listenHTML(song, api)}${button('save', api.icon(saved ? 'check' : 'plus'), `icon-button map-track__save ${saved ? 'is-saved' : ''}`, `data-id="${id}" data-session="${session.id}" data-source="${escapeHTML(from)}" aria-label="${saved ? '移除' : '留下'}《${escapeHTML(song.title)}》" aria-pressed="${saved}" title="${saved ? '已留下，点击移除' : '留下这首作品'}"`)}</div>
+      <div class="map-track__copy">${creditLink ? button('credits', `${escapeHTML(song.title)}<span aria-hidden="true">↗</span>`, 'map-track__title', `data-id="${id}" data-session="${session.id}" aria-label="查看《${escapeHTML(song.title)}》的作品署名"`) : `<strong>${escapeHTML(song.title)}</strong>`}<span>${song.artists.map(artistName).map(escapeHTML).join(' / ')}</span>${detail}${listenHTML(song, api.icon, { fogged })}</div>
+      <div class="map-track__actions">${button('save', api.icon(saved ? 'check' : 'plus'), `icon-button map-track__save ${saved ? 'is-saved' : ''}`, `data-id="${id}" data-session="${session.id}" data-source="${escapeHTML(from)}" aria-label="${saved ? '移除' : '留下'}《${escapeHTML(song.title)}》" aria-pressed="${saved}" title="${saved ? '已留下，点击移除' : '留下这首作品'}"`)}</div>
     </div>${showCredits && !fogged ? creditsHTML(song, api) : ''}`;
   }).join('');
 }
@@ -445,7 +483,7 @@ function roundCardHTML(session, edge, knowledge, api, index, stub, motion) {
     <span class="map-round-card__no" aria-hidden="true">${number}</span>${hintTag}
     <strong class="map-round-card__title">《${escapeHTML(title)}》</strong>
     <span class="map-round-card__who"><i class="map-round-card__dot" aria-hidden="true"></i>× ${escapeHTML(artistName(partner))}${badge}</span>
-    <div class="map-round-card__actions">${move}${button('edge', api.icon('info'), 'icon-button map-round-card__more', `data-id="${edge.id}" aria-label="看《${escapeHTML(title)}》的版本与来源"`)}</div>
+    <div class="map-round-card__actions">${handListenHTML(songs[edge.song], api)}${move}${button('edge', api.icon('info'), 'icon-button map-round-card__more', `data-id="${edge.id}" aria-label="看《${escapeHTML(title)}》的版本与来源"`)}</div>
   </li>`;
 }
 
@@ -784,8 +822,14 @@ function setlistHTML(map, session, api, page) {
     const song = songs[edge.song];
     const saved = songIsSaved(session, song.id);
     const title = song.credits?.length ? button('credits', `《${escapeHTML(song.title)}》`, 'map-setlist__title', `data-id="${song.id}" data-session="${session.id}" aria-label="查看《${escapeHTML(song.title)}》的作品署名"`) : `<strong class="map-setlist__title">《${escapeHTML(song.title)}》</strong>`;
-    const meta = song.dataset === 'real' ? `<span class="map-setlist__version">${escapeHTML(song.recordingLabel || song.versionLabel || '')}</span>${evidenceHTML(edge, api)}` : '<span class="map-setlist__version">示例合作 · 虚构，无音源</span>';
-    const actions = `${button('save', `${api.icon(saved ? 'check' : 'plus')}<span>${saved ? '已留下' : '留下'}</span>`, `button button--quiet map-setlist__save${saved ? ' is-saved' : ''}`, `data-id="${song.id}" data-session="${session.id}" data-source="从连线歌单留下" aria-pressed="${saved}" aria-label="${saved ? '移除' : '留下'}《${escapeHTML(song.title)}》"`)}`;
+    const link = qqLink(song);
+    const credit = qqCredit(song);
+    // The setlist is read after the round closes: QQ's own credit and the reason for a missing link both show.
+    const listenNote = song.dataset !== 'real' ? '' : link ? (credit ? `<small class="map-listen__credit">${escapeHTML(credit)}</small>` : '')
+      : `<span class="map-listen is-none"><span class="map-listen__none">${qqMissing(song)}</span>${song.listenReason ? `<small class="map-listen__reason">${escapeHTML(song.listenReason)}</small>` : ''}</span>`;
+    const meta = song.dataset === 'real' ? `<span class="map-setlist__version">${escapeHTML(song.recordingLabel || song.versionLabel || '')}</span>${evidenceHTML(edge, api)}${listenNote}` : '<span class="map-setlist__version">示例合作 · 虚构，无音源</span>';
+    const listen = link ? `<a class="button button--quiet map-setlist__listen" href="${escapeHTML(link.url)}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHTML(qqLabel(song))}"><span>去 QQ 音乐听</span>${api.icon('arrow-up-right')}</a>` : '';
+    const actions = `${listen}${button('save', `${api.icon(saved ? 'check' : 'plus')}<span>${saved ? '已留下' : '留下'}</span>`, `button button--quiet map-setlist__save${saved ? ' is-saved' : ''}`, `data-id="${song.id}" data-session="${session.id}" data-source="从连线歌单留下" aria-pressed="${saved}" aria-label="${saved ? '移除' : '留下'}《${escapeHTML(song.title)}》"`)}`;
     return `${stop}<li class="map-setlist__song" style="--i:${index * 2 + 1}"><div class="map-setlist__ticket"><span class="map-setlist__no" aria-hidden="true">${String(index + 1).padStart(2, '0')}</span><div class="map-setlist__copy">${title}${meta}</div><div class="map-setlist__actions">${actions}</div></div></li>`;
   }).join('');
   const alternatives = arrived ? shortestChains(session.start, session.target, dataset, 3).filter(chain => chain.edges.map(edge => edge.id).join() !== route.edges.map(edge => edge.id).join()) : shortestChains(session.start, session.target, dataset, 3).slice(1);
@@ -810,7 +854,7 @@ function setlistHTML(map, session, api, page) {
     ${altHTML}
     ${timelineHTML(session, api, true)}
     <div class="map-panel-actions map-setlist__actions-bar">${undoHTML(map, api, page, session.id)}${button('round-next', `再来一局 ${api.icon('arrow-right')}`, 'button button--primary')}${songIds.length ? button('save-route', unsaved ? `留下这 ${songIds.length} 首` : `已留下这 ${songIds.length} 首`, 'button button--quiet map-setlist__save-route', `data-session="${session.id}" ${unsaved ? '' : 'aria-disabled="true"'}`) : ''}${button('return-roam', '看完整图鉴', 'button button--quiet', `data-session="${session.id}"`)}</div>
-    <p class="map-setlist__note">${isReal ? '路线只来自本专题已核实的共同演唱录音；“最短”仅指本专题收录范围。无内置音频。' : '路线只来自虚构的示例合作，不代表真实演唱；“最短”仅指本示例图谱。情景示例为虚构，仅作交互演示。'}</p>`;
+    <p class="map-setlist__note">${isReal ? '路线只来自本专题已核实的共同演唱录音；“最短”仅指本专题收录范围。站内没有音频；「去 QQ 音乐听」会离开本站，只在 QQ 音乐有同一录音时出现。' : '路线只来自虚构的示例合作，不代表真实演唱；“最短”仅指本示例图谱。情景示例为虚构，仅作交互演示。'}</p>`;
 }
 
 function recordRowHTML(session, api, compact = false, index = 0) {
@@ -894,7 +938,7 @@ function panelHTML(map, api, recordsOnly = false) {
   if (panel === 'credits') {
     const song = songs[map.view.creditSongId];
     const allowed = !fog;
-    if (song?.credits?.length && allowed) content = `<div class="map-credit-heading"><span class="map-credit-disc" style="--credit-tone:${toneOf(song.artists[0])}" aria-hidden="true"></span><div><span class="eyebrow">作品署名</span><h2>${escapeHTML(song.title)}</h2><p>${escapeHTML(song.recordingLabel)}</p></div></div>${creditsHTML(song, api, true)}${fog ? '<p class="map-round-sealed-note">署名表按来源原样列出；非演唱署名不表示合唱。</p>' : ''}<div class="map-credit-bottom"><span>无内置音频</span>${button('save', `${api.icon(songIsSaved(session, song.id) ? 'check' : 'plus')} ${songIsSaved(session, song.id) ? '已留下' : '留下作品'}`, 'button button--quiet', `data-id="${song.id}" data-session="${session.id}" data-source="查看作品制作署名后留下" aria-pressed="${songIsSaved(session, song.id)}"`)}</div>`;
+    if (song?.credits?.length && allowed) content = `<div class="map-credit-heading"><span class="map-credit-disc" style="--credit-tone:${toneOf(song.artists[0])}" aria-hidden="true"></span><div><span class="eyebrow">作品署名</span><h2>${escapeHTML(song.title)}</h2><p>${escapeHTML(song.recordingLabel)}</p></div></div>${creditsHTML(song, api, true)}${fog ? '<p class="map-round-sealed-note">署名表按来源原样列出；非演唱署名不表示合唱。</p>' : ''}<div class="map-credit-bottom"><div class="map-credit-bottom__listen">${listenHTML(song, api.icon, { reason: true })}<span class="map-credit-bottom__note">站内没有音频${qqLink(song) ? '，链接会离开本站' : ''}</span></div>${button('save', `${api.icon(songIsSaved(session, song.id) ? 'check' : 'plus')} ${songIsSaved(session, song.id) ? '已留下' : '留下作品'}`, 'button button--quiet', `data-id="${song.id}" data-session="${session.id}" data-source="查看作品制作署名后留下" aria-pressed="${songIsSaved(session, song.id)}"`)}</div>`;
   }
   if (panel === 'relations' && !fog) {
     const id = datasetForArtist(map.view.selectedArtistId) === dataset ? map.view.selectedArtistId : currentNode(session).id;
@@ -2027,6 +2071,15 @@ function attachInteractions(container, api, recordsOnly) {
   };
   const dockWatch = roamDock ? new ResizeObserver(clearDock) : null;
   if (roamDock) { dockWatch.observe(roamDock); window.addEventListener('resize', clearDock, { signal }); clearDock(); }
+  // A round's toast rides just above its hand, as tall as its cards are (a turned card carries a listen row;
+  // see --map-hand-clear in map-round.css).
+  const handDock = recordsOnly ? null : container.querySelector('.map-round>.map-round-hand');
+  const clearHand = () => {
+    const top = handDock?.isConnected ? handDock.getBoundingClientRect().top : 0;
+    if (top > 0) document.documentElement.style.setProperty('--map-hand-clear', `${Math.round(window.innerHeight - top + 10)}px`);
+  };
+  const handWatch = handDock ? new ResizeObserver(clearHand) : null;
+  if (handDock) { handWatch.observe(handDock); window.addEventListener('resize', clearHand, { signal }); clearHand(); }
 
   // A drag at full-table zoom can slide the record you stand on off the paper, and its 你在这里 tag
   // with it. In a roam the table then eases back to the whole view, so where you stand stays in sight.
@@ -2057,6 +2110,7 @@ function attachInteractions(container, api, recordsOnly) {
   return () => {
     if (redrawTable === positionNodes) redrawTable = null;
     dockWatch?.disconnect();
+    handWatch?.disconnect();
     unsubscribeSavedMusic();
     abort.abort();
     clearTimeout(ceremonyTimer);

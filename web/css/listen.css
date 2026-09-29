@@ -1,0 +1,62 @@
+/* 去 QQ 音乐听 — 0.16. A quiet paper button that leaves the app (the ↗ says so) for the same recording on
+   QQ Music, with QQ's own credit beside it where it differs; recordings without a same-version page carry a
+   stamped, non-interactive note instead. Loaded after the shop's own sheets. */
+
+/* ---------- In a song row: under the title, the singers and the version ---------- */
+html[data-theme] body .map-listen { display:flex; flex-wrap:wrap; align-items:center; gap:4px 10px; margin-top:8px; }
+html[data-theme] body .map-listen > a.map-listen__link,
+html[data-theme] body a.map-round-card__listen {
+  display:inline-flex; align-items:center; justify-content:center; gap:6px; min-height:44px; min-width:44px; padding:8px 12px;
+  border:1px solid #d8ccad; border-radius:3px; background:#f6efdc; color:#24382d;
+  font:600 14px/1.2 var(--font-display); letter-spacing:.02em; text-decoration:none; white-space:nowrap;
+}
+html[data-theme] body :is(.map-listen > a.map-listen__link, a.map-round-card__listen):hover { background:#fff; border-color:#c8b98f; color:#1f3a2d; }
+html[data-theme] body :is(.map-listen > a.map-listen__link, a.map-round-card__listen, a.map-setlist__listen):focus-visible { outline:2px solid #24382d; outline-offset:2px; }
+html[data-theme] body :is(.map-listen__link, .map-round-card__listen, .map-setlist__listen) .icon { flex:none; width:14px; height:14px; }
+/* QQ's own credit (「QQ 音乐署名：周杰伦」) and why a recording has no link: helper type on paper. */
+html[data-theme] body .map-listen > small.map-listen__credit,
+html[data-theme] body .map-listen > small.map-listen__reason,
+html[data-theme] body .map-setlist__copy small.map-listen__credit { display:block; margin:0; font-size:12px; line-height:1.55; color:#6b6a5c; }
+html[data-theme] body .map-listen > small.map-listen__reason { flex:1 0 100%; }
+/* No same-version page: a stamp, not a control (dashed, no hover, no pointer). */
+html[data-theme] body .map-listen > span.map-listen__none,
+html[data-theme] body span.map-round-card__listen.is-none {
+  display:inline-flex; align-items:center; width:auto; margin:0; padding:3px 8px; border:1px dashed #cdbf9f; border-radius:2px;
+  background:none; color:#6b6a5c; font:500 12px/1.5 var(--font-display); letter-spacing:.02em; cursor:default;
+}
+html[data-theme] body .map-setlist__copy .map-listen { margin-top:4px; }
+
+/* ---------- The hand: a turned card gains the link on its own row, above 前往 ---------- */
+.map-round-card__actions { flex-wrap:wrap; }
+html[data-theme] body .map-round-card__listen { flex:1 0 100%; order:-1; }
+html[data-theme] body span.map-round-card__listen.is-none { justify-content:center; min-height:0; }
+.map-round-card__listen-short { display:none; }
+
+/* ---------- 连线歌单: beside 留下 ---------- */
+html[data-theme='sakura'] body .map-setlist__actions a.map-setlist__listen { text-decoration:none; }
+
+/* ---------- 作品署名: the link (or its reason) beside 留下作品 ---------- */
+html[data-theme] body .map-credit-bottom { align-items:flex-end; flex-wrap:wrap; }
+.map-credit-bottom__listen { display:flex; flex-direction:column; align-items:flex-start; gap:6px; min-width:0; flex:1 1 220px; }
+html[data-theme] body .map-credit-bottom__listen .map-listen { margin-top:0; }
+html[data-theme] body .map-credit-bottom .map-credit-bottom__note { font-size:12px; line-height:1.5; color:#6b6a5c; }
+
+/* ---------- 我的发现 · 留下的歌: the link under the row, and 移除 in words ---------- */
+.open-catalogue__record.has-listen summary { padding-bottom:4px; }
+.music-row__listen { grid-column:1; min-width:0; padding:0 4px 14px 49px; }
+html[data-theme] body .music-row__listen .map-listen { margin-top:0; }
+html[data-theme] body .music-row__actions .music-row__remove { min-width:44px; min-height:44px; padding:8px 14px; font-size:14px; }
+.music-row__actions:has(.music-row__remove) { padding-top:15px; }
+
+@media(max-width:600px) {
+  .music-row__listen { padding-left:35px; }
+}
+
+/* A short phone keeps the one-row hand: the link shrinks to a 38px QQ ↗ key after 前往. */
+@media(max-width:760px) and (max-height:640px) {
+  html[data-theme] body a.map-round-card__listen { flex:none; order:1; width:auto; min-width:38px; min-height:38px; padding:0 8px; gap:3px; font-size:12px; }
+  html[data-theme] body .map-round-hand .map-round-card__more { order:2; }
+  .map-round-card__listen-long { display:none; }
+  .map-round-card__listen-short { display:inline; }
+  html[data-theme] body span.map-round-card__listen.is-none { display:none; }
+}

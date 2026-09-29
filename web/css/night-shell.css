@@ -39,6 +39,16 @@ html[data-theme='sakura'] body .brand-wordmark small {
 html[data-theme='sakura'] body:not(.spatial-fallback) .app-studio-shell .brand { color:var(--night-ink); }
 html[data-theme='sakura'] body:not(.spatial-fallback) .app-studio-shell .brand-wordmark { color:var(--night-ink); text-shadow:var(--text-glow); }
 html[data-theme='sakura'] body:not(.spatial-fallback) .brand-wordmark small { color:var(--night-muted); text-shadow:var(--text-lift); }
+/* 我的发现 on a phone frames the shop's pale sign right behind the masthead: a soft night scrim lies under
+   the wordmark so 「樱下放映 · 夜场唱片店」 keeps its contrast there. Visual only. */
+@media(max-width:760px) {
+  html[data-theme='sakura'] body:not(.spatial-fallback)[data-view='records'] .app-studio-shell .brand { isolation:isolate; }
+  html[data-theme='sakura'] body:not(.spatial-fallback)[data-view='records'] .app-studio-shell .brand::before {
+    content:''; position:absolute; z-index:-1; inset:-16px -34px -18px -20px; pointer-events:none;
+    background:radial-gradient(closest-side,#0b0f22eb,#0b0f22c7 58%,#0b0f2200);
+  }
+  html[data-theme='sakura'] body:not(.spatial-fallback)[data-view='records'] .brand-wordmark small { color:var(--night-ink-soft); text-shadow:0 1px 2px #070a1a,0 0 10px #070a1ae6; }
+}
 html[data-theme='sakura'] body:not(.spatial-fallback) .brand-mark i { background:#f0a6b6; }
 html[data-theme='sakura'] body:not(.spatial-fallback) .brand-mark i:nth-child(2) { background:#ffd6c8; }
 html[data-theme='sakura'] body:not(.spatial-fallback) .brand-mark i:nth-child(3) { background:#86b596; }

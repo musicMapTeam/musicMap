@@ -18,6 +18,7 @@ import '../css/map-round.css';
 import '../css/home-map.css';
 import '../css/night-shell.css';
 import '../css/share-card.css';
+import '../css/listen.css';
 import { OverlayScrollbars } from 'overlayscrollbars';
 import { mountThemes } from './themes.js';
 import { icon } from './icons.js';
@@ -25,6 +26,7 @@ import { createMapState, mountMap, mountMapRecords } from './map.js';
 import { mountHome } from './home.js';
 import { mountMotion } from './motion.js';
 import { mountOpenCatalogue, mountSavedMusic } from './open-catalogue.js';
+import { qqLinkedCount } from './map-catalogue.js';
 
 // The key and version stay from 0.15 so a returning visitor keeps every exploration.
 const STORAGE_KEY = 'music-map-space:v1';
@@ -99,11 +101,50 @@ tidyUrl();
 // The record shop deals the friend's pair on its first drawing (mountMap's {round:{start,target}} entry).
 if (sharedRound) Object.assign(state, { view: 'explore', routePayload: { round: sharedRound, fromFriend: true } });
 
+/* In the record shop a toast sits just above the dock or the hand (map-round.css, map-spatial.css); a phone
+ * never puts one over the masthead. Where it would lie over a name tag or a song title on the table, it is
+ * lifted: on a desktop to the top middle, clear of the brand and the paper slips; on a phone to just under
+ * the masthead (over the round's question slip, which it repeats), clear of the brand. */
+const TOAST_AVOID = '.world-music-label:not([hidden]),.world-music-link:not([hidden])';
+let toastFrame = 0;
+// The scene hides its tags under an open paper with visibility, not [hidden]: only a tag one can see counts.
+const seen = element => element.checkVisibility ? element.checkVisibility({ visibilityProperty: true, opacityProperty: true }) : getComputedStyle(element).visibility === 'visible';
+function toastCovers(selector, box, gap = 4) {
+  return [...document.querySelectorAll(selector)].some(element => {
+    if (!seen(element)) return false;
+    const rect = element.getBoundingClientRect();
+    return rect.width > 0 && rect.height > 0 && rect.left < box.right + gap && rect.right > box.left - gap && rect.top < box.bottom + gap && rect.bottom > box.top - gap;
+  });
+}
+function placeToast() {
+  toastElement.classList.remove('toast--top');
+  toastElement.style.removeProperty('--toast-top');
+  if (state.view !== 'explore' || document.body.classList.contains('spatial-fallback')) return;
+  if (!toastCovers(TOAST_AVOID, toastElement.getBoundingClientRect())) return;
+  const phone = window.innerWidth <= 760;
+  const brand = document.querySelector('.app-studio-shell .brand')?.getBoundingClientRect();
+  if (phone && brand) toastElement.style.setProperty('--toast-top', `${Math.round(brand.bottom + 8)}px`);
+  toastElement.classList.add('toast--top');
+  const lifted = toastElement.getBoundingClientRect();
+  const keepClear = phone ? '.brand,.masthead-tools' : '.brand,.masthead-tools,.map-round-head,.map-studio-head';
+  if (toastCovers(TOAST_AVOID, lifted) || toastCovers(keepClear, lifted)) {
+    toastElement.classList.remove('toast--top');
+    toastElement.style.removeProperty('--toast-top');
+  }
+}
+
 function toast(message) {
   clearTimeout(toastTimer);
+  cancelAnimationFrame(toastFrame);
   toastElement.textContent = message;
-  toastElement.classList.add('visible');
-  toastTimer = setTimeout(() => toastElement.classList.remove('visible'), 3200);
+  // The scene redraws its tags on the next frame after the change that raised this toast: place, then show.
+  toastFrame = requestAnimationFrame(() => {
+    toastFrame = requestAnimationFrame(() => {
+      placeToast();
+      toastElement.classList.add('visible');
+      toastTimer = setTimeout(() => toastElement.classList.remove('visible'), 3200);
+    });
+  });
 }
 
 function persist() {
@@ -198,7 +239,7 @@ function shell() {
     <nav class="mobile-nav" aria-label="手机导航">${navItems()}</nav>
     <dialog id="about-dialog" class="about-dialog" aria-labelledby="about-title">
       <div class="about-top"><h2 id="about-title">Music Map</h2><button class="icon-button" id="close-about" aria-label="关闭关于">${icon('x')}</button></div>
-      <p class="about-intro">从喜欢，走向未知。</p><div class="about-facts"><p><b>寻声</b><span>在唱片店选好起点和终点，只能翻开所在歌手手边的合唱；沿翻开的合唱前往才算一步，翻开、提示和查看都不计步。</span></p><p><b>图鉴</b><span>唱片店里的完整图鉴摊开收录的全部合唱，可从任意一位歌手出发自由漫游。</span></p><p><b>来源</b><span>每条连线都是一首真实的共同演唱录音，附有来源；制作署名只列已核实的部分。</span></p><p><b>曲库</b><span>开放曲库只列公开数据集里的共同署名，不一定是合唱，也不连入关系图。</span></p><p><b>音频</b><span>这一版不含音频，不能试听。</span></p><p><b>数据</b><span>探索记录和留下的歌只存在这个浏览器里，清除网站数据后无法找回。</span></p></div>
+      <p class="about-intro">从喜欢，走向未知。</p><div class="about-facts"><p><b>寻声</b><span>在唱片店选好起点和终点，只能翻开所在歌手手边的合唱；沿翻开的合唱前往才算一步，翻开、提示和查看都不计步。</span></p><p><b>图鉴</b><span>唱片店里的完整图鉴摊开收录的全部合唱，可从任意一位歌手出发自由漫游。</span></p><p><b>来源</b><span>每条连线都是一首真实的共同演唱录音，附有来源；制作署名只列已核实的部分。</span></p><p><b>曲库</b><span>开放曲库只列公开数据集里的共同署名，不一定是合唱，也不连入关系图。</span></p><p><b>音频</b><span>站内没有音频；${qqLinkedCount} 首可在 QQ 音乐打开同一录音，其余标明原因。</span></p><p><b>数据</b><span>探索记录和留下的歌只存在这个浏览器里，清除网站数据后无法找回。</span></p></div>
       <button class="button button--primary" id="start-experience">知道了</button>
     </dialog>`;
   root.addEventListener('click', event => {

@@ -571,10 +571,14 @@ export function createSakuraMusic({ world, cel, host, canvas, camera, reduced, o
     // A needed name may also use a free pocket beside the paper UI, clear of every control.
     const fits = avoid => ([left, top]) => framing.placeLabel(node.button, left, top, 'top', avoid, needed);
     const own = rectAround(x, y, r * .9);
+    // For 你在这里, hiding a record whose name is needed (one tap away, the goal) costs 40: more than its
+    // longest leader (19) even with two quiet records hidden on the way (16). It steps out on a leader rather
+    // than lie over the singer it points to next (it used to cover 王嘉尔 beside 林俊杰 at 1440).
+    const neededCost = anchor ? 40 : 16;
     const hides = ([left, top, kind]) => {
       const box = { left: left - w / 2, right: left + w / 2, top, bottom: top + h };
       // The anchor's tag counts only the records' bodies it would hide (a tilted corner is not a record hidden).
-      return others.reduce((sum, item) => sum + (covers(box, needed && !anchor ? item.span : item.rect) ? item.needed ? 16 : 8 : 0), 0) + (kind !== 'over' && covers(box, own) ? .6 : 0);
+      return others.reduce((sum, item) => sum + (covers(box, needed && !anchor ? item.span : item.rect) ? item.needed ? neededCost : 8 : 0), 0) + (kind !== 'over' && covers(box, own) ? .6 : 0);
     };
     let placed = null;
     if (needed) {

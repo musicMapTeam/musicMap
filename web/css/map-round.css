@@ -204,6 +204,9 @@ html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback) .map-
 /* ---------- Toast: in the record shop it sits under the question ---------- */
 html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback) .toast { top:auto; bottom:302px; max-width:min(520px,calc(100vw - 64px)); transform:translate(-50%,10px); text-align:center; line-height:1.55; }
 html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback) .toast.visible { transform:translate(-50%,0); }
+/* In a round it rides just above the hand, however tall the hand is (--map-hand-clear is measured by map.js;
+   a turned card's 去 QQ 音乐听 row makes the hand taller). Any width, any height. */
+html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback):has(.map-round>.map-round-hand) .toast { bottom:var(--map-hand-clear,302px); }
 
 /* ---------- 2D table (WebGL off) keeps the same round ---------- */
 html[data-theme='sakura'] body.spatial-fallback[data-view='explore'] {
@@ -225,6 +228,11 @@ html[data-theme='sakura'] body.spatial-fallback[data-view='explore'] {
 html[data-theme='sakura']:has(body.spatial-fallback[data-view='explore']) { scroll-padding:88px 0 96px; }
 html[data-theme='sakura'] body.spatial-fallback[data-view='explore'] .toast { top:max(24px,env(safe-area-inset-top)); bottom:auto; transform:translate(-50%,-10px); }
 html[data-theme='sakura'] body.spatial-fallback[data-view='explore'] .toast.visible { transform:translate(-50%,0); }
+/* On a phone the top is the masthead and the hand sits just above the bottom nav: the toast lies just under
+   the masthead instead, over the question slip it repeats. */
+@media(max-width:760px) {
+  html[data-theme='sakura'] body.spatial-fallback[data-view='explore'] .toast { top:calc(64px + env(safe-area-inset-top)); }
+}
 
 /* ---------- Dialogs: type floors for the record shop ---------- */
 html[data-theme='sakura'] body .map-dialog {

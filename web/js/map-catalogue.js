@@ -48,7 +48,8 @@ const recordings = [
     id: 'real-bu-gai', title: '不该', artists: ['real-jay', 'real-amei'],
     versionLabel: '周杰伦 × aMEI 官方 MV', videoId: '_VxLOj3TB5k',
     sourceUrl: 'https://jvrmusic.com.tw/artist/gallery/detail/1212682331903627264?lang=zh_CN&type=',
-    sourceLabel: '杰威尔音乐 ·《幻城》原声带',
+    // The page is the《幻城》theme-song entry; the recording is the one on《周杰伦的床边故事》(see recordingLabel).
+    sourceLabel: '杰威尔音乐 · 作品页（《幻城》主题曲）',
     evidence: '杰威尔官方作品页将《不该》列为周杰伦、张惠妹演唱，说明两人对唱主题曲。',
   },
   {
@@ -311,11 +312,14 @@ const credited = (name, roles, sourceId) => roles.map(role => ({
 }));
 const contributions = {
   'real-dark-knight': {
-    recordingLabel: '《因你而在》· 录音室版', creditSummary: '词 阿信 · 曲 林俊杰 · 编曲 五月天',
-    sources: [],
+    recordingLabel: '《因你而在》· 录音室版', creditSummary: '词 阿信 · 曲 / 制作 林俊杰 · 编曲 林俊杰 / 五月天',
+    // QQ Music's lyric header for the album track 001tzPHJ436zJl (re-read 2026-09-29): 词 阿信, 曲 林俊杰,
+    // 编曲 林俊杰/五月天, 制作人 林俊杰. Only the production lines are taken from it; the vocal link stays on the MV.
+    sources: [source('qq-lyrics', 'QQ 音乐 · 歌词接口中的制作署名（《因你 而在》第 3 首）', 'https://c.y.qq.com/lyric/fcgi-bin/fcg_query_lyric_new.fcg?songmid=001tzPHJ436zJl&format=json&nobase64=1&g_tk=5381', '2026-09-29')],
     credits: [
       ...credited('阿信', ['作词'], 'vocal'),
       ...credited('林俊杰', ['作曲'], 'vocal'),
+      ...credited('林俊杰', ['编曲', '制作人'], 'qq-lyrics'),
       ...credited('五月天', ['编曲', '演奏'], 'vocal'),
     ],
   },
@@ -342,7 +346,7 @@ const contributions = {
     ],
   },
   'real-bu-gai': {
-    recordingLabel: '《周杰伦的床边故事》· 录音室版', creditSummary: '词 方文山 · 曲 周杰伦',
+    recordingLabel: '《周杰伦的床边故事》· 录音室版（同一录音亦收于《幻城》原声带）', creditSummary: '词 方文山 · 曲 周杰伦',
     sources: [source('release', 'Shazam · 发行制作署名', 'https://www.shazam.com/zh-tw/song/1721456390/不該-feat-張惠妹')],
     credits: [
       ...credited('周杰伦', ['作曲', '制作人'], 'release'),
@@ -735,7 +739,7 @@ const contributions = {
     ],
   },
   'real-leave-the-earth-live': {
-    recordingLabel: '《Life Live 好友加班篇》第 5 首 · 现场合唱版（非乐团独唱现场版与 2007 录音室版）', creditSummary: '词曲 阿信',
+    recordingLabel: '《Life Live 好友加班篇》第 5 首 · 现场合唱版（未核对与影片是否同一场；非乐团独唱现场版与 2007 录音室版）', creditSummary: '词曲 阿信',
     sources: [
       source('release', 'Apple Music · 现场专辑曲目', 'https://music.apple.com/hk/song/1463565284', expandedAt),
       source('news', '相信音乐 · 现场专辑发布说明（2019.05.21）', 'https://www.bin-music.com.tw/news/1030', expandedAt),
@@ -754,7 +758,7 @@ const contributions = {
     ],
   },
   'real-who-do-you-love-live': {
-    recordingLabel: '2024 官方现场视频 · 未见音频发行（原版为陶喆独唱）', creditSummary: '词 陶喆 / 娃娃 · 曲 陶喆',
+    recordingLabel: '2024 JJ20 重庆站终场现场 · QQ 音乐有同场现场音轨（无专辑；原版为陶喆独唱）', creditSummary: '词 陶喆 / 娃娃 · 曲 陶喆',
     sources: [
       source('press', '凤凰网安徽 · 重庆站报道', 'https://ah.ifeng.com/c/8eGaT2PLST0', expandedAt),
     ],
@@ -792,6 +796,79 @@ const contributions = {
   },
 };
 
+// QQ 音乐同版本直达 (user decision 2026-09-29; the PRD's 不外跳 rule is changed pending the product owner).
+// A link is listed only where QQ Music has a page for this same recording and version, checked from its
+// metadata alone: nothing was played or compared by ear. Evidence and method:
+// references/research/2026-09-29/qq-music-links.{md,json}. `singers` is QQ Music's own vocal credit, which
+// the pages show even where it differs from the two singers on our edge (说好不哭, 等你下课, 私奔到月球).
+const qqCheckedAt = '2026-09-29';
+const qqLinks = {
+  'real-bu-gai': ['000sxzol11raSd', ['周杰伦', '张惠妹']],
+  'real-far-away': ['003FRy0r0wyGHl', ['周杰伦', '费玉清']],
+  'real-wont-cry': ['001qvvgF38HVc4', ['周杰伦']],
+  'real-waiting-for-you': ['00176bPZ2wu39R', ['周杰伦']],
+  'real-sand-painting': ['001tCE0T2vR5p5', ['袁咏琳', '周杰伦']],
+  'real-a-moment': ['004QYBHS1kwnCM', ['张惠妹', '萧敬腾']],
+  'real-hello': ['003BtUeT4PTqns', ['萧敬腾', '林俊杰']],
+  'real-dimples': ['003h3CYS3UxDB4', ['林俊杰', '蔡卓妍']],
+  'real-summer-breeze': ['0018qunY0L4Bkx', ['金莎', '林俊杰']],
+  'real-beautiful': ['0038BQfx4MB0MR', ['林俊杰', 'G.E.M.邓紫棋']],
+  'real-stay-with-you-english': ['002xmBmi1c2eMG', ['林俊杰', '孙燕姿']],
+  'real-coral-sea': ['001K0AjL2huSxx', ['周杰伦', 'Lara梁心颐']],
+  'real-try': ['001faq2u0gVP6j', ['派伟俊', '周杰伦']],
+  'real-equal-terms': ['001wG84E4bOj3V', ['李荣浩', '张惠妹']],
+  'real-how-much-i-love-you': ['003LqdzX0edhb9', ['萧敬腾', '林宥嘉']],
+  'real-sincerely-yours': ['003Iq94Q0SnePV', ['阿肆', '林宥嘉']],
+  'real-dont-force-it': ['00207tA52BLqom', ['G.E.M.邓紫棋', 'Eric周兴哲']],
+  'real-when-you-loved-me': ['0036P9kz3IG3qu', ['单依纯', 'Eric周兴哲']],
+  'real-tenderness-20th': ['000qzndv3RJUjM', ['五月天', '孙燕姿']],
+  'real-elope-to-the-moon': ['000EZEV00EZCHo', ['五月天', '陈绮贞']],
+  'real-drunk-ah-q': ['001LID6n1Szd9Z', ['吴青峰', '孙燕姿']],
+  'real-marry-me-today': ['0008aOkA3v4X0Q', ['陶喆', '蔡依林']],
+  'real-who-am-i': ['003PzotY0CRLex', ['蔡依林', 'Jony J']],
+  'real-no-more-u': ['002XUx9q3uv72w', ['Lara梁心颐', '陈势安']],
+  'real-ordinary-people': ['000X6Og627LKMd', ['五月天', '萧敬腾']],
+  'real-dont-say-never-loved-live': ['002idxL60z9ORp', ['林宥嘉', 'Eric周兴哲']],
+  'real-not-truly-happy-sky-live': ['001tKUw30RmbDH', ['五月天', '蔡依林']],
+  'real-leave-the-earth-live': ['003kIzSf0LkDco', ['五月天', '李荣浩']],
+  'real-who-do-you-love-live': ['003Pfh2Z4UdNF4', ['林俊杰', '陶喆']],
+  'real-double-shadow': ['000P5BUK4HpaLo', ['张惠妹', '林忆莲']],
+  'real-shouldve-let-go': ['003vjg9A0VCFfh', ['王嘉尔', '林俊杰']],
+};
+// The six recordings without a same-version page say why; nothing is linked in their place.
+// 黑暗骑士 (qq-pending) has the same album track on QQ (001tzPHJ436zJl), credited to the band: it waits
+// for the product owner's 五月天 / 阿信 node rule. 屋顶's likely master on a later compilation is not taken.
+const qqUnavailable = {
+  'real-dark-knight': ['qq-pending', 'QQ 音乐的演唱署名是五月天整团，没有单列阿信，暂不放入口'],
+  'real-jay-jj-medley': ['qq-no-same-version', 'QQ 音乐只有《稻香》段落，没有两人的完整联唱'],
+  'real-give-me-a-song-live': ['qq-no-same-version', 'QQ 音乐的《超时代演唱会》现场专辑没有收录这首'],
+  'real-rooftop': ['qq-no-same-version', 'QQ 音乐的《有点野》缺第 11 首，精选里的同曲不是这张专辑的发行'],
+  'real-us-afterwards-live': ['qq-no-same-version', '这段现场只见官方影片，未见音频发行'],
+  'real-if-i-were-young-live': ['qq-no-same-version', 'QQ 音乐的现场音轨无法确认是南宁站这一场'],
+};
+/** Does QQ Music credit exactly our two singers (by name or alias, e.g. G.E.M.邓紫棋)? If not, the page
+ *  shows QQ's own credit beside the link. */
+function qqCreditMatches(artistIds, singers) {
+  if (singers.length !== artistIds.length) return false;
+  return artistIds.every(id => {
+    const [, name, aliases] = artistEntries.find(entry => entry[0] === id);
+    return singers.some(singer => [name, ...aliases].some(alias => singer.toLowerCase().includes(alias.toLowerCase())));
+  });
+}
+function listening(recording) {
+  const linked = qqLinks[recording.id];
+  if (linked) {
+    const [songmid, singers] = linked;
+    return {
+      listenLinks: [{ provider: 'qq', label: 'QQ 音乐', url: `https://y.qq.com/n/ryqq/songDetail/${songmid}`, songmid,
+        credit: singers.join(' / '), singers, creditMatches: qqCreditMatches(recording.artists, singers), checkedAt: qqCheckedAt }],
+      listenStatus: 'qq-same-version',
+    };
+  }
+  const [status, reason] = qqUnavailable[recording.id] || ['qq-unverified', '尚未核对 QQ 音乐'];
+  return { listenLinks: [], listenStatus: status, listenReason: reason, listenCheckedAt: qqCheckedAt };
+}
+
 export const realSongs = Object.fromEntries(recordings.map(recording => {
   const details = contributions[recording.id];
   const at = recording.checkedAt || checkedAt;
@@ -804,10 +881,12 @@ export const realSongs = Object.fromEntries(recordings.map(recording => {
       ...details.credits,
     ],
     creditSources: [source('vocal', recording.sourceLabel, recording.sourceUrl, at), ...details.sources],
-    // QQ Music is preferred. No same-version direct link has been verified yet.
-    listenLinks: [], listenStatus: 'qq-unverified',
+    // Still no audio in the app: a same-version QQ Music page opens outside it (see qqLinks).
+    ...listening(recording),
   }];
 }));
+/** How many recordings open the same recording on QQ Music; the about dialog quotes it. */
+export const qqLinkedCount = Object.values(realSongs).filter(song => song.listenLinks.length).length;
 
 // `entity: 'group'` marks a band node (五月天); every other entry is one singer.
 export const realArtists = artistEntries.map(([id, name, aliases, color, bio, extra]) => {

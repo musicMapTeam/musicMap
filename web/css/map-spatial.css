@@ -214,12 +214,16 @@ html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback) .map-
 @media(min-width:761px) and (max-width:1319px) {
   html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback):has(.map-atlas--roam>.map-undo) .toast { bottom:calc(var(--map-roam-clear,302px) + var(--map-undo-lift,68px)); }
 }
-/* A phone has no room beside the table: the roam's toast drops over the masthead at the very top, never
-   over the title slip, the records on the table or the undo slip above the dock. */
+/* A phone has no room beside the table, and the masthead (the brand) is never covered: the roam's toast
+   rides just above the bottom nav, over the foot of the dock paper, never over the records on the table
+   or the undo slip above the dock. */
 @media(max-width:760px) {
-  html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback):has(.map-atlas--roam) .toast { top:max(8px,env(safe-area-inset-top)); bottom:auto; transform:translate(-50%,-10px); }
+  html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback):has(.map-atlas--roam) .toast { top:auto; bottom:calc(86px + env(safe-area-inset-bottom)); transform:translate(-50%,10px); }
   html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback):has(.map-atlas--roam) .toast.visible { transform:translate(-50%,0); }
 }
+/* A toast that would lie over a name tag on the table is lifted by app.js (placeToast): on a desktop to the
+   top middle, clear of the brand and the slips; on a phone to just under the masthead (--toast-top). */
+html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback) .toast.toast--top.toast--top.toast--top { top:var(--toast-top,max(16px,env(safe-area-inset-top))); bottom:auto; }
 
 /* ---------- 完整图鉴 on the scene ---------- */
 html[data-theme='sakura'] body[data-view='explore']:not(.spatial-fallback) .map-atlas {
