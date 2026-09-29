@@ -120,16 +120,16 @@ These are video-production tools only, not Music Map / Music Space application r
 **Status (MVP 0.16.0)**:
 
 - `delivery/music-map-space-demo.mp4` (0.4) shows Music Space and does not represent the current app. No replacement video has been made yet; when it is, record its tools and sources in a new section.
-- The 0.15 cover has been replaced in the working tree by a 0.16 cover; see the next section. The 0.15 cover's source remains at `delivery/recording-source/cover-v015.html`, and the 0.15 PNG remains in git history (for example `3dd102c`).
+- The 0.15 cover has been replaced by a 0.16 cover, committed in `7fa4147`; see the next section. The 0.15 cover's source remains at `delivery/recording-source/cover-v015.html`, and the 0.15 PNG remains in git history (for example `3dd102c`).
 - The original 0.4 record follows.
 
 The current video captures actual application operations using Playwright's native Screencast API through Tabbit, then cuts the WebM clips and adds original Chinese subtitles with FFmpeg 9.0.1. The cover is a browser rendering of the project's original HTML and its actual exported ticket PNG. These authoring tools are not application dependencies; no tool binaries or runtime code are bundled in the MP4 or PNG. Source clips, timestamps, holds, file hashes, and the AI-generated demonstration-photo disclosure are documented in `delivery/recording-source/README.md` and `source-summary.json`. The previous HyperFrames/GSAP composition remains historical source, not the renderer for the current video.
 
-## 0.16 cover (2026-09-29; not yet committed)
+## 0.16 cover (2026-09-29; committed in `7fa4147`)
 
 - **File**: `delivery/cover.png`, 1920×1080, 1,395,457 B. It awaits the team's visual check.
 - **Source**: `delivery/recording-source/cover-v016.html`, an original HTML composition authored for this project. Its header comment says the PNG is a 1920×1080 browser screenshot of that page served from the repository root; the tool actually used was not recorded.
-- **Images inside**: three actual Music Map images, only scaled, cropped and rotated: `docs/assets/themes/roam-desktop-v016.png`, a crop of `home-desktop-v016.png`, and the exported challenge card `card-challenge-v016.png`. They belong to the 0.16 screenshot batch, which is treated as captured from the uncommitted working tree after `0b1eadc` (see `docs/PROJECT_STATUS.md`). The page is labelled 「页面为实际截图 · MVP 0.16」.
+- **Images inside**: three actual Music Map images, only scaled, cropped and rotated: `docs/assets/themes/roam-desktop-v016.png`, a crop of `home-desktop-v016.png`, and the exported challenge card `card-challenge-v016.png`. They belong to the 0.16 screenshot batch, also committed in `7fa4147`. The batch shows the code committed as `b5939d9`; no code changed between the capture and that commit (see `docs/PROJECT_STATUS.md`). The page is labelled 「页面为实际截图 · MVP 0.16」.
 - **Third-party material**: none. No stock or AI-generated images; text is set in the system font stacks named in the page (-apple-system / PingFang SC / Microsoft YaHei; SF Mono / Menlo), and no font files are distributed.
 
 ## qrcode-generator: puzzle-link QR codes (introduced 2026-09-27; current use since MVP 0.16.0)
@@ -236,11 +236,11 @@ Research record: [qq-music-links.md](references/research/2026-09-29/qq-music-lin
   - Research used QQ Music's web-player gateway (`u.y.qq.com/cgi-bin/musicu.fcg`) for song search, song detail and album track lists.
   - Only metadata was read: titles, artist and album IDs, release dates, track numbers, durations, version codes, language and label.
   - No audio was played, downloaded or compared, and no playback URL was requested.
-- **What the app uses** (wired in the working tree after `0b1eadc`; not yet committed or deployed, and the live build has no QQ link):
+- **What the app uses** (committed in `b5939d9`; live since the `7fa4147` build, `gh-pages` commit `e710bf8`):
   - The song page URL (songmid), a label, and QQ Music's listed vocal credit, which is shown as 「QQ 音乐署名：…」 where it differs from the edge's two singers (说好不哭, 等你下课, 私奔到月球).
   - One QQ Music lyric-header URL is also cited as the source of 黑暗骑士's production credits.
   - No audio, artwork, lyrics or other QQ Music content is stored in or bundled with the app.
-  - The link opens QQ Music outside the app. QQ Music may require login, VIP or its own app, and availability varies by region and account. This has not been tested on a real phone or a mainland-China network.
+  - The link opens QQ Music outside the app. On 2026-09-29 three links (千里之外, 不该, 说好不哭) were clicked on the live site in a desktop browser (Tabbit); each opened `https://y.qq.com/n/ryqq_v2/songDetail/{songmid}` for the listed songmid. Without login, none of the three pages showed the song title after waiting 8–15 seconds; the screenshots of the 千里之外 and 说好不哭 pages show a login dialog (no screenshot was kept for 不该). Nobody logged in and no audio was played. QQ Music may require login, VIP or its own app, and availability varies by region and account. This has not been tested on a real phone or a mainland-China network.
 - **Rights**: Music Map is not affiliated with QQ Music or Tencent Music, and a link is neither an endorsement nor a license.
 - **Pending confirmation**: linking out changes PRD v0.2's no-outbound-link rule. The user decided this on 2026-09-29, and it awaits the product owner's confirmation.
 

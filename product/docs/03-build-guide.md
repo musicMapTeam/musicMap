@@ -14,7 +14,7 @@
 | 数据 | 人工核实的共唱网 29 位歌手 / 37 份录音（`real-vocal-2026-09-v4`）；开放曲库 126 首（HF 固定快照）；0.15 的虚构示例 | 不含音频、歌词、封面或头像 |
 | 存储 | 两个 localStorage 键：`music-map-space:v1`（应用与 Map 状态）和 `music-map-saved-music:v1`（留下的歌） | 只在当前浏览器；无账号、无同步、无服务端 |
 | 分享 | 题目链接 `?from=&to=#/explore`；战绩卡与发现卡片在本机用 canvas 画成 1080×1350 PNG | 只在用户点击后生成、下载或调用系统分享；不上传 |
-| 外链 | 作品与署名来源、开放曲库数据卡、「去 QQ 音乐听」（§6，`0b1eadc` 之后接入，写作时尚未提交） | 新标签页打开，`rel="noopener noreferrer"` |
+| 外链 | 作品与署名来源、开放曲库数据卡、「去 QQ 音乐听」（§6，`b5939d9`） | 新标签页打开，`rel="noopener noreferrer"` |
 | 没有 | 后端、上传、账号、测试框架、模型推理、内置音频 | — |
 
 ## 2. 模块与职责
@@ -39,7 +39,7 @@
 | `web/js/sakura-printwork.js` / `sakura-batch.js` | 道具上的原创印刷纹样；静态网格合批 |
 | `web/js/motion.js` / `icons.js` | GSAP 页面与弹窗动效（尊重减少动态）；内嵌 Phosphor 图标 |
 | `web/js/vendor/sakura/` | MIT 渲染模块，`SOURCE.json` 固定上游提交；0.16 未修改 |
-| `web/css/*.css` | `base` / `themes` / `theme-sakura` / `courtyard-ui` 为纸面 token 与基础；`night-shell` 在外壳样式中最后加载（其后只有组件样式 `share-card`、`listen`），负责夜场外壳；`home-map` 为首页搜索与寻声签；`map` / `map-studio` / `map-spatial` / `map-round` / `map-credits` 为唱片店；`share-card` 为 PNG 预览；`listen` 为「去 QQ 音乐听」与缺链说明（0.16，工作区新增，未提交）；`product-finish` 为「我的发现」；其余为场景与布局 |
+| `web/css/*.css` | `base` / `themes` / `theme-sakura` / `courtyard-ui` 为纸面 token 与基础；`night-shell` 在外壳样式中最后加载（其后只有组件样式 `share-card`、`listen`），负责夜场外壳；`home-map` 为首页搜索与寻声签；`map` / `map-studio` / `map-spatial` / `map-round` / `map-credits` 为唱片店；`share-card` 为 PNG 预览；`listen` 为「去 QQ 音乐听」与缺链说明（0.16，`b5939d9` 新增）；`product-finish` 为「我的发现」；其余为场景与布局 |
 
 ## 3. 路由与场景机位
 
@@ -164,7 +164,7 @@ session = { id, dataset, version, type: 'roam'|'challenge', start, target, retur
   unavailable: { '<录音 ID>': { status: 'unconfirmed'|'no-same-version', reason } } }        // 6 条
 ```
 
-**状态。** 提交 `0b1eadc` 与已部署构建里，所有真实录音仍是 `listenLinks: []`、`listenStatus: 'qq-unverified'`，页面没有入口。下面的数据形状与渲染方式是 `0b1eadc` 之后工作区里的接入改动，写作时（2026-09-29）尚未提交或部署；提交、构建、部署与逐条打开的结果以项目状态为准。
+**状态。** 下面的数据形状与渲染方式在提交 `b5939d9`，随 `7fa4147` 的构建上线（`gh-pages` `e710bf8`）。更早的 `0b1eadc` 及其部署 `4901e31` 里，真实录音都是 `listenLinks: []`、`listenStatus: 'qq-unverified'`，没有入口。线上逐条打开的结果以项目状态为准。
 
 **数据写在哪里。** `map-catalogue.js` 把核对结果抄成两张表：
 
@@ -205,7 +205,7 @@ session = { id, dataset, version, type: 'roam'|'challenge', start, target, retur
 - 不链接搜索页，不从 `qqTitle` 反推别的版本。
 - 更新核对结果时，研究文件和 `qqLinks` / `qqUnavailable` 要一起改。
 
-**链接检查。** `y.qq.com` 桌面页是浏览器渲染的空壳，无头浏览器未登录时只见登录弹窗。检查时用手机 UA，跳转到 `i2.y.qq.com/n3/other/pages/playsong/index.html?songmid=…` 后看 `<title>`，或调用歌曲详情接口。不请求播放地址。
+**链接检查。** `y.qq.com` 桌面页是浏览器渲染的空壳，无头浏览器未登录时只见登录弹窗。检查时用手机 UA，跳转到 `i2.y.qq.com/n3/other/pages/playsong/index.html?songmid=…` 后看 `<title>`，或调用歌曲详情接口。不请求播放地址。2026-09-29 在线上版本用 Tabbit 点开 3 条，新窗口从 `ryqq` 转到 `ryqq_v2/songDetail/{songmid}`，未登录时三页都没有歌名，其中两页截图里有登录框（见项目状态）。
 
 **应用内试听。** 若以后加入，按 PRD v0.2 §4.4 执行：
 
@@ -253,14 +253,15 @@ CI（`.github/workflows/build.yml`）在推送到 main、PR 与手动触发时�
 
 ### GitHub Pages 发布
 
-线上地址是 <https://musicmapteam.github.io/musicMap/>。源码分支不推送，只把构建文件写进独立的 `gh-pages` 分支。分支里每次只有 `index.html` 与 `.nojekyll`；首个部署提交 `1e8323f` 没有父提交，第二个 `4901e31` 以它为父，提交说明写明来源提交。
+线上地址是 <https://musicmapteam.github.io/musicMap/>。源码分支不推送，只把构建文件写进独立的 `gh-pages` 分支。分支里每次只有 `index.html` 与 `.nojekyll`；首个部署提交 `1e8323f`（来自 `d6b3de3`）没有父提交，之后每次以上一个部署为父：`4901e31`（来自 `0b1eadc`），当前 `e710bf8`（来自 `7fa4147`）。提交说明写明来源提交。
 
-当时的命令没有留档。下面的步骤与已记录的提交结构一致，重新部署时照此执行，并把结果登记到项目状态：
+发布做法：用 `git archive` 取出某个提交的干净源码 → `npm ci` → `vite build` → 经 GitHub API 写入 blob、tree 与 commit（父提交为当前 `gh-pages` 提交）→ PATCH 分支引用 → 核对线上字节。本机工作区的改动不会进入构建。结果登记到项目状态：
 
 ```sh
-SRC=0b1eadc; REPO=musicMapTeam/musicMap; OUT=/tmp/mm-deploy
+SRC=7fa4147; REPO=musicMapTeam/musicMap; OUT=/tmp/mm-deploy   # SRC 换成要发布的提交
 rm -rf "$OUT" && mkdir -p "$OUT" && git archive "$SRC" | tar -x -C "$OUT"
-(cd "$OUT" && npm ci --no-audit --no-fund && npm run build)
+(cd "$OUT" && npm ci --no-audit --no-fund && npx vite build)
+wc -c "$OUT/dist/index.html"; shasum -a 256 "$OUT/dist/index.html"
 
 HTML=$(jq -n --rawfile c <(base64 < "$OUT/dist/index.html") '{encoding:"base64",content:$c}' \
   | gh api "repos/$REPO/git/blobs" --input - --jq .sha)
@@ -272,7 +273,10 @@ PARENT=$(gh api "repos/$REPO/git/ref/heads/gh-pages" --jq .object.sha)
 COMMIT=$(jq -n --arg t "$TREE" --arg p "$PARENT" --arg m "Deploy Music Map static build from feat/map-mainline@$SRC" \
   '{message:$m,tree:$t,parents:[$p]}' | gh api "repos/$REPO/git/commits" --input - --jq .sha)
 gh api -X PATCH "repos/$REPO/git/refs/heads/gh-pages" -f sha="$COMMIT"
-gh api "repos/$REPO/pages/builds/latest" --jq '{status,commit}'
+gh api "repos/$REPO/pages/builds/latest" --jq '{status,commit}'   # 等到 status 为 built、commit 为 $COMMIT
+
+curl -sS -o /tmp/mm-live.html -w '%{http_code} %{size_download}\n' https://musicmapteam.github.io/musicMap/
+shasum -a 256 /tmp/mm-live.html "$OUT/dist/index.html"   # 字节数与 SHA-256 都一致才算上线
 ```
 
 首次发布时的差异：
@@ -283,7 +287,7 @@ gh api "repos/$REPO/pages/builds/latest" --jq '{status,commit}'
 
 每次发布都是公开发布，受 FAQ Q10 约束，见交付方案 §2。发布后要检查：
 
-- 线上文件大小与本地 `dist/index.html` 一致；
+- 线上文件的字节数与 SHA-256 与本次干净构建一致；
 - 手机能从链接直接进入；
 - 刷新后记录仍在；
 - 题目链接能在另一浏览器打开。

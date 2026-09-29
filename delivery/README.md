@@ -1,18 +1,18 @@
 # MVP 0.16.0 交付清单
 
-2026-09-29 · 文档 3.0。0.16 起参赛作品只有 **Music Map**（用户 2026-09-28 的决定，细节待与产品负责人对齐）；Music Space 退出参赛入口，保留在 main `3dd102c`（MVP 0.15.0）。在线 Demo 已公开部署；比赛视频尚未录制；封面已按 0.16 重做（未提交，待团队终检）。未代填报名，也未提交赛事。构建、部署与检查证据以[项目状态](../docs/PROJECT_STATUS.md)为准。
+2026-09-29 · 文档 3.0。0.16 起参赛作品只有 **Music Map**（用户 2026-09-28 的决定，细节待与产品负责人对齐）；Music Space 退出参赛入口，保留在 main `3dd102c`（MVP 0.15.0）。在线 Demo 已公开部署；比赛视频尚未录制；封面已按 0.16 重做并提交（`7fa4147`），待团队终检。未代填报名，也未提交赛事。构建、部署与检查证据以[项目状态](../docs/PROJECT_STATUS.md)为准。
 
 | 文件 / 地址 | 用途 | 规格 / 状态 |
 | --- | --- | --- |
-| [在线 Demo](https://musicmapteam.github.io/musicMap/) | 评审链接（公开） | GitHub Pages，`gh-pages` 分支只放构建产物（`index.html` 与 `.nojekyll`）。当前为 `0b1eadc` 的构建，1,410,882 B；2026-09-29 本机请求返回 200，内容与本地构建一致。实体手机与中国大陆网络未检查。公开访问按 FAQ Q10 可能被认定为已上线，风险由用户接受 |
-| `../dist/index.html` | 0.16.0 单文件应用，不提交 Git | `npm run build` 生成；`0b1eadc` 构建为 1,410,882 B / gzip 388.93 kB。Three、GSAP、OverlayScrollbars、qrcode-generator 与数据都已内联，附许可声明；file:// 与任意静态托管都能打开。无后端、无账号、无音频，记录只存在浏览器本地 |
-| [cover.png](cover.png) | 16:9 参赛封面 | **0.16 封面，待团队终检。** 1920×1080、1,395,457 B，源文件 [recording-source/cover-v016.html](recording-source/cover-v016.html)：合成 `roam-desktop-v016`、`home-desktop-v016` 两张截图与实际导出的 `card-challenge-v016`，页内注明「页面为实际截图 · MVP 0.16」。这些截图取自 `0b1eadc` 之后未提交的工作区（见[项目状态](../docs/PROJECT_STATUS.md)）。封面与源文件都尚未提交。0.15 Space 封面「同一刻，另一面」（1,284,063 B）的源文件仍在 [recording-source/cover-v015.html](recording-source/cover-v015.html)，成品在 Git 历史（如 `3dd102c`） |
+| [在线 Demo](https://musicmapteam.github.io/musicMap/) | 评审链接（公开） | GitHub Pages，`gh-pages` 分支只放构建产物（`index.html` 与 `.nojekyll`）。当前为 `7fa4147` 的构建（`e710bf8`），1,423,065 B；2026-09-29 09:12 本机请求返回 200，与该提交的干净构建逐字节一致。此前两次部署：`1e8323f`（来自 `d6b3de3`）、`4901e31`（来自 `0b1eadc`，1,410,882 B）。实体手机与中国大陆网络未检查。公开访问按 FAQ Q10 可能被认定为已上线，风险由用户接受 |
+| `../dist/index.html` | 0.16.0 单文件应用，不提交 Git | `npm run build` 生成；`7fa4147` 的干净构建为 1,423,065 B / gzip 392.03 kB（`0b1eadc` 为 1,410,882 B）。Three、GSAP、OverlayScrollbars、qrcode-generator 与数据都已内联，附许可声明；file:// 与任意静态托管都能打开。无后端、无账号、无音频，记录只存在浏览器本地 |
+| [cover.png](cover.png) | 16:9 参赛封面 | **0.16 封面，待团队终检。** 1920×1080、1,395,457 B，源文件 [recording-source/cover-v016.html](recording-source/cover-v016.html)：合成 `roam-desktop-v016`、`home-desktop-v016` 两张截图与实际导出的 `card-challenge-v016`，页内注明「页面为实际截图 · MVP 0.16」。这些截图的画面对应 `b5939d9` 的代码（见[项目状态](../docs/PROJECT_STATUS.md)）。封面、源文件与截图都在 `7fa4147` 提交。0.15 Space 封面「同一刻，另一面」（1,284,063 B）的源文件仍在 [recording-source/cover-v015.html](recording-source/cover-v015.html)，成品在 Git 历史（如 `3dd102c`） |
 | 比赛视频 | ≤3 分钟实际操作录屏 | **待录制。** 分镜见[报名材料](../docs/competition/README.md)第 2 节；完成后登记文件名、时长、分辨率、帧率、编码、大小、SHA256 与所用构建提交 |
 | [music-map-space-demo.mp4](music-map-space-demo.mp4) | 历史：0.4 Space 实际操作演示视频 | 106秒、1920×1080、30fps、H.264、7,199,962字节（约6.87MiB）；中文字幕、无音轨。内容以 Space 为主，不能作为 Music Map 的比赛视频 |
-| [视觉规范与画面](../docs/VISUAL_THEMES.md) | 夜场唱片店与历史预览 | 0.16 截图已拍（14 张，未提交），见视觉规范；来源登记见[项目状态](../docs/PROJECT_STATUS.md)。0.15 及更早截图保留原版本 |
+| [视觉规范与画面](../docs/VISUAL_THEMES.md) | 夜场唱片店与历史预览 | 0.16 截图 14 张已提交（`7fa4147`），见视觉规范；来源登记见[项目状态](../docs/PROJECT_STATUS.md)。0.15 及更早截图保留原版本 |
 | [recording-source/](recording-source/) | 历史 0.4 录屏与 0.15 封面的编辑源，以及 0.16 封面源 `cover-v016.html` | 原片摘要、精确剪点、FFmpeg 字幕合成脚本、HTML 封面、实际导出票根。`render.mjs` 与 `edit-plan.json` 可作新录屏的字幕合成参考，字幕样式使用 Microsoft YaHei 字体 |
 | [video-source/](video-source/) | 历史：0.2 / 0.3 展示源 | 旧截图编排源；旧视频和封面可由Git历史取得，不作为本轮录屏 |
-| [报名材料](../docs/competition/README.md) | 介绍、视频脚本、评委问答与提交核对 | 待团队补齐身份信息、视频、封面和提交回执 |
+| [报名材料](../docs/competition/README.md) | 介绍、视频脚本、评委问答与提交核对 | 待团队补齐身份信息、视频、封面终检和提交回执 |
 
 ## 打开与重新构建
 
