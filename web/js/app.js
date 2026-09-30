@@ -27,9 +27,10 @@ import { mountHome } from './home.js';
 import { mountMotion } from './motion.js';
 import { mountOpenCatalogue, mountSavedMusic } from './open-catalogue.js';
 import { qqLinkedCount } from './map-catalogue.js';
+import { createExplorationStorage, EXPLORATION_KEY } from './exploration-storage.js';
 
 // The key and version stay from 0.15 so a returning visitor keeps every exploration.
-const STORAGE_KEY = 'music-map-space:v1';
+const STORAGE_KEY = EXPLORATION_KEY;
 const views = ['home', 'explore', 'records'];
 // Routes retired in 0.16: old links, saved views and an older scene build all land on the courtyard.
 const LEGACY = new Map([['space', 'home'], ['live', 'home']]);
@@ -37,7 +38,21 @@ const root = document.querySelector('#app');
 const toastElement = document.querySelector('#toast');
 let toastTimer;
 let cleanup;
-let saveFailed = false;
+let storageReady = false;
+let conflictRenderQueued = false;
+const explorationStorage = createExplorationStorage({
+  storage: { getItem: key => localStorage.getItem(key), setItem: (key, value) => localStorage.setItem(key, value) },
+  locks: navigator.locks,
+  onChange() {
+    if (!storageReady) return;
+    updateChrome();
+    // Never re-enter render from a migration or cleanup's synchronous update.
+    if (explorationStorage.conflict && !conflictRenderQueued) {
+      conflictRenderQueued = true;
+      queueMicrotask(() => { conflictRenderQueued = false; render(); });
+    }
+  },
+});
 let recordsFilter = 'map';
 let themeController;
 let motion;
@@ -50,7 +65,7 @@ function initialState() {
 
 function load() {
   try {
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    const saved = JSON.parse(explorationStorage.initialRaw);
     if (saved?.version === 1 && saved.map) {
       // 0.15 saves also carry the Space demo (cards with photos) and its actor; neither is read any more.
       const { space, actor, ...kept } = saved;
@@ -148,18 +163,20 @@ function toast(message) {
 }
 
 function persist() {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    saveFailed = false;
-  } catch {
-    saveFailed = true;
-  }
+  const saved = explorationStorage.save(state);
   updateChrome();
+  return saved;
+}
+
+function canUpdate() {
+  return explorationStorage.check();
 }
 
 function update(mutator) {
+  if (!canUpdate()) return false;
   mutator(state);
-  persist();
+  void persist();
+  return true;
 }
 
 function navigate(name, payload = null) {
@@ -171,13 +188,14 @@ function navigate(name, payload = null) {
   const nextUrl = new URL(location.href);
   nextUrl.hash = `/${view}`;
   if (location.href !== nextUrl.href) history.pushState(null, '', nextUrl);
-  persist();
+  // Navigation must never write an old exploration snapshot over another tab.
+  explorationStorage.check();
   render();
   window.scrollTo({ top: 0, behavior: 'instant' });
   document.querySelector('#main-content').focus({ preventScroll: true });
 }
 
-const api = { getState: () => state, update, render, navigate, toast, icon,
+const api = { getState: () => state, update, canUpdate, render, navigate, toast, icon,
   spatial: {
     publish(content) {
       spatialContext = content;
@@ -191,7 +209,7 @@ const api = { getState: () => state, update, render, navigate, toast, icon,
 
 /** The courtyard only navigates and forwards record-table actions to the shop. */
 function onSpatialAction(action) {
-  if (action.type === 'music') spatialContext.onMusic?.(action);
+  if (action.type === 'music' && canUpdate()) spatialContext.onMusic?.(action);
   if (action.type === 'navigate') navigate(action.view);
   // 'editor' and 'photo' came from Space's desk and photo wall; an older scene build may still send them.
 }
@@ -204,7 +222,15 @@ function updateChrome() {
     else el.removeAttribute('aria-current');
   });
   const storageNote = document.querySelector('#storage-warning');
-  if (storageNote) storageNote.hidden = !saveFailed;
+  if (storageNote) {
+    storageNote.hidden = !(explorationStorage.failed || explorationStorage.conflict);
+    const message = document.querySelector('#storage-message');
+    message.textContent = explorationStorage.conflict
+      ? '另一标签页已更新或清除了探索记录，本页已停止写入，避免覆盖。当前页内容仍保留；请重载最新记录后继续。'
+      : '这次修改尚未保存。请检查浏览器存储空间，并使用支持 Web Locks 的现代浏览器（HTTPS 或本地文件）。当前页内容仍保留，可先下载备份。';
+    document.querySelector('#retry-save').hidden = explorationStorage.conflict;
+    document.querySelector('#reload-records').hidden = !explorationStorage.conflict;
+  }
   const sectionNames = { home: '从喜欢，走向未知', explore: '唱片店', records: '我的发现' };
   // The brand comes first in the tab, as it does on the wordmark.
   document.title = `Music Map · ${sectionNames[state.view]}`;
@@ -233,7 +259,7 @@ function shell() {
     </header>
     <div id="sakura-world" class="spatial-world" hidden></div>
     <div class="app-body">
-      <div id="storage-warning" class="storage-warning" role="alert" hidden>这次修改尚未保存到浏览器，当前页面内容仍保留。请检查浏览器存储空间后重试。<button id="retry-save">重试保存</button></div>
+      <div id="storage-warning" class="storage-warning" role="alert" hidden><span id="storage-message"></span><button id="retry-save">重试保存</button><button id="reload-records" hidden>重载最新记录</button><button id="backup-records">下载本页探索备份</button></div>
       <main id="main-content" class="main-content" tabindex="-1"></main>
     </div>
     <nav class="mobile-nav" aria-label="手机导航">${navItems()}</nav>
@@ -261,9 +287,24 @@ function shell() {
   document.querySelector('#close-about').addEventListener('click', () => dialog.close());
   document.querySelector('#start-experience').addEventListener('click', () => dialog.close());
   dialog.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
-  document.querySelector('#retry-save').addEventListener('click', () => {
-    persist();
-    toast(saveFailed ? '仍未保存，请检查浏览器存储空间后重试' : '已保存到当前浏览器');
+  document.querySelector('#retry-save').addEventListener('click', async () => {
+    const saved = await persist();
+    toast(saved ? '已保存到当前浏览器' : '仍未保存，当前页内容保留，请查看存储提示');
+  });
+  document.querySelector('#reload-records').addEventListener('click', () => {
+    if (explorationStorage.dirty && !window.confirm('本页还有未保存的探索。请先下载本页备份；重载会放弃本页未保存的修改。确定重载最新记录吗？')) return;
+    location.reload();
+  });
+  document.querySelector('#backup-records').addEventListener('click', () => {
+    const file = new Blob([JSON.stringify({ version: 1, map: state.map }, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(file);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'music-map-exploration-backup.json';
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   });
 }
 
@@ -289,6 +330,12 @@ function render() {
   document.body.dataset.view = state.view;
   document.body.dataset.spatialSection = state.view;
   themeController?.setView(state.view);
+  if (explorationStorage.conflict) {
+    themeController?.setMusic(null);
+    container.innerHTML = '<section class="empty-state"><h1>探索记录已在另一页更新</h1><p>本页暂时停止编辑。请用上方「重载最新记录」继续；未保存的内容可先下载备份，取消重载会留在本页。</p></section>';
+    updateChrome();
+    return;
+  }
   if (state.view === 'home') cleanup = mountHome(container, api);
   if (state.view === 'explore') cleanup = mountMap(container, api);
   if (state.view === 'records') cleanup = mountRecords(container);
@@ -302,11 +349,23 @@ window.addEventListener('popstate', () => {
   state.view = routeView(location.hash.slice(2));
   state.routePayload = null;
   tidyUrl();
-  persist();
+  explorationStorage.check();
   render();
 });
 
+window.addEventListener('storage', event => {
+  if ((event.key === STORAGE_KEY || event.key === null) && (!event.storageArea || event.storageArea === localStorage)) explorationStorage.check();
+});
+window.addEventListener('focus', () => explorationStorage.check());
+window.addEventListener('pageshow', () => explorationStorage.check());
+window.addEventListener('beforeunload', event => {
+  if (!explorationStorage.dirty) return;
+  event.preventDefault();
+  event.returnValue = '';
+});
+
 shell();
+storageReady = true;
 // Write the trimmed save once, so the dropped Space data frees its storage now.
 if (droppedLegacy) persist();
 themeController = mountThemes({ onAction: onSpatialAction, view: state.view,

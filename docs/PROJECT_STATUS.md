@@ -19,6 +19,8 @@
 
 ## Doing
 
+- **探索记录跨标签页保护（2026-09-30）**：dot；范围 `web/js/app.js`、`exploration-storage.js`、`map.js`、`web/css/app-studio.css`、`tests/`、相关 README/CI。已实现导航不回写、版本核对、Web Locks 串行写入、旧页停止编辑与本机备份/重载确认；22 项 Node 回归通过，Vite 生产构建通过（56 模块，1,426,010 B）。真实双标签 UI 验证未完成：隔离 Chromium 无法启动，云端浏览器阻止 localhost。本地验证完成，远端 PR/CI/合并/部署待完成；用户已授权本轮这些操作。
+
 | 任务 | 负责人 | 文件范围 | 状态 |
 | --- | --- | --- | --- |
 | 0.16 Map 主线收口（本轮） | 开发侧（Alakazamc）与 Claude 多代理，文件范围互斥 | 代码提交见下方 Done · 0.16.0；文档：`README.md`、`AGENTS.md`、`CONTRIBUTING.md`、`RUN-ME.md`、`CHANGELOG.md`、`THIRD_PARTY_NOTICES.md`、产品三文档、本文件、[视觉规范](VISUAL_THEMES.md)、[比赛材料](competition/README.md)、[交付清单](../delivery/README.md) | 代码 `7bcbe3f`…`b5939d9` 已提交；文档重写 `9b0830b`，0.16 截图与封面 `7fa4147`；`7fa4147` 的构建已部署并在线核对（见 Done · 0.16.0）；上线后的文档状态修订已提交（紧随 `7fa4147` 的 `docs:` 提交）。剩余事项见 Todo。按用户 2026-09-29「推送并且合并」的授权，`feat/map-mainline` 推送并开 [PR #6](https://github.com/musicMapTeam/musicMap/pull/6)，在 Build demo 检查通过后合并到 `main`（实际结果以 PR 记录为准）；线上 Demo 仍由 `gh-pages` 提供 |
