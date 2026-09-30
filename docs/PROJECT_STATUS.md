@@ -19,11 +19,18 @@
 
 ## Doing
 
-- **探索记录跨标签页保护（2026-09-30）**：dot；范围 `web/js/app.js`、`exploration-storage.js`、`map.js`、`web/css/app-studio.css`、`tests/`、相关 README/CI。已实现导航不回写、版本核对、Web Locks 串行写入、旧页停止编辑与本机备份/重载确认；22 项 Node 回归通过，Vite 生产构建通过（56 模块，1,426,010 B）。真实双标签 UI 验证未完成：隔离 Chromium 无法启动，云端浏览器阻止 localhost。本地验证完成，远端 PR/CI/合并/部署待完成；用户已授权本轮这些操作。
-
 | 任务 | 负责人 | 文件范围 | 状态 |
 | --- | --- | --- | --- |
 | 0.16 Map 主线收口（本轮） | 开发侧（Alakazamc）与 Claude 多代理，文件范围互斥 | 代码提交见下方 Done · 0.16.0；文档：`README.md`、`AGENTS.md`、`CONTRIBUTING.md`、`RUN-ME.md`、`CHANGELOG.md`、`THIRD_PARTY_NOTICES.md`、产品三文档、本文件、[视觉规范](VISUAL_THEMES.md)、[比赛材料](competition/README.md)、[交付清单](../delivery/README.md) | 代码 `7bcbe3f`…`b5939d9` 已提交；文档重写 `9b0830b`，0.16 截图与封面 `7fa4147`；`7fa4147` 的构建已部署并在线核对（见 Done · 0.16.0）；上线后的文档状态修订已提交（紧随 `7fa4147` 的 `docs:` 提交）。剩余事项见 Todo。按用户 2026-09-29「推送并且合并」的授权，`feat/map-mainline` 推送并开 [PR #6](https://github.com/musicMapTeam/musicMap/pull/6)，在 Build demo 检查通过后合并到 `main`（实际结果以 PR 记录为准）；线上 Demo 仍由 `gh-pages` 提供 |
+
+## Done · 2026-09-30 探索记录保护
+
+- **实现**：[PR #7](https://github.com/musicMapTeam/musicMap/pull/7)，源码合并提交 `99913a9c09373f5ee7085eded5699df5869015cb`。导航/前进后退不回写整份存档；版本核对加 Web Locks 串行写入，旧页停止编辑；失败或冲突的本页内容保留，可下载 JSON 备份，重载可取消。原 v1 数据继续兼容，独立歌曲收藏未改。
+- **自动验证**：22 项 Node 回归通过，覆盖相同/不同会话、同时写入、新增/删除、失败重试、取消重载、备份内容、旧存档与 app 实际路由/事件脚本。源码提交的 [Build demo](https://github.com/musicMapTeam/musicMap/actions/runs/36673105080) 成功；干净源码在本地与 [Actions 准备任务](https://github.com/musicMapTeam/musicMap/actions/runs/36675780664) 再次测试和构建成功。
+- **发布**：2026-09-30 UTC，`gh-pages` `f6dc9fe1e49e8d9d84e7e265470575ad0206b32e`，父提交 `e710bf8`；来源为 `main@99913a9`。[Pages 部署](https://github.com/musicMapTeam/musicMap/actions/runs/36675932792) 成功。线上 `https://musicmapteam.github.io/musicMap/` 返回 200，1,426,010 B，SHA-256 `2598c6c478746db645e4cbf91aefe7e2e0fd9708ca756525f9afc09dfb15b3cc`，与干净构建逐字节相同。
+- **发布路径**：大 HTML 经过连接器传输未完成，分支当时保持原样；临时 [PR #8](https://github.com/musicMapTeam/musicMap/pull/8) 在 GitHub 内按原有 clean-source→blob/tree/commit 方式准备对象，固定源码、旧父提交和两个哈希。核对小型 manifest 后才由 API 非强制更新 `gh-pages`。一次性准备工作流随这条记录移除；没有新增长期凭据、服务或仓库权限设置。
+- **线上实操**：dot 云端浏览器，两个标签页初始均为 0 条记录。A 从周杰伦沿《不该》走到张惠妹并结束探索；旧 B 切到「我的发现」显示停止写入提示，前进/后退后重载，新的一条记录仍在（途经 2 位、1 段路线）。删除确认选择「保留」后仍为 1 条。没有改动已有用户记录或发布外部内容。
+- **范围与未验证**：同一云端浏览器的两个真实标签页，使用无 WebGL 的二维降级界面；没有实体手机、不同浏览器或真实同时点击的端到端验证。同时竞争、删除不复活及故障分支由回归测试覆盖。JSON 备份目前没有一键导入入口；不支持安全存储锁时会明确显示未保存，不做竞态写入。旧版已打开页面需重载才能获得保护。
 
 ## Done · 0.16.0
 
