@@ -33,4 +33,4 @@ MVP 0.16.0 · 文档 3.0 · 2026-09-29
 
 ## 许可与源码
 
-第三方许可见 `THIRD_PARTY_NOTICES.md`，单文件内也保留了许可声明。源码与资料在 <https://github.com/musicMapTeam/musicMap>。0.16 主线已通过 [PR #6](https://github.com/musicMapTeam/musicMap/pull/6) 合并到 `main`（`61d0689`）；旧 Space 代码可在历史提交 `3dd102c` 找到。本次跨标签页保护仍待发布，线上版本以项目状态中的部署记录为准。
+第三方许可见 `THIRD_PARTY_NOTICES.md`，单文件内也保留了许可声明。源码与资料在 <https://github.com/musicMapTeam/musicMap>。0.16 主线已通过 [PR #6](https://github.com/musicMapTeam/musicMap/pull/6) 合并到 `main`（`61d0689`）；旧 Space 代码可在历史提交 `3dd102c` 找到。本次跨标签页保护已通过 [PR #7](https://github.com/musicMapTeam/musicMap/pull/7) 合并；源码 `99913a9` 的干净构建发布到 `gh-pages` `f6dc9fe`，具体线上核对见项目状态。

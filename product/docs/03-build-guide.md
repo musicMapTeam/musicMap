@@ -253,6 +253,8 @@ CI（`.github/workflows/build.yml`）在推送到 main、PR 与手动触发时�
 
 ### GitHub Pages 发布
 
+2026-09-30 存档保护修复：源码 `99913a9`（PR #7）→ `gh-pages` `f6dc9fe`。本地大文件上传未完成时，临时 [PR #8](https://github.com/musicMapTeam/musicMap/pull/8) 让 Actions 对同一源码执行以下既有流程并返回小型 manifest；核对源码、旧部署父提交、大小、SHA-256 与 blob 后再由 API 非强制更新分支。临时工作流随发布记录移除，没有新凭据或发布服务。下文保留 0.16 首次发布的历史示例。
+
 线上地址是 <https://musicmapteam.github.io/musicMap/>。源码分支不推送，只把构建文件写进独立的 `gh-pages` 分支。分支里每次只有 `index.html` 与 `.nojekyll`；首个部署提交 `1e8323f`（来自 `d6b3de3`）没有父提交，之后每次以上一个部署为父：`4901e31`（来自 `0b1eadc`），当前 `e710bf8`（来自 `7fa4147`）。提交说明写明来源提交。
 
 发布做法：用 `git archive` 取出某个提交的干净源码 → `npm ci` → `vite build` → 经 GitHub API 写入 blob、tree 与 commit（父提交为当前 `gh-pages` 提交）→ PATCH 分支引用 → 核对线上字节。本机工作区的改动不会进入构建。结果登记到项目状态：
