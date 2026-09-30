@@ -249,7 +249,7 @@ npm run preview        # 本地预览构建结果；npm start 相同
 
 `dist/` 不提交。
 
-CI（`.github/workflows/build.yml`）在推送到 main、PR 与手动触发时运行 `npm ci` 和 `npm run build`，上传名为 `music-map-demo` 的产物，包含 `dist/index.html`、`README.md`、`RUN-ME.md` 与 `THIRD_PARTY_NOTICES.md`，保留 14 天。CI 不负责部署。
+CI（`.github/workflows/build.yml`）在推送到 main、PR 与手动触发时运行 `npm ci`、`npm test` 和 `npm run build`，上传名为 `music-map-demo` 的产物，包含 `dist/index.html`、`README.md`、`RUN-ME.md` 与 `THIRD_PARTY_NOTICES.md`，保留 14 天。CI 不负责部署。
 
 ### GitHub Pages 发布
 

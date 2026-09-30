@@ -27,7 +27,8 @@ html[data-theme] .masthead-tools .demo-help { width:38px; height:38px; min-width
 html[data-theme] .app-body { margin-left:112px; padding:0; min-height:100dvh; }
 html[data-theme] .main-content { max-width:1660px; min-height:100dvh; padding:94px 32px 32px 16px; margin:0 auto; }
 html[data-theme] .main-content:focus { outline:none; }
-html[data-theme] .storage-warning { position:relative; margin:80px 32px -70px 16px; z-index:30; }
+html[data-theme] .storage-warning { position:relative; margin:80px 32px 12px 16px; z-index:30; }
+html[data-theme] .storage-warning>span { display:block; overflow-wrap:anywhere; }
 /* The doubled class keeps the weight (0,3,1) the old shared-button list gave this rule, so every button rule tuned against it resolves as before. */
 html[data-theme] .button.button { border-radius:13px; min-height:44px; padding:10px 17px; font-size:13px; font-weight:550; border-color:var(--line); transition:transform .18s,background .18s,box-shadow .18s; }
 html[data-theme] .button--primary { background:var(--button-fill); color:var(--button-ink); border-color:var(--button-fill); }
@@ -102,7 +103,7 @@ html[data-theme] .map-record__actions .icon-button { width:30px; height:30px; mi
   html[data-theme] .mobile-nav .nav-item>.icon { width:19px; height:19px; }
   html[data-theme] .mobile-nav .nav-item.active::before,html[data-theme] .mobile-nav .nav-item::after { display:none; }
   html[data-theme] .toast { bottom:100px; font-size:12px; }
-  html[data-theme] .storage-warning { margin:65px 16px -60px; font-size:12px; }
+  html[data-theme] .storage-warning { margin:65px 16px 12px; font-size:12px; }
   html[data-theme] .records-page { padding-top:4px; }
   html[data-theme] .records-heading { margin-bottom:23px; gap:12px; }
   html[data-theme] .records-heading h1 { font-size:23px; }

@@ -1021,7 +1021,7 @@ function attachInteractions(container, api, recordsOnly) {
       }),
       windowX: window.scrollX, windowY: window.scrollY,
     };
-    api.update(state => fn(state.map));
+    if (api.update(state => fn(state.map)) === false) return;
     if (redraw) {
       api.render();
       const currentContainer = container.isConnected ? container : document.getElementById(container.id);
@@ -1204,6 +1204,7 @@ function attachInteractions(container, api, recordsOnly) {
   }
   let lastOpener = null;
   function runAction(control) {
+    if (api.canUpdate && !api.canUpdate()) return;
     if (!control || !container.contains(control) || control.disabled || Date.now() < suppressClickUntil) return;
     const menu = control.closest('.map-shop-menu');
     if (menu) menu.open = false;
